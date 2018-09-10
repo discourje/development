@@ -1,4 +1,4 @@
-(ns ProjectSetup.Tests.ProjectSetupTests
+(ns projectSetup.ProjectSetupTests
   (:require [clojure.test :refer :all])
   (:require [ProjectSetup.ProjectSetup :refer :all]))
 

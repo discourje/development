@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f3082b47-1484-4ee7-881b-b3835433d5aa" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/ThreeBuyerProtocol/Tests/TBPTests.clj" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/ThreeBuyerProtocol/ThreeBuyerProtocol.clj" />
+    <list default="true" id="6fdd3211-89b6-43e6-86ae-60249c672f12" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Clojure_1_8_0.xml" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj" afterPath="$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj" />
-      <change beforePath="$PROJECT_DIR$/src/ProjectSetup/Tests/ProjectSetupTests.cljc" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/Discourje.iml" afterPath="$PROJECT_DIR$/Discourje.iml" />
+      <change beforePath="$PROJECT_DIR$/lib/clojure-1.8.0.jar" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/ProjectSetup/Tests/ProjectSetupTests.clj" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/ThreeBuyerProtocol/Tests/TBPTests.clj" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/src/ThreeBuyerProtocol/ThreeBuyerProtocol.clj" afterPath="" />
     </list>
-    <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,36 +20,58 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="ThreeBuyerProtocol.clj" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/ThreeBuyerProtocol/ThreeBuyerProtocol.clj">
+    <leaf>
+      <file leaf-file-name="core.clj" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/discourje/core.clj">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="0">
-              <caret line="0" column="42" lean-forward="false" selection-start-line="0" selection-start-column="42" selection-end-line="0" selection-end-column="42" />
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Discourje.iml" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Discourje.iml">
+      <file leaf-file-name="core_test.clj" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/discourje/core_test.clj">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="11" column="9" lean-forward="false" selection-start-line="11" selection-start-column="9" selection-end-line="11" selection-end-column="9" />
+            <state relative-caret-position="0">
+              <caret line="0" column="23" lean-forward="false" selection-start-line="0" selection-start-column="4" selection-end-line="0" selection-end-column="23" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ProjectSetupTests.clj" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/test/projectSetup/ProjectSetupTests.clj">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="391">
+              <caret line="23" column="45" lean-forward="true" selection-start-line="23" selection-start-column="45" selection-end-line="23" selection-end-column="45" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ThreeBuyerProtocol.clj" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/discourje/threeBuyerProtocol/ThreeBuyerProtocol.clj">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="36" lean-forward="false" selection-start-line="0" selection-start-column="36" selection-end-line="0" selection-end-column="36" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TBPTests.clj" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/discourje/tbpTests/TBPTests.clj">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="34">
+              <caret line="2" column="19" lean-forward="false" selection-start-line="2" selection-start-column="19" selection-end-line="2" selection-end-column="19" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
-  </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="CLJC Namespace" />
-        <option value="Clojure Namespace" />
-      </list>
-    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -59,13 +84,9 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/README.md" />
-        <option value="$PROJECT_DIR$/src/Tests/ProjectSetupTests.cljc" />
-        <option value="$PROJECT_DIR$/out/production/Discourje/Tests/ProjectSetupTests.cljc" />
-        <option value="$PROJECT_DIR$/src/ProjectSetup/Tests/ProjectSetupTests.cljc" />
-        <option value="$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj" />
-        <option value="$PROJECT_DIR$/src/ThreeBuyerProtocol/Tests/TBPTests.clj" />
-        <option value="$PROJECT_DIR$/src/ThreeBuyerProtocol/ThreeBuyerProtocol.clj" />
+        <option value="$PROJECT_DIR$/test/projectSetup/ProjectSetupTests.clj" />
+        <option value="$PROJECT_DIR$/src/discourje/threeBuyerProtocol/ThreeBuyerProtocol.clj" />
+        <option value="$PROJECT_DIR$/test/discourje/tbpTests/TBPTests.clj" />
       </list>
     </option>
   </component>
@@ -91,75 +112,81 @@
     </navigator>
     <panes>
       <pane id="AndroidView" />
+      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
-              <item name="Discourje" type="b2602c69:ProjectViewProjectNode" />
+              <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
               <item name="Discourje" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="Discourje" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Discourje" type="462c0819:PsiDirectoryNode" />
-              <item name=".idea" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Discourje" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Discourje" type="462c0819:PsiDirectoryNode" />
-              <item name=".idea" type="462c0819:PsiDirectoryNode" />
-              <item name="libraries" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Discourje" type="b2602c69:ProjectViewProjectNode" />
+              <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
               <item name="Discourje" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="Discourje" type="b2602c69:ProjectViewProjectNode" />
+              <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
               <item name="Discourje" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="ProjectSetup" type="462c0819:PsiDirectoryNode" />
+              <item name="discourje" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="Discourje" type="b2602c69:ProjectViewProjectNode" />
+              <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
               <item name="Discourje" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="ProjectSetup" type="462c0819:PsiDirectoryNode" />
-              <item name="Tests" type="462c0819:PsiDirectoryNode" />
+              <item name="discourje" type="462c0819:PsiDirectoryNode" />
+              <item name="threeBuyerProtocol" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="Discourje" type="b2602c69:ProjectViewProjectNode" />
+              <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
               <item name="Discourje" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="ThreeBuyerProtocol" type="462c0819:PsiDirectoryNode" />
+              <item name="target" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="Discourje" type="b2602c69:ProjectViewProjectNode" />
+              <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
               <item name="Discourje" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="ThreeBuyerProtocol" type="462c0819:PsiDirectoryNode" />
-              <item name="Tests" type="462c0819:PsiDirectoryNode" />
+              <item name="test" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="Discourje" type="b2602c69:ProjectViewProjectNode" />
-              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+              <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Discourje" type="462c0819:PsiDirectoryNode" />
+              <item name="test" type="462c0819:PsiDirectoryNode" />
+              <item name="discourje" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Discourje" type="462c0819:PsiDirectoryNode" />
+              <item name="test" type="462c0819:PsiDirectoryNode" />
+              <item name="discourje" type="462c0819:PsiDirectoryNode" />
+              <item name="tbpTests" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Discourje" type="462c0819:PsiDirectoryNode" />
+              <item name="test" type="462c0819:PsiDirectoryNode" />
+              <item name="projectSetup" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
       <pane id="PackagesPane" />
-      <pane id="Scratches" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="project.structure.last.edited" value="Modules" />
-    <property name="project.structure.proportion" value="0.15" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="project.structure.last.edited" value="Global Libraries" />
+    <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="cursive.last.file.extension.C\:/Users/Ruben/Documents/Discourje/src" value="clj" />
   </component>
-  <component name="ReplState" timestamp="1536555944123">{:repl-history {:ide [], :local [{:command &quot;(+ 1 2 3)&quot;, :offset 9, :ns &quot;user&quot;} {:command &quot;(let [a 1 b 2]\n  + a b)&quot;, :offset 23, :ns &quot;user&quot;} {:command &quot;(let [a 1 b 2]\n    ( + a b\n        ))&quot;, :offset 37, :ns &quot;user&quot;} {:command &quot;(ns ProjectSetup)&quot;, :offset 17, :ns &quot;user&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `(~@'(7 8 9))))&quot;, :offset 37, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `(~@(7 8 9))))&quot;, :offset 36, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `(@(7 8 9))))&quot;, :offset 35, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `((7 8 9))))&quot;, :offset 34, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `7 8 9))&quot;, :offset 30, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 @( 7 8 9)))&quot;, :offset 33, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 ~@( 7 8 9)))&quot;, :offset 34, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 ~@`( 7 8 9)))&quot;, :offset 35, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `~@( 7 8 9)))&quot;, :offset 35, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `~( 7 8 9)))&quot;, :offset 34, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `( 7 8 9)))&quot;, :offset 33, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `(~@( 7 8 9))))&quot;, :offset 37, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `(~@' 7 8 9)))&quot;, :offset 36, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `(~@'( 7 8 9))))&quot;, :offset 38, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6))&quot;, :offset 23, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;(def flatList\n  `(1 2 3 ~@(list 4 5 6))\n  )&quot;, :offset 43, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList\n  (`(1 2 3 ~@(list 4 5 6)))\n  )&quot;, :offset 45, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList\n  (eval `(1 2 3 ~@(list 4 5 6))) )&quot;, :offset 48, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(flatList)&quot;, :offset 10, :ns &quot;ProjectSetup&quot;} {:command &quot;(def a (1))&quot;, :offset 11, :ns &quot;ProjectSetup&quot;} {:command &quot;(def a 1)&quot;, :offset 9, :ns &quot;ProjectSetup&quot;} {:command &quot;a&quot;, :offset 1, :ns &quot;ProjectSetup&quot;} {:command &quot;(def value 10)&quot;, :offset 14, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;value&quot;, :offset 5, :ns &quot;ProjectSetup&quot;} {:command &quot;ProjectSetup.ProjectSetup/value&quot;, :offset 31, :ns &quot;ProjectSetup&quot;} {:command &quot;(deftest flatListTest\n  (is (= 1 2 3 4 5 6)  flatList ))&quot;, :offset 56, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;(def flatList\n  `(1 2 3 ~@(list 4 5 6)))&quot;, :offset 40, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList (`(1 2 3 ~@(list 4 5 6))))&quot;, :offset 40, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList @`(1 2 3 ~@(list 4 5 6)))&quot;, :offset 39, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList  (eval `(1 2 3 ~@(list 4 5 6))))&quot;, :offset 46, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList  ('`(1 2 3 ~@(list 4 5 6))))&quot;, :offset 42, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList (fn []  `(1 2 3 ~@(list 4 5 6))))&quot;, :offset 47, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList `(1 2 3 ~@(list 4 5 6)))&quot;, :offset 38, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;flatList&quot;, :offset 8, :ns &quot;user&quot;} {:command &quot;ProjectSetup.ProjectSetup/flatList&quot;, :offset 34, :ns &quot;user&quot;} {:command &quot;(eval (cons `list flatList))&quot;, :offset 28, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;lein install&quot;, :offset 12, :ns &quot;user&quot;}], :remote []}}</component>
+  <component name="RecentsManager">
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="discourje" />
+    </key>
+  </component>
+  <component name="ReplState" timestamp="1536557852216">{:repl-history {:ide [], :local [], :remote []}}</component>
   <component name="RunDashboard">
     <option name="ruleStates">
       <list>
@@ -172,7 +199,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Clojure REPL.Leiningen REPL ">
+  <component name="RunManager">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="HTML_USED" value="false" />
       <option name="WIDTH" value="400" />
@@ -194,33 +221,13 @@
       <module name="" />
       <envs />
     </configuration>
-    <configuration name="Leiningen REPL " type="ClojureREPL" factoryName="Local">
-      <setting name="replType" value="0" />
-      <module name="Discourje" />
+    <configuration name="LeiningenREPL" type="ClojureREPL" factoryName="Local">
+      <setting name="replType" value="1" />
+      <module name="discourje" />
       <setting name="jvmArgs" value="" />
       <setting name="parameters" value="" />
       <setting name="workingDir" value="$PROJECT_DIR$" />
       <setting name="profiles" value="" />
-    </configuration>
-    <configuration name="ProjectSetup" type="ClojureScriptRunConfiguration" factoryName="Clojure Script" temporary="true">
-      <module name="Discourje" />
-      <setting name="path" value="$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj" />
-      <setting name="namespace" value="" />
-      <setting name="useLein" value="false" />
-      <setting name="profiles" value="" />
-      <setting name="vmparams" value="" />
-      <setting name="params" value="" />
-      <setting name="workDir" value="$PROJECT_DIR$/src/ProjectSetup" />
-    </configuration>
-    <configuration name="ProjectSetupTests" type="ClojureScriptRunConfiguration" factoryName="Clojure Script" temporary="true">
-      <module name="Discourje" />
-      <setting name="path" value="$PROJECT_DIR$/src/ProjectSetup/Tests/ProjectSetupTests.cljc" />
-      <setting name="namespace" value="" />
-      <setting name="useLein" value="false" />
-      <setting name="profiles" value="" />
-      <setting name="vmparams" value="" />
-      <setting name="params" value="" />
-      <setting name="workDir" value="$PROJECT_DIR$/src/ProjectSetup/Tests" />
     </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
@@ -282,17 +289,6 @@
       <option name="PROGRAM_PARAMETERS" />
       <predefined_log_file id="idea.log" enabled="true" />
     </configuration>
-    <list size="3">
-      <item index="0" class="java.lang.String" itemvalue="Clojure REPL.Leiningen REPL " />
-      <item index="1" class="java.lang.String" itemvalue="Clojure Application.ProjectSetup" />
-      <item index="2" class="java.lang.String" itemvalue="Clojure Application.ProjectSetupTests" />
-    </list>
-    <recent_temporary>
-      <list size="2">
-        <item index="0" class="java.lang.String" itemvalue="Clojure Application.ProjectSetupTests" />
-        <item index="1" class="java.lang.String" itemvalue="Clojure Application.ProjectSetup" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="ShelveChangesManager" show_recycled="false">
     <option name="remove_strategy" value="false" />
@@ -302,180 +298,102 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="f3082b47-1484-4ee7-881b-b3835433d5aa" name="Default" comment="" />
-      <created>1536385888686</created>
+      <changelist id="6fdd3211-89b6-43e6-86ae-60249c672f12" name="Default" comment="" />
+      <created>1536557417867</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1536385888686</updated>
+      <updated>1536557417867</updated>
     </task>
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="1912" y="-8" width="1936" height="1066" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32948583" sideWeight="0.50416666" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="REPL" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3296875" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32948583" sideWeight="0.49583334" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32948583" sideWeight="0.49375" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Leiningen" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="REPL" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3296875" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Leiningen" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <option name="time" value="8" />
-    </breakpoint-manager>
+    <breakpoint-manager />
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/ThreeBuyerProtocol/ThreeBuyerProtocol.clj">
+    <entry file="file://$PROJECT_DIR$/test/discourje/core_test.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
-          <caret line="0" column="42" lean-forward="true" selection-start-line="0" selection-start-column="42" selection-end-line="0" selection-end-column="42" />
+          <caret line="0" column="23" lean-forward="false" selection-start-line="0" selection-start-column="4" selection-end-line="0" selection-end-column="23" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Discourje.iml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="9" lean-forward="true" selection-start-line="11" selection-start-column="9" selection-end-line="11" selection-end-column="9" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj">
+    <entry file="file://$PROJECT_DIR$/src/discourje/core.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Discourje.iml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="9" lean-forward="false" selection-start-line="11" selection-start-column="9" selection-end-line="11" selection-end-column="9" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/Tests/ProjectSetupTests.cljc" />
-    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj">
+    <entry file="file://$PROJECT_DIR$/src/discourje/threeBuyerProtocol/ThreeBuyerProtocol.clj">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="12" column="14" lean-forward="true" selection-start-line="12" selection-start-column="14" selection-end-line="12" selection-end-column="14" />
+        <state relative-caret-position="0">
+          <caret line="0" column="36" lean-forward="false" selection-start-line="0" selection-start-column="36" selection-end-line="0" selection-end-column="36" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/Tests/ProjectSetupTests.cljc" />
+    <entry file="file://$PROJECT_DIR$/test/discourje/tbpTests/TBPTests.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="19" lean-forward="false" selection-start-line="2" selection-start-column="19" selection-end-line="2" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
           <first_editor relative-caret-position="0">
             <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <folding />
           </first_editor>
           <second_editor />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
+    <entry file="file://$PROJECT_DIR$/test/projectSetup/ProjectSetupTests.clj">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="289">
-            <caret line="17" column="0" lean-forward="true" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-      <provider editor-type-id="text-editor">
         <state relative-caret-position="391">
-          <caret line="23" column="0" lean-forward="true" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/out/production/Discourje/Tests/ProjectSetupTests.cljc" />
-    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/Tests/ProjectSetupTests.cljc" />
-    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/Tests/ProjectSetupTests.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="2" selection-end-column="53" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="14" lean-forward="true" selection-start-line="11" selection-start-column="14" selection-end-line="11" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ThreeBuyerProtocol/Tests/TBPTests.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="4" column="0" lean-forward="true" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.idea/vcs.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ThreeBuyerProtocol/ThreeBuyerProtocol.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="42" lean-forward="false" selection-start-line="0" selection-start-column="42" selection-end-line="0" selection-end-column="42" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Discourje.iml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="9" lean-forward="false" selection-start-line="11" selection-start-column="9" selection-end-line="11" selection-end-column="9" />
+          <caret line="23" column="45" lean-forward="true" selection-start-line="23" selection-start-column="45" selection-end-line="23" selection-end-column="45" />
           <folding />
         </state>
       </provider>
@@ -497,7 +415,7 @@
       </state>
       <state key="FacetStructureConfigurable.UI">
         <settings>
-          <last-edited>Detection</last-edited>
+          <last-edited>No facets are configured</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -532,7 +450,19 @@
       </state>
       <state key="ModuleStructureConfigurable.UI">
         <settings>
-          <last-edited>Discourje</last-edited>
+          <last-edited>discourje</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectJDKs.UI">
+        <settings>
+          <last-edited>IDE SDK</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -544,7 +474,7 @@
       </state>
       <state key="ProjectLibrariesConfigurable.UI">
         <settings>
-          <last-edited>Clojure-1.8.0</last-edited>
+          <last-edited>Leiningen: clojure-complete:0.2.4</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
