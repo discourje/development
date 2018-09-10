@@ -2,9 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f3082b47-1484-4ee7-881b-b3835433d5aa" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/ProjectSetup/Tests/ProjectSetupTests.cljc" />
-      <change beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/src/ThreeBuyerProtocol/Tests/TBPTests.clj" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/src/ThreeBuyerProtocol/ThreeBuyerProtocol.clj" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj" afterPath="$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj" />
+      <change beforePath="$PROJECT_DIR$/src/ProjectSetup/Tests/ProjectSetupTests.cljc" afterPath="" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -16,31 +18,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="ProjectSetup.clj" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj">
+      <file leaf-file-name="ThreeBuyerProtocol.clj" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/ThreeBuyerProtocol/ThreeBuyerProtocol.clj">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="204">
-              <caret line="12" column="14" lean-forward="true" selection-start-line="12" selection-start-column="14" selection-end-line="12" selection-end-column="14" />
+            <state relative-caret-position="0">
+              <caret line="0" column="42" lean-forward="false" selection-start-line="0" selection-start-column="42" selection-end-line="0" selection-end-column="42" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Discourje.iml" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Discourje.iml" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Discourje.iml">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="187">
               <caret line="11" column="9" lean-forward="false" selection-start-line="11" selection-start-column="9" selection-end-line="11" selection-end-column="9" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ProjectSetupTests.cljc" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/ProjectSetup/Tests/ProjectSetupTests.cljc">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="11" column="20" lean-forward="true" selection-start-line="11" selection-start-column="20" selection-end-line="11" selection-end-column="20" />
               <folding />
             </state>
           </provider>
@@ -51,8 +43,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Clojure Namespace" />
         <option value="CLJC Namespace" />
+        <option value="Clojure Namespace" />
       </list>
     </option>
   </component>
@@ -70,8 +62,10 @@
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/src/Tests/ProjectSetupTests.cljc" />
         <option value="$PROJECT_DIR$/out/production/Discourje/Tests/ProjectSetupTests.cljc" />
-        <option value="$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj" />
         <option value="$PROJECT_DIR$/src/ProjectSetup/Tests/ProjectSetupTests.cljc" />
+        <option value="$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj" />
+        <option value="$PROJECT_DIR$/src/ThreeBuyerProtocol/Tests/TBPTests.clj" />
+        <option value="$PROJECT_DIR$/src/ThreeBuyerProtocol/ThreeBuyerProtocol.clj" />
       </list>
     </option>
   </component>
@@ -96,7 +90,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
       <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
@@ -104,6 +97,17 @@
             <path>
               <item name="Discourje" type="b2602c69:ProjectViewProjectNode" />
               <item name="Discourje" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Discourje" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Discourje" type="462c0819:PsiDirectoryNode" />
+              <item name=".idea" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Discourje" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Discourje" type="462c0819:PsiDirectoryNode" />
+              <item name=".idea" type="462c0819:PsiDirectoryNode" />
+              <item name="libraries" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Discourje" type="b2602c69:ProjectViewProjectNode" />
@@ -125,23 +129,37 @@
             </path>
             <path>
               <item name="Discourje" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Discourje" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="ThreeBuyerProtocol" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Discourje" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Discourje" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="ThreeBuyerProtocol" type="462c0819:PsiDirectoryNode" />
+              <item name="Tests" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Discourje" type="b2602c69:ProjectViewProjectNode" />
               <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
       <pane id="Scratches" />
       <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="cursive.last.file.extension.C\:/Users/Ruben/Documents/Discourje/src" value="cljc" />
+    <property name="cursive.last.file.extension.C\:/Users/Ruben/Documents/Discourje/src" value="clj" />
   </component>
-  <component name="ReplState" timestamp="1536392956987">{:repl-history {:ide [], :local [{:command &quot;(+ 1 2 3)&quot;, :offset 9, :ns &quot;user&quot;} {:command &quot;(let [a 1 b 2]\n  + a b)&quot;, :offset 23, :ns &quot;user&quot;} {:command &quot;(let [a 1 b 2]\n    ( + a b\n        ))&quot;, :offset 37, :ns &quot;user&quot;} {:command &quot;(ns ProjectSetup)&quot;, :offset 17, :ns &quot;user&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `(~@'(7 8 9))))&quot;, :offset 37, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `(~@(7 8 9))))&quot;, :offset 36, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `(@(7 8 9))))&quot;, :offset 35, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `((7 8 9))))&quot;, :offset 34, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `7 8 9))&quot;, :offset 30, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 @( 7 8 9)))&quot;, :offset 33, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 ~@( 7 8 9)))&quot;, :offset 34, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 ~@`( 7 8 9)))&quot;, :offset 35, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `~@( 7 8 9)))&quot;, :offset 35, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `~( 7 8 9)))&quot;, :offset 34, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `( 7 8 9)))&quot;, :offset 33, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `(~@( 7 8 9))))&quot;, :offset 37, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `(~@' 7 8 9)))&quot;, :offset 36, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `(~@'( 7 8 9))))&quot;, :offset 38, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6))&quot;, :offset 23, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;(def flatList\n  `(1 2 3 ~@(list 4 5 6))\n  )&quot;, :offset 43, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList\n  (`(1 2 3 ~@(list 4 5 6)))\n  )&quot;, :offset 45, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList\n  (eval `(1 2 3 ~@(list 4 5 6))) )&quot;, :offset 48, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(flatList)&quot;, :offset 10, :ns &quot;ProjectSetup&quot;} {:command &quot;(def a (1))&quot;, :offset 11, :ns &quot;ProjectSetup&quot;} {:command &quot;(def a 1)&quot;, :offset 9, :ns &quot;ProjectSetup&quot;} {:command &quot;a&quot;, :offset 1, :ns &quot;ProjectSetup&quot;} {:command &quot;(def value 10)&quot;, :offset 14, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;value&quot;, :offset 5, :ns &quot;ProjectSetup&quot;} {:command &quot;ProjectSetup.ProjectSetup/value&quot;, :offset 31, :ns &quot;ProjectSetup&quot;} {:command &quot;(deftest flatListTest\n  (is (= 1 2 3 4 5 6)  flatList ))&quot;, :offset 56, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;(def flatList\n  `(1 2 3 ~@(list 4 5 6)))&quot;, :offset 40, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList (`(1 2 3 ~@(list 4 5 6))))&quot;, :offset 40, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList @`(1 2 3 ~@(list 4 5 6)))&quot;, :offset 39, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList  (eval `(1 2 3 ~@(list 4 5 6))))&quot;, :offset 46, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList  ('`(1 2 3 ~@(list 4 5 6))))&quot;, :offset 42, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList (fn []  `(1 2 3 ~@(list 4 5 6))))&quot;, :offset 47, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList `(1 2 3 ~@(list 4 5 6)))&quot;, :offset 38, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;flatList&quot;, :offset 8, :ns &quot;user&quot;} {:command &quot;ProjectSetup.ProjectSetup/flatList&quot;, :offset 34, :ns &quot;user&quot;}], :remote []}}</component>
+  <component name="ReplState" timestamp="1536555944123">{:repl-history {:ide [], :local [{:command &quot;(+ 1 2 3)&quot;, :offset 9, :ns &quot;user&quot;} {:command &quot;(let [a 1 b 2]\n  + a b)&quot;, :offset 23, :ns &quot;user&quot;} {:command &quot;(let [a 1 b 2]\n    ( + a b\n        ))&quot;, :offset 37, :ns &quot;user&quot;} {:command &quot;(ns ProjectSetup)&quot;, :offset 17, :ns &quot;user&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `(~@'(7 8 9))))&quot;, :offset 37, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `(~@(7 8 9))))&quot;, :offset 36, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `(@(7 8 9))))&quot;, :offset 35, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `((7 8 9))))&quot;, :offset 34, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `7 8 9))&quot;, :offset 30, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 @( 7 8 9)))&quot;, :offset 33, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 ~@( 7 8 9)))&quot;, :offset 34, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 ~@`( 7 8 9)))&quot;, :offset 35, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `~@( 7 8 9)))&quot;, :offset 35, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `~( 7 8 9)))&quot;, :offset 34, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `( 7 8 9)))&quot;, :offset 33, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `(~@( 7 8 9))))&quot;, :offset 37, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `(~@' 7 8 9)))&quot;, :offset 36, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6 `(~@'( 7 8 9))))&quot;, :offset 38, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;`(1 2 3 ~@(list 4 5 6))&quot;, :offset 23, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;(def flatList\n  `(1 2 3 ~@(list 4 5 6))\n  )&quot;, :offset 43, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList\n  (`(1 2 3 ~@(list 4 5 6)))\n  )&quot;, :offset 45, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList\n  (eval `(1 2 3 ~@(list 4 5 6))) )&quot;, :offset 48, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(flatList)&quot;, :offset 10, :ns &quot;ProjectSetup&quot;} {:command &quot;(def a (1))&quot;, :offset 11, :ns &quot;ProjectSetup&quot;} {:command &quot;(def a 1)&quot;, :offset 9, :ns &quot;ProjectSetup&quot;} {:command &quot;a&quot;, :offset 1, :ns &quot;ProjectSetup&quot;} {:command &quot;(def value 10)&quot;, :offset 14, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;value&quot;, :offset 5, :ns &quot;ProjectSetup&quot;} {:command &quot;ProjectSetup.ProjectSetup/value&quot;, :offset 31, :ns &quot;ProjectSetup&quot;} {:command &quot;(deftest flatListTest\n  (is (= 1 2 3 4 5 6)  flatList ))&quot;, :offset 56, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;(def flatList\n  `(1 2 3 ~@(list 4 5 6)))&quot;, :offset 40, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList (`(1 2 3 ~@(list 4 5 6))))&quot;, :offset 40, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList @`(1 2 3 ~@(list 4 5 6)))&quot;, :offset 39, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList  (eval `(1 2 3 ~@(list 4 5 6))))&quot;, :offset 46, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList  ('`(1 2 3 ~@(list 4 5 6))))&quot;, :offset 42, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList (fn []  `(1 2 3 ~@(list 4 5 6))))&quot;, :offset 47, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;(def flatList `(1 2 3 ~@(list 4 5 6)))&quot;, :offset 38, :ns &quot;ProjectSetup.ProjectSetup&quot;} {:command &quot;flatList&quot;, :offset 8, :ns &quot;user&quot;} {:command &quot;ProjectSetup.ProjectSetup/flatList&quot;, :offset 34, :ns &quot;user&quot;} {:command &quot;(eval (cons `list flatList))&quot;, :offset 28, :ns &quot;ProjectSetup.Tests.ProjectSetupTests&quot;} {:command &quot;lein install&quot;, :offset 12, :ns &quot;user&quot;}], :remote []}}</component>
   <component name="RunDashboard">
     <option name="ruleStates">
       <list>
@@ -193,6 +211,16 @@
       <setting name="vmparams" value="" />
       <setting name="params" value="" />
       <setting name="workDir" value="$PROJECT_DIR$/src/ProjectSetup" />
+    </configuration>
+    <configuration name="ProjectSetupTests" type="ClojureScriptRunConfiguration" factoryName="Clojure Script" temporary="true">
+      <module name="Discourje" />
+      <setting name="path" value="$PROJECT_DIR$/src/ProjectSetup/Tests/ProjectSetupTests.cljc" />
+      <setting name="namespace" value="" />
+      <setting name="useLein" value="false" />
+      <setting name="profiles" value="" />
+      <setting name="vmparams" value="" />
+      <setting name="params" value="" />
+      <setting name="workDir" value="$PROJECT_DIR$/src/ProjectSetup/Tests" />
     </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
@@ -254,13 +282,15 @@
       <option name="PROGRAM_PARAMETERS" />
       <predefined_log_file id="idea.log" enabled="true" />
     </configuration>
-    <list size="2">
+    <list size="3">
       <item index="0" class="java.lang.String" itemvalue="Clojure REPL.Leiningen REPL " />
       <item index="1" class="java.lang.String" itemvalue="Clojure Application.ProjectSetup" />
+      <item index="2" class="java.lang.String" itemvalue="Clojure Application.ProjectSetupTests" />
     </list>
     <recent_temporary>
-      <list size="1">
-        <item index="0" class="java.lang.String" itemvalue="Clojure Application.ProjectSetup" />
+      <list size="2">
+        <item index="0" class="java.lang.String" itemvalue="Clojure Application.ProjectSetupTests" />
+        <item index="1" class="java.lang.String" itemvalue="Clojure Application.ProjectSetup" />
       </list>
     </recent_temporary>
   </component>
@@ -282,7 +312,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="1912" y="-8" width="1936" height="1066" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -298,7 +327,7 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -324,63 +353,26 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj">
+    <entry file="file://$PROJECT_DIR$/src/ThreeBuyerProtocol/ThreeBuyerProtocol.clj">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="12" column="14" lean-forward="true" selection-start-line="12" selection-start-column="14" selection-end-line="12" selection-end-column="14" />
+        <state relative-caret-position="0">
+          <caret line="0" column="42" lean-forward="true" selection-start-line="0" selection-start-column="42" selection-end-line="0" selection-end-column="42" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/Tests/ProjectSetupTests.cljc">
+    <entry file="file://$PROJECT_DIR$/Discourje.iml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="187">
-          <caret line="11" column="20" lean-forward="true" selection-start-line="11" selection-start-column="20" selection-end-line="11" selection-end-column="20" />
+          <caret line="11" column="9" lean-forward="true" selection-start-line="11" selection-start-column="9" selection-end-line="11" selection-end-column="9" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="0">
-            <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-            <folding />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
+    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="23" column="0" lean-forward="true" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="289">
-            <caret line="17" column="0" lean-forward="true" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-            <folding />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/out/production/Discourje/Tests/ProjectSetupTests.cljc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="40" lean-forward="false" selection-start-line="0" selection-start-column="40" selection-end-line="0" selection-end-column="40" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -392,18 +384,98 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/Tests/ProjectSetupTests.cljc">
+    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/Tests/ProjectSetupTests.cljc" />
+    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="20" lean-forward="true" selection-start-line="11" selection-start-column="20" selection-end-line="11" selection-end-column="20" />
-          <folding />
+        <state relative-caret-position="204">
+          <caret line="12" column="14" lean-forward="true" selection-start-line="12" selection-start-column="14" selection-end-line="12" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/Tests/ProjectSetupTests.cljc" />
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="0">
+            <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="289">
+            <caret line="17" column="0" lean-forward="true" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+      <provider editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="23" column="0" lean-forward="true" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/out/production/Discourje/Tests/ProjectSetupTests.cljc" />
+    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/Tests/ProjectSetupTests.cljc" />
+    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/Tests/ProjectSetupTests.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="2" selection-end-column="53" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="12" column="14" lean-forward="true" selection-start-line="12" selection-start-column="14" selection-end-line="12" selection-end-column="14" />
+        <state relative-caret-position="187">
+          <caret line="11" column="14" lean-forward="true" selection-start-line="11" selection-start-column="14" selection-end-line="11" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ThreeBuyerProtocol/Tests/TBPTests.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" column="0" lean-forward="true" selection-start-line="4" selection-start-column="0" selection-end-line="4" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.idea/vcs.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ThreeBuyerProtocol/ThreeBuyerProtocol.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="42" lean-forward="false" selection-start-line="0" selection-start-column="42" selection-end-line="0" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Discourje.iml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="9" lean-forward="false" selection-start-line="11" selection-start-column="9" selection-end-line="11" selection-end-column="9" />
           <folding />
         </state>
       </provider>
@@ -425,7 +497,7 @@
       </state>
       <state key="FacetStructureConfigurable.UI">
         <settings>
-          <last-edited>No facets are configured</last-edited>
+          <last-edited>Detection</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -465,7 +537,6 @@
             <option name="proportions">
               <list>
                 <option value="0.2" />
-                <option value="0.6" />
               </list>
             </option>
           </splitter-proportions>
