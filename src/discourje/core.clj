@@ -1,6 +1,5 @@
 (ns discourje.core)
+;; defrecord does not support a doc string, maybe write custom macro that does?
 
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
+
+(defrecord participant [name])
