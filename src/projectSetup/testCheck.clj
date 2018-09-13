@@ -8,7 +8,7 @@
   ([x & more] (apply + x more)))
 
 (defn messenger
-  "test method for checking correct config and installation of test.check library"
+  "test method experiment"
   ([]     (messenger "Hello world!"))
-  ([msg]  (println msg))
-  ([msg & more]  (apply println msg more)))
+  ([msg]  (apply str msg))
+  ([msg & more]  (apply str msg more)))
