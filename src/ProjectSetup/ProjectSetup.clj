@@ -1,4 +1,4 @@
-(ns projectSetup.ProjectSetup)
+(ns ProjectSetup.ProjectSetup)
 
 (defn sum [ x y z]
   (+ x y z))

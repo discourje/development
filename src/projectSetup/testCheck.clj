@@ -1,4 +1,4 @@
-(ns projectSetup.testCheck)
+(ns ProjectSetup.testCheck)
 
 (defn sumAll
   "test method for checking correct config and installation of test.check library,
