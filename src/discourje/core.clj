@@ -1,25 +1,16 @@
 (ns discourje.core
   (:refer-clojure :exclude [send]))
-;; defrecord & deftype does not support a doc string, maybe write custom macro that does?
 
 (defrecord message [data])
-(deftype channel [sender receiver message])
 
 (defprotocol source
   "A participant identified as a Sender."
-  (send [channel] "Send something through the channel"))
+  (send [message] "The message to send"))
 
 (defprotocol sink
   "A participant identified as a Receiver."
-  (receive [channel] "Receive something from a channel"))
+  (receive [message] "Receive a message"))
 
-(deftype sender [name channel]
-  source
-  (send [channel]
-     (:data (.message channel) )))
-
-(def testSender
-  (sender. "tester"
-           (channel. nil nil
-                     (message. "i am sanding..."))))
-;;(send testSender)
+(defprotocol channel
+  "Define channel interface"
+  (send [source sink message] "Send from source to sink the following message "))
