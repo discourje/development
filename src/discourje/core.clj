@@ -12,5 +12,16 @@
   (receive [message] "Receive a message"))
 
 (defprotocol channel
-  "Define channel interface"
-  (send [source sink message] "Send from source to sink the following message "))
+  "Define channel interface with overloads(arity)"
+  (transmit
+    [source sink message]                                   ;"transmit from source to sink the following message"
+    [source sink message method]))                           ;"transmit from source to sink the following message executing the desire method"
+
+;participant with source and sink template
+(defrecord participant [name]
+  source
+    (send [sendableMessage] (:data sendableMessage))
+  sink
+    (receive [receivableMessage] (:data receivableMessage)))
+
+(defprotocol protocol [name])
