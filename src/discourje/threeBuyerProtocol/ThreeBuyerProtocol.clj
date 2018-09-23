@@ -1,7 +1,7 @@
 (ns discourje.threeBuyerProtocol.ThreeBuyerProtocol
-  (:require [discourje.core :refer :all])
+  (:require [discourje.experiments.abstractionExperiments :refer :all])
   (:refer-clojure :exclude [send])
-  (:import (discourje.core message participant)))
+  (:import (discourje.experiments.abstractionExperiments message participant)))
 
 ;sample messages
 (def helloWorldMessage (message. "Hello World"))
