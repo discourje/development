@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6fdd3211-89b6-43e6-86ae-60249c672f12" name="Default" comment="">
+      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/ClojureProjectResolveSettings.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/src/discourje/core.clj" afterPath="$PROJECT_DIR$/src/discourje/core.clj" />
+      <change beforePath="$PROJECT_DIR$/test/discourje/core_test.clj" afterPath="$PROJECT_DIR$/test/discourje/core_test.clj" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -12,67 +15,110 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="testCheckConfig.clj" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/projectSetup/testCheckConfig.clj">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="340">
-              <caret line="20" column="46" lean-forward="true" selection-start-line="20" selection-start-column="46" selection-end-line="20" selection-end-column="46" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="testCheck.clj" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/projectSetup/testCheck.clj">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="11" column="35" lean-forward="true" selection-start-line="11" selection-start-column="21" selection-end-line="11" selection-end-column="35" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ProjectSetup.clj" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/projectSetup/ProjectSetup.clj">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="11" column="14" lean-forward="true" selection-start-line="11" selection-start-column="14" selection-end-line="11" selection-end-column="14" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="core_test.clj" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/discourje/core_test.clj">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="7" column="0" lean-forward="true" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="core.clj" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/discourje/core.clj">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <splitter split-orientation="vertical" split-proportion="0.5">
+      <split-first>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+          <file leaf-file-name="core_test.clj" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/test/discourje/core_test.clj">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="374">
+                  <caret line="22" column="22" lean-forward="true" selection-start-line="22" selection-start-column="22" selection-end-line="22" selection-end-column="22" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="experiments.clj" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/discourje/experiments.clj">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="289">
+                  <caret line="17" column="7" lean-forward="false" selection-start-line="17" selection-start-column="3" selection-end-line="17" selection-end-column="7" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="testCheckConfig.clj" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/test/projectSetup/testCheckConfig.clj">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="204">
+                  <caret line="12" column="0" lean-forward="false" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="ProjectSetupTests.clj" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/test/projectSetup/ProjectSetupTests.clj">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="136">
+                  <caret line="8" column="33" lean-forward="false" selection-start-line="8" selection-start-column="25" selection-end-line="8" selection-end-column="33" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="ThreeBuyerProtocol.clj" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/discourje/threeBuyerProtocol/ThreeBuyerProtocol.clj">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="221">
+                  <caret line="13" column="0" lean-forward="false" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="experimentsTests.clj" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/test/discourje/experimentsTests.clj">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="221">
+                  <caret line="13" column="0" lean-forward="false" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="core.clj" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/discourje/core.clj">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="136">
+                  <caret line="8" column="0" lean-forward="false" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-first>
+      <split-second>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+          <file leaf-file-name="core.clj" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/src/discourje/core.clj">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="85">
+                  <caret line="5" column="19" lean-forward="false" selection-start-line="5" selection-start-column="19" selection-end-line="5" selection-end-column="19" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+        </leaf>
+      </split-second>
+    </splitter>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="JavaFXApplication" />
-        <option value="Clojure Test Namespace" />
         <option value="Clojure Namespace" />
+        <option value="Clojure Test Namespace" />
       </list>
     </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>verze</find>
+    </findStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -86,12 +132,16 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/test/projectSetup/ProjectSetupTests.clj" />
-        <option value="$PROJECT_DIR$/src/discourje/threeBuyerProtocol/ThreeBuyerProtocol.clj" />
-        <option value="$PROJECT_DIR$/test/discourje/tbpTests/TBPTests.clj" />
         <option value="$PROJECT_DIR$/project.clj" />
         <option value="$PROJECT_DIR$/src/projectSetup/ProjectSetup.clj" />
         <option value="$PROJECT_DIR$/src/projectSetup/testCheck.clj" />
         <option value="$PROJECT_DIR$/test/projectSetup/testCheckConfig.clj" />
+        <option value="$PROJECT_DIR$/src/ProjectSetup/testCheck.clj" />
+        <option value="$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj" />
+        <option value="$PROJECT_DIR$/src/discourje/experiments.clj" />
+        <option value="$PROJECT_DIR$/test/discourje/experimentsTests.clj" />
+        <option value="$PROJECT_DIR$/test/discourje/tbpTests/TBPTests.clj" />
+        <option value="$PROJECT_DIR$/src/discourje/threeBuyerProtocol/ThreeBuyerProtocol.clj" />
         <option value="$PROJECT_DIR$/test/discourje/core_test.clj" />
         <option value="$PROJECT_DIR$/src/discourje/core.clj" />
       </list>
@@ -118,7 +168,10 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
       <pane id="Scratches" />
+      <pane id="AndroidView" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -141,19 +194,7 @@
               <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
               <item name="Discourje" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="discourje" type="462c0819:PsiDirectoryNode" />
-              <item name="threeBuyerProtocol" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Discourje" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="projectSetup" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Discourje" type="462c0819:PsiDirectoryNode" />
-              <item name="target" type="462c0819:PsiDirectoryNode" />
+              <item name="ProjectSetup" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
@@ -187,9 +228,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
-      <pane id="AndroidView" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -200,13 +238,14 @@
     <property name="cursive.last.file.extension.C\:/Users/Ruben/Documents/Discourje/test" value="clj" />
     <property name="cursive.last.file.extension.C\:/Users/Ruben/Documents/Discourje/src" value="clj" />
     <property name="settings.editor.selected.configurable" value="reference.settings.project.maven.repository.indices" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
   </component>
   <component name="RecentsManager">
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="discourje" />
     </key>
   </component>
-  <component name="ReplState" timestamp="1536816171408">{:repl-history {:ide [], :local [{:command &quot;(testMessenger)&quot;, :offset 15, :ns &quot;user&quot;} {:command &quot;(projectSetup.testCheckConfig/testMessenger)&quot;, :offset 44, :ns &quot;user&quot;} {:command &quot;(messenger \&quot;1\&quot;)&quot;, :offset 15, :ns &quot;user&quot;} {:command &quot;(defn sumAll\n  \&quot;test method for checking correct config and installation of test.check library\&quot;\n  [x] `(x)\n  [x &amp; more] (+ x more))&quot;, :offset 131, :ns &quot;user&quot;} {:command &quot;(defn sumAll\n  \&quot;test method for checking correct config and installation of test.check library\&quot;\n     ([x] `(x))\n     ([x &amp; more] (+ x more)) )&quot;, :offset 142, :ns &quot;projectSetup.testCheckConfig&quot;} {:command &quot;(defn sumAll\n  \&quot;test method for checking correct config and installation of test.check library\&quot;\n  ([x] `(x))\n  ([x &amp; more] (+ x more)))&quot;, :offset 135, :ns &quot;user&quot;} {:command &quot;(defn sumAll\n  \&quot;test method for checking correct config and installation of test.check library\&quot;\n  ([x] '(x))\n  ([x &amp; more] (+ x more)))&quot;, :offset 135, :ns &quot;user&quot;} {:command &quot;(defn sumAll\n  \&quot;test method for checking correct config and installation of test.check library\&quot;\n  ([x] (+ x))\n  ([x &amp; more] (+ x more)))&quot;, :offset 136, :ns &quot;user&quot;} {:command &quot;(defn sumAll\n  \&quot;test method for checking correct config and installation of test.check library\&quot;\n  ([x] (first (x)))\n  ([x &amp; more] (+ x more)))&quot;, :offset 142, :ns &quot;user&quot;} {:command &quot;(sumAll 1 2)&quot;, :offset 12, :ns &quot;user&quot;} {:command &quot;(defn sumAll\n  \&quot;test method for checking correct config and installation of test.check library\&quot;\n  ([x] (first `(x)))\n  ([x &amp; more] (+ x more)))&quot;, :offset 143, :ns &quot;user&quot;} {:command &quot;(defn sumAll\n  \&quot;test method for checking correct config and installation of test.check library\&quot;\n  ([x] (first '(x)))\n  ([x &amp; more] (+ x more)))&quot;, :offset 143, :ns &quot;user&quot;} {:command &quot;(defn sumAll\n  \&quot;test method for checking correct config and installation of test.check library\&quot;\n  ([] (0) )\n  ([x] (first '(x)))\n  ([x &amp; more] (+ x more)))&quot;, :offset 155, :ns &quot;user&quot;} {:command &quot;(defn sumAll\n  \&quot;test method for checking correct config and installation of test.check library\&quot;\n     ([] (0) )\n     ([x] (first (x)))\n     ([x &amp; more] (+ x more)))&quot;, :offset 163, :ns &quot;projectSetup.testCheckConfig&quot;} {:command &quot;(defn sumAll\n  \&quot;test method for checking correct config and installation of test.check library\&quot;\n     ([] (0) )\n     ([x] (first (x)))\n     ([x &amp; more] (reduce + (x &amp; more))))&quot;, :offset 174, :ns &quot;projectSetup.testCheckConfig&quot;} {:command &quot;(defn sumAll\n  \&quot;test method for checking correct config and installation of test.check library\&quot;\n  ([] (0) )\n  ([x] (first (x)))\n  ([&amp; more] (reduce + (x &amp; more))))&quot;, :offset 163, :ns &quot;user&quot;} {:command &quot;(sumAll 1  3 4)&quot;, :offset 15, :ns &quot;user&quot;} {:command &quot;(sumAll 1 3 4)&quot;, :offset 14, :ns &quot;user&quot;} {:command &quot;(sumall)&quot;, :offset 8, :ns &quot;user&quot;} {:command &quot;(defn sumAll\n  \&quot;test method for checking correct config and installation of test.check library\&quot;\n     ([] (int 0) )\n     ([x] (first (x)))\n     ([&amp; more] (reduce + (x &amp; more))))&quot;, :offset 176, :ns &quot;projectSetup.testCheckConfig&quot;} {:command &quot;(defn messenger\n  \&quot;test test\&quot;\n  ([]     (messenger \&quot;Hello world!\&quot;))\n  ([msg]  (println msg)))&quot;, :offset 93, :ns &quot;projectSetup.testCheckConfig&quot;} {:command &quot;(messenger\n  )&quot;, :offset 14, :ns &quot;user&quot;} {:command &quot;(defn messenger\n  ([]     (messenger \&quot;Hello world!\&quot;))\n  ([msg]  (println msg)))&quot;, :offset 79, :ns &quot;user&quot;} {:command &quot;(defn messenger\n  \&quot;asdasdasdasdasd\&quot;\n  ([]     (messenger \&quot;Hello world!\&quot;))\n  ([msg]  (println msg)))&quot;, :offset 99, :ns &quot;user&quot;} {:command &quot;(defn messenger\n  \&quot;asdasdasdasdasd\&quot;\n  ([]     (messenger \&quot;Hello world!\&quot;))\n  ([msg]  (println msg))\n  ([msg &amp; more]  (apply println  (msg more))))&quot;, :offset 145, :ns &quot;user&quot;} {:command &quot;(messenger hello test test)&quot;, :offset 27, :ns &quot;user&quot;} {:command &quot;(defn messenger\n  \&quot;asdasdasdasdasd\&quot;\n  ([]     (messenger \&quot;Hello world!\&quot;))\n  ([msg]  (println msg))\n  ([msg &amp; more]  (println (str msg more))))&quot;, :offset 142, :ns &quot;user&quot;} {:command &quot;(messenger \&quot;hello\&quot; \&quot;hello\&quot; \&quot;hello\&quot;)&quot;, :offset 35, :ns &quot;user&quot;} {:command &quot;(messenger \&quot;hello\&quot; \&quot;hello\&quot; hello)&quot;, :offset 33, :ns &quot;user&quot;} {:command &quot;(defn messenger\n  \&quot;asdasdasdasdasd\&quot;\n  ([]     (messenger \&quot;Hello world!\&quot;))\n  ([msg]  (println msg))\n  ([msg &amp; more]  (apply println (str msg more))))&quot;, :offset 148, :ns &quot;user&quot;} {:command &quot;(defn messenger\n  \&quot;asdasdasdasdasd\&quot;\n  ([]     (messenger \&quot;Hello world!\&quot;))\n  ([msg]  (println msg))\n  ([msg &amp; more]  (apply println str msg more)))&quot;, :offset 146, :ns &quot;user&quot;} {:command &quot;(messager \&quot;a\&quot; \&quot;b\&quot; \&quot;c\&quot;)&quot;, :offset 22, :ns &quot;user&quot;} {:command &quot;(defn messenger\n  \&quot;asdasdasdasdasd\&quot;\n  ([]     (messenger \&quot;Hello world!\&quot;))\n  ([msg]  (println msg))\n  ([msg &amp; more]  (apply println msg more)))&quot;, :offset 142, :ns &quot;user&quot;} {:command &quot;(messenger \&quot;a\&quot; \&quot;b\&quot; \&quot;c\&quot;)&quot;, :offset 23, :ns &quot;user&quot;} {:command &quot;(defn sumAll\n  \&quot;test method for checking correct config and installation of test.check library\&quot;\n  ([] (int 0) )\n  ([x] (first (int x)))\n  ([x &amp; more] (apply + x &amp; more))&quot;, :offset 169, :ns &quot;user&quot;} {:command &quot;(defn sumAll\n  \&quot;test method for checking correct config and installation of test.check library\&quot;\n  ([] (int 0) )\n  ([x] (first (int x)))\n  ([x &amp; more] (apply + x &amp; more)))&quot;, :offset 170, :ns &quot;user&quot;} {:command &quot;(defn sumAll\n  \&quot;test method for checking correct config and installation of test.check library\&quot;\n  ([] (int 0) )\n  ([x] (first (int x)))\n  ([x &amp; more] (apply + x more)))&quot;, :offset 168, :ns &quot;user&quot;} {:command &quot;(sumAll 1 2 3)&quot;, :offset 14, :ns &quot;user&quot;} {:command &quot;(sumAll 1 2 )&quot;, :offset 13, :ns &quot;user&quot;} {:command &quot;(sumAll 1  )&quot;, :offset 12, :ns &quot;user&quot;} {:command &quot;(defn sumAll\n  \&quot;test method for checking correct config and installation of test.check library\&quot;\n  ([] (int 0) )\n  ([x] (int x)\n   ([x &amp; more] (apply + x more))&quot;, :offset 159, :ns &quot;user&quot;} {:command &quot;(defn sumAll\n  \&quot;test method for checking correct config and installation of test.check library\&quot;\n  ([] (int 0) )\n  ([x] (int x))\n   ([x &amp; more] (apply + x more)))&quot;, :offset 161, :ns &quot;user&quot;} {:command &quot;(sumAll 1)&quot;, :offset 10, :ns &quot;user&quot;} {:command &quot;(sumAll)&quot;, :offset 8, :ns &quot;user&quot;} {:command &quot;(sumAll 1 2 3 44555)&quot;, :offset 20, :ns &quot;user&quot;} {:command &quot;(defn messenger\n  \&quot;test method for checking correct config and installation of test.check library\&quot;\n  ([]     (messenger \&quot;Hello world!\&quot;))\n  ([msg]  (println msg))\n  ([msg &amp; more]  (apply println msg more)))&quot;, :offset 205, :ns &quot;user&quot;} {:command &quot;(messenger|)&quot;, :offset 12, :ns &quot;user&quot;} {:command &quot;(messenger \&quot;a\&quot;)&quot;, :offset 15, :ns &quot;user&quot;} {:command &quot;(messenger \&quot;a\&quot; \&quot;b\&quot; )&quot;, :offset 20, :ns &quot;user&quot;} {:command &quot;(require '[clojure.test.check.generators :as gen])&quot;, :offset 50, :ns &quot;user&quot;} {:command &quot;( gen/int)&quot;, :offset 10, :ns &quot;user&quot;} {:command &quot;(sample gen/int)&quot;, :offset 16, :ns &quot;user&quot;} {:command &quot;(def a\n  (prop/for-all [values (gen/int)])\n  (== (+ values) (sumAll values)))&quot;, :offset 77, :ns &quot;user&quot;} {:command &quot;(def a\n  (prop/for-all [values (gen/list gen/int)])\n  (== (+ values) (sumAll values)))&quot;, :offset 86, :ns &quot;user&quot;} {:command &quot;(require '[clojure.test.check :as tc])\n(require '[clojure.test.check.generators :as gen])\n(require '[clojure.test.check.properties :as prop])&quot;, :offset 141, :ns &quot;user&quot;} {:command &quot;(def property\n  (prop/for-all [v (gen/vector gen/int)]\n                (let [s (sort v)]\n                  (and (= (count v) (count s))\n                       (ascending? s)))))&quot;, :offset 177, :ns &quot;user&quot;} {:command &quot;(require '[clojure.test.check :as tc])\n(require '[clojure.test.check.generators :as gen])\n(require '[clojure.test.check.properties :as prop])\n\n(defn ascending?\n  \&quot;clojure.core/sorted? doesn't do what we might expect, so we write our\n  own function\&quot;\n  [coll]\n  (every? (fn [[a b]] (&lt;= a b))\n          (partition 2 1 coll)))\n\n(def property\n  (prop/for-all [v (gen/vector gen/int)]\n                (let [s (sort v)]\n                  (and (= (count v) (count s))\n                       (ascending? s)))))&quot;, :offset 501, :ns &quot;user&quot;} {:command &quot;(def assd\n  (prop/for-all [v (gen/list gen/int)])\n  (== (+ v) (sumAll v)))&quot;, :offset 74, :ns &quot;user&quot;} {:command &quot;(tc/quick-check 100 assd)&quot;, :offset 25, :ns &quot;user&quot;} {:command &quot;(def assd\n  (prop/for-all [v (gen/int)]\n                (== (+ v) (sumAll v))))&quot;, :offset 79, :ns &quot;user&quot;} {:command &quot;(def assd\n  (prop/for-all [v (gen/list gen/int)]\n                (== (+ v) (sumAll v))))&quot;, :offset 88, :ns &quot;user&quot;} {:command &quot;(assd)&quot;, :offset 6, :ns &quot;user&quot;} {:command &quot;(reduce + ( 1 2 3))&quot;, :offset 19, :ns &quot;user&quot;} {:command &quot;(reduce + `(1 2 3))&quot;, :offset 19, :ns &quot;user&quot;} {:command &quot;(def assd\n  (prop/for-all [v (gen/list gen/int)]\n                (== (reduce + v) (sumAll v))))&quot;, :offset 95, :ns &quot;user&quot;} {:command &quot;(def testSum\n  (prop/for-all [v (gen/list gen/int)]\n                (== (reduce + v) (sumAll v))))\n\n(tc/quick-check 2 testSum)&quot;, :offset 126, :ns &quot;user&quot;} {:command &quot;(defn ascending?\n  \&quot;clojure.core/sorted? doesn't do what we might expect, so we write our\n  own function\&quot;\n  [coll]\n  (every? (fn [[a b]] (&lt;= a b))\n          (partition 2 1 coll)))\n\n(def property\n  (prop/for-all [v (gen/vector gen/int)]\n                (let [s (sort v)]\n                  (and (= (count v) (count s))\n                       (ascending? s)))))\n\n;; test our property\n(tc/quick-check 100 property)&quot;, :offset 410, :ns &quot;user&quot;} {:command &quot;(def testSum\n  (prop/for-all [v (gen/list gen/int)]\n                (== (reduce + v) (sumAll v))))&quot;, :offset 98, :ns &quot;user&quot;} {:command &quot;(tc/quick-check 1 testSum)&quot;, :offset 26, :ns &quot;user&quot;} {:command &quot;(gen/list gen/int)&quot;, :offset 18, :ns &quot;user&quot;} {:command &quot;(gen/sample gen/list gen/int)&quot;, :offset 29, :ns &quot;user&quot;} {:command &quot;(gen/sample gen/int)&quot;, :offset 20, :ns &quot;user&quot;} {:command &quot;(def testSum\n  (prop/for-all [v (gen/vector gen/int)]\n                (== (reduce + v) (sumAll v))))\n\n(tc/quick-check 1 testSum)&quot;, :offset 128, :ns &quot;user&quot;} {:command &quot;(reduce + [1 2 3 4])&quot;, :offset 20, :ns &quot;user&quot;} {:command &quot;(sumAll [ 1 2 3])&quot;, :offset 17, :ns &quot;user&quot;} {:command &quot;(apply sumAll [ 1 2 3])&quot;, :offset 23, :ns &quot;user&quot;} {:command &quot;(def testSum\n  (prop/for-all [v (gen/vector gen/int)]\n                (== (reduce + v) (apply sumAll v))))\n\n(tc/quick-check 1 testSum)&quot;, :offset 134, :ns &quot;user&quot;} {:command &quot;(def testSum\n  (prop/for-all [v (gen/vector gen/int)]\n                (== (reduce + v) (apply sumAll v))))\n\n(tc/quick-check 100 testSum)&quot;, :offset 136, :ns &quot;user&quot;} {:command &quot;(def testMessenger\n  \&quot;test the messenger function, taking in consideration the nil case\&quot;\n  (prop/for-all [v (gen/vector gen/string)]\n    (if (empty? v)\n      (== '(\&quot;Hello World\&quot;) (messenger v))\n      (== (apply println v) (apply messenger v)))))&quot;, :offset 245, :ns &quot;projectSetup.testCheckConfig&quot;} {:command &quot;(ns projectSetup.testCheckConfig\n  (:require [clojure.test :refer :all])\n  (:require [projectSetup.testCheck :refer :all])\n  (:require [clojure.test.check.generators :as gen])\n  (:require [clojure.test.check.properties :as prop])\n  (:require [clojure.test.check :as tc]))&quot;, :offset 271, :ns &quot;user&quot;} {:command &quot;(apply projectSetup.testCheck/messenger [\&quot;a\&quot; \&quot;a\&quot; \&quot;a\&quot; \&quot;a\&quot;])&quot;, :offset 58, :ns &quot;user&quot;} {:command &quot;(apply println [\&quot;a\&quot; \&quot;a\&quot; \&quot;a\&quot; \&quot;a\&quot;])&quot;, :offset 33, :ns &quot;user&quot;} {:command &quot;(== '(\&quot;Hello World\&quot;) (apply projectSetup.testCheck/messenger))&quot;, :offset 62, :ns &quot;user&quot;} {:command &quot;(== '(\&quot;Hello World\&quot;) (projectSetup.testCheck/messenger []))&quot;, :offset 59, :ns &quot;user&quot;} {:command &quot;(== '(\&quot;Hello World\&quot;) (projectSetup.testCheck/messenger `[]))&quot;, :offset 60, :ns &quot;user&quot;} {:command &quot;(== '(\&quot;Hello World\&quot;) (projectSetup.testCheck/messenger '[]))&quot;, :offset 60, :ns &quot;user&quot;} {:command &quot;(== '(\&quot;Hello World\&quot;) (apply projectSetup.testCheck/messenger [ \n                                                              ]))&quot;, :offset 129, :ns &quot;user&quot;} {:command &quot;(== '(\&quot;Hello World\&quot;) (apply projectSetup.testCheck/messenger []))&quot;, :offset 65, :ns &quot;user&quot;} {:command &quot;(def testMessenger\n  \&quot;test the messenger function, taking in consideration the nil case\&quot;\n  (prop/for-all [v (gen/vector gen/string)]\n    (if (empty? v)\n      (== '(\&quot;Hello World\&quot;) (apply messenger v))\n      (== (apply println v) (apply messenger v)))))&quot;, :offset 251, :ns &quot;projectSetup.testCheckConfig&quot;} {:command &quot;(def testMessenger\n  \&quot;test the messenger function, taking in consideration the nil case\&quot;\n  (prop/for-all [v (gen/vector gen/string)]\n    (if (empty? v)\n      (== '(\&quot;Hello World\&quot;) (apply messenger v))\n      (== (apply str v) (apply messenger v)))))&quot;, :offset 247, :ns &quot;projectSetup.testCheckConfig&quot;} {:command &quot;(defn messenger\n  \&quot;test method experiment\&quot;\n  ([]     (messenger \&quot;Hello world!\&quot;))\n  ([msg]  (apply str msg))\n  ([msg &amp; more]  (apply str msg more)))&quot;, :offset 147, :ns &quot;projectSetup.testCheck&quot;} {:command &quot;(messenger)&quot;, :offset 11, :ns &quot;user&quot;} {:command &quot;(projectSetup.testCheck/messenger)&quot;, :offset 34, :ns &quot;user&quot;} {:command &quot;(def testMessenger\n  \&quot;test the messenger function, taking in consideration the nil case\&quot;\n  (prop/for-all [v (gen/vector gen/string)]\n    (if (empty? v)\n      (= '(\&quot;Hello world!\&quot;) (apply messenger v))\n      (= (apply str v) (apply messenger v)))))&quot;, :offset 246, :ns &quot;projectSetup.testCheckConfig&quot;} {:command &quot;(= '(\&quot;Hello world!\&quot;) (apply projectSetup.testCheck/messenger []))&quot;, :offset 65, :ns &quot;user&quot;} {:command &quot;(apply projectSetup.testCheck/messenger [])&quot;, :offset 43, :ns &quot;user&quot;} {:command &quot;'(\&quot;Hello world!\&quot;)&quot;, :offset 17, :ns &quot;user&quot;} {:command &quot;(= (str \&quot;Hello world!\&quot;) (apply projectSetup.testCheck/messenger []))&quot;, :offset 68, :ns &quot;user&quot;} {:command &quot;(def testMessenger\n  \&quot;test the messenger function, taking in consideration the nil case\&quot;\n  (prop/for-all [v (gen/vector gen/string)]\n    (if (empty? v)\n      (= (str \&quot;Hello world!\&quot;) (apply messenger v))\n      (= (apply str v) (apply messenger v)))))&quot;, :offset 249, :ns &quot;projectSetup.testCheckConfig&quot;} {:command &quot;(tc/quick-check 1 testMessenger)&quot;, :offset 32, :ns &quot;projectSetup.testCheckConfig&quot;} {:command &quot;(tc/quick-check 100 testMessenger)&quot;, :offset 34, :ns &quot;projectSetup.testCheckConfig&quot;}], :remote []}}</component>
+  <component name="ReplState" timestamp="1537682378617">{:repl-history {:ide [], :local [{:command &quot;(deftype channel [sender receiver message])&quot;, :offset 43, :ns &quot;discourje.core&quot;} {:command &quot;(defprotocol source\n  \&quot;A participant identified as a Sender.\&quot;\n  (verzend [channel] \&quot;Send something through the channel\&quot;))&quot;, :offset 121, :ns &quot;discourje.core&quot;} {:command &quot;(deftype sender [name channel]\n  source\n  (verzend [channel] (println (.-message channel))))&quot;, :offset 92, :ns &quot;discourje.core&quot;} {:command &quot;(def testSender (-&gt;sender \&quot;tester\&quot; (-&gt;channel nil \&quot;a\&quot; (-&gt;message \&quot;i am sanding...\&quot;))))&quot;, :offset 86, :ns &quot;discourje.core&quot;} {:command &quot;(.verzend testSender)&quot;, :offset 21, :ns &quot;discourje.core-test&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(deftype channel [sender receiver bericht])\n\n(defprotocol source\n  \&quot;A participant identified as a Sender.\&quot;\n  (verzend [channel] \&quot;Send something through the channel\&quot;))\n\n(defprotocol sink\n  \&quot;A participant identified as a Receiver.\&quot;\n  (ontvang [channel] \&quot;Receive something from a channel\&quot;))\n\n(deftype sender [name channel]\n  source\n  (verzend [channel] (:bericht)))\n\n(def testSender\n  (sender. \&quot;tester\&quot;\n           (channel. nil nil\n                     (bericht. \&quot;i am sanding...\&quot;))))\n(verzend testSender)&quot;, :offset 640, :ns &quot;user&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(deftype channel [sender receiver bericht])\n\n(defprotocol source\n  \&quot;A participant identified as a Sender.\&quot;\n  (verzend [channel] \&quot;Send something through the channel\&quot;))\n\n(defprotocol sink\n  \&quot;A participant identified as a Receiver.\&quot;\n  (ontvang [channel] \&quot;Receive something from a channel\&quot;))\n\n(deftype sender [name channel]\n  source\n  (verzend [channel] (:bericht channel)))\n\n(def testSender\n  (sender. \&quot;tester\&quot;\n           (channel. nil nil\n                     (bericht. \&quot;i am sanding...\&quot;))))\n(verzend testSender)&quot;, :offset 648, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(deftype channel [sender receiver bericht])\n\n(defprotocol source\n  \&quot;A participant identified as a Sender.\&quot;\n  (verzend [channel] \&quot;Send something through the channel\&quot;))\n\n(defprotocol sink\n  \&quot;A participant identified as a Receiver.\&quot;\n  (ontvang [channel] \&quot;Receive something from a channel\&quot;))\n\n(deftype sender [name channel]\n  source\n  (verzend [channel] (:bericht channel (:data bericht))))\n\n(def testSender\n  (sender. \&quot;tester\&quot;\n           (channel. nil nil\n                     (bericht. \&quot;i am sanding...\&quot;))))\n(verzend testSender)&quot;, :offset 664, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(deftype channel [sender receiver bericht])\n\n(defprotocol source\n  \&quot;A participant identified as a Sender.\&quot;\n  (verzend [channel] \&quot;Send something through the channel\&quot;))\n\n(defprotocol sink\n  \&quot;A participant identified as a Receiver.\&quot;\n  (ontvang [channel] \&quot;Receive something from a channel\&quot;))\n\n(deftype sender [name channel]\n  source\n  (verzend [channel] (println (:bericht))))\n\n(def testSender\n  (sender. \&quot;tester\&quot;\n           (channel. nil nil\n                     (bericht. \&quot;i am sanding...\&quot;))))\n(verzend testSender)&quot;, :offset 650, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(deftype channel [sender receiver bericht])\n\n(defprotocol source\n  \&quot;A participant identified as a Sender.\&quot;\n  (verzend [channel] \&quot;Send something through the channel\&quot;))\n\n(defprotocol sink\n  \&quot;A participant identified as a Receiver.\&quot;\n  (ontvang [channel] \&quot;Receive something from a channel\&quot;))\n\n(deftype sender [name channel]\n  source\n  (verzend [channel] (println (:bericht channel))))\n\n(def testSender\n  (sender. \&quot;tester\&quot;\n           (channel. nil nil\n                     (bericht. \&quot;i am sanding...\&quot;))))\n(verzend testSender)&quot;, :offset 658, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(deftype channel [sender receiver bericht])\n\n(defprotocol source\n  \&quot;A participant identified as a Sender.\&quot;\n  (verzend [channel] \&quot;Send something through the channel\&quot;))\n\n(defprotocol sink\n  \&quot;A participant identified as a Receiver.\&quot;\n  (ontvang [channel] \&quot;Receive something from a channel\&quot;))\n\n(deftype sender [name channel]\n  source\n  (verzend [channel] (println (:bericht channel (:data bericht)))))\n\n(def testSender\n  (sender. \&quot;tester\&quot;\n           (channel. nil nil\n                     (bericht. \&quot;i am sanding...\&quot;))))\n(verzend testSender)&quot;, :offset 674, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(deftype channel [sender receiver bericht])\n\n(defprotocol source\n  \&quot;A participant identified as a Sender.\&quot;\n  (verzend [channel] \&quot;Send something through the channel\&quot;))\n\n(defprotocol sink\n  \&quot;A participant identified as a Receiver.\&quot;\n  (ontvang [channel] \&quot;Receive something from a channel\&quot;))\n\n(deftype sender [name channel]\n  source\n  (verzend [channel] (println (.-bericht))))\n\n(def testSender\n  (sender. \&quot;tester\&quot;\n           (channel. nil nil\n                     (bericht. \&quot;i am sanding...\&quot;))))\n(verzend testSender)&quot;, :offset 651, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(deftype channel [sender receiver bericht])\n\n(defprotocol source\n  \&quot;A participant identified as a Sender.\&quot;\n  (verzend [channel] \&quot;Send something through the channel\&quot;))\n\n(defprotocol sink\n  \&quot;A participant identified as a Receiver.\&quot;\n  (ontvang [channel] \&quot;Receive something from a channel\&quot;))\n\n(deftype sender [name channel]\n  source\n  (verzend [channel] (println (bericht. data))))\n\n(def testSender\n  (sender. \&quot;tester\&quot;\n           (channel. nil nil\n                     (bericht. \&quot;i am sanding...\&quot;))))\n(verzend testSender)&quot;, :offset 655, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(deftype channel [sender receiver bericht])\n\n(defprotocol source\n  \&quot;A participant identified as a Sender.\&quot;\n  (verzend [channel] \&quot;Send something through the channel\&quot;))\n\n(defprotocol sink\n  \&quot;A participant identified as a Receiver.\&quot;\n  (ontvang [channel] \&quot;Receive something from a channel\&quot;))\n\n(deftype sender [name channel]\n  source\n  (verzend [channel]\n    (println (:data bericht))))\n\n(def testSender\n  (sender. \&quot;tester\&quot;\n           (channel. nil nil\n                     (bericht. \&quot;i am sanding...\&quot;))))\n(verzend testSender)&quot;, :offset 659, :ns &quot;discourje.core&quot;} {:command &quot;(verzend testSender)&quot;, :offset 20, :ns &quot;discourje.core&quot;} {:command &quot;(def testSender\n  (sender. \&quot;tester\&quot;\n           (channel. nil nil\n                     (bericht. \&quot;i am sanding...\&quot;))))&quot;, :offset 117, :ns &quot;discourje.core&quot;} {:command &quot;(extends? sender  testSender)&quot;, :offset 29, :ns &quot;discourje.core&quot;} {:command &quot;(extends? source  testSender)&quot;, :offset 29, :ns &quot;discourje.core&quot;} {:command &quot;(extends? source  sender)&quot;, :offset 25, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(deftype channel [sender receiver bericht])\n\n(def testChannel nil nil \&quot;i am sending\&quot;)&quot;, :offset 223, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(deftype channel [sender receiver bericht])\n\n(def testChannel (.channel nil nil \&quot;i am sending\&quot;))&quot;, :offset 234, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(deftype channel [sender receiver bericht])\n\n(def testChannel (channel. nil nil \&quot;i am sending\&quot;))&quot;, :offset 234, :ns &quot;discourje.core&quot;} {:command &quot;(:data (:bericht testChannel))&quot;, :offset 30, :ns &quot;discourje.core&quot;} {:command &quot;(.data (.bericht testChannel))&quot;, :offset 30, :ns &quot;discourje.core&quot;} {:command &quot;(:bericht testChannel)&quot;, :offset 22, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(def testBericht (bericht. \&quot;i am sending\&quot;))\n\n(deftype channel [sender receiver bericht])\n\n(def testChannel (channel. nil nil \&quot;i am sending\&quot;))\n\n(defprotocol source\n  \&quot;A participant identified as a Sender.\&quot;\n  (verzend [channel] \&quot;Send something through the channel\&quot;))\n\n(defprotocol sink\n  \&quot;A participant identified as a Receiver.\&quot;\n  (ontvang [channel] \&quot;Receive something from a channel\&quot;))\n\n(deftype sender [name channel]\n  source\n  (verzend [channel]\n    (println (:data bericht))))\n\n(def testSender\n  (sender. \&quot;tester\&quot;\n           (channel. nil nil\n                     (bericht. \&quot;i am sanding...\&quot;))))\n(verzend testSender)&quot;, :offset 757, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(def testBericht (bericht. \&quot;i am sending\&quot;))\n(:bericht discourje.core.testBericht)&quot;, :offset 219, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(def testBericht (bericht. \&quot;i am sending\&quot;))\n(:bericht testBericht)&quot;, :offset 204, :ns &quot;discourje.core&quot;} {:command &quot;(defrecord bericht [data])\n(def testBericht (bericht. \&quot;i am sending\&quot;))\n(:bericht testBericht)&quot;, :offset 93, :ns &quot;discourje.core&quot;} {:command &quot;(defrecord bericht [data])&quot;, :offset 26, :ns &quot;discourje.core&quot;} {:command &quot;(def testBericht (bericht. \&quot;i am sending\&quot;))&quot;, :offset 43, :ns &quot;discourje.core&quot;} {:command &quot;(:bericht testBericht)&quot;, :offset 22, :ns &quot;discourje.core&quot;} {:command &quot;(:data testBericht)&quot;, :offset 19, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(deftype channel [sender receiver bericht])\n\n\n\n(def testChannel (channel. nil nil \&quot;i am sending\&quot;))\n\n(defprotocol source\n  \&quot;A participant identified as a Sender.\&quot;\n  (verzend [channel] \&quot;Send something through the channel\&quot;))\n\n(defprotocol sink\n  \&quot;A participant identified as a Receiver.\&quot;\n  (ontvang [channel] \&quot;Receive something from a channel\&quot;))\n\n(deftype sender [name channel]\n  source\n  (verzend [channel]\n    (:data bericht)))\n\n(def testSender\n  (sender. \&quot;tester\&quot;\n           (channel. nil nil\n                     (bericht. \&quot;i am sanding...\&quot;))))\n(verzend testSender)&quot;, :offset 704, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(deftype channel [sender receiver bericht])\n\n(def testChannel (channel. nil nil (bericht. \&quot;i am sending\&quot;) ))&quot;, :offset 246, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(deftype channel [sender receiver bericht])\n\n(def testChannel (channel. nil nil (bericht. \&quot;i am sending\&quot;) ))\n\n(.channel testChannel)&quot;, :offset 270, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(deftype channel [sender receiver bericht])\n\n(def testChannel (channel. nil nil (bericht. \&quot;i am sending\&quot;) ))\n\n(.bericht testChannel)&quot;, :offset 270, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(deftype channel [sender receiver bericht])\n\n(def testChannel (channel. nil nil (bericht. \&quot;i am sending\&quot;) ))\n\n(.bericht testChannel (:data))&quot;, :offset 278, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(deftype channel [sender receiver bericht])\n\n(def testChannel (channel. nil nil (bericht. \&quot;i am sending\&quot;) ))\n\n(.bericht testChannel (:data bericht))&quot;, :offset 286, :ns &quot;discourje.core&quot;} {:command &quot;(:data (.bericht testChannel))&quot;, :offset 30, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(deftype channel [sender receiver bericht])\n\n(def testChannel (channel. nil nil (bericht. \&quot;i am sending\&quot;) ))\n\n(:data (.bericht testChannel))\n(defprotocol source\n  \&quot;A participant identified as a Sender.\&quot;\n  (verzend [channel] \&quot;Send something through the channel\&quot;))\n\n(defprotocol sink\n  \&quot;A participant identified as a Receiver.\&quot;\n  (ontvang [channel] \&quot;Receive something from a channel\&quot;))\n\n(deftype sender [name channel]\n  source\n  (verzend [channel]\n    (:data (bericht channel) )))\n\n(def testSender\n  (sender. \&quot;tester\&quot;\n           (channel. nil nil\n                     (bericht. \&quot;i am sanding...\&quot;))))\n(verzend testSender)&quot;, :offset 756, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(deftype channel [sender receiver bericht])\n\n(def testChannel (channel. nil nil (bericht. \&quot;i am sending\&quot;) ))\n\n(:data (.bericht testChannel))\n(defprotocol source\n  \&quot;A participant identified as a Sender.\&quot;\n  (verzend [channel] \&quot;Send something through the channel\&quot;))\n\n(defprotocol sink\n  \&quot;A participant identified as a Receiver.\&quot;\n  (ontvang [channel] \&quot;Receive something from a channel\&quot;))\n\n(deftype sender [name channel]\n  source\n  (verzend [channel]\n    (:data (.bericht channel) )))\n\n(def testSender\n  (sender. \&quot;tester\&quot;\n           (channel. nil nil\n                     (bericht. \&quot;i am sanding...\&quot;))))\n(verzend testSender)&quot;, :offset 757, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core)\n;; defrecord &amp; deftype does not support a doc string, maybe write custom macro that does?\n\n(defrecord bericht [data])\n(deftype channel [sender receiver bericht])\n\n(def testChannel (channel. nil nil (bericht. \&quot;i am sending\&quot;) ))\n\n(:data (.bericht testChannel))\n(defprotocol source\n  \&quot;A participant identified as a Sender.\&quot;\n  (verzend [channel] \&quot;Send something through the channel\&quot;))\n\n(defprotocol sink\n  \&quot;A participant identified as a Receiver.\&quot;\n  (ontvang [channel] \&quot;Receive something from a channel\&quot;))\n\n(deftype sender [name channel]\n  source\n  (verzend [channel]\n    (:data (.bericht channel) )))&quot;, :offset 617, :ns &quot;discourje.core&quot;} {:command &quot;\n(def testSender\n  (sender. \&quot;tester\&quot;\n           (channel. nil nil\n                     (bericht. \&quot;i am sanding...\&quot;))))&quot;, :offset 118, :ns &quot;discourje.core&quot;} {:command &quot;(verzend testChannel)&quot;, :offset 21, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core-test\n  (:require [clojure.test :refer :all]\n            [discourje.core :refer :all]))\n\n(def testBericht (bericht. \&quot;i am sending\&quot;))\n\n(deftest berichtTest\n         (= (str \&quot;i am sending\&quot;) (:data testBericht)))&quot;, :offset 227, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core-test\n  (:require [clojure.test :refer :all]\n            [discourje.core :refer :all]))\n\n(def testBericht (bericht. \&quot;i am sending\&quot;))\n\n(deftest berichtTest\n  (is (= (str \&quot;i am sending\&quot;) (:data testBericht)) ))&quot;, :offset 226, :ns &quot;discourje.core-test&quot;} {:command &quot;(ns discourje.core-test\n  (:require [clojure.test :refer :all]\n            [discourje.core :refer :all]))\n\n;;(def testBericht (bericht. \&quot;i am sending\&quot;))\n\n(deftest berichtTest\n  (is (= (str \&quot;i am sending\&quot;) (:data testBericht)) ))&quot;, :offset 228, :ns &quot;discourje.core-test&quot;} {:command &quot;(deftest berichtTest\n  (is (= (str \&quot;i am sending\&quot;) (:data testBericht)) ))&quot;, :offset 74, :ns &quot;discourje.core-test&quot;} {:command &quot;(deftype sender [name channel]\n  source\n  (send [channel]\n     (:data (.message channel) )))&quot;, :offset 92, :ns &quot;discourje.core&quot;} {:command &quot;(send. sender)&quot;, :offset 14, :ns &quot;user&quot;} {:command &quot;(.send sender)&quot;, :offset 14, :ns &quot;user&quot;} {:command &quot;(deftype sender [name channel]\n  source\n  (send [channel]\n     (:data (message. channel) )))&quot;, :offset 92, :ns &quot;discourje.core&quot;} {:command &quot;(send sender)&quot;, :offset 13, :ns &quot;user&quot;} {:command &quot;(def testSender (-&gt;sender \&quot;tester\&quot; testChannel))&quot;, :offset 48, :ns &quot;discourje.core-test&quot;} {:command &quot;(send. testSender)&quot;, :offset 18, :ns &quot;user&quot;} {:command &quot;(send. discourje.core.testSender)&quot;, :offset 33, :ns &quot;user&quot;} {:command &quot;(send. discourje.core-test.testSender)&quot;, :offset 38, :ns &quot;user&quot;} {:command &quot;(send discourje.core-test.testSender)&quot;, :offset 37, :ns &quot;user&quot;} {:command &quot;(.send discourje.core-test.testSender)&quot;, :offset 38, :ns &quot;user&quot;} {:command &quot;(send testChannel)&quot;, :offset 18, :ns &quot;discourje.core-test&quot;} {:command &quot;(send testSender)&quot;, :offset 17, :ns &quot;discourje.core-test&quot;} {:command &quot;(defrecord testChannel\n  channel\n  (transmit [testSource testSink messageToSend] ()))&quot;, :offset 85, :ns &quot;discourje.core-test&quot;} {:command &quot;(ns discourje.core\n  (:refer-clojure :exclude [send]))\n&quot;, :offset 55, :ns &quot;user&quot;} {:command &quot;\n(deftest messageTest\n  (let [m (message. \&quot;hello\&quot;)]\n    (is (= (str \&quot;hello\&quot;) (:data m)))))\n\n(defrecord testSource [message]\n  source\n  (send [message] (:data message)))\n\n(defrecord testSink [message]\n  sink\n  (receive [message] (:data message)))\n\n;setting up some test data\n(def sender (participant. \&quot;sender\&quot;))\n(def receiver (participant. \&quot;receiver\&quot;))\n(def messageToSend (message. \&quot;First message is send!\&quot;))&quot;, :offset 407, :ns &quot;discourje.core-test&quot;} {:command &quot;(let [s (.source channel)\n      r (.sink channel)\n      m (.message channel)]\n    (bla s r m))&quot;, :offset 94, :ns &quot;discourje.core-test&quot;} {:command &quot;(defrecord testChannel [source sink message]\n  channel\n  (transmit source sink message () )\n  (bla source sink message)(fn [m] (.length (:data m) ))) ;anonymous function applying java .length to string&quot;, :offset 201, :ns &quot;discourje.core-test&quot;} {:command &quot;(defrecord testChannel [source sink message]\n  channel\n  (transmit [source sink message ]() )\n  (bla [source sink message] (fn [m] (.length (:data m))))) &quot;, :offset 154, :ns &quot;discourje.core-test&quot;} {:command &quot;(defrecord testSource [message]\n  source\n  (send [message] (:data message)))\n\n(defrecord testSink [message]\n  sink\n  (receive [message] (:data message)))&quot;, :offset 153, :ns &quot;discourje.core-test&quot;} {:command &quot;(defprotocol source\n  \&quot;A participant identified as a Sender.\&quot;\n  (send [message] \&quot;The message to send\&quot;))\n\n(defprotocol sink\n  \&quot;A participant identified as a Receiver.\&quot;\n  (receive [message] \&quot;Receive a message\&quot;))&quot;, :offset 209, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core-test\n  (:require [clojure.test :refer :all]\n            [discourje.core :refer :all])\n  (:refer-clojure :exclude [send])\n  (:import (discourje.core message channel participant)))\n\n(deftest messageTest\n  (let [m (message. \&quot;hello\&quot;)]\n    (is (= (str \&quot;hello\&quot;) (:data m)))))\n\n(defrecord testSource [message]\n  source\n  (send [message] (:data message)))\n\n(defrecord testSink [message]\n  sink\n  (receive [message] (:data message)))\n\n;defining a test channel implementing both overloads:\n;sending the message and sending the length of the string as message\n(defrecord testChannel [source sink message]\n  channel\n  (transmit [source sink message ]() )\n  (bla [source sink message] (fn [m] (.length (:data m))))) ;anonymous function applying java .length to string\n\n;setting up some test data\n(def sender (participant. \&quot;sender\&quot;))\n(def receiver (participant. \&quot;receiver\&quot;))\n(def messageToSend (message. \&quot;First message is send!\&quot;))\n;test channel\n(def channel (-&gt;testChannel sender, receiver, messageToSend))\n\n(let [s (.source channel)\n      r (.sink channel)\n      m (.message channel)]\n    (bla s r m))&quot;, :offset 1107, :ns &quot;user&quot;} {:command &quot;(defrecord testChannel [source sink message]\n  channel\n  (transmit [source sink message ]() )\n  (bla [source sink message] (fn [m] (.length (:data m)))))&quot;, :offset 153, :ns &quot;discourje.core-test&quot;} {:command &quot;\n(defrecord testSource [message]\n  source\n  (send [message] (:data message)))&quot;, :offset 77, :ns &quot;discourje.core-test&quot;} {:command &quot;(defrecord testChannel [source sink message]\n  channel\n  (transmit [source sink message])\n  (bla [source sink message] (fn [m] (.length (:data m)))))&quot;, :offset 149, :ns &quot;discourje.core-test&quot;} {:command &quot;(defrecord testChannel [source sink message]\n  channel\n  (transmit [source sink message])\n  (bla [source sink message]))&quot;, :offset 120, :ns &quot;discourje.core-test&quot;} {:command &quot;(defrecord testChannel [source sink message]\n  channel\n  (transmit [source sink message]))&quot;, :offset 90, :ns &quot;discourje.core-test&quot;} {:command &quot;(defrecord testChannel [source sink message]\n  channel\n  ;(transmit [source sink message])\n  (bla [source sink message] (fn [m] (.length (:data m)))))&quot;, :offset 150, :ns &quot;discourje.core-test&quot;} {:command &quot;(defrecord testChannel [source sink message]\n  channel\n  ;(transmit [source sink message])\n  (testTransmit [source sink message] (fn [m] (.length (:data m)))))&quot;, :offset 159, :ns &quot;discourje.core-test&quot;} {:command &quot;(defprotocol channel\n  ;\&quot;Define channel interface with overloads(arity)\&quot;\n  (transmit [source sink message])              ;\&quot;transmit from source to sink the following message\&quot;\n  (transmit [source sink message messageMethod])\n  (testTransmit [source sink message])) &quot;, :offset 264, :ns &quot;discourje.core&quot;} {:command &quot;(defprotocol channel\n  ;\&quot;Define channel interface with overloads(arity)\&quot;\n  (transmit\n    [source sink message]\n    [source sink message messageMethod])              ;\&quot;transmit from source to sink the following message\&quot;\n  (testTransmit\n    [source sink message])) &quot;, :offset 263, :ns &quot;discourje.core&quot;} {:command &quot;(let [s (.source channel)\n      r (.sink channel)\n      m (.message channel)]\n    (testTransmit s r m))&quot;, :offset 103, :ns &quot;discourje.core-test&quot;} {:command &quot;(ns discourje.core\n  (:refer-clojure :exclude [send]))\n\n(defrecord message [data])\n\n(defprotocol source\n  \&quot;A participant identified as a Sender.\&quot;\n  (send [message] \&quot;The message to send\&quot;))\n\n(defprotocol sink\n  \&quot;A participant identified as a Receiver.\&quot;\n  (receive [message] \&quot;Receive a message\&quot;))\n\n(defprotocol channel\n  ;\&quot;Define channel interface with overloads(arity)\&quot;\n  (transmit\n    [source sink message]\n    [source sink message messageMethod]))            ;\&quot;transmit from source to sink the following message\&quot;\n  ;(testTransmit\n  ;  [source sink message]))  ;\&quot;transmit from source to sink the following message executing the desire method\&quot;\n\n;participant with source and sink template\n(defrecord participant [name]\n  source\n    (send [sendableMessage] (:data sendableMessage))\n  sink\n    (receive [receivableMessage] (:data receivableMessage)))&quot;, :offset 845, :ns &quot;user&quot;} {:command &quot;(defrecord testSource [message]\n  source\n  (send [message] (:data message)))&quot;, :offset 76, :ns &quot;discourje.core-test&quot;} {:command &quot;(defrecord testChannel [source sink message]\n  channel\n  (transmit [source sink message](fn [m] (.length (:data m)))))&quot;, :offset 118, :ns &quot;discourje.core-test&quot;} {:command &quot;(defrecord participant [name]\n  source\n    (send [sendableMessage] (:data sendableMessage))\n  sink\n    (receive [receivableMessage] (:data receivableMessage)))&quot;, :offset 159, :ns &quot;discourje.core&quot;} {:command &quot;(def sender (participant. \&quot;sender\&quot;))&quot;, :offset 36, :ns &quot;discourje.core-test&quot;} {:command &quot;(defprotocol sink\n  \&quot;A participant identified as a Receiver.\&quot;\n  (receive [message] \&quot;Receive a message\&quot;))&quot;, :offset 104, :ns &quot;discourje.core&quot;} {:command &quot;(ns discourje.core-test\n  (:require [clojure.test :refer :all]\n            [discourje.core :refer :all])\n  (:refer-clojure :exclude [send])\n  (:import (discourje.core message channel participant)))&quot;, :offset 197, :ns &quot;user&quot;} {:command &quot;(defrecord testChannel [s r m]\n  channel\n  (transmit [s r m] (fn [me] (.length (:data me)))))&quot;, :offset 93, :ns &quot;discourje.core-test&quot;} {:command &quot;(ns discourje.core-test\n  (:require [clojure.test :refer :all]\n            [discourje.core :refer :all])\n  (:refer-clojure :exclude [send])\n  (:import (discourje.core message participant channel)))&quot;, :offset 197, :ns &quot;user&quot;} {:command &quot;(defrecord testSource [message]\n  source\n  (send [message] (:data message)))\n&quot;, :offset 77, :ns &quot;discourje.core-test&quot;} {:command &quot;(defrecord testSink [message]\n  sink\n  (receive [message] (:data message)))&quot;, :offset 75, :ns &quot;discourje.core-test&quot;} {:command &quot;(defrecord testChannel [s r m]\n  discourje.core.channel\n  (transmit [s r m] (fn [me] (.length (:data me)))))&quot;, :offset 108, :ns &quot;discourje.core-test&quot;} {:command &quot;(def sender (participant. \&quot;sender\&quot;))\n(def receiver (participant. \&quot;receiver\&quot;))\n(def messageToSend (message. \&quot;First message is send!\&quot;))&quot;, :offset 133, :ns &quot;discourje.core-test&quot;} {:command &quot;(def chan (-&gt;testChannel sender, receiver, messageToSend))&quot;, :offset 58, :ns &quot;discourje.core-test&quot;} {:command &quot;(def chan (-&gt;testChannel testSource, testSink, messageToSend))&quot;, :offset 62, :ns &quot;discourje.core-test&quot;} {:command &quot;(let [s (.s chan)\n      r (.r chan)\n      m (.m chan)]\n    (transmit s r m))&quot;, :offset 76, :ns &quot;discourje.core-test&quot;} {:command &quot;(ns discourje.core-test\n  (:require [clojure.test :refer :all]\n            [discourje.core :refer :all])\n  (:refer-clojure :exclude [send])\n  (:import (discourje.core message participant)))&quot;, :offset 189, :ns &quot;user&quot;} {:command &quot;(defrecord testChannel [ch s r m]\n  discourje.core.channel\n  (transmit [ch s r m] (fn [me] (.length (:data me)))))&quot;, :offset 114, :ns &quot;discourje.core-test&quot;} {:command &quot;(def chan (-&gt;testChannel chan testSource, testSink, messageToSend))&quot;, :offset 67, :ns &quot;discourje.core-test&quot;} {:command &quot;(let [s (.s chan)\n      r (.r chan)\n      m (.m chan)]\n    (transmit chan s r m))&quot;, :offset 81, :ns &quot;discourje.core-test&quot;}], :remote []}}</component>
   <component name="RunDashboard">
     <option name="ruleStates">
       <list>
@@ -219,7 +258,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Clojure REPL.LeiningenREPL">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="HTML_USED" value="false" />
       <option name="WIDTH" value="400" />
@@ -248,6 +287,16 @@
       <setting name="parameters" value="" />
       <setting name="workingDir" value="$PROJECT_DIR$" />
       <setting name="profiles" value="" />
+    </configuration>
+    <configuration name="core" type="ClojureScriptRunConfiguration" factoryName="Clojure Script" temporary="true">
+      <module name="discourje" />
+      <setting name="path" value="$PROJECT_DIR$/src/discourje/core.clj" />
+      <setting name="namespace" value="" />
+      <setting name="useLein" value="false" />
+      <setting name="profiles" value="" />
+      <setting name="vmparams" value="" />
+      <setting name="params" value="" />
+      <setting name="workDir" value="$PROJECT_DIR$/src/discourje" />
     </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
@@ -309,6 +358,15 @@
       <option name="PROGRAM_PARAMETERS" />
       <predefined_log_file id="idea.log" enabled="true" />
     </configuration>
+    <list size="2">
+      <item index="0" class="java.lang.String" itemvalue="Clojure REPL.LeiningenREPL" />
+      <item index="1" class="java.lang.String" itemvalue="Clojure Application.core" />
+    </list>
+    <recent_temporary>
+      <list size="1">
+        <item index="0" class="java.lang.String" itemvalue="Clojure Application.core" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="ShelveChangesManager" show_recycled="false">
     <option name="remove_strategy" value="false" />
@@ -328,6 +386,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="1912" y="-8" width="1936" height="1066" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -336,9 +395,9 @@
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="REPL" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39270833" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="REPL" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2734375" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32948583" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.21091291" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Leiningen" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -357,6 +416,35 @@
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
+    <layout-to-restore>
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="REPL" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2734375" sideWeight="0.5" order="5" side_tool="true" content_ui="tabs" />
+      <window_info id="Leiningen" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.17733473" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32948583" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.21091291" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="true" content_ui="tabs" />
+    </layout-to-restore>
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
@@ -376,7 +464,15 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/test/projectSetup/testCheckConfig.clj">
+    <entry file="file://$PROJECT_DIR$/test/discourje/experimentsTests.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="13" column="0" lean-forward="false" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/discourje/core.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -384,18 +480,198 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/projectSetup/testCheck.clj">
+    <entry file="file://$PROJECT_DIR$/test/discourje/core_test.clj">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="10" column="25" lean-forward="false" selection-start-line="10" selection-start-column="25" selection-end-line="10" selection-end-column="25" />
+        <state relative-caret-position="357">
+          <caret line="21" column="41" lean-forward="false" selection-start-line="21" selection-start-column="41" selection-end-line="21" selection-end-column="41" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/projectSetup/ProjectSetup.clj">
+    <entry file="file://$PROJECT_DIR$/src/discourje/experiments.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="20" column="0" lean-forward="true" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/discourje/threeBuyerProtocol/ThreeBuyerProtocol.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="14" column="0" lean-forward="false" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/discourje/experimentsTests.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="13" column="0" lean-forward="true" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/discourje/core.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/discourje/core_test.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="8" column="38" lean-forward="false" selection-start-line="8" selection-start-column="38" selection-end-line="8" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/discourje/experiments.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="0" lean-forward="false" selection-start-line="11" selection-start-column="0" selection-end-line="13" selection-end-column="57" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/discourje/experimentsTests.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="2" lean-forward="false" selection-start-line="11" selection-start-column="2" selection-end-line="11" selection-end-column="51" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/discourje/core.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="7" column="41" lean-forward="true" selection-start-line="7" selection-start-column="41" selection-end-line="7" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/discourje/core_test.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="8" column="38" lean-forward="true" selection-start-line="8" selection-start-column="38" selection-end-line="8" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/discourje/experiments.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="0" lean-forward="false" selection-start-line="11" selection-start-column="0" selection-end-line="13" selection-end-column="57" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/discourje/experimentsTests.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="2" lean-forward="false" selection-start-line="11" selection-start-column="2" selection-end-line="11" selection-end-column="51" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/discourje/core.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="42" lean-forward="true" selection-start-line="11" selection-start-column="42" selection-end-line="11" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/discourje/core_test.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/discourje/core.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" column="34" lean-forward="true" selection-start-line="1" selection-start-column="2" selection-end-line="1" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/projectSetup/testCheckConfig.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="20" column="46" lean-forward="false" selection-start-line="20" selection-start-column="46" selection-end-line="20" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/testCheck.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="35" lean-forward="false" selection-start-line="11" selection-start-column="21" selection-end-line="11" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="187">
           <caret line="11" column="14" lean-forward="false" selection-start-line="11" selection-start-column="14" selection-end-line="11" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/discourje/core.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="17" column="51" lean-forward="false" selection-start-line="17" selection-start-column="51" selection-end-line="17" selection-end-column="51" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/discourje/core_test.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/projectSetup/testCheckConfig.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="20" column="46" lean-forward="true" selection-start-line="20" selection-start-column="46" selection-end-line="20" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/testCheck.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="35" lean-forward="true" selection-start-line="11" selection-start-column="21" selection-end-line="11" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="14" lean-forward="true" selection-start-line="11" selection-start-column="14" selection-end-line="11" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/discourje/core_test.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="7" column="0" lean-forward="true" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/discourje/core.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -408,19 +684,39 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/projectSetup/testCheck.clj">
+    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/testCheck.clj">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="6" lean-forward="false" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
+        <state relative-caret-position="170">
+          <caret line="10" column="25" lean-forward="false" selection-start-line="10" selection-start-column="25" selection-end-line="10" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="14" lean-forward="false" selection-start-line="11" selection-start-column="14" selection-end-line="11" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/projectSetup/testCheckConfig.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/projectSetup/ProjectSetup.clj">
+    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/testCheck.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="6" lean-forward="false" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="187">
           <caret line="11" column="14" lean-forward="true" selection-start-line="11" selection-start-column="14" selection-end-line="11" selection-end-column="14" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -459,13 +755,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/discourje/tbpTests/TBPTests.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="19" lean-forward="false" selection-start-line="2" selection-start-column="19" selection-end-line="2" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
@@ -476,13 +765,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/discourje/threeBuyerProtocol/ThreeBuyerProtocol.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="52" lean-forward="false" selection-start-line="0" selection-start-column="52" selection-end-line="0" selection-end-column="52" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/project.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="119">
@@ -490,49 +772,87 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/projectSetup/ProjectSetupTests.clj">
+    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="23" column="29" lean-forward="true" selection-start-line="23" selection-start-column="29" selection-end-line="23" selection-end-column="29" />
+        <state relative-caret-position="0">
+          <caret line="0" column="29" lean-forward="false" selection-start-line="0" selection-start-column="29" selection-end-line="0" selection-end-column="29" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/projectSetup/testCheck.clj">
+    <entry file="file://$PROJECT_DIR$/target/classes/META-INF/maven/discourje/discourje/pom.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/testCheck.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="26" lean-forward="false" selection-start-line="0" selection-start-column="26" selection-end-line="0" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/discourje/tbpTests/TBPTests.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="187">
-          <caret line="11" column="35" lean-forward="true" selection-start-line="11" selection-start-column="21" selection-end-line="11" selection-end-column="35" />
+          <caret line="11" column="0" lean-forward="true" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/discourje/experimentsTests.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="13" column="0" lean-forward="false" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/projectSetup/testCheckConfig.clj">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="20" column="46" lean-forward="true" selection-start-line="20" selection-start-column="46" selection-end-line="20" selection-end-column="46" />
+        <state relative-caret-position="204">
+          <caret line="12" column="0" lean-forward="false" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/projectSetup/ProjectSetup.clj">
+    <entry file="file://$PROJECT_DIR$/test/projectSetup/ProjectSetupTests.clj">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="14" lean-forward="true" selection-start-line="11" selection-start-column="14" selection-end-line="11" selection-end-column="14" />
+        <state relative-caret-position="136">
+          <caret line="8" column="33" lean-forward="false" selection-start-line="8" selection-start-column="25" selection-end-line="8" selection-end-column="33" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/discourje/core_test.clj">
+    <entry file="file://$PROJECT_DIR$/src/discourje/threeBuyerProtocol/ThreeBuyerProtocol.clj">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" column="0" lean-forward="true" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+        <state relative-caret-position="221">
+          <caret line="13" column="0" lean-forward="false" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/discourje/experiments.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="17" column="7" lean-forward="false" selection-start-line="17" selection-start-column="3" selection-end-line="17" selection-end-column="7" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/discourje/core.clj">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+        <state relative-caret-position="136">
+          <caret line="8" column="0" lean-forward="false" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/discourje/core_test.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="374">
+          <caret line="22" column="22" lean-forward="true" selection-start-line="22" selection-start-column="22" selection-end-line="22" selection-end-column="22" />
           <folding />
         </state>
       </provider>
