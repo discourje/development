@@ -19,17 +19,23 @@
 ;defining a test channel implementing both overloads:
 ;sending the message and sending the length of the string as message
 (defrecord testChannel [ch s r m]
-  discourje.core.channel
-  (transmit [ch s r m] (fn [me] (.length (:data me)))))
-  ;(testTransmit [source sink message] (fn [m] (.length (:data m))))) ;anonymous function applying java .length to string
+  channel
+  (transmit [ch s r m]
+    (let [mes m]
+      (str (:data mes)))))
 
 ;setting up some test data
 (def sender (participant. "sender"))
 (def receiver (participant. "receiver"))
 (def messageToSend (message. "First message is send!"))
 
+(fn [messageToSend] (str (:data messageToSend)))
+
+(let [m messageToSend]
+  (str (:data m)))
+
 ;test channel
-(def chan (->testChannel chan testSource, testSink, messageToSend))
+(def chan (->testChannel chan sender, receiver, messageToSend))
 ;
 (let [s (.s chan)
       r (.r chan)

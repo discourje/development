@@ -12,7 +12,7 @@
   (receive [message] "Receive a message"))
 
 (defprotocol channel
-  ;"Define channel interface with overloads(arity)"
+  "Define channel interface with overloads(arity)"
   (transmit
     [ch source sink message]
     [ch source sink message messageMethod]))            ;"transmit from source to sink the following message"
