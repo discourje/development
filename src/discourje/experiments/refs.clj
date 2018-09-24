@@ -5,26 +5,33 @@
 
 (defprotocol source
   "A participant identified as a Sender."
-  (se [message] "The message to send"))
+  (se [source message] "The message to send"))
 
 (defprotocol sink
   "A participant identified as a Receiver."
-  (re [message] "Receive a message"))
+  (re [sink message] "Receive a message"))
 
 (defrecord participant [name]
   source
-  (se [message] (:data message))
+  (se [this message] (format "Message send from: %s, " (:name this)))
   sink
-  (re [message] (:data message)))
+  (re [this message] (format "%s received a message: %s" (:name this) (:data message))))
 
 (def alice (ref (->participant "alice")))
 (def bob (ref (->participant "bob")))
 
-(def channel (ref ()))
+(def channel (ref ""))
 
 (defn sendMessage [source sink message]
-  (dosync (alter channel conj message)  ))
+  (dosync
+    (ref-set channel
+             (let [so @source
+                   si @sink
+                   me message]
+               (re si
+                   (->message
+                     (format "%s %s" (se so me) me)))))))
 
-(sendMessage alice bob (->message "Hi there"))
-(sendMessage alice bob (->message "Hi there again"))
-(sendMessage alice bob (->message "Hi there again and again"))
+(sendMessage alice bob "Hi there bob")
+(sendMessage bob alice "Hi there too alice")
+(sendMessage alice bob "Hi there again")
