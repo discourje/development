@@ -36,7 +36,7 @@
 
 ;test channel
 (def chan (->testChannel chan sender, receiver, messageToSend))
-;
+
 (let [s (.s chan)
       r (.r chan)
       m (.m chan)]

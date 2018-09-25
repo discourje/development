@@ -13,25 +13,51 @@
 
 (defrecord participant [name]
   source
-  (se [this message] (format "Message send from: %s, " (:name this)))
+  (se [this message] (format "Message send from: %s, content:" (:name this)))
   sink
-  (re [this message] (format "%s received a message: %s" (:name this) (:data message))))
+  (re [this message] (format "%s received a message, %s" (:name this) (:data message))))
 
 (def alice (ref (->participant "alice")))
 (def bob (ref (->participant "bob")))
 
 (def channel (ref ""))
 
-(defn sendMessage [source sink message]
+(defn sendMessageSimple
+  [source sink message]
   (dosync
     (ref-set channel
-             (let [so @source
-                   si @sink
-                   me message]
-               (re si
-                   (->message
-                     (format "%s %s" (se so me) me)))))))
+                  (re @sink
+                   (->message (format "%s %s" (se @source message) message))))))
 
-(sendMessage alice bob "Hi there bob")
-(sendMessage bob alice "Hi there too alice")
-(sendMessage alice bob "Hi there again")
+(sendMessageSimple alice bob "Hi there bob")
+(sendMessageSimple bob alice "Hi there too alice")
+(sendMessageSimple alice bob "Hi there again")
+
+(defn sendMessageArity
+  ([source sink message]
+   (sendMessageArity source sink message
+                     (re @sink
+                         (->message (format "%s %s" (se @source message) message)))))
+  ([source sink message function]
+   (dosync
+     (ref-set channel function))))
+
+
+(sendMessageArity alice bob "Hey bob, my name is Alice.")
+(sendMessageArity bob alice "Hi Alice." (re @bob
+                                            (->message
+                                              (format "This message is received with the arity overload! %s %s" (se @alice "Hi Alice.") "Hi Alice."))))
+(def amountOfMessages (ref 0))
+(defn updateAmountMessages [x]
+  (dosync
+    (ref-set amountOfMessages (+ @amountOfMessages x))))
+
+(add-watch channel :stateWatcher
+           (fn [key ref old-state new-state]
+             (prn "-- channel has changed --")
+             (if (= old-state new-state)
+               (prn "Old and New are identical with value: " new-state)
+               (prn (format
+                      "old state %s
+                      new state %s" old-state new-state)))
+             (prn (format "messages received on channel: %s",(updateAmountMessages 1)))))
