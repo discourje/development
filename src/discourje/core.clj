@@ -14,7 +14,4 @@
   "Define channel interface with overloads(arity)"
   (transmit [chan dcj-source dcj-sink message]))
 
-
-
-
 (defn addMessage [])
