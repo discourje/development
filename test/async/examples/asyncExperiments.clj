@@ -279,7 +279,7 @@
 (def exec-chan (chan))
 (def thread-pool (thread-pool-service exec-chan (fn [x]
                                                   (println x)
-                                                  (Thread/sleep 5000)) 1000 3000))
+                                                  (Thread/sleep 5000)) 10000 3000))
 
 
 
