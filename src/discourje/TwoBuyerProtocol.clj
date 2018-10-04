@@ -32,6 +32,7 @@
 (defn getRandomDate "Get a random date, in the future, up to a maximum range (inclusive)"
   [maxRange]
   (getDate (+ (rand-int maxRange) 1)))
+
 ; generate a (pseudo)random bool, use the random number generator between 0 and 2(exclusive) and check whether it is 1
 (defn randomBoolean "Generate random boolean"
   []
@@ -55,21 +56,21 @@
   (when-let [message (<! s)]
     (cond
       (= (:tag message) :title)
-      (println (format "Book title received: %s" (:msg message)) )
+      (println (format "Book title received: %s" (:msg message)))
       (let [quote (+ (rand-int 30) 1)]                      ;use let construct to define a quote variable as a random number between 1 (inclusive) and 30 (inclusive)
         (go (send-with-tag quote :quote buyer1))
         (go (send-with-tag quote :quote buyer2)))
       (= (:tag message) :ok) (println "Ok confirmation received!")
       (= (:tag message) :address) (go (send-with-tag (getRandomDate 5) :date buyer2)) ;send a random date between 1 (inclusive) and 5 (inclusive)
-      (= (:tag message) :quit) (closeMultiple! buyer1 buyer2 s))))                         ;send a message (random number between 1 and 30) with tag `quote' over to buyer 1 and 2
+      (= (:tag message) :quit) (closeMultiple! buyer1 buyer2 s)))) ;send a message (random number between 1 and 30) with tag `quote' over to buyer 1 and 2
 
 ;subscribe buyer 1 to :quote tag
 (let [b1 buyer1]
   (sub (publish b1) :quote b1)                              ;subscribe to channel b1 for tag :quote
-  (go (let [content (<! b1)]                                ;when a message with tag quote comes in, do a nonblocking take and set it as argument in let block
-        (if (number? (:msg content))                        ;make sure the message content is a number
+  (go (let [message (<! b1)]                                ;when a message with tag quote comes in, do a nonblocking take and set it as argument in let block
+        (if (number? (:msg message))                        ;make sure the message content is a number
           ((print "Yes, :quote message content is a number!") ;print message (debugging), not here for practical reasons
-            (send-with-tag (rand-int (:msg content)) :quoteDiv buyer2)))))) ;send a new message to buyer2, with a random number attaching tag quoteDiv
+            (send-with-tag (rand-int (:msg message)) :quoteDiv buyer2)))))) ;send a new message to buyer2, with a random number attaching tag quoteDiv
 
 ;subscribe buyer 2 to  :quote tag
 (let [b2 buyer2]
@@ -79,12 +80,11 @@
   (when-let [message (<! b2)]
     (cond
       (= (:tag message) :quote) (print "message with :quote received, not cached at this moment!")
-      (= (:tag message) :quoteDiv) (go (let [content (<! b2)]
-                                         (if (number? (:msg content))
-                                           (print "Yes, :quoteDiv message content is a number! Sending random decline or accept and address if accepted")
-                                           (let [choice randomBoolean]
-                                             (if true? choice
-                                                (send-with-tag "Open Universiteit, Valkenburgerweg 177, 6419 AT, Heerlen" :address seller))
-                                             (send-with-tag choice :ok seller)))))
-      (= (:tag message) :date) ((print "message with :quote received, not cached at this moment!")
+      (= (:tag message) :quoteDiv) (go (if (number? (:msg message))
+                                         (print "Yes, :quoteDiv message content is a number! Sending random decline or accept and address if accepted")
+                                         (let [choice randomBoolean]
+                                           (if true? choice
+                                                     (send-with-tag "Open University, Valkenburgerweg 177, 6419 AT, Heerlen" :address seller))
+                                           (send-with-tag choice :ok seller))))
+      (= (:tag message) :date) ((print (format "Date received: %s, now quitting" (:msg message)))
                                  (send-with-tag "quit" :quit seller)))))
