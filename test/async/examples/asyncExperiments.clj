@@ -412,7 +412,7 @@
         (when-let [v (<! c)]
           (>! print-chan (pr-str "Cat guy got: " v))
           (recur))
-        (println "Cat guy exiting"))))
+        )))
 
 ;; This guy likes updates about dogs
 (let [c (chan 1)]
@@ -422,7 +422,7 @@
         (when-let [v (<! c)]
           (>! print-chan (pr-str "Dog guy got: " v))
           (recur))
-        (println "Dog guy exiting"))))
+        )))
 
 ;; This guy likes updates about animals
 (let [c (chan 1)]
@@ -433,7 +433,7 @@
         (when-let [v (<! c)]
           (>! print-chan (pr-str "Cat/Dog guy got: " v))
           (recur))
-        (println "Cat/dog guy exiting"))))
+        )))
 
 
 (defn send-with-tags [msg]
