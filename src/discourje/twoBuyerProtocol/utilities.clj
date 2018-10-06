@@ -1,6 +1,7 @@
 (ns discourje.twoBuyerProtocol.utilities
   (:require [clojure.test :refer :all]
-            [clojure.core.async :as async :refer :all]))
+            [clojure.core.async :as async :refer :all])
+  (:import (clojure.core.async.impl.channels ManyToManyChannel)))
 
 ;Define method to assign to publish on a channel
 (defn publish "Define method to assign to publish on a channel"
@@ -10,6 +11,22 @@
 (defn send-with-tag "Send a message with a certain tag on a channel"
   [msg tag channel]
   (>!! channel {:msg msg :tag tag}))
+
+(defn go-with-tag "Send a message with a certain tag on a channel"
+  [msg tag channel]
+  (go (>! channel {:msg msg :tag tag})))
+
+;create logging channel
+(def logChannel (chan 1))
+;loop through channel endlessly
+(go (loop []
+      (when-let [v (<! logChannel)]
+        (println v)
+        (recur))))
+;log a message to the logchannel
+(defn logMessage [message]
+  "Log a message"
+  (go (>! logChannel message)))
 
 ; Generate a new Java Date
 (defn getDate "Generate a new date and increment an amount of days"
@@ -34,4 +51,4 @@
 ; Close all channels given as arguments
 (defn closeN! "Calls close! on n channels given as arguments since core.async does not have a close multiple channels function"
   [c & more]
-  (apply close! c more))
+  (apply (close! c) more))
