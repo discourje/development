@@ -34,10 +34,12 @@
 (sendMessageSimple alice bob "Hi there again")
 
 (defn sendMessageArity
+  ;1
   ([source sink message]
    (sendMessageArity source sink message
                      (re @sink
                          (->message (format "%s %s" (se @source message) message)))))
+  ;2
   ([source sink message function]
    (dosync
      (ref-set channel function))))
