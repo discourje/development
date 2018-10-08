@@ -1,7 +1,6 @@
 (ns discourje.twoBuyerProtocol.utilities
   (:require [clojure.test :refer :all]
-            [clojure.core.async :as async :refer :all])
-  (:import (clojure.core.async.impl.channels ManyToManyChannel)))
+            [clojure.core.async :as async :refer :all]))
 
 ;Define method to assign to publish on a channel
 (defn publish "Define method to assign to publish on a channel"
@@ -17,7 +16,7 @@
   (go (>! channel {:msg msg :tag tag})))
 
 ;create logging channel
-(def logChannel (chan 1))
+(def logChannel (chan))
 ;loop through channel endlessly
 (go (loop []
       (when-let [v (<! logChannel)]
