@@ -1,4 +1,4 @@
-(ns discourje.twoBuyerProtocol.utilities
+(ns discourje.twoBuyerProtocol.publishSubscribeExample.utilities
   (:require [clojure.test :refer :all]
             [clojure.core.async :as async :refer :all]))
 
@@ -10,7 +10,7 @@
 (defn send-with-tag "Send a message with a certain tag on a channel"
   [msg tag channel]
   (>!! channel {:msg msg :tag tag}))
-
+;send nonblocking message on log channel
 (defn go-with-tag "Send a message with a certain tag on a channel"
   [msg tag channel]
   (go (>! channel {:msg msg :tag tag})))
@@ -50,4 +50,5 @@
 ; Close all channels given as arguments
 (defn closeN! "Calls close! on n channels given as arguments since core.async does not have a close multiple channels function"
   [c & more]
-  (apply (close! c) more))
+  (apply close! c)
+  (for [channel more] (apply close! channel)))
