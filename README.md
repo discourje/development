@@ -1,7 +1,7 @@
 Master thesis Graduation Project: 	
 EMBEDDED PROTOCOL LANGUAGE.
 
-REDUCING MULTI-THREADING COMPLEXITY THROUGH AN EMBEDDED PROTOCOL LANGUAGE ASCLOJURE MACROS.
+REDUCING MULTI-THREADING COMPLEXITY THROUGH AN EMBEDDED PROTOCOL LANGUAGE AS CLOJURE MACROS.
 
 Student Name 	 	Ruben Hamers
 Student number 		#851851876
@@ -35,8 +35,6 @@ Getting started:
 
 7: Create a new item with the + symbol
 
-8: Select Clojure REPL and select `Local'
+8: Select Clojure REPL and select `Leining REPL'
 
-9: Select REPL and JVM process
-
-10: Run testcases 
+9: Run testcases by opening a test file, right click in file content, select `Leiningen REPL' at the bottom of the popup menu and run testcases is current namespace.

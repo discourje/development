@@ -17,5 +17,5 @@
 (deftype sender [name channel]
   source
   (send [channel]
-    (:data (message. channel) )))
+    (:data (message. channel))))
 
