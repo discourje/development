@@ -4,13 +4,19 @@
 ;define a message record, only with content param at this moment
 (defrecord message [content])
 
-;create a pipeline (sequence, no parallelism)
-(defn setupPipeLineSequenceing
-  "Creates a pipeline going from channel `from' to `to' exposing operations to filter"
-  [from to filter]
-  (pipeline 1 to filter from))
+(defprotocol sequencePipeline
+  (createPipeline [this to filter from] ))
+
+;create a pipeline (sequence, no parallelism) "Creates a pipeline going from channel `from' to `to' exposing operations to filter"
+(defrecord setupPipeLineSequencing [from to filter]
+  sequencePipeline
+  (createPipeline [this to filter from] (pipeline 1 to filter from)))
 
 ;protocol(interface) for filter
-(defprotocol filter
+(defprotocol messageFilter
   "filter some message"
   (filt [this message] "filer the message"))
+
+(defrecord stringFilter []
+  messageFilter
+  (filt [this message] (string? message)))
