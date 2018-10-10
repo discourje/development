@@ -2,7 +2,7 @@
   (:require [clojure.core.async :as async :refer :all]))
 
 ;define a message record, only with content param at this moment
-(defrecord message [content])
+(defrecord message [tag content])
 
 (defprotocol sequencePipeline
   (createPipeline [this to filter from] ))
@@ -20,3 +20,10 @@
 (defrecord stringFilter []
   messageFilter
   (filt [this message] (string? message)))
+
+(defrecord tagFilter [tag]
+  messageFilter
+  (filt [this message] (= (:tag message) tag)))
+
+(def bookCollection
+  (vector "The Joy of Clojure" "Clojure Programming" "Mastering Clojure Macros"))
