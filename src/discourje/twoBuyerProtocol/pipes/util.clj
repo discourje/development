@@ -27,3 +27,35 @@
 
 (def bookCollection
   (vector "The Joy of Clojure" "Clojure Programming" "Mastering Clojure Macros"))
+
+(defn putOnChannel
+  "Put a new message with the given tag on a channel"
+  [channel message tag]
+  (go (>! channel (->message tag message))))
+
+
+; Generate a new Java Date
+(defn getDate "Generate a new date and increment an amount of days"
+  [days]
+  (let [cal (java.util.Calendar/getInstance)
+        d (new java.util.Date)]
+    (doto cal
+      (.setTime d)
+      (.add java.util.Calendar/DATE days)
+      (.getTime))))
+
+; Generate a new java date with a random amount of days incremented up to a specified range
+(defn getRandomDate "Get a random date, in the future, up to a maximum range (inclusive)"
+  [maxRange]
+  (getDate (+ (rand-int maxRange) 1)))
+
+; generate a (pseudo)random bool, use the random number generator between 0 and 2(exclusive) and check whether it is 1
+(defn randomBoolean "Generate random boolean"
+  []
+  (= 1 (rand-int 2)))
+
+; Close all channels given as arguments
+(defn closeN! "Calls close! on n channels given as arguments since core.async does not have a close multiple channels function"
+  [c & more]
+  (apply close! c)
+  (for [channel more] (apply close! channel)))
