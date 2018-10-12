@@ -5,7 +5,7 @@
 (defrecord message [tag content])
 
 (defprotocol sequencePipeline
-  (createPipeline [this to filter from] ))
+  (createPipeline [this to filter from]))
 
 ;create a pipeline (sequence, no parallelism) "Creates a pipeline going from channel `from' to `to' exposing operations to filter"
 (defrecord setupPipeLineSequencing [from to filter]
