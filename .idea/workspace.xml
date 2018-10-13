@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6fdd3211-89b6-43e6-86ae-60249c672f12" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/simpleSetup.clj" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/proto.clj" afterPath="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/proto.clj" />
-      <change beforePath="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/util.clj" afterPath="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/util.clj" />
+      <change beforePath="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/simpleSetup.clj" afterPath="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/simpleSetup.clj" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -31,8 +28,8 @@
           <file leaf-file-name="util.clj" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/util.clj">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="34">
-                  <caret line="2" column="0" lean-forward="true" selection-start-line="1" selection-start-column="1" selection-end-line="2" selection-end-column="0" />
+                <state relative-caret-position="-68">
+                  <caret line="2" column="0" lean-forward="false" selection-start-line="1" selection-start-column="1" selection-end-line="2" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
@@ -62,31 +59,11 @@
       </split-first>
       <split-second>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="utilTests.clj" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/test/discourje/tbpTests/pipesTests/utilTests.clj">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="289">
-                  <caret line="17" column="0" lean-forward="false" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="protoTests.clj" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/test/discourje/tbpTests/pipesTests/protoTests.clj">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="0">
-                  <caret line="0" column="21" lean-forward="false" selection-start-line="0" selection-start-column="21" selection-end-line="0" selection-end-column="21" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
           <file leaf-file-name="proto.clj" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/proto.clj">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="150">
-                  <caret line="21" column="23" lean-forward="true" selection-start-line="20" selection-start-column="2" selection-end-line="21" selection-end-column="23" />
+                <state relative-caret-position="0">
+                  <caret line="21" column="23" lean-forward="false" selection-start-line="20" selection-start-column="2" selection-end-line="21" selection-end-column="23" />
                   <folding />
                 </state>
               </provider>
@@ -95,18 +72,38 @@
           <file leaf-file-name="simpleSetup.clj" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/simpleSetup.clj">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="340">
-                  <caret line="20" column="46" lean-forward="true" selection-start-line="20" selection-start-column="46" selection-end-line="20" selection-end-column="46" />
+                <state relative-caret-position="350">
+                  <caret line="76" column="6" lean-forward="true" selection-start-line="76" selection-start-column="6" selection-end-line="76" selection-end-column="6" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="twoBuyerProtocolPubSub.clj" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/publishSubscribeExample/twoBuyerProtocolPubSub.clj">
+          <file leaf-file-name="testCheck.clj" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/src/ProjectSetup/testCheck.clj">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="132">
-                  <caret line="12" column="62" lean-forward="true" selection-start-line="12" selection-start-column="62" selection-end-line="12" selection-end-column="62" />
+                <state relative-caret-position="221">
+                  <caret line="13" column="26" lean-forward="false" selection-start-line="13" selection-start-column="26" selection-end-line="13" selection-end-column="26" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="asyncExamples.clj" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/test/async/examples/asyncExamples.clj">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="-1605">
+                  <caret line="23" column="0" lean-forward="false" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="asyncExperiments.clj" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/test/async/examples/asyncExperiments.clj">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="102">
+                  <caret line="573" column="0" lean-forward="true" selection-start-line="573" selection-start-column="0" selection-end-line="573" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
@@ -126,17 +123,7 @@
             <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/participants/buyer1.clj">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="170">
-                  <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="utilities.clj" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/publishSubscribeExample/utilities.clj">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="901">
-                  <caret line="53" column="46" lean-forward="false" selection-start-line="28" selection-start-column="0" selection-end-line="53" selection-end-column="46" />
+                  <caret line="10" column="0" lean-forward="false" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
@@ -147,16 +134,6 @@
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="170">
                   <caret line="10" column="18" lean-forward="false" selection-start-line="10" selection-start-column="18" selection-end-line="10" selection-end-column="18" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="participant.clj" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/participant.clj">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="306">
-                  <caret line="18" column="46" lean-forward="false" selection-start-line="18" selection-start-column="46" selection-end-line="18" selection-end-column="46" />
                   <folding />
                 </state>
               </provider>
@@ -255,9 +232,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
-      <pane id="Scratches" />
-      <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -403,7 +377,10 @@
           <select />
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
+      <pane id="AndroidView" />
       <pane id="Scope" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -426,7 +403,7 @@
       <recent name="C:\Users\Ruben\Documents\Discourje\src\discourje\experiments" />
     </key>
   </component>
-  <component name="ReplState" timestamp="1539323336701">{:repl-history {:ide [], :local [{:command &quot;(ns discourje.twoBuyerProtocol.publishSubscribeExample.twoBuyerProtocolPubSub.\n  (:require [clojure.test :refer :all]\n            [clojure.core.async :as async :refer :all]\n            [discourje.twoBuyerProtocol.publishSubscribeExample.utilities :as util :refer :all]))&quot;, :offset 270, :ns &quot;user&quot;} {:command &quot;(def buyer1 \&quot;Define Buyer1 as a channel\&quot; (chan))&quot;, :offset 48, :ns &quot;discourje.twoBuyerProtocol.publishSubscribeExample.twoBuyerProtocolPubSub.&quot;} {:command &quot;(def buyer2 \&quot;Define Buyer2 as a channel\&quot; (chan))&quot;, :offset 48, :ns &quot;discourje.twoBuyerProtocol.publishSubscribeExample.twoBuyerProtocolPubSub.&quot;} {:command &quot;(def seller \&quot;Define Seller as a channel\&quot; (chan))&quot;, :offset 48, :ns &quot;discourje.twoBuyerProtocol.publishSubscribeExample.twoBuyerProtocolPubSub.&quot;} {:command &quot;(let [b1 buyer1]\n  (sub (publish b1) :quote b1)\n  (go (loop []\n        (when-let [message (&lt;! b1)]\n          (logMessage message)\n          (when (number? (:msg message))\n            (logMessage \&quot;yes is number\&quot;)\n            (send-with-tag (rand-int (:msg message)) :quoteDiv buyer2))\n          (recur)))))&quot;, :offset 305, :ns &quot;discourje.twoBuyerProtocol.publishSubscribeExample.twoBuyerProtocolPubSub.&quot;} {:command &quot;(let [s seller]\n  (sub (publish s) :title s)\n  (sub (publish s) :ok s)\n  (sub (publish s) :address s)\n  (sub (publish s) :quit s)\n  (go (loop []\n        (when-let [message (&lt;! s)]\n          (cond\n            (= (:tag message) :title)\n            (when (string? (:msg message))\n              (logMessage (format \&quot;Book title received: %s\&quot; (:msg message)))\n              (let [quote (+ (rand-int 30) 1)]\n                (send-with-tag quote :quote buyer1)\n                (send-with-tag quote :quote buyer2)))\n            (= (:tag message) :ok) (logMessage \&quot;Ok confirmation received!\&quot;)\n            (= (:tag message) :address) ((logMessage \&quot;Address received!\&quot;)\n                                          (send-with-tag (getRandomDate 5) :date buyer2))\n            (= (:tag message) :quit) (closeN! buyer1 buyer2 s))\n          (recur)))))&quot;, :offset 832, :ns &quot;discourje.twoBuyerProtocol.publishSubscribeExample.twoBuyerProtocolPubSub.&quot;} {:command &quot;(let [b2 buyer2]\n  (sub (publish b2) :quote b2)\n  (sub (publish b2) :quoteDiv b2)\n  (sub (publish b2) :date b2)\n  (go (loop []\n        (when-let [message (&lt;! b2)]\n          (cond\n            (= (:tag message) :quote) (logMessage \&quot;message with :quote received, not cached at this moment!\&quot;)\n            (= (:tag message) :quoteDiv) (go (when (number? (:msg message))\n                                               (logMessage \&quot;Yes, :quoteDiv message content is a number! Sending random decline or accept and address if accepted\&quot;)\n                                               (let [choice (randomBoolean)]\n                                                 (logMessage (format \&quot;random boolean is: %s\&quot; choice))\n                                                 (send-with-tag choice :ok seller)\n                                                 (if true? choice\n                                                           (send-with-tag \&quot;Open University, Valkenburgerweg 177, 6419 AT, Heerlen\&quot; :address seller)))))\n            (= (:tag message) :date) ((logMessage (format \&quot;Date received: %s, now quitting\&quot; (:msg message)))\n                                       (send-with-tag \&quot;quit\&quot; :quit seller)))\n          (recur)))))&quot;, :offset 1215, :ns &quot;discourje.twoBuyerProtocol.publishSubscribeExample.twoBuyerProtocolPubSub.&quot;} {:command &quot;(send-with-tag \&quot;The Joy of Clojure\&quot; :title seller)&quot;, :offset 50, :ns &quot;discourje.twoBuyerProtocol.publishSubscribeExample.twoBuyerProtocolPubSub.&quot;} {:command &quot;(discourje.twoBuyerProtocol.publishSubscribeExample.utilities/closeN! discourje.twoBuyerProtocol.publishSubscribeExample.twoBuyerProtocolPubSub.buyer1 discourje.twoBuyerProtocol.publishSubscribeExample.twoBuyerProtocolPubSub.buyer2 discourje.twoBuyerProtocol.publishSubscribeExample.twoBuyerProtocolPubSub.seller)&quot;, :offset 313, :ns &quot;user&quot;} {:command &quot;(discourje.twoBuyerProtocol.publishSubscribeExample.utilities/closeN! discourje.twoBuyerProtocol.publishSubscribeExample.twoBuyerProtocolPubSub/buyer1 discourje.twoBuyerProtocol.publishSubscribeExample.twoBuyerProtocolPubSub/buyer2 discourje.twoBuyerProtocol.publishSubscribeExample.twoBuyerProtocolPubSub/seller)&quot;, :offset 313, :ns &quot;user&quot;} {:command &quot;(discourje.twoBuyerProtocol.publishSubscribeExample.utilities/closeN! discourje.twoBuyerProtocol.publishSubscribeExample.twoBuyerProtocolPubSub./buyer1 discourje.twoBuyerProtocol.publishSubscribeExample.twoBuyerProtocolPubSub./buyer2 discourje.twoBuyerProtocol.publishSubscribeExample.twoBuyerProtocolPubSub./seller)&quot;, :offset 316, :ns &quot;user&quot;} {:command &quot;(discourje.twoBuyerProtocol.publishSubscribeExample.utilities/closeN! buyer1 buyer2 seller)&quot;, :offset 91, :ns &quot;user&quot;} {:command &quot;(defrecord message [content])&quot;, :offset 29, :ns &quot;discourje.twoBuyerProtocol.pipes.util&quot;} {:command &quot;(defprotocol sequencePipeline\n  (createPipeline [to filter from] ))&quot;, :offset 67, :ns &quot;discourje.twoBuyerProtocol.pipes.util&quot;} {:command &quot;(defrecord setupPipeLineSequencing [from to filter]\n  sequencePipeline\n  (createPipeline [to filter from] (pipeline 1 to filter from)))&quot;, :offset 135, :ns &quot;discourje.twoBuyerProtocol.pipes.util&quot;} {:command &quot;(defprotocol filter\n  \&quot;filter some message\&quot;\n  (filt [this message] \&quot;filer the message\&quot;))&quot;, :offset 88, :ns &quot;discourje.twoBuyerProtocol.pipes.util&quot;} {:command &quot;(deftest pipelineTest\n  (-&gt;setupPipeLineSequencing channel1 channel2\n                              (reify filter\n                                (filt filter\n                                  (-&gt;message\n                                    (go\n                                      (&lt;! channel2)))))))&quot;, :offset 300, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(def channel1 (chan))&quot;, :offset 21, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(def channel2 (chan))&quot;, :offset 21, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(defrecord stringFilter []\n  filter\n  (filt [this message] (string? (&lt;! message))))&quot;, :offset 83, :ns &quot;discourje.twoBuyerProtocol.pipes.util&quot;} {:command &quot;(def stringFilter (stringFilter.))&quot;, :offset 34, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(defrecord stringFilter []\n  filter\n  (filt [this message] (string? message)))&quot;, :offset 78, :ns &quot;discourje.twoBuyerProtocol.pipes.util&quot;} {:command &quot;(def stringFilter (-&gt;stringFilter))&quot;, :offset 35, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(ns discourje.tbpTests.pipesTests.utilTests\n  (:require [clojure.test :refer :all]\n            [clojure.core.async :as async :refer :all]\n            [discourje.twoBuyerProtocol.pipes.util :refer :all]))&quot;, :offset 203, :ns &quot;user&quot;} {:command &quot;(deftest pipelineTest\n  (-&gt;setupPipeLineSequencing channel1 channel2 (filt stringFilter (go (&lt;! channel2)))))&quot;, :offset 109, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(deftest pipelineTest\n  (= true (-&gt;setupPipeLineSequencing channel1 channel2 (filt stringFilter (go (&lt;! channel2))))))&quot;, :offset 118, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(deftest pipelineTest\n  (is (= true (-&gt;setupPipeLineSequencing channel1 channel2 (filt stringFilter (go (&lt;! channel2)))))))&quot;, :offset 123, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(defprotocol messageFilter\n  \&quot;filter some message\&quot;\n  (filt [this message] \&quot;filer the message\&quot;))&quot;, :offset 95, :ns &quot;discourje.twoBuyerProtocol.pipes.util&quot;} {:command &quot;(defrecord stringFilter []\n  messageFilter\n  (filt [this message] (string? message)))&quot;, :offset 85, :ns &quot;discourje.twoBuyerProtocol.pipes.util&quot;} {:command &quot;(def stringFilter (map-&gt;stringFilter {}))&quot;, :offset 41, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(def testPipeline\n  (-&gt;setupPipeLineSequencing channel1 channel2 (filt stringFilter (go (&lt;! channel2)))))&quot;, :offset 105, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(deftest stringFilterTest\n  (is (= true (filt stringFilter \&quot;test\&quot;))))&quot;, :offset 69, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(deftest tagFilterOkTest\n  (is (= \&quot;hello\&quot; (filt tagFilt (-&gt;message :h \&quot;hello\&quot;)))))&quot;, :offset 82, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(deftest tagFilterOkTest\n  (is (= true (filt tagFilt (-&gt;message :h \&quot;hello\&quot;)))))&quot;, :offset 79, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(defrecord participant\n  (chan))&quot;, :offset 32, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(def bookCollection\n  (list \&quot;The Joy of Clojure\&quot; \&quot;Clojure Programming\&quot; \&quot;Mastering Clojure Macros\&quot;))&quot;, :offset 99, :ns &quot;user&quot;} {:command &quot;(def bookCollection\n  (.split \&quot;The Joy of Clojure\&quot; \&quot;Clojure Programming\&quot; \&quot;Mastering Clojure Macros\&quot;))&quot;, :offset 101, :ns &quot;user&quot;} {:command &quot;(def bookCollection\n  (vector (.split \&quot;The Joy of Clojure\&quot; \&quot;Clojure Programming\&quot; \&quot;Mastering Clojure Macros\&quot;)))&quot;, :offset 110, :ns &quot;user&quot;} {:command &quot;(def bookCollection\n  (vector (str \&quot;The Joy of Clojure\&quot; \&quot;Clojure Programming\&quot; \&quot;Mastering Clojure Macros\&quot;)))&quot;, :offset 107, :ns &quot;discourje.twoBuyerProtocol.pipes.util&quot;} {:command &quot;(bookCollection)&quot;, :offset 16, :ns &quot;user&quot;} {:command &quot;(vec bookCollection)\\&quot;, :offset 21, :ns &quot;user&quot;} {:command &quot;(vec bookCollection)&quot;, :offset 20, :ns &quot;user&quot;} {:command &quot;(vector bookCollection)&quot;, :offset 23, :ns &quot;user&quot;} {:command &quot;(def bookCollection\n  (vector \&quot;The Joy of Clojure\&quot; \&quot;Clojure Programming\&quot; \&quot;Mastering Clojure Macros\&quot;))&quot;, :offset 101, :ns &quot;user&quot;} {:command &quot;(defn getRandomBook\n  \&quot;Get a random book from the book collection in the util\&quot;\n  ;(rand-nth bookCollection)\n  (let [books bookCollection]\n    (rand-nth books)))&quot;, :offset 160, :ns &quot;discourje.twoBuyerProtocol.pipes.participants.buyer1&quot;} {:command &quot;(defn getRandomBook\n  \&quot;Get a random book from the book collection in the util\&quot;\n  (rand-nth bookCollection))&quot;, :offset 107, :ns &quot;user&quot;} {:command &quot;(rand-nth bookCollection)&quot;, :offset 25, :ns &quot;user&quot;} {:command &quot;(defn getRandomBook []\n  \&quot;Get a random book from the book collection in the util\&quot;\n  (rand-nth bookCollection))&quot;, :offset 110, :ns &quot;user&quot;} {:command &quot;(getRandomBook)&quot;, :offset 15, :ns &quot;user&quot;} {:command &quot;(ns discourje.twoBuyerProtocol.pipes.participant\n  (:require [clojure.core.async :as async :refer :all]))&quot;, :offset 105, :ns &quot;user&quot;} {:command &quot;(&gt;!! buyer1)&quot;, :offset 12, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(defn generateAddress []\n  {:name \&quot;Open University\&quot;\n   :street \&quot;Valkenburgerweg\&quot;\n   :number 177\n   :zipcode \&quot;6419 AT\&quot;\n   :city \&quot;Heerlen\&quot;})&quot;, :offset 138, :ns &quot;user&quot;} {:command &quot;(generateAddress)&quot;, :offset 17, :ns &quot;user&quot;} {:command &quot;(participant \&quot;buyer1\&quot;)&quot;, :offset 22, :ns &quot;discourje.twoBuyerProtocol.pipes.participants.buyer1&quot;} {:command &quot;(defprotocol stakeHolder\n  (receive [this message])\n  (provide [this channel message tag]))&quot;, :offset 91, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(defrecord tester []\n  stakeHolder\n  (receive [this message] (str \&quot;test\&quot;))\n  (provide [this channel message tag] (putOnChannel channel message tag))\n  )&quot;, :offset 152, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(chan)&quot;, :offset 6, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(defrecord tester []\n  stakeHolder\n  (receive [this message] (str \&quot;test\&quot;))\n  (provide [this channel message tag] (putOnChannel channel message tag))\n  (chan))&quot;, :offset 158, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(ns discourje.twoBuyerProtocol.pipes.participant\n  (:require [clojure.core.async :as async :refer :all]\n            [discourje.twoBuyerProtocol.pipes.util :refer :all]))&quot;, :offset 169, :ns &quot;user&quot;} {:command &quot;(defprotocol stakeHolder\n  (receive [this message])\n  (provide [this channel message tag])\n  (getChannel [this]))&quot;, :offset 113, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;\n\n\n(defrecord channelHandler [C]\n  stakeHolder\n  (receive [this message] (str \&quot;test\&quot;))\n  (provide [this channel message tag] (putOnChannel channel message tag))\n  (getChannel [this] C))\n\n\n(defn generateParticipant [name channel]\n  (def name (-&gt;channelHandler channel)))\n\n(generateParticipant buyer1 (chan))&quot;, :offset 306, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(defrecord channelHandler [C]\n  stakeHolder\n  (receive [this message] (str \&quot;test\&quot;))\n  (provide [this channel message tag] (putOnChannel channel message tag))\n  )&quot;, :offset 161, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(defrecord channelHandler [C]\n  stakeHolder\n  (receive [this message] (str \&quot;test\&quot;))\n  (provide [this channel message tag] (discourje.twoBuyerProtocol.pipes.util/putOnChannel channel message tag))\n  (getChannel [this] C))&quot;, :offset 220, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(defrecord channelHandler [C]\n  stakeHolder\n  (receive [this message] (str \&quot;test\&quot;))\n  (provide [this channel message tag] (discourje.twoBuyerProtocol.pipes.util.putOnChannel channel message tag))\n  (getChannel [this] C))&quot;, :offset 220, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(defn generateParticipant [name channel]\n  (def name (-&gt;channelHandler channel)))&quot;, :offset 81, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(defn generateParticipant [identifier channel]\n  (def identifier (-&gt;channelHandler channel)))&quot;, :offset 93, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(generateParticipant buyer1 (chan))&quot;, :offset 35, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(generateParticipant \&quot;a\&quot; (chan))&quot;, :offset 32, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(def a (channelHandler. (chan)))&quot;, :offset 32, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(defrecord channelHandler [C]\n  stakeHolder\n  (receive [this message] (str \&quot;test\&quot;))\n  (provide [this channel message tag] (putOnChannel channel message tag))\n  (getChannel [this] C))&quot;, :offset 182, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(def a (-&gt;channelHandler (chan)))&quot;, :offset 33, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(defrecord proto [pipelines])&quot;, :offset 29, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(def twoBuyerProto (-&gt;proto []))&quot;, :offset 32, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(defn createTwoBuyerProto [buyer1 buyer2 seller]\n  (cons (:pipelines twoBuyerProto) (-&gt;setupPipeLineSequencing buyer1 seller (-&gt;tagFilter :title))) ; pipe for title to seller\n  (cons (:pipelines twoBuyerProto) (-&gt;setupPipeLineSequencing seller buyer1 (-&gt;tagFilter :quote))); pipe for quote to buyer 1\n  (cons (:pipelines twoBuyerProto) (-&gt;setupPipeLineSequencing seller buyer2 (-&gt;tagFilter :quote))) ; pipe for quote to buyer 2\n  (cons (:pipelines twoBuyerProto) (-&gt;setupPipeLineSequencing buyer1 buyer2 (-&gt;tagFilter :quoteDiv))) ;pipe for quote div to buyer2\n  (cons (:pipelines twoBuyerProto) (-&gt;setupPipeLineSequencing buyer2 seller (-&gt;tagFilter :ok))) ; pipe for ok to seller 2\n  (cons (:pipelines twoBuyerProto) (-&gt;setupPipeLineSequencing buyer2 seller (-&gt;tagFilter :address))) ; pipe for address to seller\n  (cons (:pipelines twoBuyerProto) (-&gt;setupPipeLineSequencing seller buyer2 (-&gt;tagFilter :date))) ; pipe for date to buyer2\n  (cons (:pipelines twoBuyerProto) (-&gt;setupPipeLineSequencing buyer2 seller (-&gt;tagFilter :quit))))&quot;, :offset 1034, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(defn createPipeline [from to filter operation]\n  (pipeline 1 to filter from)\n  (go-loop []\n    (operation (&lt;! from))))&quot;, :offset 119, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(defrecord tagFilter [tag]\n  messageFilter\n  (filt [this message] (= (:tag message) tag)))&quot;, :offset 90, :ns &quot;discourje.twoBuyerProtocol.pipes.util&quot;} {:command &quot;(defn createPipeline [from to filter operation]\n  (pipeline 1 to filter from)\n  (go-loop []\n    (operation (&lt;! to))))&quot;, :offset 117, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(createPipeline buyer1 seller (-&gt;tagFilter :title) (print))&quot;, :offset 59, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(ns discourje.twoBuyerProtocol.pipes.proto\n  (:require [clojure.core.async :as async :refer :all]\n            [discourje.twoBuyerProtocol.pipes.util :refer :all]))&quot;, :offset 163, :ns &quot;user&quot;} {:command &quot;(def buyer2 (chan))&quot;, :offset 19, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(defn generatePipeline [from to filter operation]\n  (pipeline 1 to filter from)\n  (go-loop []\n    (operation (&lt;! to))))&quot;, :offset 119, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(generatePipeline buyer1 seller (-&gt;tagFilter :title) (print))&quot;, :offset 61, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(generatePipeline \n  buyer1 \n  seller \n  (filter (fn [m] (= (:tag m) :title))) \n  (printt))&quot;, :offset 91, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(generatePipeline \n  buyer1 \n  seller \n  (filter (fn [m] (= (:tag m) :title))) \n  (print))&quot;, :offset 90, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(go (&gt;! buyer1 (-&gt;message :title \&quot;yo\&quot;)))&quot;, :offset 40, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(ns discourje.twoBuyerProtocol.pipes.simpleSetup \n  (:require [clojure.core.async :as async :refer :all]))&quot;, :offset 106, :ns &quot;user&quot;} {:command &quot;(pipeline 1 seller (filter string?) buyer1)&quot;, :offset 43, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(go (&gt;! buyer1 \&quot;aaa\&quot;))&quot;, :offset 22, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(go (println (&lt;! seller)))&quot;, :offset 26, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(defn messageTo [to filter from operation]\n  (pipeline 1 to (filter filter) from)\n  (go-loop []\n    (operation (&lt;! to))))&quot;, :offset 121, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(messageTo seller string? buyer1 (print))&quot;, :offset 41, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(go (&gt;! buyer1 \&quot;hello from buyer1 to seller\&quot;))&quot;, :offset 46, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(ns discourje.twoBuyerProtocol.pipes.simpleSetup\n  (:require [clojure.core.async :as async :refer :all]))&quot;, :offset 105, :ns &quot;user&quot;} {:command &quot;(def buyer1 (chan))&quot;, :offset 19, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(def seller (chan))&quot;, :offset 19, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(defn messageTo [to filter from operation message]\n  (pipeline 1 to (filter filter) from)\n  (go (&gt;! from message))\n  (go-loop []\n    (operation (&lt;! to))))&quot;, :offset 154, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(messageTo seller string? buyer1 (print) \&quot;heya\&quot;)&quot;, :offset 48, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(messageTo seller string? buyer1 (fn [x] (print x)) \&quot;heya\&quot;)&quot;, :offset 59, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(def greet (fn [x] (print x)))&quot;, :offset 30, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(messageTo \&quot;heya\&quot; seller string? buyer1 greet)&quot;, :offset 46, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;}], :remote []}}</component>
+  <component name="ReplState" timestamp="1539416069307">{:repl-history {:ide [], :local [{:command &quot;(def channel1 (chan))&quot;, :offset 21, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(def channel2 (chan))&quot;, :offset 21, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(defrecord stringFilter []\n  filter\n  (filt [this message] (string? (&lt;! message))))&quot;, :offset 83, :ns &quot;discourje.twoBuyerProtocol.pipes.util&quot;} {:command &quot;(def stringFilter (stringFilter.))&quot;, :offset 34, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(defrecord stringFilter []\n  filter\n  (filt [this message] (string? message)))&quot;, :offset 78, :ns &quot;discourje.twoBuyerProtocol.pipes.util&quot;} {:command &quot;(def stringFilter (-&gt;stringFilter))&quot;, :offset 35, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(ns discourje.tbpTests.pipesTests.utilTests\n  (:require [clojure.test :refer :all]\n            [clojure.core.async :as async :refer :all]\n            [discourje.twoBuyerProtocol.pipes.util :refer :all]))&quot;, :offset 203, :ns &quot;user&quot;} {:command &quot;(deftest pipelineTest\n  (-&gt;setupPipeLineSequencing channel1 channel2 (filt stringFilter (go (&lt;! channel2)))))&quot;, :offset 109, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(deftest pipelineTest\n  (= true (-&gt;setupPipeLineSequencing channel1 channel2 (filt stringFilter (go (&lt;! channel2))))))&quot;, :offset 118, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(deftest pipelineTest\n  (is (= true (-&gt;setupPipeLineSequencing channel1 channel2 (filt stringFilter (go (&lt;! channel2)))))))&quot;, :offset 123, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(defprotocol messageFilter\n  \&quot;filter some message\&quot;\n  (filt [this message] \&quot;filer the message\&quot;))&quot;, :offset 95, :ns &quot;discourje.twoBuyerProtocol.pipes.util&quot;} {:command &quot;(defrecord stringFilter []\n  messageFilter\n  (filt [this message] (string? message)))&quot;, :offset 85, :ns &quot;discourje.twoBuyerProtocol.pipes.util&quot;} {:command &quot;(def stringFilter (map-&gt;stringFilter {}))&quot;, :offset 41, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(def testPipeline\n  (-&gt;setupPipeLineSequencing channel1 channel2 (filt stringFilter (go (&lt;! channel2)))))&quot;, :offset 105, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(deftest stringFilterTest\n  (is (= true (filt stringFilter \&quot;test\&quot;))))&quot;, :offset 69, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(deftest tagFilterOkTest\n  (is (= \&quot;hello\&quot; (filt tagFilt (-&gt;message :h \&quot;hello\&quot;)))))&quot;, :offset 82, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(deftest tagFilterOkTest\n  (is (= true (filt tagFilt (-&gt;message :h \&quot;hello\&quot;)))))&quot;, :offset 79, :ns &quot;discourje.tbpTests.pipesTests.utilTests&quot;} {:command &quot;(defrecord participant\n  (chan))&quot;, :offset 32, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(def bookCollection\n  (list \&quot;The Joy of Clojure\&quot; \&quot;Clojure Programming\&quot; \&quot;Mastering Clojure Macros\&quot;))&quot;, :offset 99, :ns &quot;user&quot;} {:command &quot;(def bookCollection\n  (.split \&quot;The Joy of Clojure\&quot; \&quot;Clojure Programming\&quot; \&quot;Mastering Clojure Macros\&quot;))&quot;, :offset 101, :ns &quot;user&quot;} {:command &quot;(def bookCollection\n  (vector (.split \&quot;The Joy of Clojure\&quot; \&quot;Clojure Programming\&quot; \&quot;Mastering Clojure Macros\&quot;)))&quot;, :offset 110, :ns &quot;user&quot;} {:command &quot;(def bookCollection\n  (vector (str \&quot;The Joy of Clojure\&quot; \&quot;Clojure Programming\&quot; \&quot;Mastering Clojure Macros\&quot;)))&quot;, :offset 107, :ns &quot;discourje.twoBuyerProtocol.pipes.util&quot;} {:command &quot;(bookCollection)&quot;, :offset 16, :ns &quot;user&quot;} {:command &quot;(vec bookCollection)\\&quot;, :offset 21, :ns &quot;user&quot;} {:command &quot;(vec bookCollection)&quot;, :offset 20, :ns &quot;user&quot;} {:command &quot;(vector bookCollection)&quot;, :offset 23, :ns &quot;user&quot;} {:command &quot;(def bookCollection\n  (vector \&quot;The Joy of Clojure\&quot; \&quot;Clojure Programming\&quot; \&quot;Mastering Clojure Macros\&quot;))&quot;, :offset 101, :ns &quot;user&quot;} {:command &quot;(defn getRandomBook\n  \&quot;Get a random book from the book collection in the util\&quot;\n  ;(rand-nth bookCollection)\n  (let [books bookCollection]\n    (rand-nth books)))&quot;, :offset 160, :ns &quot;discourje.twoBuyerProtocol.pipes.participants.buyer1&quot;} {:command &quot;(defn getRandomBook\n  \&quot;Get a random book from the book collection in the util\&quot;\n  (rand-nth bookCollection))&quot;, :offset 107, :ns &quot;user&quot;} {:command &quot;(rand-nth bookCollection)&quot;, :offset 25, :ns &quot;user&quot;} {:command &quot;(defn getRandomBook []\n  \&quot;Get a random book from the book collection in the util\&quot;\n  (rand-nth bookCollection))&quot;, :offset 110, :ns &quot;user&quot;} {:command &quot;(getRandomBook)&quot;, :offset 15, :ns &quot;user&quot;} {:command &quot;(ns discourje.twoBuyerProtocol.pipes.participant\n  (:require [clojure.core.async :as async :refer :all]))&quot;, :offset 105, :ns &quot;user&quot;} {:command &quot;(&gt;!! buyer1)&quot;, :offset 12, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(defn generateAddress []\n  {:name \&quot;Open University\&quot;\n   :street \&quot;Valkenburgerweg\&quot;\n   :number 177\n   :zipcode \&quot;6419 AT\&quot;\n   :city \&quot;Heerlen\&quot;})&quot;, :offset 138, :ns &quot;user&quot;} {:command &quot;(generateAddress)&quot;, :offset 17, :ns &quot;user&quot;} {:command &quot;(participant \&quot;buyer1\&quot;)&quot;, :offset 22, :ns &quot;discourje.twoBuyerProtocol.pipes.participants.buyer1&quot;} {:command &quot;(defprotocol stakeHolder\n  (receive [this message])\n  (provide [this channel message tag]))&quot;, :offset 91, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(defrecord tester []\n  stakeHolder\n  (receive [this message] (str \&quot;test\&quot;))\n  (provide [this channel message tag] (putOnChannel channel message tag))\n  )&quot;, :offset 152, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(chan)&quot;, :offset 6, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(defrecord tester []\n  stakeHolder\n  (receive [this message] (str \&quot;test\&quot;))\n  (provide [this channel message tag] (putOnChannel channel message tag))\n  (chan))&quot;, :offset 158, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(ns discourje.twoBuyerProtocol.pipes.participant\n  (:require [clojure.core.async :as async :refer :all]\n            [discourje.twoBuyerProtocol.pipes.util :refer :all]))&quot;, :offset 169, :ns &quot;user&quot;} {:command &quot;(defprotocol stakeHolder\n  (receive [this message])\n  (provide [this channel message tag])\n  (getChannel [this]))&quot;, :offset 113, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;\n\n\n(defrecord channelHandler [C]\n  stakeHolder\n  (receive [this message] (str \&quot;test\&quot;))\n  (provide [this channel message tag] (putOnChannel channel message tag))\n  (getChannel [this] C))\n\n\n(defn generateParticipant [name channel]\n  (def name (-&gt;channelHandler channel)))\n\n(generateParticipant buyer1 (chan))&quot;, :offset 306, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(defrecord channelHandler [C]\n  stakeHolder\n  (receive [this message] (str \&quot;test\&quot;))\n  (provide [this channel message tag] (putOnChannel channel message tag))\n  )&quot;, :offset 161, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(defrecord channelHandler [C]\n  stakeHolder\n  (receive [this message] (str \&quot;test\&quot;))\n  (provide [this channel message tag] (discourje.twoBuyerProtocol.pipes.util/putOnChannel channel message tag))\n  (getChannel [this] C))&quot;, :offset 220, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(defrecord channelHandler [C]\n  stakeHolder\n  (receive [this message] (str \&quot;test\&quot;))\n  (provide [this channel message tag] (discourje.twoBuyerProtocol.pipes.util.putOnChannel channel message tag))\n  (getChannel [this] C))&quot;, :offset 220, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(defn generateParticipant [name channel]\n  (def name (-&gt;channelHandler channel)))&quot;, :offset 81, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(defn generateParticipant [identifier channel]\n  (def identifier (-&gt;channelHandler channel)))&quot;, :offset 93, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(generateParticipant buyer1 (chan))&quot;, :offset 35, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(generateParticipant \&quot;a\&quot; (chan))&quot;, :offset 32, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(def a (channelHandler. (chan)))&quot;, :offset 32, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(defrecord channelHandler [C]\n  stakeHolder\n  (receive [this message] (str \&quot;test\&quot;))\n  (provide [this channel message tag] (putOnChannel channel message tag))\n  (getChannel [this] C))&quot;, :offset 182, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(def a (-&gt;channelHandler (chan)))&quot;, :offset 33, :ns &quot;discourje.twoBuyerProtocol.pipes.participant&quot;} {:command &quot;(defrecord proto [pipelines])&quot;, :offset 29, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(def twoBuyerProto (-&gt;proto []))&quot;, :offset 32, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(defn createTwoBuyerProto [buyer1 buyer2 seller]\n  (cons (:pipelines twoBuyerProto) (-&gt;setupPipeLineSequencing buyer1 seller (-&gt;tagFilter :title))) ; pipe for title to seller\n  (cons (:pipelines twoBuyerProto) (-&gt;setupPipeLineSequencing seller buyer1 (-&gt;tagFilter :quote))); pipe for quote to buyer 1\n  (cons (:pipelines twoBuyerProto) (-&gt;setupPipeLineSequencing seller buyer2 (-&gt;tagFilter :quote))) ; pipe for quote to buyer 2\n  (cons (:pipelines twoBuyerProto) (-&gt;setupPipeLineSequencing buyer1 buyer2 (-&gt;tagFilter :quoteDiv))) ;pipe for quote div to buyer2\n  (cons (:pipelines twoBuyerProto) (-&gt;setupPipeLineSequencing buyer2 seller (-&gt;tagFilter :ok))) ; pipe for ok to seller 2\n  (cons (:pipelines twoBuyerProto) (-&gt;setupPipeLineSequencing buyer2 seller (-&gt;tagFilter :address))) ; pipe for address to seller\n  (cons (:pipelines twoBuyerProto) (-&gt;setupPipeLineSequencing seller buyer2 (-&gt;tagFilter :date))) ; pipe for date to buyer2\n  (cons (:pipelines twoBuyerProto) (-&gt;setupPipeLineSequencing buyer2 seller (-&gt;tagFilter :quit))))&quot;, :offset 1034, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(defn createPipeline [from to filter operation]\n  (pipeline 1 to filter from)\n  (go-loop []\n    (operation (&lt;! from))))&quot;, :offset 119, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(defrecord tagFilter [tag]\n  messageFilter\n  (filt [this message] (= (:tag message) tag)))&quot;, :offset 90, :ns &quot;discourje.twoBuyerProtocol.pipes.util&quot;} {:command &quot;(defn createPipeline [from to filter operation]\n  (pipeline 1 to filter from)\n  (go-loop []\n    (operation (&lt;! to))))&quot;, :offset 117, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(createPipeline buyer1 seller (-&gt;tagFilter :title) (print))&quot;, :offset 59, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(ns discourje.twoBuyerProtocol.pipes.proto\n  (:require [clojure.core.async :as async :refer :all]\n            [discourje.twoBuyerProtocol.pipes.util :refer :all]))&quot;, :offset 163, :ns &quot;user&quot;} {:command &quot;(def buyer2 (chan))&quot;, :offset 19, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(defn generatePipeline [from to filter operation]\n  (pipeline 1 to filter from)\n  (go-loop []\n    (operation (&lt;! to))))&quot;, :offset 119, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(generatePipeline buyer1 seller (-&gt;tagFilter :title) (print))&quot;, :offset 61, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(generatePipeline \n  buyer1 \n  seller \n  (filter (fn [m] (= (:tag m) :title))) \n  (printt))&quot;, :offset 91, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(generatePipeline \n  buyer1 \n  seller \n  (filter (fn [m] (= (:tag m) :title))) \n  (print))&quot;, :offset 90, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(go (&gt;! buyer1 (-&gt;message :title \&quot;yo\&quot;)))&quot;, :offset 40, :ns &quot;discourje.twoBuyerProtocol.pipes.proto&quot;} {:command &quot;(ns discourje.twoBuyerProtocol.pipes.simpleSetup \n  (:require [clojure.core.async :as async :refer :all]))&quot;, :offset 106, :ns &quot;user&quot;} {:command &quot;(pipeline 1 seller (filter string?) buyer1)&quot;, :offset 43, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(go (&gt;! buyer1 \&quot;aaa\&quot;))&quot;, :offset 22, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(go (println (&lt;! seller)))&quot;, :offset 26, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(defn messageTo [to filter from operation]\n  (pipeline 1 to (filter filter) from)\n  (go-loop []\n    (operation (&lt;! to))))&quot;, :offset 121, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(messageTo seller string? buyer1 (print))&quot;, :offset 41, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(go (&gt;! buyer1 \&quot;hello from buyer1 to seller\&quot;))&quot;, :offset 46, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(def buyer1 (chan))&quot;, :offset 19, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(def seller (chan))&quot;, :offset 19, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(defn messageTo [to filter from operation message]\n  (pipeline 1 to (filter filter) from)\n  (go (&gt;! from message))\n  (go-loop []\n    (operation (&lt;! to))))&quot;, :offset 154, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(messageTo seller string? buyer1 (print) \&quot;heya\&quot;)&quot;, :offset 48, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(messageTo seller string? buyer1 (fn [x] (print x)) \&quot;heya\&quot;)&quot;, :offset 59, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(def greet (fn [x] (print x)))&quot;, :offset 30, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(messageTo \&quot;heya\&quot; seller string? buyer1 greet)&quot;, :offset 46, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(defn generateQuoteDiv []\n  (fn [quote] (+ (rand-int quote) 1)))&quot;, :offset 64, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(defn generateBook []\n  (str \&quot;Joy of Clojure\&quot;))&quot;, :offset 47, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(defn generateQuote []\n  (+ (rand-int 30) 1))&quot;, :offset 45, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(def generateQuoteDiv (fn [quote] (+ (rand-int quote) 1)))&quot;, :offset 58, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(defn scribbleChoice [choice acceptPipe declinePipe]\n  (if (choice) acceptPipe declinePipe))&quot;, :offset 92, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(def quoteDivHigherThan15 (fn [x] (&lt; 15 x)))&quot;, :offset 44, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(defn CreateTwoBuyerProtocol []\n  (let [buyer1 (chan)\n        buyer2 (chan)\n        seller (chan)]\n    (scribbleSequence (generateBook) string? buyer1 seller)\n    (scribbleMultipleTo (generateQuote) number? seller buyer1 buyer2)\n    (scribbleSequence generateQuoteDiv number? buyer1 buyer2)\n    (scribbleChoice quoteDivHigherThan15\n                    (\n                      (scribbleSequence (fn [] (\&quot;ok\&quot;)) string? buyer2 seller)\n                      (scribbleSequence (fn [] (\&quot;Address:  test test\&quot;)) string? buyer2 seller)\n                      (scribbleSequence (fn [] (\&quot;Date:  01-01-2018\&quot;)) string? seller buyer2))\n                    (scribbleSequence (fn [] (\&quot;quit\&quot;)) string? buyer2 seller))\n    ))&quot;, :offset 706, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(ns discourje.twoBuyerProtocol.pipes.simpleSetup\n  (:require [clojure.core.async :as async :refer :all]))&quot;, :offset 105, :ns &quot;user&quot;} {:command &quot;(defn scribbleSequence\n  \&quot;function to replicate scribble syntax, however we need a filter for now to only take interesting messages from the channels\&quot;\n  [operation filter from to]\n  (pipeline 1 to (filter filter) from)\n  (go (&gt;! from operation)))&quot;, :offset 246, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(defn scribbleMultipleTo\n  \&quot;function to replicate scribble syntax, however we need a filter for now to only take interesting messages from the channels\&quot;\n  [operation filter from to &amp; more]\n  (pipeline 1 to (filter filter) from)\n  (for [m more]\n    ((pipeline 1 m (filter filter) from)))\n  (go (&gt;! from operation)))&quot;, :offset 314, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(defn generateBook []\n  (println \&quot;generating book\&quot;)\n  (str \&quot;Joy of Clojure\&quot;))&quot;, :offset 77, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(defn generateQuote []\n  (println \&quot;generating random integer between 0 and 30\&quot;)\n  (+ (rand-int 30) 1))&quot;, :offset 102, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(def generateQuoteDiv\n  (println \&quot;generating random quote div\&quot;)\n  (fn [quote] (+ (rand-int quote) 1)))&quot;, :offset 102, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(def generateQuoteDiv\n    ((println \&quot;generating random quote div\&quot;)\n      (fn [quote] (+ (rand-int quote) 1))))&quot;, :offset 110, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(def generateQuoteDiv\n    (fn [quote] (+ (rand-int quote) 1)))&quot;, :offset 62, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(defn scribbleChoice [choice acceptPipe declinePipe]\n  (println \&quot;chosing between accept or decline\&quot;)\n  (if (choice) acceptPipe declinePipe))&quot;, :offset 140, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(defn CreateTwoBuyerProtocol []\n  (let [buyer1 (chan)\n        buyer2 (chan)\n        seller (chan)]\n    (scribbleSequence (generateBook) string? buyer1 seller)\n    (scribbleMultipleTo (generateQuote) number? seller buyer1 buyer2)\n    (scribbleSequence generateQuoteDiv number? buyer1 buyer2)\n    ;(scribbleChoice quoteDivHigherThan15\n    ;                (\n    ;                  (scribbleSequence (fn [] (\&quot;ok\&quot;)) string? buyer2 seller)\n    ;                  (scribbleSequence (fn [] (\&quot;Address:  test test\&quot;)) string? buyer2 seller)\n    ;                  (scribbleSequence (fn [] (\&quot;Date:  01-01-2018\&quot;)) string? seller buyer2))\n    ;                (scribbleSequence (fn [] (\&quot;quit\&quot;)) string? buyer2 seller))\n    ))&quot;, :offset 712, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(discourje.twoBuyerProtocol.pipes.simpleSetup/CreateTwoBuyerProtocol)&quot;, :offset 69, :ns &quot;user&quot;}], :remote []}}</component>
   <component name="RunDashboard">
     <option name="ruleStates">
       <list>
@@ -576,8 +553,8 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="REPL" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3234375" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.21091291" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32948583" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.21091291" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Leiningen" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -587,8 +564,8 @@
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.44596013" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -724,13 +701,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/projectSetup/testCheckConfig.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="301">
-          <caret line="20" column="46" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="20" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.hgignore">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -774,24 +744,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/projectSetup/ProjectSetupTests.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="187">
           <caret line="11" column="14" lean-forward="false" selection-start-line="11" selection-start-column="14" selection-end-line="11" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/testCheck.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="0" lean-forward="false" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
         </state>
       </provider>
     </entry>
@@ -822,13 +778,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/discourje/tbpTests/pipesTests/buyer2Tests].clj" />
-    <entry file="file://$PROJECT_DIR$/test/async/examples/asyncExamples.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="23" column="0" lean-forward="false" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/test/discourje/core_test.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="34">
@@ -913,14 +862,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/async/examples/asyncExperiments.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/org/clojure/core.async/0.4.474/core.async-0.4.474.jar!/clojure/core/async.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="218">
@@ -971,7 +912,39 @@
     <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/participants/buyer1.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="170">
-          <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+          <caret line="10" column="0" lean-forward="false" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/util.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-68">
+          <caret line="2" column="0" lean-forward="false" selection-start-line="1" selection-start-column="1" selection-end-line="2" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/proto.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="21" column="23" lean-forward="false" selection-start-line="20" selection-start-column="2" selection-end-line="21" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/async/examples/asyncExamples.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1605">
+          <caret line="23" column="0" lean-forward="false" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/projectSetup/ProjectSetupTests.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -979,31 +952,39 @@
     <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/publishSubscribeExample/twoBuyerProtocolPubSub.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="132">
-          <caret line="12" column="62" lean-forward="true" selection-start-line="12" selection-start-column="62" selection-end-line="12" selection-end-column="62" />
+          <caret line="12" column="62" lean-forward="false" selection-start-line="12" selection-start-column="62" selection-end-line="12" selection-end-column="62" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/util.clj">
+    <entry file="file://$PROJECT_DIR$/test/async/examples/asyncExperiments.clj">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="0" lean-forward="true" selection-start-line="1" selection-start-column="1" selection-end-line="2" selection-end-column="0" />
+        <state relative-caret-position="102">
+          <caret line="573" column="0" lean-forward="true" selection-start-line="573" selection-start-column="0" selection-end-line="573" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/proto.clj">
+    <entry file="file://$PROJECT_DIR$/test/projectSetup/testCheckConfig.clj">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="21" column="23" lean-forward="true" selection-start-line="20" selection-start-column="2" selection-end-line="21" selection-end-column="23" />
+        <state relative-caret-position="238">
+          <caret line="14" column="0" lean-forward="true" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ProjectSetup/testCheck.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="13" column="26" lean-forward="false" selection-start-line="13" selection-start-column="26" selection-end-line="13" selection-end-column="26" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/simpleSetup.clj">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="20" column="46" lean-forward="true" selection-start-line="20" selection-start-column="46" selection-end-line="20" selection-end-column="46" />
+        <state relative-caret-position="350">
+          <caret line="76" column="6" lean-forward="true" selection-start-line="76" selection-start-column="6" selection-end-line="76" selection-end-column="6" />
           <folding />
         </state>
       </provider>
