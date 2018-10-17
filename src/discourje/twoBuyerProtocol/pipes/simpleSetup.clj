@@ -1,11 +1,17 @@
 (ns discourje.twoBuyerProtocol.pipes.simpleSetup
   (:require [clojure.core.async :as async :refer :all]))
 
+(defn testCC [channel]
+  (fn [] (go (<! channel)))
+  (fn [] (go (<! channel))))
+(testCC (chan))
+
+
 (defn scribbleSequence
   "function to replicate scribble syntax, however we need a filter for now to only take interesting messages from the channels"
   [operation filter from to]
   (pipeline 1 to (filter filter) from)
-  (go (>!! from operation)))
+  (fn [] (go (>! from operation))))
 
 (defn scribbleMultipleTo
   "function to replicate scribble syntax, however we need a filter for now to only take interesting messages from the channels"
@@ -13,7 +19,7 @@
   (pipeline 1 to (filter filter) from)
   (for [m more]
     (pipeline 1 m (filter filter) from))
-  (go (>!! from operation)))
+  (fn [] (go (>! from operation))))
 
 
 (defn generateBook []
@@ -25,11 +31,11 @@
   (+ (rand-int 30) 1))
 
 (def generateQuoteDiv
-    (fn [quote]
-      (+ (rand-int quote) 1)))
+  (fn [quote]
+    (+ (rand-int quote) 1)))
 
 (defn quoteDivHigherThan15 [channel]
-  (go (let [quote (<!! channel)]
+  (go (let [quote (<! channel)]
         (println (format "quote is %s" quote))
         (> 15 12))))
 
@@ -42,11 +48,11 @@
     (scribbleSequence generateQuoteDiv number? buyer1 buyer2)
     (if (quoteDivHigherThan15 buyer2)
       ;(
-        (scribbleSequence (fn [x] (println "ok")) string? buyer2 seller)
-      ;        (scribbleSequence (fn [x] (str "Address:  test test")) string? buyer2 seller)
+        (scribbleSequence (fn [x] (str "ok")) string? buyer2 seller)
+        ;(scribbleSequence (fn [x] (str "Address: test test")) string? buyer2 seller)
         ;(scribbleSequence (fn [x] (str "Date:  01-01-2018")) string? seller buyer2)
-        ;)
-      (scribbleSequence (fn [x] (println "quit")) string? buyer2 seller))))
+        ; )
+      (scribbleSequence (fn [x] (str "quit")) string? buyer2 seller))))
 (discourje.twoBuyerProtocol.pipes.simpleSetup/CreateTwoBuyerProtocol)
 
 
