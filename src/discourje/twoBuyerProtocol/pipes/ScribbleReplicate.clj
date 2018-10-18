@@ -19,7 +19,7 @@
 (def c (chan))
 
 (defn getPipe [to from operation]
-  (->pipeAndOp (pipeline 1 to (filter string?) from)
+  (->pipeAndOp (pipeline 1 to (filter string?) from false)
                (go-loop []
                   (>! from operation)
                  (recur))))
@@ -28,10 +28,10 @@
   (getPipe a b (str "test-a-b"))
   (getPipe b c (str "test-b-c")))
 
-
-
 (go (>! c "haha"))
 (testerPipe)
+
+(go (<! c))
 (close! a)
 (close! b)
 (close! c)
