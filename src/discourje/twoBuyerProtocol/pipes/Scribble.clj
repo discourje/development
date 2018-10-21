@@ -9,21 +9,10 @@
 (def validMessage (->message "valid" :valid))
 (def invalidMessage (->message "invalid" :invalid))
 
-(def messageFilter (fn [x] (filter (:tag x))))
-(def messageFilterT (filter (fn [x] (= (:tag x) :valid))))
-
-
-;(def validFilter? (fn [x] (= (:tag x) :valid)))
-
-(defmacro filterM [tag]
-  `(fn [~'x] (= (:tag ~'x) ~tag)))
-
-;(filterM :valid)
-(macroexpand `(filterM :valid))
-
-(= true (filterM :valid) validMessage)
-
-
+(defn filterBy
+  "Creates a function to compare tags of messages, this function can be supplied to filter."
+  [tag]
+  (fn [x] (= (:tag x) tag)))
 
 (defn createPipeline
   "Test for pipeline to use transducer as operation"
