@@ -14,6 +14,12 @@
   [tag]
   (fn [x] (= (:tag x) tag)))
 
+(defn IF [tag operation]
+  (fn [x]
+    (let [condition (= (:tag x) tag)]
+      (if condition (operation x))
+      condition)))
+
 (defn createPipeline
   "Test for pipeline to use transducer as operation"
   [from to operation]
@@ -23,7 +29,7 @@
 (go (>! b1 validMessage))
 
 
-(createPipeline b1 b2 messageFilterT)
+(createPipeline b1 b2 (filterBy :valid))
 
 (go (println :content (<! b2)))
 

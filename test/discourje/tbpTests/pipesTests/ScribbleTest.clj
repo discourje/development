@@ -23,25 +23,14 @@
 (deftest filterMessageInvalidMyFilter
   (is (= nil (first (filter (filterBy :valid) [invalid])))))
 
-(defn filterAndInvoke [tag operation]
-  (if-not (nil? (filterBy tag)) operation))
+(deftest filterMessageIF
+  (is (= valid (first (filter (IF :valid (fn [x] (println x))) [valid])))))
+
+(deftest filterMessageInvalidIF
+  (is (= nil (first (filter (IF :valid (fn [x] (println x))) [invalid])))))
+
+;(defn filterAndInvoke [tag operation]
+;  (if-not (nil? (filterBy tag)) operation))
 
 (deftest strTest
   (is (= (str "true") (str "true"))))
-
-(first (filter
-         (filterAndInvoke :valid (str 7))
-         [valid]))
-
-(deftest trueFilter1
-  (is (= (str "true")
-          (filter
-           (filterAndInvoke :valid (str "true"))
-           [valid]))))
-
-
-(deftest trueFilter
-  (is (= "true" (filter
-                  (filterAndInvoke :valid
-                                   (str "true"))
-                  [valid]))))
