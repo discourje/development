@@ -2,8 +2,35 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6fdd3211-89b6-43e6-86ae-60249c672f12" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/Scribble.clj" beforeDir="false" afterPath="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/Scribble.clj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/discourje/tbpTests/pipesTests/ScribbleTest.clj" beforeDir="false" afterPath="$PROJECT_DIR$/test/discourje/tbpTests/pipesTests/ScribbleTest.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/discourje/core.clj" beforeDir="false" afterPath="$PROJECT_DIR$/src/research/core.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/discourje/experiments/abstractionExperiments.clj" beforeDir="false" afterPath="$PROJECT_DIR$/src/research/experiments/abstractionExperiments.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/discourje/experiments/experiments.clj" beforeDir="false" afterPath="$PROJECT_DIR$/src/research/experiments/experiments.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/discourje/experiments/refs.clj" beforeDir="false" afterPath="$PROJECT_DIR$/src/research/experiments/refs.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/discourje/threeBuyerProtocol/ThreeBuyerProtocol.clj" beforeDir="false" afterPath="$PROJECT_DIR$/src/research/threeBuyerProtocol/ThreeBuyerProtocol.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/Scribble.clj" beforeDir="false" afterPath="$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/Scribble.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/ScribbleReplicate.clj" beforeDir="false" afterPath="$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/ScribbleReplicate.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/participant.clj" beforeDir="false" afterPath="$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/participant.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/participants/buyer1.clj" beforeDir="false" afterPath="$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/participants/buyer1.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/participants/buyer2.clj" beforeDir="false" afterPath="$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/participants/buyer2.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/participants/seller.clj" beforeDir="false" afterPath="$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/participants/seller.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/proto.clj" beforeDir="false" afterPath="$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/proto.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/simpleSetup.clj" beforeDir="false" afterPath="$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/simpleSetup.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/util.clj" beforeDir="false" afterPath="$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/util.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/publishSubscribeExample/twoBuyerProtocolPubSub.clj" beforeDir="false" afterPath="$PROJECT_DIR$/src/research/twoBuyerProtocol/publishSubscribeExample/twoBuyerProtocolPubSub.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/publishSubscribeExample/utilities.clj" beforeDir="false" afterPath="$PROJECT_DIR$/src/research/twoBuyerProtocol/publishSubscribeExample/utilities.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/discourje/abstractionExperiments_test.clj" beforeDir="false" afterPath="$PROJECT_DIR$/test/research/abstractionExperiments_test.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/discourje/core_test.clj" beforeDir="false" afterPath="$PROJECT_DIR$/test/research/core_test.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/discourje/experimentsTests.clj" beforeDir="false" afterPath="$PROJECT_DIR$/test/research/experimentsTests.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/discourje/tbpTests/TBPTests.clj" beforeDir="false" afterPath="$PROJECT_DIR$/test/research/tbpTests/TBPTests.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/discourje/tbpTests/pipesTests/ScribbleTest.clj" beforeDir="false" afterPath="$PROJECT_DIR$/test/research/tbpTests/pipesTests/ScribbleTest.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/discourje/tbpTests/pipesTests/buyer1Tests.clj" beforeDir="false" afterPath="$PROJECT_DIR$/test/research/tbpTests/pipesTests/buyer1Tests.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/discourje/tbpTests/pipesTests/buyer2Tests.clj" beforeDir="false" afterPath="$PROJECT_DIR$/test/research/tbpTests/pipesTests/buyer2Tests.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/discourje/tbpTests/pipesTests/participantTests.clj" beforeDir="false" afterPath="$PROJECT_DIR$/test/research/tbpTests/pipesTests/participantTests.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/discourje/tbpTests/pipesTests/protoTests.clj" beforeDir="false" afterPath="$PROJECT_DIR$/test/research/tbpTests/pipesTests/protoTests.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/discourje/tbpTests/pipesTests/sellerTests.clj" beforeDir="false" afterPath="$PROJECT_DIR$/test/research/tbpTests/pipesTests/sellerTests.clj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/discourje/tbpTests/pipesTests/utilTests.clj" beforeDir="false" afterPath="$PROJECT_DIR$/test/research/tbpTests/pipesTests/utilTests.clj" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -29,111 +56,134 @@
     <session id="410710807">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="9" />
+          <entry key="project.closed" value="10" />
           <entry key="project.open.time.13" value="1" />
           <entry key="project.open.time.14" value="3" />
-          <entry key="project.open.time.16" value="4" />
+          <entry key="project.open.time.16" value="5" />
           <entry key="project.open.time.17" value="1" />
           <entry key="project.open.time.22" value="1" />
-          <entry key="project.opened" value="10" />
+          <entry key="project.opened" value="11" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="clj" value="4792" />
+          <entry key="clj" value="4822" />
+          <entry key="gitignore" value="18" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Clojure" value="4792" />
+          <entry key="Clojure" value="4822" />
+          <entry key="PLAIN_TEXT" value="18" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="clj" value="14" />
+          <entry key="clj" value="43" />
+          <entry key="gitignore" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Clojure" value="14" />
+          <entry key="Clojure" value="43" />
+          <entry key="PLAIN_TEXT" value="1" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="vertical" split-proportion="0.6329527">
-      <split-first>
-        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/test/discourje/abstractionExperiments_test.clj">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="60">
-                  <caret line="4" column="76" selection-start-line="4" selection-start-column="65" selection-end-line="4" selection-end-column="76" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/util.clj">
-              <provider selected="true" editor-type-id="text-editor">
-                <state>
-                  <caret selection-end-line="1" selection-end-column="56" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/test/discourje/tbpTests/pipesTests/ScribbleTest.clj">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="484">
-                  <caret line="35" column="37" lean-forward="true" selection-start-line="35" selection-start-column="37" selection-end-line="35" selection-end-column="37" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/test/discourje/tbpTests/pipesTests/utilTests.clj">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="210">
-                  <caret line="14" selection-start-line="14" selection-end-line="14" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-first>
-      <split-second>
-        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/Scribble.clj">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="83">
-                  <caret line="19" selection-start-line="19" selection-end-line="19" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/test/projectSetup/ProjectSetupTests.clj">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="135">
-                  <caret line="9" column="1" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="165">
-                  <caret line="11" column="14" selection-start-line="11" selection-start-column="14" selection-end-line="11" selection-end-column="14" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-second>
-    </splitter>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/research/abstractionExperiments_test.clj">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="420">
+              <caret line="28" column="40" lean-forward="true" selection-start-line="28" selection-start-column="40" selection-end-line="28" selection-end-column="40" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/research/tbpTests/TBPTests.clj">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="60">
+              <caret line="4" column="20" selection-start-line="4" selection-start-column="20" selection-end-line="4" selection-end-column="20" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/research/tbpTests/pipesTests/ScribbleTest.clj">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="150">
+              <caret line="10" column="47" lean-forward="true" selection-start-line="10" selection-start-column="47" selection-end-line="10" selection-end-column="47" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="300">
+              <caret line="20" column="5" lean-forward="true" selection-start-line="20" selection-start-column="5" selection-end-line="20" selection-end-column="5" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/research/tbpTests/pipesTests/protoTests.clj">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <caret column="12" selection-start-column="12" selection-end-column="12" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/research/tbpTests/pipesTests/participantTests.clj">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <caret column="12" selection-start-column="12" selection-end-column="12" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/research/tbpTests/pipesTests/buyer2Tests.clj">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="45">
+              <caret line="3" column="21" selection-start-line="3" selection-start-column="21" selection-end-line="3" selection-end-column="21" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/research/tbpTests/pipesTests/buyer1Tests.clj">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="210">
+              <caret line="14" column="53" lean-forward="true" selection-start-line="14" selection-start-column="53" selection-end-line="14" selection-end-column="53" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/research/tbpTests/pipesTests/utilTests.clj">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="45">
+              <caret line="3" column="21" selection-start-line="3" selection-start-column="21" selection-end-line="3" selection-end-column="21" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/research/tbpTests/pipesTests/sellerTests.clj">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="45">
+              <caret line="3" column="21" selection-start-line="3" selection-start-column="21" selection-end-line="3" selection-end-column="21" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -157,24 +207,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/project.clj" />
-        <option value="$PROJECT_DIR$/src/projectSetup/ProjectSetup.clj" />
-        <option value="$PROJECT_DIR$/src/projectSetup/testCheck.clj" />
-        <option value="$PROJECT_DIR$/test/projectSetup/testCheckConfig.clj" />
-        <option value="$PROJECT_DIR$/src/ProjectSetup/testCheck.clj" />
-        <option value="$PROJECT_DIR$/src/ProjectSetup/ProjectSetup.clj" />
-        <option value="$PROJECT_DIR$/src/discourje/experiments.clj" />
-        <option value="$PROJECT_DIR$/test/discourje/tbpTests/TBPTests.clj" />
-        <option value="$PROJECT_DIR$/src/discourje/experiments/experiments.clj" />
-        <option value="$PROJECT_DIR$/test/discourje/experimentsTests.clj" />
-        <option value="$PROJECT_DIR$/src/discourje/experiments/abstractionExperiments.clj" />
-        <option value="$PROJECT_DIR$/test/discourje/core_test.clj" />
-        <option value="$PROJECT_DIR$/src/discourje/threeBuyerProtocol/ThreeBuyerProtocol.clj" />
-        <option value="$PROJECT_DIR$/src/discourje/core.clj" />
-        <option value="$PROJECT_DIR$/test/discourje/abstractionExperiments_test.clj" />
-        <option value="$PROJECT_DIR$/src/discourje/experiments/refs.clj" />
-        <option value="$PROJECT_DIR$/src/discourje/TwoBuyerProtocol.clj" />
-        <option value="$PROJECT_DIR$/test/async/examples/asyncExperiments.clj" />
         <option value="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/TwoBuyerProtocol.clj" />
         <option value="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/utilities.clj" />
         <option value="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/twoBuyerProtocolPubSub.clj" />
@@ -198,6 +230,34 @@
         <option value="$PROJECT_DIR$/test/projectSetup/ProjectSetupTests.clj" />
         <option value="$PROJECT_DIR$/test/discourje/tbpTests/pipesTests/ScribbleTest.clj" />
         <option value="$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/Scribble.clj" />
+        <option value="$PROJECT_DIR$/src/research/core.clj" />
+        <option value="$PROJECT_DIR$/src/research/twoBuyerProtocol/publishSubscribeExample/utilities.clj" />
+        <option value="$PROJECT_DIR$/src/research/twoBuyerProtocol/publishSubscribeExample/twoBuyerProtocolPubSub.clj" />
+        <option value="$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/util.clj" />
+        <option value="$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/simpleSetup.clj" />
+        <option value="$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/ScribbleReplicate.clj" />
+        <option value="$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/Scribble.clj" />
+        <option value="$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/proto.clj" />
+        <option value="$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/participant.clj" />
+        <option value="$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/participants/seller.clj" />
+        <option value="$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/participants/buyer2.clj" />
+        <option value="$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/participants/buyer1.clj" />
+        <option value="$PROJECT_DIR$/src/research/threeBuyerProtocol/ThreeBuyerProtocol.clj" />
+        <option value="$PROJECT_DIR$/src/research/experiments/refs.clj" />
+        <option value="$PROJECT_DIR$/src/research/experiments/experiments.clj" />
+        <option value="$PROJECT_DIR$/src/research/experiments/abstractionExperiments.clj" />
+        <option value="$PROJECT_DIR$/test/research/core_test.clj" />
+        <option value="$PROJECT_DIR$/test/research/experimentsTests.clj" />
+        <option value="$PROJECT_DIR$/test/research/abstractionExperiments_test.clj" />
+        <option value="$PROJECT_DIR$/test/research/tbpTests/TBPTests.clj" />
+        <option value="$PROJECT_DIR$/test/research/tbpTests/pipesTests/utilTests.clj" />
+        <option value="$PROJECT_DIR$/test/research/tbpTests/pipesTests/sellerTests.clj" />
+        <option value="$PROJECT_DIR$/test/research/tbpTests/pipesTests/ScribbleTest.clj" />
+        <option value="$PROJECT_DIR$/test/research/tbpTests/pipesTests/protoTests.clj" />
+        <option value="$PROJECT_DIR$/test/research/tbpTests/pipesTests/participantTests.clj" />
+        <option value="$PROJECT_DIR$/test/research/tbpTests/pipesTests/buyer2Tests.clj" />
+        <option value="$PROJECT_DIR$/test/research/tbpTests/pipesTests/buyer1Tests.clj" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -228,6 +288,11 @@
             <path>
               <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
               <item name="Discourje" type="462c0819:PsiDirectoryNode" />
+              <item name=".idea" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Discourje" type="462c0819:PsiDirectoryNode" />
               <item name="doc" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -244,74 +309,39 @@
               <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
               <item name="Discourje" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="discourje" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Discourje" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="discourje" type="462c0819:PsiDirectoryNode" />
-              <item name="twoBuyerProtocol" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Discourje" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="discourje" type="462c0819:PsiDirectoryNode" />
-              <item name="twoBuyerProtocol" type="462c0819:PsiDirectoryNode" />
-              <item name="pipes" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Discourje" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="discourje" type="462c0819:PsiDirectoryNode" />
-              <item name="twoBuyerProtocol" type="462c0819:PsiDirectoryNode" />
-              <item name="publishSubscribeExample" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Discourje" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="ProjectSetup" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
               <item name="Discourje" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="research" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Discourje" type="462c0819:PsiDirectoryNode" />
               <item name="test" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
               <item name="Discourje" type="462c0819:PsiDirectoryNode" />
               <item name="test" type="462c0819:PsiDirectoryNode" />
-              <item name="examples" type="462c0819:PsiDirectoryNode" />
+              <item name="research" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
               <item name="Discourje" type="462c0819:PsiDirectoryNode" />
               <item name="test" type="462c0819:PsiDirectoryNode" />
-              <item name="discourje" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Discourje" type="462c0819:PsiDirectoryNode" />
-              <item name="test" type="462c0819:PsiDirectoryNode" />
-              <item name="discourje" type="462c0819:PsiDirectoryNode" />
+              <item name="research" type="462c0819:PsiDirectoryNode" />
               <item name="tbpTests" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
               <item name="Discourje" type="462c0819:PsiDirectoryNode" />
               <item name="test" type="462c0819:PsiDirectoryNode" />
-              <item name="discourje" type="462c0819:PsiDirectoryNode" />
+              <item name="research" type="462c0819:PsiDirectoryNode" />
               <item name="tbpTests" type="462c0819:PsiDirectoryNode" />
               <item name="pipesTests" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Discourje" type="462c0819:PsiDirectoryNode" />
-              <item name="test" type="462c0819:PsiDirectoryNode" />
-              <item name="projectSetup" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="discourje" type="b2602c69:ProjectViewProjectNode" />
@@ -363,7 +393,7 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1540184324081" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1540271027698" />
     <property name="cursive.last.file.extension./home/plcbo/Projects/Discourje/src" value="clj" />
     <property name="cursive.last.file.extension./home/plcbo/Projects/Discourje/test" value="clj" />
     <property name="cursive.last.file.extension.C\:/Users/Ruben/Documents/Discourje/src" value="clj" />
@@ -380,12 +410,14 @@
       <recent name="discourje" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/test/research" />
+      <recent name="$PROJECT_DIR$/src/research" />
       <recent name="C:\Users\Ruben\Documents\Discourje\src\discourje\twoBuyerProtocol\publishSubscribeExample" />
       <recent name="C:\Users\Ruben\Documents\Discourje\src\discourje\twoBuyerProtocol" />
       <recent name="C:\Users\Ruben\Documents\Discourje\src\discourje\experiments" />
     </key>
   </component>
-  <component name="ReplState" timestamp="1540184307391">{:repl-history {:ide [], :local [{:command &quot;(discourje.twoBuyerProtocol.pipes.simpleSetup/CreateTwoBuyerProtocol)&quot;, :offset 69, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(close! a)&quot;, :offset 10, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(close! b)&quot;, :offset 10, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(close! c)&quot;, :offset 10, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn getPipe [to from operation]\n  (-&gt;pipeAndOp (pipeline 1 to (filter string?) from)\n               (go-loop []\n                 (println \&quot;asdasd\&quot;)\n                  (&gt;! from operation)\n                 (recur))))&quot;, :offset 215, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(go (&gt;! a \&quot;tst\&quot;))&quot;, :offset 17, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(go (println &lt;! c))&quot;, :offset 19, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn getPipe [to from operation]\n  (-&gt;pipeAndOp (pipeline 1 to (filter string?) from)\n               (go-loop []\n                  (&gt;! from operation)\n                  to\n                 (recur))))&quot;, :offset 200, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn testerPipe []\n  (getPipe a b (\&quot;test-a-b\&quot;))\n  (getPipe b c (\&quot;test-b-c\&quot;)))&quot;, :offset 78, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn testerPipe []\n  (getPipe a b '(\&quot;test-a-b\&quot;))\n  (getPipe b c '(\&quot;test-b-c\&quot;)))&quot;, :offset 80, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defrecord participant [channel internalState])&quot;, :offset 47, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn generateParticipant\n  \&quot;Generates a new participant, trying to simulate a constructor.\n  Creates a participant with a new channel and an empty map for internalState\&quot;\n  [] (-&gt;participant (chan) {}))&quot;, :offset 202, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(def buyer1 (generateParticipant))&quot;, :offset 34, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(def buyer2 (generateParticipant))&quot;, :offset 34, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(def seller (generateParticipant))&quot;, :offset 34, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn getPipe [to from operation]\n  (-&gt;pipeAndOp (pipeline 1 to (filter string?) from)\n               (go-loop []\n                  (&gt;! from operation)\n                 (recur))))&quot;, :offset 179, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn getPipe [to from operation]\n  (-&gt;pipeAndOp (pipeline 1 to (filter string?) from)\n               (go-loop []\n                  (&gt;! from (println operation) )\n                 (recur))))&quot;, :offset 190, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn getPipe [to from operation]\n  (-&gt;pipeAndOp (pipeline 1 to (filter string?) from)\n               (go-loop []\n                  (&gt;! from (println operation) operation)\n                 (recur))))&quot;, :offset 199, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn getPipe [to from operation]\n  (-&gt;pipeAndOp (pipeline 1 to (filter string?) from)\n               (go-loop []\n                  (&gt;! from (println operation) )operation\n                 (recur))))&quot;, :offset 199, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(go (&lt;! c))&quot;, :offset 11, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(def g (chan))&quot;, :offset 14, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(def testLoop (go-loop (&lt;! g) (recur)))&quot;, :offset 39, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(def testLoop (go-loop [] (&lt;! g) (recur)))&quot;, :offset 42, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn testLoop [] \n  (go-loop [] \n    (&lt;! g) \n    (recur)))&quot;, :offset 59, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn testLoop [] \n  (go-loop [] \n    (let [text (&lt;! g)]\n      (println text))\n    g\n    (recur)))&quot;, :offset 98, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(def g (chan 1))&quot;, :offset 16, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn testLoop []\n  (go-loop []\n    (let [text (&lt;! g)]\n      (println text))\n    (recur)))&quot;, :offset 90, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(testLoop)&quot;, :offset 10, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(go (&gt;! g \&quot;bla\&quot;))&quot;, :offset 17, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(ns discourje.twoBuyerProtocol.pipes.ScribbleReplicate\n  (:require [clojure.core.async :as async :refer :all]\n            [clojure.core :refer :all]))&quot;, :offset 150, :ns &quot;user&quot;} {:command &quot;(defrecord pipeAndOp [pipe operation])&quot;, :offset 38, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(def a (chan))&quot;, :offset 14, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(def b (chan))&quot;, :offset 14, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(def c (chan))&quot;, :offset 14, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn getPipe [to from operation]\n  (-&gt;pipeAndOp (pipeline 1 to (filter string?) from false)\n               (go-loop []\n                  (&gt;! from operation)\n                 (recur))))&quot;, :offset 185, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(go (&gt;! a \&quot;ss\&quot;))&quot;, :offset 16, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(go (&gt;! c \&quot;haha\&quot;))&quot;, :offset 18, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn getPipe [to from operation]\n  (-&gt;pipeAndOp (pipeline 1 to (filter string?) from false)\n               (go-loop []\n                  (&gt;! from operation)\n                  operation\n                 (recur))\n               operation))&quot;, :offset 238, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn testerPipe []\n  (getPipe a b (str \&quot;test-a-b\&quot;))\n  (getPipe b c (str \&quot;test-b-c\&quot;)))&quot;, :offset 86, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(testerPipe)&quot;, :offset 12, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn getPipe [to from operation]\n  (-&gt;pipeAndOp (pipeline 1 to (filter string?) from false)\n               (go-loop []\n                  (&gt;! from operation)\n                  operation\n                 (recur)operation)))&quot;, :offset 222, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn getPipe [to from operation]\n  (-&gt;pipeAndOp (pipeline 1 to (filter string?) from false)\n               (go-loop []\n                  (&gt;! from operation)\n                  operation\n                 (recur))))&quot;, :offset 213, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defrecord message [message tag])&quot;, :offset 33, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(def messageFilter (fn [x] (filter (:tag x))))&quot;, :offset 46, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(defn createPipeline\n  \&quot;Test for pipeline to use transducer as operation\&quot;\n  [from to operation]\n  (pipeline 1 to operation from true))&quot;, :offset 134, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(go (&lt;! b2))&quot;, :offset 12, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(go (println (&lt;! b2)))&quot;, :offset 22, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(go (println :message (&lt;! b2)))&quot;, :offset 31, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(go (&gt;! b1 validMessage))&quot;, :offset 25, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(def messageFilter (filter (fn [x] (filter (:tag x)))))&quot;, :offset 55, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(ns discourje.twoBuyerProtocol.pipes.Scribble\n  (:require [clojure.core.async :as async :refer :all]\n            [clojure.core :refer :all]))&quot;, :offset 141, :ns &quot;user&quot;} {:command &quot;(def b1 (chan))&quot;, :offset 15, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(def b2 (chan))&quot;, :offset 15, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(defrecord message [content tag])&quot;, :offset 33, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(defn createPipeline\n  \&quot;Test for pipeline to use transducer as operation\&quot;\n  [from to operation]\n  (pipeline 1 to operation from))&quot;, :offset 129, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(createPipeline b1 b2 messageFilter)&quot;, :offset 36, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(def messageFilterT (filter (fn [x] (filter (:tag x)))))&quot;, :offset 56, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(createPipeline b1 b2 messageFilterT)&quot;, :offset 37, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(def invalidMessage (-&gt;message \&quot;invalid\&quot; :invalid))&quot;, :offset 51, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(def validMessage (-&gt;message \&quot;valid\&quot; :valid))&quot;, :offset 45, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(def messageFilterT (filter (fn [x] (= (:tag x) :valid))))&quot;, :offset 58, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(go (&gt;! b1 invalidMessage))&quot;, :offset 27, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(go (println :content (&lt;! b2)))&quot;, :offset 31, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(def valid (-&gt;message \&quot;content\&quot; :valid))&quot;, :offset 40, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(ns discourje.tbpTests.pipesTests.ScribbleTest\n  (:require [clojure.test :refer :all]\n            [discourje.twoBuyerProtocol.pipes.Scribble :refer :all]))&quot;, :offset 155, :ns &quot;user&quot;} {:command &quot;(def invalid (-&gt;message \&quot;CONTENT\&quot; :invalid))&quot;, :offset 44, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(def filterTest (filter (fn [x] (= (:tag x) :valid))))&quot;, :offset 54, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(deftest filterValid\n  (is (= true (filterTest valid))\n                   ))&quot;, :offset 76, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(filter (fn [] (= (:tag valid) :valid)))&quot;, :offset 40, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;( \n  (fn [] \n    (= (:tag valid) :valid)))&quot;, :offset 42, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(filter\n  (fn [x]\n    (= (:tag x) :valid)) valid)&quot;, :offset 49, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(filter\n  (fn [x]\n    (= (:tag x) :valid)) [valid])&quot;, :offset 51, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(macroexpand `(filterMacro :valid))&quot;, :offset 35, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(macroexpand '(filterMacro :valid))&quot;, :offset 35, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(defmacro filterM [tag]\n  `(fn [x] (= (:tag x) ~tag)))&quot;, :offset 54, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(defmacro filterM [tag]\n  `(fn [~'x] (= (:tag ~'x) ~tag)))&quot;, :offset 58, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(macroexpand `(filterM :valid))&quot;, :offset 31, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(= true (filterM :valid) :valid)&quot;, :offset 32, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(= true (filterM :valid) validMessage)&quot;, :offset 38, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(str \&quot;true\&quot;)&quot;, :offset 12, :ns &quot;user&quot;} {:command &quot;(filter\n  (filterAndInvoke :valid (str \&quot;true\&quot;))\n  [valid])&quot;, :offset 58, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(filter\n  (filterAndInvoke :valid (\&quot;true\&quot;))\n  [valid])&quot;, :offset 54, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(filter\n  (filterAndInvoke :valid \&quot;true\&quot;)\n  [valid])&quot;, :offset 52, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(filter\n  (filterAndInvoke :valid 6)\n  [valid])&quot;, :offset 47, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(filter\n  (filterAndInvoke :valid (println 7))\n  [valid])&quot;, :offset 57, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(filter\n  (filterAndInvoke :valid (str 7))\n  [valid])&quot;, :offset 53, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(first (filter\n         (filterAndInvoke :valid (str 7))\n         [valid]))&quot;, :offset 75, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(first (filter (filterI :valid (println \&quot;asd\&quot;)) [invalid]))&quot;, :offset 59, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(defn log [&amp; [idx]]\n  (fn [rf]\n    (fn\n      ([] (rf))\n      ([result] (rf result))\n      ([result el]\n       (let [n-step (if idx (str \&quot;Step: \&quot; idx \&quot;. \&quot;) \&quot;\&quot;)]\n         (println (format \&quot;%sResult: %s, Item: %s\&quot; n-step result el)))\n       (rf result el)))))&quot;, :offset 256, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(sequence (log) [:a :b :c])&quot;, :offset 27, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(my-identity-prop)&quot;, :offset 18, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(defn my-identity-prop [xf]\n  (fn\n    ([]\n     (println \&quot;Arity 0.\&quot;)\n     (xf))\n    ([result]\n     (let [r (xf result)]\n       (println \&quot;my-identity(\&quot; result \&quot;) =\&quot; r)\n       r))\n    ([result input]\n     (let [r (xf result input)]\n       (println \&quot;my-idenity(\&quot; result \&quot;,\&quot; input \&quot;) =\&quot; r)\n       r))))&quot;, :offset 297, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(my-identity-prop 2)&quot;, :offset 20, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(my-identity-prop '(2))&quot;, :offset 23, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(my-identity-prop [2])&quot;, :offset 22, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(def cd (true? true))&quot;, :offset 21, :ns &quot;user&quot;} {:command &quot;(if cd (println \&quot;a\&quot;))&quot;, :offset 21, :ns &quot;user&quot;} {:command &quot;(if-not cd (println \&quot;a\&quot;))&quot;, :offset 25, :ns &quot;user&quot;} {:command &quot;(def cdn (true? false))&quot;, :offset 23, :ns &quot;user&quot;} {:command &quot;(if cdn (println \&quot;a\&quot;))&quot;, :offset 22, :ns &quot;user&quot;}], :remote []}}</component>
+  <component name="ReplState" timestamp="1540185118467">{:repl-history {:ide [], :local [{:command &quot;(discourje.twoBuyerProtocol.pipes.simpleSetup/CreateTwoBuyerProtocol)&quot;, :offset 69, :ns &quot;discourje.twoBuyerProtocol.pipes.simpleSetup&quot;} {:command &quot;(close! a)&quot;, :offset 10, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(close! b)&quot;, :offset 10, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(close! c)&quot;, :offset 10, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn getPipe [to from operation]\n  (-&gt;pipeAndOp (pipeline 1 to (filter string?) from)\n               (go-loop []\n                 (println \&quot;asdasd\&quot;)\n                  (&gt;! from operation)\n                 (recur))))&quot;, :offset 215, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(go (&gt;! a \&quot;tst\&quot;))&quot;, :offset 17, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(go (println &lt;! c))&quot;, :offset 19, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn getPipe [to from operation]\n  (-&gt;pipeAndOp (pipeline 1 to (filter string?) from)\n               (go-loop []\n                  (&gt;! from operation)\n                  to\n                 (recur))))&quot;, :offset 200, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn testerPipe []\n  (getPipe a b (\&quot;test-a-b\&quot;))\n  (getPipe b c (\&quot;test-b-c\&quot;)))&quot;, :offset 78, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn testerPipe []\n  (getPipe a b '(\&quot;test-a-b\&quot;))\n  (getPipe b c '(\&quot;test-b-c\&quot;)))&quot;, :offset 80, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defrecord participant [channel internalState])&quot;, :offset 47, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn generateParticipant\n  \&quot;Generates a new participant, trying to simulate a constructor.\n  Creates a participant with a new channel and an empty map for internalState\&quot;\n  [] (-&gt;participant (chan) {}))&quot;, :offset 202, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(def buyer1 (generateParticipant))&quot;, :offset 34, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(def buyer2 (generateParticipant))&quot;, :offset 34, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(def seller (generateParticipant))&quot;, :offset 34, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn getPipe [to from operation]\n  (-&gt;pipeAndOp (pipeline 1 to (filter string?) from)\n               (go-loop []\n                  (&gt;! from operation)\n                 (recur))))&quot;, :offset 179, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn getPipe [to from operation]\n  (-&gt;pipeAndOp (pipeline 1 to (filter string?) from)\n               (go-loop []\n                  (&gt;! from (println operation) )\n                 (recur))))&quot;, :offset 190, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn getPipe [to from operation]\n  (-&gt;pipeAndOp (pipeline 1 to (filter string?) from)\n               (go-loop []\n                  (&gt;! from (println operation) operation)\n                 (recur))))&quot;, :offset 199, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn getPipe [to from operation]\n  (-&gt;pipeAndOp (pipeline 1 to (filter string?) from)\n               (go-loop []\n                  (&gt;! from (println operation) )operation\n                 (recur))))&quot;, :offset 199, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(go (&lt;! c))&quot;, :offset 11, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(def g (chan))&quot;, :offset 14, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(def testLoop (go-loop (&lt;! g) (recur)))&quot;, :offset 39, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(def testLoop (go-loop [] (&lt;! g) (recur)))&quot;, :offset 42, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn testLoop [] \n  (go-loop [] \n    (&lt;! g) \n    (recur)))&quot;, :offset 59, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn testLoop [] \n  (go-loop [] \n    (let [text (&lt;! g)]\n      (println text))\n    g\n    (recur)))&quot;, :offset 98, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(def g (chan 1))&quot;, :offset 16, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn testLoop []\n  (go-loop []\n    (let [text (&lt;! g)]\n      (println text))\n    (recur)))&quot;, :offset 90, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(testLoop)&quot;, :offset 10, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(go (&gt;! g \&quot;bla\&quot;))&quot;, :offset 17, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(ns discourje.twoBuyerProtocol.pipes.ScribbleReplicate\n  (:require [clojure.core.async :as async :refer :all]\n            [clojure.core :refer :all]))&quot;, :offset 150, :ns &quot;user&quot;} {:command &quot;(defrecord pipeAndOp [pipe operation])&quot;, :offset 38, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(def a (chan))&quot;, :offset 14, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(def b (chan))&quot;, :offset 14, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(def c (chan))&quot;, :offset 14, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn getPipe [to from operation]\n  (-&gt;pipeAndOp (pipeline 1 to (filter string?) from false)\n               (go-loop []\n                  (&gt;! from operation)\n                 (recur))))&quot;, :offset 185, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(go (&gt;! a \&quot;ss\&quot;))&quot;, :offset 16, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(go (&gt;! c \&quot;haha\&quot;))&quot;, :offset 18, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn getPipe [to from operation]\n  (-&gt;pipeAndOp (pipeline 1 to (filter string?) from false)\n               (go-loop []\n                  (&gt;! from operation)\n                  operation\n                 (recur))\n               operation))&quot;, :offset 238, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn testerPipe []\n  (getPipe a b (str \&quot;test-a-b\&quot;))\n  (getPipe b c (str \&quot;test-b-c\&quot;)))&quot;, :offset 86, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(testerPipe)&quot;, :offset 12, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn getPipe [to from operation]\n  (-&gt;pipeAndOp (pipeline 1 to (filter string?) from false)\n               (go-loop []\n                  (&gt;! from operation)\n                  operation\n                 (recur)operation)))&quot;, :offset 222, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defn getPipe [to from operation]\n  (-&gt;pipeAndOp (pipeline 1 to (filter string?) from false)\n               (go-loop []\n                  (&gt;! from operation)\n                  operation\n                 (recur))))&quot;, :offset 213, :ns &quot;discourje.twoBuyerProtocol.pipes.ScribbleReplicate&quot;} {:command &quot;(defrecord message [message tag])&quot;, :offset 33, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(def messageFilter (fn [x] (filter (:tag x))))&quot;, :offset 46, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(defn createPipeline\n  \&quot;Test for pipeline to use transducer as operation\&quot;\n  [from to operation]\n  (pipeline 1 to operation from true))&quot;, :offset 134, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(go (&lt;! b2))&quot;, :offset 12, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(go (println (&lt;! b2)))&quot;, :offset 22, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(go (println :message (&lt;! b2)))&quot;, :offset 31, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(go (&gt;! b1 validMessage))&quot;, :offset 25, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(def messageFilter (filter (fn [x] (filter (:tag x)))))&quot;, :offset 55, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(ns discourje.twoBuyerProtocol.pipes.Scribble\n  (:require [clojure.core.async :as async :refer :all]\n            [clojure.core :refer :all]))&quot;, :offset 141, :ns &quot;user&quot;} {:command &quot;(def b1 (chan))&quot;, :offset 15, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(def b2 (chan))&quot;, :offset 15, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(defrecord message [content tag])&quot;, :offset 33, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(defn createPipeline\n  \&quot;Test for pipeline to use transducer as operation\&quot;\n  [from to operation]\n  (pipeline 1 to operation from))&quot;, :offset 129, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(createPipeline b1 b2 messageFilter)&quot;, :offset 36, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(def messageFilterT (filter (fn [x] (filter (:tag x)))))&quot;, :offset 56, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(createPipeline b1 b2 messageFilterT)&quot;, :offset 37, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(def invalidMessage (-&gt;message \&quot;invalid\&quot; :invalid))&quot;, :offset 51, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(def validMessage (-&gt;message \&quot;valid\&quot; :valid))&quot;, :offset 45, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(def messageFilterT (filter (fn [x] (= (:tag x) :valid))))&quot;, :offset 58, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(go (&gt;! b1 invalidMessage))&quot;, :offset 27, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(go (println :content (&lt;! b2)))&quot;, :offset 31, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(def valid (-&gt;message \&quot;content\&quot; :valid))&quot;, :offset 40, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(ns discourje.tbpTests.pipesTests.ScribbleTest\n  (:require [clojure.test :refer :all]\n            [discourje.twoBuyerProtocol.pipes.Scribble :refer :all]))&quot;, :offset 155, :ns &quot;user&quot;} {:command &quot;(def invalid (-&gt;message \&quot;CONTENT\&quot; :invalid))&quot;, :offset 44, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(def filterTest (filter (fn [x] (= (:tag x) :valid))))&quot;, :offset 54, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(deftest filterValid\n  (is (= true (filterTest valid))\n                   ))&quot;, :offset 76, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(filter (fn [] (= (:tag valid) :valid)))&quot;, :offset 40, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;( \n  (fn [] \n    (= (:tag valid) :valid)))&quot;, :offset 42, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(filter\n  (fn [x]\n    (= (:tag x) :valid)) valid)&quot;, :offset 49, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(filter\n  (fn [x]\n    (= (:tag x) :valid)) [valid])&quot;, :offset 51, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(macroexpand `(filterMacro :valid))&quot;, :offset 35, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(macroexpand '(filterMacro :valid))&quot;, :offset 35, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(defmacro filterM [tag]\n  `(fn [x] (= (:tag x) ~tag)))&quot;, :offset 54, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(defmacro filterM [tag]\n  `(fn [~'x] (= (:tag ~'x) ~tag)))&quot;, :offset 58, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(macroexpand `(filterM :valid))&quot;, :offset 31, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(= true (filterM :valid) :valid)&quot;, :offset 32, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(= true (filterM :valid) validMessage)&quot;, :offset 38, :ns &quot;discourje.twoBuyerProtocol.pipes.Scribble&quot;} {:command &quot;(str \&quot;true\&quot;)&quot;, :offset 12, :ns &quot;user&quot;} {:command &quot;(filter\n  (filterAndInvoke :valid (str \&quot;true\&quot;))\n  [valid])&quot;, :offset 58, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(filter\n  (filterAndInvoke :valid (\&quot;true\&quot;))\n  [valid])&quot;, :offset 54, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(filter\n  (filterAndInvoke :valid \&quot;true\&quot;)\n  [valid])&quot;, :offset 52, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(filter\n  (filterAndInvoke :valid 6)\n  [valid])&quot;, :offset 47, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(filter\n  (filterAndInvoke :valid (println 7))\n  [valid])&quot;, :offset 57, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(filter\n  (filterAndInvoke :valid (str 7))\n  [valid])&quot;, :offset 53, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(first (filter\n         (filterAndInvoke :valid (str 7))\n         [valid]))&quot;, :offset 75, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(first (filter (filterI :valid (println \&quot;asd\&quot;)) [invalid]))&quot;, :offset 59, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(defn log [&amp; [idx]]\n  (fn [rf]\n    (fn\n      ([] (rf))\n      ([result] (rf result))\n      ([result el]\n       (let [n-step (if idx (str \&quot;Step: \&quot; idx \&quot;. \&quot;) \&quot;\&quot;)]\n         (println (format \&quot;%sResult: %s, Item: %s\&quot; n-step result el)))\n       (rf result el)))))&quot;, :offset 256, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(sequence (log) [:a :b :c])&quot;, :offset 27, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(my-identity-prop)&quot;, :offset 18, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(defn my-identity-prop [xf]\n  (fn\n    ([]\n     (println \&quot;Arity 0.\&quot;)\n     (xf))\n    ([result]\n     (let [r (xf result)]\n       (println \&quot;my-identity(\&quot; result \&quot;) =\&quot; r)\n       r))\n    ([result input]\n     (let [r (xf result input)]\n       (println \&quot;my-idenity(\&quot; result \&quot;,\&quot; input \&quot;) =\&quot; r)\n       r))))&quot;, :offset 297, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(my-identity-prop 2)&quot;, :offset 20, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(my-identity-prop '(2))&quot;, :offset 23, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(my-identity-prop [2])&quot;, :offset 22, :ns &quot;discourje.tbpTests.pipesTests.ScribbleTest&quot;} {:command &quot;(def cd (true? true))&quot;, :offset 21, :ns &quot;user&quot;} {:command &quot;(if cd (println \&quot;a\&quot;))&quot;, :offset 21, :ns &quot;user&quot;} {:command &quot;(if-not cd (println \&quot;a\&quot;))&quot;, :offset 25, :ns &quot;user&quot;} {:command &quot;(def cdn (true? false))&quot;, :offset 23, :ns &quot;user&quot;} {:command &quot;(if cdn (println \&quot;a\&quot;))&quot;, :offset 22, :ns &quot;user&quot;}], :remote []}}</component>
   <component name="RunDashboard">
     <option name="ruleStates">
       <list>
@@ -483,18 +515,19 @@
       <workItem from="1539920053639" duration="5756000" />
       <workItem from="1539971025401" duration="1661000" />
       <workItem from="1540102513523" duration="6299000" />
-      <workItem from="1540179323095" duration="4980000" />
+      <workItem from="1540179323095" duration="5790000" />
+      <workItem from="1540270427374" duration="597000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="36252000" />
+    <option name="totallyTimeSpent" value="37659000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1433" y="-2" width="1853" height="1082" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.09573879" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.3215274" />
       <window_info id="Structure" order="1" weight="0.25" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -508,7 +541,7 @@
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Terminal" order="7" />
+      <window_info anchor="bottom" id="Terminal" order="7" visible="true" weight="0.32983193" />
       <window_info anchor="bottom" id="Event Log" order="8" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" internal_type="SLIDING" order="9" type="SLIDING" weight="0.21091291" />
       <window_info anchor="bottom" id="Messages" order="10" />
@@ -518,7 +551,7 @@
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Capture Analysis" order="3" />
       <window_info anchor="right" id="Theme Preview" order="4" />
-      <window_info active="true" anchor="right" id="REPL" order="5" sideWeight="0.5010504" side_tool="true" visible="true" weight="0.32429442" />
+      <window_info anchor="right" id="REPL" order="5" sideWeight="0.5010504" side_tool="true" weight="0.32429442" />
       <window_info anchor="right" id="Leiningen" order="6" sideWeight="0.4989496" weight="0.32982844" />
       <window_info anchor="right" id="Palette&#9;" order="7" />
       <window_info anchor="right" id="Palette" order="8" />
@@ -567,23 +600,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/discourje/core.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="21" selection-start-line="8" selection-start-column="21" selection-end-line="8" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/project.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="6" column="43" selection-start-line="6" selection-start-column="30" selection-end-line="6" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.nrepl-port">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
@@ -650,66 +666,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/discourje/threeBuyerProtocol/ThreeBuyerProtocol.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="196">
-          <caret line="14" selection-start-line="14" selection-end-line="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/discourje/experiments/experiments.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="196">
-          <caret line="15" selection-start-line="15" selection-end-line="15" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/doc/TwoBuyerProtocol.png">
       <provider selected="true" editor-type-id="images" />
     </entry>
     <entry file="file://$PROJECT_DIR$/test/discourje/tbpTests/pipesTests/buyer2Tests].clj" />
-    <entry file="file://$PROJECT_DIR$/test/discourje/core_test.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" selection-start-line="2" selection-end-line="2" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/discourje/tbpTests/TBPTests.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" column="6" selection-start-line="7" selection-start-column="6" selection-end-line="7" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/discourje/tbpTests/pipesTests/buyer2Tests.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="4" selection-start-line="4" selection-end-line="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/discourje/tbpTests/pipesTests/participantTests.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" selection-start-line="2" selection-end-line="2" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/discourje/tbpTests/pipesTests/buyer1Tests.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="14" column="34" selection-start-line="14" selection-start-column="34" selection-end-line="14" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/publishSubscribeExample/utilities.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="901">
-          <caret line="53" column="46" selection-start-line="28" selection-end-line="53" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/org/clojure/core.async/0.4.474/core.async-0.4.474.jar!/clojure/core/async/impl/channels.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3754">
@@ -721,13 +681,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="218">
           <caret line="87" column="17" selection-start-line="87" selection-start-column="17" selection-end-line="87" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/participant.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="18" column="46" selection-start-line="18" selection-start-column="46" selection-end-line="18" selection-end-column="46" />
         </state>
       </provider>
     </entry>
@@ -754,104 +707,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/ScribbleReplicate.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-226">
-          <caret line="2" column="40" lean-forward="true" selection-start-line="1" selection-start-column="1" selection-end-line="2" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/discourje/experiments/refs.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="13" column="22" selection-start-line="13" selection-start-column="11" selection-end-line="13" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/discourje/experiments/abstractionExperiments.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="22" column="50" selection-start-line="22" selection-start-column="50" selection-end-line="22" selection-end-column="50" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/proto.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="21" column="23" selection-start-line="20" selection-start-column="2" selection-end-line="21" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/participants/seller.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="17" selection-start-line="6" selection-start-column="17" selection-end-line="6" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/participants/buyer2.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="18" selection-start-line="10" selection-start-column="18" selection-end-line="10" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/simpleSetup.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="18" column="38" selection-start-line="18" selection-start-column="38" selection-end-line="18" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/discourje/tbpTests/pipesTests/protoTests.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="21" selection-start-column="21" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/discourje/tbpTests/pipesTests/sellerTests.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret selection-end-line="3" selection-end-column="90" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/publishSubscribeExample/twoBuyerProtocolPubSub.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="56" selection-start-line="5" selection-start-column="56" selection-end-line="5" selection-end-column="56" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/participants/buyer1.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" selection-start-line="10" selection-end-line="10" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/discourje/abstractionExperiments_test.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="76" selection-start-line="4" selection-start-column="65" selection-end-line="4" selection-end-column="76" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/util.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret selection-end-line="1" selection-end-column="56" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/discourje/tbpTests/pipesTests/utilTests.clj">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" selection-start-line="14" selection-end-line="14" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/test/projectSetup/ProjectSetupTests.clj">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
@@ -866,17 +721,199 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/discourje/tbpTests/pipesTests/ScribbleTest.clj">
+    <entry file="file://$PROJECT_DIR$/src/research/twoBuyerProtocol/publishSubscribeExample/utilities.clj">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="484">
-          <caret line="35" column="37" lean-forward="true" selection-start-line="35" selection-start-column="37" selection-end-line="35" selection-end-column="37" />
+        <state>
+          <caret column="12" selection-start-column="12" selection-end-column="12" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/discourje/twoBuyerProtocol/pipes/Scribble.clj">
+    <entry file="file://$PROJECT_DIR$/src/research/twoBuyerProtocol/publishSubscribeExample/twoBuyerProtocolPubSub.clj">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="83">
-          <caret line="19" selection-start-line="19" selection-end-line="19" />
+        <state>
+          <caret column="12" selection-start-column="12" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/util.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="12" selection-start-column="12" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/simpleSetup.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="12" selection-start-column="12" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/ScribbleReplicate.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="12" selection-start-column="12" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/Scribble.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="12" selection-start-column="12" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/proto.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="12" selection-start-column="12" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/participant.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="12" selection-start-column="12" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/participants/seller.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="12" selection-start-column="12" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/participants/buyer2.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="12" selection-start-column="12" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/research/twoBuyerProtocol/pipes/participants/buyer1.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="12" selection-start-column="12" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/research/threeBuyerProtocol/ThreeBuyerProtocol.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="12" selection-start-column="12" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/research/experiments/refs.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="12" selection-start-column="12" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/research/experiments/experiments.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="12" selection-start-column="12" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/research/experiments/abstractionExperiments.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="24" column="34" selection-start-line="24" selection-start-column="34" selection-end-line="24" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/research/core.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="16" column="16" lean-forward="true" selection-start-line="16" selection-start-column="16" selection-end-line="16" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/research/experimentsTests.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="21" selection-start-line="2" selection-start-column="21" selection-end-line="2" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/research/core_test.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="12" selection-start-column="12" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/research/abstractionExperiments_test.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="420">
+          <caret line="28" column="40" lean-forward="true" selection-start-line="28" selection-start-column="40" selection-end-line="28" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/research/tbpTests/TBPTests.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="20" selection-start-line="4" selection-start-column="20" selection-end-line="4" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/research/tbpTests/pipesTests/utilTests.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="21" selection-start-line="3" selection-start-column="21" selection-end-line="3" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/research/tbpTests/pipesTests/sellerTests.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="21" selection-start-line="3" selection-start-column="21" selection-end-line="3" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/research/tbpTests/pipesTests/protoTests.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="12" selection-start-column="12" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/research/tbpTests/pipesTests/participantTests.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="12" selection-start-column="12" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/research/tbpTests/pipesTests/buyer2Tests.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="21" selection-start-line="3" selection-start-column="21" selection-end-line="3" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/research/tbpTests/pipesTests/buyer1Tests.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" column="53" lean-forward="true" selection-start-line="14" selection-start-column="53" selection-end-line="14" selection-end-column="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/research/tbpTests/pipesTests/ScribbleTest.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="47" lean-forward="true" selection-start-line="10" selection-start-column="47" selection-end-line="10" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="20" column="5" lean-forward="true" selection-start-line="20" selection-start-column="5" selection-end-line="20" selection-end-column="5" />
         </state>
       </provider>
     </entry>
