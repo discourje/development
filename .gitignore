@@ -10,12 +10,12 @@ pom.xml.asc
 .hgignore
 .hg/
 
-/.idea/workspace.xml
-/.idea/replstate.xml
-/.idea/inspectionProfiles/Project_Default.xml
-/.idea/dictionaries
-/.idea/shelf
-/.idea/libraries
-/.idea/modules
-/.idea/gradle_extensions.xml
+.idea/workspace.xml
+.idea/replstate.xml
+.idea/inspectionProfiles/Project_Default.xml
+.idea/dictionaries
+.idea/shelf
+.idea/libraries
+.idea/modules
+.idea/gradle_extensions.xml
 *.iml
