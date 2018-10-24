@@ -1,2 +1,2 @@
-(ns discourje.core-test
+(ns research.core-test
   (:require [clojure.test :refer :all]))

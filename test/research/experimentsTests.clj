@@ -1,8 +1,8 @@
-(ns discourje.experimentsTests
+(ns research.experimentsTests
   (:require [clojure.test :refer :all]
-            [discourje.experiments.experiments :refer :all])
+            [research.experiments.experiments :refer :all])
   (:refer-clojure :exclude [send])
-  (:import (discourje.experiments.experiments channel message)))
+  (:import (research.experiments.experiments channel message)))
 
 (def testMessage (message. "i am sending"))
 (def testChannel (channel. nil nil testMessage))

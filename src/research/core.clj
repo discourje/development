@@ -1,4 +1,4 @@
-(ns discourje.core
+(ns research.core
   (:require [clojure.core :refer :all]))
 ;add dcj prefix to remove confusion of native clojure constructs ( but should be removed once working properly).
 

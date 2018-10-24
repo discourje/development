@@ -1,8 +1,8 @@
-(ns discourje.tbpTests.TBPTests
+(ns research.tbpTests.TBPTests
   (:require [clojure.test :refer :all])
-  (:require [discourje.threeBuyerProtocol.ThreeBuyerProtocol :refer :all])
+  (:require [research.threeBuyerProtocol.ThreeBuyerProtocol :refer :all])
   (:refer-clojure :exclude [send])
-  (:import (discourje.core message)))
+  (:import (research.core message)))
 
 (deftest testHelloWorldContent
   (is (= (str "Hello World") (:data helloWorldMessage))))

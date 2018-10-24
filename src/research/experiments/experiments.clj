@@ -1,4 +1,4 @@
-(ns discourje.experiments.experiments
+(ns research.experiments.experiments
   (:refer-clojure :exclude [send]))
 
 ;; defrecord & deftype does not support a doc string, maybe write custom macro that does?
