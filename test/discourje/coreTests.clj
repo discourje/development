@@ -4,25 +4,62 @@
             [discourje.core :refer :all]))
 
 (def testingChannel (chan))
+(def alice (createParticipant))
+(def bob (createParticipant))
+
 (deftest takeTest
   (putMessage testingChannel "hello")
   (is (go (= "hello" (<! (takeMessage testingChannel))))))
-
-(def alice (->participant (thread) (chan) (chan)))
-(def bob (->participant (thread) (chan) (chan)))
 
 (deftest provideAlice
   (provide alice "hello alice")
   (is (go (= (str "hello alice") (str (<! (:output alice)))))))
 
-(go (>! (:input bob) "hello bob"))
-(go (println (= (str "hello bob") (consume bob (str)))))
-
 (deftest consumeBob
   (go (>! (:input bob) "hello bob"))
-  (is (go (= (str "hello bob") (consume bob (str))))))
+  (is (go (= (str "hello bob") (<! (consume bob str))))))
 
 (deftest messageFromAliceToBob
   (provide alice "message from alice to bob")
-  (go (>! (:input bob) (<! (:output alice)))) ; The protocol would take the message from alice output and send to bob input
-  (is (go (= (str "message from alice to bob") (consume bob (str))))))
+  (go (>! (:input bob) (<! (:output alice))))               ; The protocol would take the message from alice output and send to bob input
+  (is (go (= (str "message from alice to bob") (<! (consume bob str))))))
+
+(deftest toUpper
+  (is (= (str "TEST") (clojure.string/upper-case "test"))))
+
+;(def a (chan))
+;(go (>! a "aaa"))
+;(go (println (take! (<! (thread (go (<! a)))) clojure.string/upper-case)))
+
+;(go
+;  (println
+;    (clojure.string/upper-case
+;      (<! (thread
+;            (<!! (go
+;                   (<! a))))))))
+
+(deftest getValueFromThread
+  (let [a (chan)]
+  (go (>! a "aaa"))
+  (is (go (= "AAA" (clojure.string/upper-case (<! (thread (<!! (go (<! a)))))))))))
+
+;(go ;this should work
+;  (println
+;    (= "AAA"
+;       (clojure.string/upper-case
+;         (<! (thread
+;               (<!! (go
+;                      (<! a)))))))))
+
+;(go (println (take! (<! (thread (go (<! a)))) clojure.string/upper-case)))
+
+
+
+(go (>! (:input bob) "test"))
+(go (println (<! (consume bob str :test))))
+
+
+(deftest messageFromAliceToBobOnThread
+  (provide alice "message from alice to bob")
+  (go (>! (:input bob) (<! (:output alice))))               ; The protocol would take the message from alice output and send to bob input
+  (is (go (= (str "message from alice to bob") (<! (consume bob str :test))))))
