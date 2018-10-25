@@ -7,5 +7,7 @@
 (def buyer2 (->participant (async/thread) (chan) (chan)))
 (def seller (->participant (async/thread) (chan) (chan)))
 
-(defn twoBuyers [b1 b2 s]
+(defn twoBuyersProtocol
+  "This protocol will enforce the correct `conversation' between the participants."
+  [b1 b2 s]
   )
