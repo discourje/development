@@ -21,11 +21,16 @@
 
 (deftest messageFromAliceToBob
   (provide alice "message from alice to bob")
-  (go (>! (:input bob) (<! (:output alice))))               ; The protocol would take the message from alice output and send to bob input
+  (fromOutputToInput alice bob)             ; The protocol would take the message from alice output and send to bob input
+  (is (go (= (str "message from alice to bob") (<! (consume bob str))))))
+
+(deftest messageFromAliceToBobInputToOutput
+  (provide alice "message from alice to bob")
+  (fromOutputToInput alice bob)                  ; The protocol would take the message from alice output and send to bob input
   (is (go (= (str "message from alice to bob") (<! (consume bob str))))))
 
 (deftest toUpper
-  (is (= (str "TEST") (clojure.string/upper-case "test"))))
+  (is (= "TEST" (clojure.string/upper-case "test"))))
 
 ;(def a (chan))
 ;(go (>! a "aaa"))
@@ -61,5 +66,9 @@
 
 (deftest messageFromAliceToBobOnThread
   (provide alice "message from alice to bob")
-  (go (>! (:input bob) (<! (:output alice))))               ; The protocol would take the message from alice output and send to bob input
+  (fromOutputToInput alice bob)     ; The protocol would take the message from alice output and send to bob input
+  (is (go (= (str "message from alice to bob") (<! (consume bob str :test))))))
+
+(deftest sendMessageFromAliceToBobOnThread
+  (sendMessage alice bob "message from alice to bob")
   (is (go (= (str "message from alice to bob") (<! (consume bob str :test))))))

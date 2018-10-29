@@ -25,7 +25,25 @@
   (consume [this operation] (go (operation (<! input))))
   (consume [this operation test] (go (operation (<! (thread (<!! (go (<! input)))))))))
 
+(defn fromOutputToInput
+  "Take data from input channel FROM and put it to output channel TO"
+  [from to]
+  (go (>! (:input to) (<! (:output from)))))
+
+(defn fromInputToOutput
+  "Take data from output channel FROM and put it to input channel TO"
+  [from to]
+  (go (>! (:output to) (<! (:input from)))))
+
 (defn createParticipant
   "Create a new participant, simulates constructor-like behavior"
   []
   (->participant (thread) (chan) (chan)))
+
+
+(defn sendMessage
+  "Send message from FROM to TO & MORE"
+  [message from to & more]
+  (provide from message)
+  (fromOutputToInput from to)
+  (for [receiver more] (fromOutputToInput from receiver)))
