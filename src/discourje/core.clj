@@ -18,7 +18,7 @@
 (defn takeMessage [channel]
    (go (<! channel)))
 
-(defrecord participant [threade input output]
+(defrecord participant [input output]
   messenger
   (provide [this message] (putMessage output message))
   (provide [this message operation] (putMessage output (operation message)))
@@ -38,7 +38,7 @@
 (defn createParticipant
   "Create a new participant, simulates constructor-like behavior"
   []
-  (->participant (thread) (chan) (chan)))
+  (agent (->participant (chan) (chan))))
 
 
 (defn sendMessage
