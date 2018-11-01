@@ -13,6 +13,10 @@
   (putMessage testingChannel "hello")
   (is (go (= "hello" (<! (takeMessage testingChannel))))))
 
+(deftest blockingPutMessageAlice
+  (dataToInput @alice "hey Alice")
+  (is (= "hey Alice" (<!! (:input @alice)))))
+
 (deftest provideAlice
   (provide @alice "hello alice")
   (is (go (= (str "hello alice") (str (<! (:output @alice)))))))

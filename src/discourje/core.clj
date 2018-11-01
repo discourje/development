@@ -7,23 +7,38 @@
     [this message]
     [this message operation])
   (consume
-  ;  [this message]
     [this operation]
-    [this operation test]))
+    [this operation test])
+  (dataFromOutput
+    [this])
+  (dataToInput
+    [this message])
+  (functionToInput
+    [this operation]))
 
 ;use take! to also supply a callback when a message is received
 (defn putMessage [channel message]
   (go (>! channel message)))
 
+(defn blockingPutMessage [channel message]
+  (>!! channel message))
+
 (defn takeMessage [channel]
    (go (<! channel)))
+
+(defn blockingTakeMessage [channel]
+  (<!! channel))
 
 (defrecord participant [input output]
   messenger
   (provide [this message] (putMessage output message))
   (provide [this message operation] (putMessage output (operation message)))
   (consume [this operation] (go (operation (<! input))))
-  (consume [this operation test] (go (operation (<! (thread (<!! (go (<! input)))))))))
+  (consume [this operation test] (go (operation (<! (thread (<!! (go (<! input))))))))
+  ;blocking variants
+  (dataFromOutput [this] (blockingTakeMessage output))
+  (dataToInput [this message] (putMessage input message))
+  (functionToInput [this function] (putMessage input (function))))
 
 (defn fromOutputToInput
   "Take data from input channel FROM and put it to output channel TO"
