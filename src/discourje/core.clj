@@ -29,13 +29,13 @@
 (defn blockingTakeMessage [channel]
   (<!! channel))
 
-(defrecord participant [input output]
+(defrecord participant [input output state]
   messenger
   (provide [this message] (putMessage output message))
   (provide [this message operation] (putMessage output (operation message)))
   (consume [this operation] (go (operation (<! input))))
   (consume [this operation test] (go (operation (<! (thread (<!! (go (<! input))))))))
-  ;blocking variants
+  ;new Variants-blocking variants
   (dataFromOutput [this] (blockingTakeMessage output))
   (dataToInput [this message] (putMessage input message))
   (functionToInput [this function] (putMessage input (function))))
@@ -53,7 +53,7 @@
 (defn createParticipant
   "Create a new participant, simulates constructor-like behavior"
   []
-  (agent (->participant (chan) (chan))))
+  (atom (->participant (chan) (chan) nil)))
 
 
 (defn sendMessage
