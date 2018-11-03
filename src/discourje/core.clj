@@ -16,6 +16,26 @@
   (functionToInput
     [this operation]))
 
+(defmacro sendOff
+  "takes a function and prepends a quote at the from to delay evaluation"
+  [f]
+  `'~f)
+
+(defn changeStateByData
+  "Swaps participant state value with incomming data"
+  [participant data]
+  (println data)
+  (swap! participant assoc :state data))
+
+
+(defn changeStateByEval
+  "Swaps participant state value by executing function on thread and setting result in state"
+  [participant function]
+  (println (clojure.string/upper-case (str function)))
+  (swap! participant assoc :state (eval function)))
+
+
+
 ;use take! to also supply a callback when a message is received
 (defn putMessage [channel message]
   (go (>! channel message)))
