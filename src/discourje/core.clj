@@ -16,6 +16,19 @@
   (functionToInput
     [this operation]))
 
+(defprotocol stakeholder
+  (putInput         ;put data or function on input channel
+    [this data])
+  (inputToThread    ;move data or function from input to thread
+    [this])
+  (threadToOutput   ;more data or function from thread to output
+    [this])
+  (consumeInput     ;consume input (shorthand for inputToThread & threadToOutput)
+    [this])
+  (takeOutput       ;take data or function from output
+    [this]))
+
+
 (defmacro sendOff
   "takes a function and prepends a quote at the from to delay evaluation"
   [f]
@@ -27,14 +40,11 @@
   (println data)
   (swap! participant assoc :state data))
 
-
 (defn changeStateByEval
   "Swaps participant state value by executing function on thread and setting result in state"
   [participant function]
-  (println (clojure.string/upper-case (str function)))
+  (println (clojure.string/upper-case (str function))) ;easy for debugging
   (swap! participant assoc :state (eval function)))
-
-
 
 ;use take! to also supply a callback when a message is received
 (defn putMessage [channel message]
@@ -60,6 +70,12 @@
   (dataToInput [this message] (putMessage input message))
   (functionToInput [this function] (putMessage input (function))))
 
+(defrecord protocolStateHolder [input output state]
+  stakeholder
+  (putInput [this data] (putMessage input data))
+  (consumeInput [this] (putMessage output (changeStateByEval this (blockingTakeMessage input))))
+  (takeOutput [this] (blockingTakeMessage output)))
+
 (defn fromOutputToInput
   "Take data from input channel FROM and put it to output channel TO"
   [from to]
@@ -74,7 +90,10 @@
   "Create a new participant, simulates constructor-like behavior"
   []
   (atom (->participant (chan) (chan) nil)))
-
+(defn createStakeholder
+  "Create a new participant, simulates constructor-like behavior"
+  []
+  (atom (->protocolStateHolder (chan) (chan) nil)))
 
 (defn sendMessage
   "Send message from FROM to TO & MORE"

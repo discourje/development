@@ -3,57 +3,60 @@
             [clojure.core.async :as async :refer :all]
             [discourje.core :refer :all]))
 
-(def alice (createParticipant))
+(def testParticipant (createParticipant))
 
 ;(swap! alice assoc :state (format "InternalState changed %s" (+ (rand-int 30)1)))
 
-(defn consumeStateByEval
-  "Swaps participant state value by executing function on thread and setting result in state"
-  [participant function]
-  (println (clojure.string/upper-case (str "Before concat: " function)))
-  (concat function (:state @participant))
-  (println (clojure.string/upper-case (str "After concat: " function)))
-  (swap! participant assoc :state (eval function)))
 
-(defn consumeStateByEval2
-  "Swaps participant state value by executing function on thread and setting result in state"
-  [participant function]
-  (println (clojure.string/upper-case (str function)))
-  (swap! participant assoc :state (eval function :state)))
 
 (defn changeStateByF [participant function]
   (println (clojure.string/upper-case (str function)))
   (swap! participant assoc :state (function)))
 
-
-(defn toHigherOrder
-  "current solution for delaying function eval"
-  [f]
-  (println f)
-  (fn [] (eval f)))
-
-(macroexpand `(sendOff (format "changing state to %s" (str "hello"))))
+(macroexpand-1 `(sendOff (format "changing state to %s" (str "hello"))))
+;(def ap(macroexpand-1 `(sendOff (format "changing state to %s" (str "hello")))))
+;ap
+;(deftest macroExpandSendOffTests
+;  "check if the macro expands correctly"
+;  (is (= ap;(macroexpand-1 `(sendOff (format "changing state to %s" (str "hello"))))
+;        (quote (clojure.core/format "changing state to %s" (clojure.core/str "hello"))))))
 (sendOff (format "changing state to %s" (str "hello")))
 
+(changeStateByF testParticipant (fn [] (format "changing state to %s" (str "hello"))))
+(changeStateByEval testParticipant (sendOff (format "changing state to %s" (str "hello"))))
 
-;not working !(changeState alice '(format "changing state to %s" (str "hello")))
-(changeStateByF alice (toHigherOrder '(format "changing state to %s" (str "hello"))))
-(changeStateByF alice (fn [] (format "changing state to %s" (str "hello"))))
+
+(def carol (createParticipant))
+
+(deftest changeStateByDataTest
+  "changes the state of alice(participant by swapping data with data)"
+  (changeStateByData carol "changedState")
+  (is (= "changedState" (:state @carol))))
+
+(def alice(createParticipant))
 (changeStateByEval alice (sendOff (format "changing state to %s" (str "hello"))))
 
-(consumeStateByEval2 alice (sendOff (fn [x] (clojure.string/upper-case x))))
-
-
-(deftest changeStateByData
-  "changes the state of alice(participant by swapping data with data)"
-  (is (= nil (:state @alice)))
-  (changeStateByData alice "changedState")
-  (is (= "changedState" (:state @alice))))
-
-(changeStateByData alice nil)
-
-(deftest changeStateByFunction
-  "changes the state of alice (participant by swapping data with function result"
-  (is (= nil (:state @alice)))
-  (changeStateByF alice '(format "changing state to %s" (str "hello")))
+(deftest changeStateByDelayedFunction
+  "uses our sendoff macro to delay function evaluation to alice thread"
   (is (= "changing state to hello" (:state @alice))))
+
+(changeStateByEval alice (sendOff (clojure.string/upper-case (:state @alice))))
+
+(deftest changeStateByDelayedFunctionConsumingState
+  "changes the state of alice, by delaying function evaluation which consumes the previous state (as function argument)"
+
+  (is (= "CHANGING STATE TO HELLO" (:state @alice))))
+
+(def bob (createParticipant))
+(deftest changeStateByFunction
+  "changes the state of bob (participant by swapping data with function result"
+  (changeStateByF bob '(format "changing state to %s" (str "hello")))
+  (is (= "changing state to hello" (:state @bob))))
+
+
+;(changeStateByF alice (toHigherOrder '(format "changing state to %s" (str "hello"))))
+;(defn toHigherOrder
+;  "current solution for delaying function eval"
+;  [f]
+;  (println f)
+;  (fn [] (eval f)))
