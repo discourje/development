@@ -6,7 +6,8 @@
   (putInput         ;put data or function on input channel
     [this data])
   (consumeInput     ;consume input (shorthand for inputToThread & threadToOutput)
-    [this])
+    [this]
+    [this function])
   (takeOutput       ;take data or function from output
     [this]))
 
@@ -16,10 +17,10 @@
   `'~f)
 
 (defn changeStateByEval
-  "Swaps participant state value by executing function on thread and setting result in state"
-  [participant function]
+  "Swaps participant tag(:input, :state, :output) value by executing function on thread and setting result in tag"
+  [participant function tag]
   (println (clojure.string/upper-case (str function))) ;easy for debugging
-  (swap! participant assoc :state (eval function)))
+  (swap! participant assoc tag (eval function)))
 
 (defn putMessage
   "Puts message on the channel, non-blocking"
@@ -33,9 +34,13 @@
 
 (defn processInput
   "Consumes input from FROM and sends to input TO"
-  [from to]
+  ([from to]
   (consumeInput from)
   (putInput to (takeOutput from)))
+  ([function from to]
+  ())
+  )
+
 
 (defn sendInput
   "Sends input from FROM to TO"
@@ -46,13 +51,16 @@
 (defrecord participant [input output state]
   messenger
   (putInput [this data] (putMessage input data))
-  (consumeInput [this] (putMessage (:output @this) (:state (changeStateByEval this (blockingTakeMessage (:input @this))))))
+  (consumeInput
+    [this] (putMessage (:output @this) (:state (changeStateByEval this (blockingTakeMessage (:input @this)) :state)))
+    [this function] (putMessage (:output @this) (:state (changeStateByEval this function :state)))
+    )
   (takeOutput [this] (blockingTakeMessage output)))
 
 (extend-type clojure.lang.Atom
   messenger
   (putInput [this data] (putMessage (:input @this) data))
-  (consumeInput [this] (putMessage (:output @this) (:state (changeStateByEval this (blockingTakeMessage (:input @this))))))
+  (consumeInput [this] (putMessage (:output @this) (:state (changeStateByEval this (blockingTakeMessage (:input @this)) :state))))
   (takeOutput [this] (blockingTakeMessage (:output @this))))
 
 (defn createParticipant

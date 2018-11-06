@@ -23,6 +23,7 @@
 
 (sendInput (sendOff (generateBook)) buyer1 seller)
 (sendInput "hello" buyer1 seller)
+(processInput (sendOff (clojure.string/upper-case (:state @seller))) seller seller)
 (<!!(:input @seller))
 
 (defn twoBuyersStakeholdersProtocol
