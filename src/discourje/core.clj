@@ -3,42 +3,17 @@
             [clojure.core :refer :all]))
 
 (defprotocol messenger
-  (provide
-    [this message]
-    [this message operation])
-  (consume
-    [this operation]
-    [this operation test])
-  (dataFromOutput
-    [this])
-  (dataToInput
-    [this message])
-  (functionToInput
-    [this operation]))
-
-(defprotocol stakeholder
   (putInput         ;put data or function on input channel
     [this data])
-  (inputToThread    ;move data or function from input to thread
-    [this])
-  (threadToOutput   ;more data or function from thread to output
-    [this])
   (consumeInput     ;consume input (shorthand for inputToThread & threadToOutput)
     [this])
   (takeOutput       ;take data or function from output
     [this]))
 
-
 (defmacro sendOff
   "takes a function and prepends a quote at the from to delay evaluation"
   [f]
   `'~f)
-
-(defn changeStateByData
-  "Swaps participant state value with incomming data"
-  [participant data]
-  (println data)
-  (swap! participant assoc :state data))
 
 (defn changeStateByEval
   "Swaps participant state value by executing function on thread and setting result in state"
@@ -46,58 +21,41 @@
   (println (clojure.string/upper-case (str function))) ;easy for debugging
   (swap! participant assoc :state (eval function)))
 
-;use take! to also supply a callback when a message is received
-(defn putMessage [channel message]
+(defn putMessage
+  "Puts message on the channel, non-blocking"
+  [channel message]
   (go (>! channel message)))
 
-(defn blockingPutMessage [channel message]
-  (>!! channel message))
-
-(defn takeMessage [channel]
-   (go (<! channel)))
-
-(defn blockingTakeMessage [channel]
+(defn blockingTakeMessage
+  "Takes message from the channel, blocking"
+  [channel]
   (<!! channel))
+
+(defn processInput
+  "Consumes input from FROM and sends to input TO"
+  [from to]
+  (consumeInput from)
+  (putInput to (takeOutput from)))
+
+(defn sendInput
+  "Sends input from FROM to TO"
+  [data from to]
+  (putInput from data)
+  (processInput from to))
 
 (defrecord participant [input output state]
   messenger
-  (provide [this message] (putMessage output message))
-  (provide [this message operation] (putMessage output (operation message)))
-  (consume [this operation] (go (operation (<! input))))
-  (consume [this operation test] (go (operation (<! (thread (<!! (go (<! input))))))))
-  ;new Variants-blocking variants
-  (dataFromOutput [this] (blockingTakeMessage output))
-  (dataToInput [this message] (putMessage input message))
-  (functionToInput [this function] (putMessage input (function))))
-
-(defrecord protocolStateHolder [input output state]
-  stakeholder
   (putInput [this data] (putMessage input data))
-  (consumeInput [this] (putMessage output (changeStateByEval this (blockingTakeMessage input))))
+  (consumeInput [this] (putMessage (:output @this) (:state (changeStateByEval this (blockingTakeMessage (:input @this))))))
   (takeOutput [this] (blockingTakeMessage output)))
 
-(defn fromOutputToInput
-  "Take data from input channel FROM and put it to output channel TO"
-  [from to]
-  (go (>! (:input to) (<! (:output from)))))
-
-(defn fromInputToOutput
-  "Take data from output channel FROM and put it to input channel TO"
-  [from to]
-  (go (>! (:output to) (<! (:input from)))))
+(extend-type clojure.lang.Atom
+  messenger
+  (putInput [this data] (putMessage (:input @this) data))
+  (consumeInput [this] (putMessage (:output @this) (:state (changeStateByEval this (blockingTakeMessage (:input @this))))))
+  (takeOutput [this] (blockingTakeMessage (:output @this))))
 
 (defn createParticipant
   "Create a new participant, simulates constructor-like behavior"
   []
   (atom (->participant (chan) (chan) nil)))
-(defn createStakeholder
-  "Create a new participant, simulates constructor-like behavior"
-  []
-  (atom (->protocolStateHolder (chan) (chan) nil)))
-
-(defn sendMessage
-  "Send message from FROM to TO & MORE"
-  [message from to & more]
-  (provide from message)
-  (fromOutputToInput from to)
-  (for [receiver more] (fromOutputToInput from receiver)))

@@ -1,7 +1,8 @@
 (ns discourje.coreTests
   (:require [clojure.test :refer :all]
             [clojure.core.async :as async :refer :all]
-            [discourje.core :refer :all]))
+            [discourje.core :refer :all]
+            [discourje.samples :refer :all]))
 
 (def testingChannel (chan))
 (def alice (createParticipant))

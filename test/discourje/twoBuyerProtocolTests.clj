@@ -4,5 +4,10 @@
             [discourje.core :refer :all]
             [discourje.twoBuyerProtocol :refer :all]))
 
-(deftest generateQuoteTest
-  (is (< 31 (generateQuote))))
+(def alice (createParticipant))
+(def bob (createParticipant))
+
+(deftest sendInputTest
+  "tests logic for sendInput"
+  (sendInput "hello" alice bob)
+  (is (= "hello" (<!! (:input @bob)))))

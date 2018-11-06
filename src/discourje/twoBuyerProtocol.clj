@@ -19,15 +19,21 @@
       (println (format "received title: %s" title))
       (+ (rand-int 30) 1))))
 
-(defn twoBuyersProtocol
+
+
+(sendInput (sendOff (generateBook)) buyer1 seller)
+(sendInput "hello" buyer1 seller)
+(<!!(:input @seller))
+
+(defn twoBuyersStakeholdersProtocol
   "This protocol will enforce the correct `conversation' between the participants."
   [b1 b2 s]
-  (sendMessage (generateBook) b1 s);send title from buyer1 to seller
-  (sendMessage (generateQuote) s b1 b2);send quote from seller to both buyers
-  ();send quoteDiv from buyer1 to buyer2
+  (sendInput (sendOff (generateBook)) b1 s);send title from buyer1 to seller
+  ;send quote from seller to both buyers
+  ;send quoteDiv from buyer1 to buyer2
   ;send ok from buyer2 to seller
   ;send address from buyer 2 to seller
   ;send data from seller to buyer2
   ;send quite from buyer2 to seller
   )
-(twoBuyersProtocol buyer1 buyer2 seller)
+(twoBuyersStakeholdersProtocol buyer1 buyer2 seller)
