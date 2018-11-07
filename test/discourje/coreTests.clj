@@ -4,8 +4,26 @@
             [discourje.core :refer :all]
             [discourje.samples :refer :all]))
 
+
+(defn testConsume
+  "docstring"
+  [tag]
+  (println tag))
+
+(defmacro ssend
+  "takes a function and prepends a quote at the front to delay evaluation"
+  ([f]`'~f)
+  ([f tag] `(~f ~tag))
+  ([f participant tag] `(~f (~tag ~participant))))
+
+(defmacro setdata
+  "takes a function and prepends a quote at the front to delay evaluation"
+  ([f]`'~f)
+  ([f participant tag] `(~tag ~participant ~f)))
+
 (def testingChannel (chan))
 (def alice (createParticipant))
+
 (def bob (createParticipant))
 
 (def testThread (thread ))
