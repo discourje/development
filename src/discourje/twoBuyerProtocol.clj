@@ -7,7 +7,6 @@
 (def buyer2 (createParticipant))
 (def seller (createParticipant))
 
-
 (defn generateBook []
   (str "TheJoyOfClojure"))
 
@@ -21,14 +20,23 @@
 
 (defn quoteBook [title]
   (println (format "received title: %s" title))
-  (+ (rand-int 30) 1))
+  (let [x (+ (rand-int 30) 1)]
+    (println (format "random number is: %s" x))
+    x))
 
+
+
+(macroexpand '(sendOffConsumingInput quoteBook seller))
+(macroexpand '(sendOffFunction quoteBook))
 (sendInput (sendOffFunction generateBook) buyer1 seller)
 (sendInput (sendOffFunction quoteBook) seller buyer1)
+(sendInput (sendOffConsumingInput quoteBook seller) seller buyer1)
 (sendInput "hello" buyer1 seller)
 (<!!(:input @seller))
+(quoteBook (<!!(:input @seller)))
 (println @seller)
-(sendInput (sendOffData (generateQuote)) seller buyer1 buyer2)
+(println @buyer1)
+(sendInput (sendOffData generateQuote) seller buyer1 buyer2)
 (<!!(:input @buyer1))
 
 (defn twoBuyersStakeholdersProtocol

@@ -23,12 +23,13 @@
 (defn changeStateByEval
   "Swaps participant tag(:input, :state, :output) value by executing function on thread and setting result in tag"
   [participant function tag]
-  (println (clojure.string/upper-case (str function))) ;easy for debugging
+  (println (format "changeStateByEval: %s" (clojure.string/upper-case (str function)))) ;easy for debugging
   (swap! participant assoc tag (eval function)))
 
 (defn putMessage
   "Puts message on the channel, non-blocking"
   [channel message]
+  (println (format "setting message %s" message))
   (go (>! channel message)))
 
 (defn blockingTakeMessage
@@ -39,10 +40,12 @@
 (defn processInput
   "Consumes input from FROM and sends to input TO & more"
   ([from to]
+   (println "ProcessInput No Arity")
   (consumeInput from)
   (putInput to (takeOutput from)))
   ;arity overload to support multiple receivers for the same data
   ([from to & more]
+   (println "ProcessInput Arity")
    (consumeInput from)
    (let [value (takeOutput from)]
      (putInput to value)
@@ -52,6 +55,7 @@
 (defn sendInput
   "Sends input from FROM to TO"
   [data from to & more]
+  (println data)
   (putInput from data)
   (processInput from to more))
 
@@ -71,3 +75,8 @@
   "Create a new participant, simulates constructor-like behavior"
   []
   (atom (->participant (chan) (chan) nil)))
+
+(defmacro sendOffConsumingInput
+  "takes a function and prepends a quote at the front to delay evaluation, consumes data on Input channel of the given participant"
+  ([f participant]
+   `(~f (blockingTakeMessage (:input (deref ~participant))))))
