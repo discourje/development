@@ -23,8 +23,14 @@
 (defn changeStateByEval
   "Swaps participant tag(:input, :state, :output) value by executing function on thread and setting result in tag"
   [participant function tag]
-  (println (format "changeStateByEval: %s" (clojure.string/upper-case (str function)))) ;easy for debugging
+  (println (format "changeStateByEVAL: %s" (clojure.string/upper-case (str function)))) ;easy for debugging
   (swap! participant assoc tag (eval function)))
+
+(defn changeStateByData
+  "Swaps participant tag(:input, :state, :output) value by setting value on thread and setting result in tag"
+  [participant data tag]
+  (println (format "changeStateByDATA: %s" (clojure.string/upper-case (str data)))) ;easy for debugging
+  (swap! participant assoc tag data))
 
 (defn putMessage
   "Puts message on the channel, non-blocking"
@@ -40,12 +46,10 @@
 (defn processInput
   "Consumes input from FROM and sends to input TO & more"
   ([from to]
-   (println "ProcessInput No Arity")
   (consumeInput from)
   (putInput to (takeOutput from)))
   ;arity overload to support multiple receivers for the same data
   ([from to & more]
-   (println "ProcessInput Arity")
    (consumeInput from)
    (let [value (takeOutput from)]
      (putInput to value)
@@ -58,6 +62,20 @@
   (println data)
   (putInput from data)
   (processInput from to more))
+
+(defn inputToState
+  "moves input to state"
+  [participant]
+  (changeStateByData participant (blockingTakeMessage (:input @participant)) :state))
+
+(defn branch
+  "branch by function on input of given participant. Branch will also first move input -> state and then evaluate"
+  ([participant function]
+  (inputToState participant)
+  (eval (function (:state @participant))))
+  ([participant function trueBranch falseBranch]
+   (if (branch participant function)
+    trueBranch falseBranch)))
 
 (defrecord participant [input output state]
   messenger

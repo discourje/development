@@ -24,7 +24,7 @@
 (sendOffData (format "changing state to %s" (str "hello")))
 
 (changeStateByF testParticipant (fn [] (format "changing state to %s" (str "hello"))))
-(changeStateByEval testParticipant (sendOffData (format "changing state to %s" (str "hello"))))
+(changeStateByEval testParticipant (sendOffData (format "changing state to %s" (str "hello"))) :state)
 
 
 (def carol (createParticipant))
@@ -35,13 +35,13 @@
   (is (= "changedState" (:state @carol))))
 
 (def alice(createParticipant))
-(changeStateByEval alice (sendOffData (format "changing state to %s" (str "hello"))))
+(changeStateByEval alice (sendOffData (format "changing state to %s" (str "hello"))) :state)
 
 (deftest changeStateByDelayedFunction
   "uses our sendoff macro to delay function evaluation to alice thread"
   (is (= "changing state to hello" (:state @alice))))
 
-(changeStateByEval alice (sendOffData (clojure.string/upper-case (:state @alice))))
+(changeStateByEval alice (sendOffData (clojure.string/upper-case (:state @alice))) :state)
 
 (deftest changeStateByDelayedFunctionConsumingState
   "changes the state of alice, by delaying function evaluation which consumes the previous state (as function argument)"
