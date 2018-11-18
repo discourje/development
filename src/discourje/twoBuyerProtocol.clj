@@ -29,13 +29,13 @@
   "returns true when the received quote is <= 15 (50% chance at this moment)"
   [quote]
   (println (format "received quote: %s" quote))
-  quote <= 15)
+  (+ (rand-int quote) 1))
 
-(defn contribute
+(defn contribute?
   "returns true when the received quote is <= 15 (50% chance at this moment)"
   [quote]
   (println (format "Only contribute up to 15, quote is %s" quote))
-  quote <= 15)
+  (<= quote 15))
 
 ; Generate a new Java Date
 (defn getDate "Generate a new date and increment an amount of days"
@@ -52,24 +52,33 @@
   [maxRange]
   (getDate (+ (rand-int maxRange) 1)))
 
+(defmacro delaySendInput
+  [f from to]
+  `'(sendInput ~f ~from ~to))
+
+;(eval (eval (macroexpand '(delaySendInput (sendOffData "ok") buyer2 seller))))
+;(eval (delaySendInput (sendOffData "ok") buyer2 seller))
+
+
 (defn twoBuyersStakeholdersProtocol
   "This protocol will enforce the correct `conversation' between the participants."
   [b1 b2 s]
   (sendInput (sendOffData (generateBook)) b1 s)             ;send title from buyer1 to seller
   (sendInput (sendOffConsumingInput quoteBook s) s b1 b2)   ;send quote from seller to both buyers, consumes the current value of the inputchannel for Seller
   (sendInput (sendOffConsumingInput quoteDiv b1) b1 b2)     ;send quoteDiv from buyer1 to buyer2
-  (branch b2 contribute                                     ;decide to contribute to continue or not (taking true or false branch)
+  (choice b2 contribute?                                     ;decide to contribute to continue or not (taking true or false branch)
           ;(
-            ;(println ("true branch taken"))                 ;true branch
-            (sendInput (sendOffData "ok") b2 s)             ;send ok from buyer2 to seller
-            ;(sendInput (sendOffFunction generateAddress) b2 s) ;send address from buyer 2 to seller
-            ;(sendInput (sendOffData (getDate 3)) s b2)      ;send date from seller to buyer2
-            ;)
+          ;(println ("true branch taken"))                 ;true branch
+          (delaySendInput (sendOffData "ok") b2 seller)        ;send ok from buyer2 to seller
+          ;(sendInput (sendOffFunction generateAddress) b2 s) ;send address from buyer 2 to seller
+          ;(sendInput (sendOffData (getDate 3)) s b2)      ;send date from seller to buyer2
+          ;)
           ;(
-            ;(println "false branch taken")                  ; false branch
-            (sendInput (sendOffData "quit") b2 s)           ;send quite from buyer2 to seller
-            ;)
-  )
+          ;(println "false branch taken")                  ; false branch
+          `(sendInput (sendOffData "quit") ~b2 ~s)         ;send quite from buyer2 to seller
+          "test"
+          ;)
+          )
   )
 
 ;todo create take branch macro to lazy evaluate!

@@ -3,11 +3,11 @@
             [clojure.core :refer :all]))
 
 (defprotocol messenger
-  (putInput         ;put data or function on input channel
+  (putInput                                                 ;put data or function on input channel
     [this data])
-  (consumeInput     ;consume input
+  (consumeInput                                             ;consume input
     [this])
-  (takeOutput       ;take data or function from output
+  (takeOutput                                               ;take data or function from output
     [this]))
 
 (defmacro sendOffData
@@ -17,7 +17,7 @@
 
 (defmacro sendOffFunction
   "takes a function and prepends a quote at the front to delay evaluation, includes arity to support 1 argument(maybe more in future)"
-  ([f]`'(~f))
+  ([f] `'(~f))
   ([f value] `(~f ~value)))
 
 (defn changeStateByEval
@@ -46,8 +46,8 @@
 (defn processInput
   "Consumes input from FROM and sends to input TO & more"
   ([from to]
-  (consumeInput from)
-  (putInput to (takeOutput from)))
+   (consumeInput from)
+   (putInput to (takeOutput from)))
   ;arity overload to support multiple receivers for the same data
   ([from to & more]
    (consumeInput from)
@@ -68,14 +68,28 @@
   [participant]
   (changeStateByData participant (blockingTakeMessage (:input @participant)) :state))
 
-(defn branch
+(defn choice
   "branch by function on input of given participant. Branch will also first move input -> state and then evaluate"
   ([participant function]
-  (inputToState participant)
-  (eval (function (:state @participant))))
+   (inputToState participant)
+   (eval (function (:state @participant))))
   ([participant function trueBranch falseBranch]
-   (if (branch participant function)
-    trueBranch falseBranch)))
+   (if (choice participant function)
+     trueBranch falseBranch))
+  ([participant function trueBranch falseBranch test]
+   (println test)
+   (println trueBranch)
+   (println falseBranch)
+   (if (choice participant function)
+     (let [branch trueBranch] ;true
+       (println "taking true")
+       (println branch)
+       (eval branch))
+     (let [branch falseBranch] ;false
+       (println "taking false")
+       (println branch)
+       (eval branch)
+       ))))
 
 (defrecord participant [input output state]
   messenger
