@@ -77,17 +77,17 @@
    (if (choice participant function)
      trueBranch falseBranch))
   ([participant function trueBranch falseBranch test]
-   (println test)
-   (println trueBranch)
-   (println falseBranch)
+   ;(println test)
+   ;(println trueBranch)
+   ;(println falseBranch)
    (if (choice participant function)
      (let [branch trueBranch] ;true
-       (println "taking true")
-       (println branch)
+       ;(println "taking true")
+       ;(println branch)
        (eval branch))
      (let [branch falseBranch] ;false
-       (println "taking false")
-       (println branch)
+       ;(println "taking false")
+       ;(println branch)
        (eval branch)
        ))))
 

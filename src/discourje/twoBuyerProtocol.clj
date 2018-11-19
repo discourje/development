@@ -56,8 +56,32 @@
   [f from to]
   `'(sendInput ~f ~from ~to))
 
+(defn delayInputs [list]
+  (for [tuple list]
+    (let [f (nth tuple 0)
+          from (nth tuple 1)
+          to (nth tuple 2)]
+      (println f)
+      (println from)
+      (println to)
+      (delaySendInput `f from to))))
+
 ;(eval (eval (macroexpand '(delaySendInput (sendOffData "ok") buyer2 seller))))
 ;(eval (delaySendInput (sendOffData "ok") buyer2 seller))
+
+(delayInputs (list
+               (list (sendOffData "ok") buyer2 seller)
+               (list (sendOffFunction generateAddress) buyer2 seller)
+               (list (sendOffData (getDate 3)) seller buyer2))
+             )
+
+(list
+  ;(println ("true branch taken"))                 ;true branch
+  (delaySendInput (sendOffData "ok") buyer2 seller)         ;send ok from buyer2 to seller
+  (delaySendInput (sendOffFunction generateAddress) buyer2 seller) ;send address from buyer 2 to seller
+  (delaySendInput (sendOffData (getDate 3)) seller buyer2)  ;send date from seller to buyer2
+
+  )
 
 
 (defn twoBuyersStakeholdersProtocol
@@ -66,20 +90,18 @@
   (sendInput (sendOffData (generateBook)) b1 s)             ;send title from buyer1 to seller
   (sendInput (sendOffConsumingInput quoteBook s) s b1 b2)   ;send quote from seller to both buyers, consumes the current value of the inputchannel for Seller
   (sendInput (sendOffConsumingInput quoteDiv b1) b1 b2)     ;send quoteDiv from buyer1 to buyer2
-  (choice b2 contribute?                                     ;decide to contribute to continue or not (taking true or false branch)
-          ;(
-          ;(println ("true branch taken"))                 ;true branch
-          (delaySendInput (sendOffData "ok") b2 seller)        ;send ok from buyer2 to seller
-          ;(sendInput (sendOffFunction generateAddress) b2 s) ;send address from buyer 2 to seller
-          ;(sendInput (sendOffData (getDate 3)) s b2)      ;send date from seller to buyer2
-          ;)
-          ;(
-          ;(println "false branch taken")                  ; false branch
-          `(sendInput (sendOffData "quit") ~b2 ~s)         ;send quite from buyer2 to seller
+  (choice b2 contribute?                                    ;decide to contribute to continue or not (taking true or false branch)
+          (list
+            (delaySendInput (sendOffData "ok") buyer2 seller) ;send ok from buyer2 to seller
+            (delaySendInput (sendOffFunction generateAddress) buyer2 seller) ;send address from buyer 2 to seller
+            (delaySendInput (sendOffData (getDate 3)) seller buyer2) ;send date from seller to buyer2
+
+            )
+          (list
+            (delaySendInput (sendOffData "quit") buyer2 seller) ;send quite from buyer2 to seller
+            )
           "test"
-          ;)
           )
   )
 
-;todo create take branch macro to lazy evaluate!
 (twoBuyersStakeholdersProtocol buyer1 buyer2 seller)
