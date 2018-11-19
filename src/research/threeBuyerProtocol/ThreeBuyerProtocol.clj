@@ -1,4 +1,4 @@
-(ns discourje.threeBuyerProtocol.ThreeBuyerProtocol
+(ns research.threeBuyerProtocol.ThreeBuyerProtocol
   (:require [discourje.experiments.abstractionExperiments :refer :all])
   (:refer-clojure :exclude [send])
   (:import (discourje.experiments.abstractionExperiments message participant)))

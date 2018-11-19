@@ -1,4 +1,4 @@
-(ns discourje.experiments.abstractionExperiments
+(ns research.experiments.abstractionExperiments
   (:refer-clojure :exclude [send]))
 
 (defrecord message [data])

@@ -1,4 +1,4 @@
-(ns discourje.experiments.refs)
+(ns research.experiments.refs)
 
 (defrecord message [data])
 (->message "hello")

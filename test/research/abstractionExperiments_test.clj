@@ -1,8 +1,8 @@
-(ns discourje.abstractionExperiments-test
+(ns research.abstractionExperiments-test
   (:require [clojure.test :refer :all]
-            [discourje.experiments.abstractionExperiments :refer :all])
+            [research.experiments.abstractionExperiments :refer :all])
   (:refer-clojure :exclude [send])
-  (:import (discourje.experiments.abstractionExperiments message participant)))
+  (:import (research.experiments.abstractionExperiments message participant)))
 
 (deftest messageTest
   (let [m (message. "hello")]
