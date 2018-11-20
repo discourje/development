@@ -1,5 +1,5 @@
-(ns discourje.twoBuyerProtocol
-  (:require [discourje.core :refer :all]
+(ns discourje.coordinateByProtocol.twoBuyerProtocol
+  (:require [discourje.coordinateByProtocol.core :refer :all]
             [clojure.core.async :as async :refer :all]
             [clojure.core :refer :all]))
 

@@ -5,3 +5,5 @@ Buyer1, Buyer2 and Seller. For each participant we need an input and output chan
 We will create abstractions around take/put from core async to communicate between the participants. 
 Our protocol will handle all logic to call each channel when they are supposed to. If a channel is being
 used when the protocol does not prescribe, a monitor will throw an exception or log a message.
+
+In this package the protocol has full control over communication flow AND methods being executed.
