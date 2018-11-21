@@ -4,3 +4,4 @@
             [discourje.multiparty.Buyer2 :refer :all]
             [discourje.multiparty.Seller :refer :all]))
 
+(def channels (generateChannels ))
