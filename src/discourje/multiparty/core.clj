@@ -2,22 +2,17 @@
   (:require [clojure.core.async :as async :refer :all]
             [clojure.core :refer :all]))
 
-(def ^{:dynamic true} *debug-enabled* false)
-
-(defn- log [level s]
-  (println (apply str (cons (str "[" level "] ") s))))
-
-(defn debug [ & s ]
-  (when *debug-enabled*
-    (log "Logging: " s)))
 
 (defrecord communicationChannel [sender receiver channel])
 
-(defn- generateChannel [sender receiver]
-  (debug (format "generating channel between %s %s" sender receiver))
+(defn- generateChannel
+  "function to generate a channel between sender and receiver"
+  [sender receiver]
   (->communicationChannel sender receiver (chan)))
 
-(defn- uniqueCartesianProduct [x y]
+(defn- uniqueCartesianProduct
+  "Generate channels between all participants and filter out duplicates e.g.: buyer1<->buyer1"
+  [x y]
   (filter some?
           (for [x x y y]
             (when (not (identical? x y))
@@ -28,3 +23,5 @@
   [participants]
   (map #(apply generateChannel %) (uniqueCartesianProduct participants participants)))
 
+(defn send! [action value from to]
+  (discourje.multiparty.TwoBuyersProtocol/communicate action value from to))
