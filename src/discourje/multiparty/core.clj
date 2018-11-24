@@ -23,5 +23,25 @@
   [participants]
   (map #(apply generateChannel %) (uniqueCartesianProduct participants participants)))
 
-(defn send! [action value from to]
-  (discourje.multiparty.TwoBuyersProtocol/communicate action value from to))
+
+(defn putMessage
+  "Puts message on the channel, non-blocking"
+  [channel message]
+  (println (format "setting message %s" message))
+  (println channel)
+  (go (>! channel message)))
+
+(defn blockingTakeMessage
+  "Takes message from the channel, blocking"
+  [channel]
+  (<!! channel))
+
+;(defn send!
+;  "send something through the protocol"
+;  [action value from to]
+;  (discourje.multiparty.TwoBuyersProtocol/communicate action value from to))
+;
+;(defn receive!
+;  "receive something through the protocol"
+;  [action from to]
+;  (discourje.multiparty.TwoBuyersProtocol/communicate action from to))

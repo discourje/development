@@ -5,7 +5,7 @@
 (defn generateBook
   "generate simple book title"
   []
-  (str "TheJoyOfClojure"))
+  "TheJoyOfClojure")
 
 (defn quoteDiv
   "returns true when the received quote is <= 15 (50% chance at this moment)"
@@ -13,9 +13,14 @@
   (println (format "received quote: %s" quote))
   (+ (rand-int quote) 1))
 
-
-(defn orderBook []
-  (send! ""))
+(discourje.multiparty.TwoBuyersProtocol/communicate "title" (generateBook) "buyer1" "seller")
+(defn orderBook
+  "Order a book from buyer1's perspective"
+  []
+  (discourje.multiparty.TwoBuyersProtocol/communicate "title" (generateBook) "buyer1" "seller")
+  (let [quote (discourje.multiparty.TwoBuyersProtocol/communicate "quote" "seller" "buyer1")]
+    (discourje.multiparty.TwoBuyersProtocol/communicate "quoteDiv" (quoteDiv quote) "buyer1" "buyer2")))
+(orderBook)
 
 ;send title to seller
 ;wait for quote
