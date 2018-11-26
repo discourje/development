@@ -1,5 +1,6 @@
 (ns discourje.multiparty.Buyer1
-  (:require [discourje.multiparty.core :refer :all]))
+  (:require [discourje.multiparty.core :refer :all]
+            ))
 
 
 (defn generateBook
@@ -20,7 +21,7 @@
   (discourje.multiparty.TwoBuyersProtocol/communicate "title" (generateBook) "buyer1" "seller")
   (let [quote (discourje.multiparty.TwoBuyersProtocol/communicate "quote" "seller" "buyer1")]
     (discourje.multiparty.TwoBuyersProtocol/communicate "quoteDiv" (quoteDiv quote) "buyer1" "buyer2")))
-(orderBook)
+(clojure.core.async/thread (orderBook))
 
 ;send title to seller
 ;wait for quote
