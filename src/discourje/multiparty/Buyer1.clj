@@ -14,13 +14,13 @@
   (println (format "received quote: %s" quote))
   (+ (rand-int quote) 1))
 
-(discourje.multiparty.TwoBuyersProtocol/communicate "title" (generateBook) "buyer1" "seller")
 (defn orderBook
   "Order a book from buyer1's perspective"
   []
   (discourje.multiparty.TwoBuyersProtocol/communicate "title" (generateBook) "buyer1" "seller")
   (let [quote (discourje.multiparty.TwoBuyersProtocol/communicate "quote" "seller" "buyer1")]
     (discourje.multiparty.TwoBuyersProtocol/communicate "quoteDiv" (quoteDiv quote) "buyer1" "buyer2")))
+
 (clojure.core.async/thread (orderBook))
 
 ;send title to seller

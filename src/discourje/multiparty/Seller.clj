@@ -24,7 +24,13 @@
   [maxRange]
   (getDate (+ (rand-int maxRange) 1)))
 
+(defn orderBook
+  "order a book from seller's perspective"
+  []
+  (let [title (discourje.multiparty.TwoBuyersProtocol/communicate "title" "buyer1" "seller")]
+    (discourje.multiparty.TwoBuyersProtocol/communicate "quote" (quoteBook title) "seller" "buyer1 AND buyer2")    ;<--- will not work atm!
 
+    ))
 
 ;wait for title
 ;send quote to buyer1 and buyer2

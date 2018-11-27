@@ -4,7 +4,7 @@
 
 (defn contribute?
   "returns true when the received quote is <= 15 (50% chance at this moment)"
-  [quote]
+  [quote div]
   (println (format "Only contribute up to 15, quote is %s" quote))
   (<= quote 15))
 
@@ -13,8 +13,18 @@
   []
   "Open University, Valkenburgerweg 177, 6419 AT, Heerlen")
 
+(defn orderBook
+  "order a book from buyer2's perspective"
+  (let [quote (discourje.multiparty.TwoBuyersProtocol/communicate "quote" "seller" "buyer2")
+        quoteDiv (discourje.multiparty.TwoBuyersProtocol/communicate "quoteDiv" "buyer1" "buyer2")]
+    (if (contribute? quote quoteDiv)
+      (do (discourje.multiparty.TwoBuyersProtocol/communicate "ok" "ok" "buyer2" "seller")
+          (discourje.multiparty.TwoBuyersProtocol/communicate "address" (generateAddress) "buyer2" "seller")
+          (let [date (discourje.multiparty.TwoBuyersProtocol/communicate "date" "seller" "buyer2")]
+            (println date)))
+      (discourje.multiparty.TwoBuyersProtocol/communicate "quit" "quit" "buyer2" "seller"))))
 
-
+(orderBook)
 ;wait for quote
 ;wait for quote div
 ;branch on data
