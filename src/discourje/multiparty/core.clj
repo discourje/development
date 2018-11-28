@@ -52,27 +52,3 @@
                 (= (:sender ch) sender)
                 (= (:receiver ch) receiver)))
             channels)))
-
-(defn- allowSend
-  "send is allowed to put on the channel of the active monitor"
-  [channel value]
-  (if (instance? Seqable channel)
-    (for [receiver channel] (putMessage receiver value))
-    (putMessage channel value)))
-
-(defn send!
-  "send something through the protocol"
-  [action value from to protocol]
-  (if (nil? (:activeMonitor @protocol))
-    (discourje.multiparty.monitor/incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply send! with an instantiated protocol!")
-    (if (discourje.multiparty.monitor/isCommunicationValid? action from to protocol)
-      (let [currentMonitor (:activeMonitor @protocol)]
-        (println "oh yes")
-        (discourje.multiparty.monitor/activateNextMonitor protocol)
-        (allowSend (:channel (getChannel (:from currentMonitor) (:to currentMonitor) (:channels @protocol))) value))
-      (discourje.multiparty.monitor/incorrectCommunication (format "Send action: %s is not allowed to proceed from %s to %s" action from to)))))
-
-(defn recv!
-  "receive something through the protocol"
-  [action from to protocol]
-  (discourje.multiparty.TwoBuyersProtocol/communicate action from to))
