@@ -52,12 +52,12 @@
                 (= (:receiver ch) receiver)))
             channels)))
 
-;(defn send!
-;  "send something through the protocol"
-;  [action value from to]
-;  (discourje.multiparty.TwoBuyersProtocol/communicate action value from to))
-;
-;(defn receive!
-;  "receive something through the protocol"
-;  [action from to]
-;  (discourje.multiparty.TwoBuyersProtocol/communicate action from to))
+(defn send!
+  "send something through the protocol"
+  [action value from to]
+  (discourje.multiparty.TwoBuyersProtocol/communicate action value from to))
+
+(defn receive!
+  "receive something through the protocol"
+  [action from to]
+  (discourje.multiparty.TwoBuyersProtocol/communicate action from to))

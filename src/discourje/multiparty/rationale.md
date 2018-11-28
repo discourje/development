@@ -9,3 +9,6 @@ So this packages differs from `coordinateByProtocol` in the following ways:
 2: Participants are responsible for executing their own functions and communication to other participants.
 
 3: The protocol will instantiate the required channels for all communication needed. Participants will use a reference of the protocol and desired receiver to transfer data/functions.
+
+
+-build monitor into send-receive abstractions. to monitor only at the last moment.

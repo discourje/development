@@ -1,6 +1,5 @@
 (ns discourje.multiparty.Buyer1
-  (:require [discourje.multiparty.core :refer :all]
-            ))
+  (:require [discourje.multiparty.core :refer :all]))
 
 
 (defn generateBook
