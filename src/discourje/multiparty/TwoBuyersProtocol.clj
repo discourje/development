@@ -1,6 +1,7 @@
 (ns discourje.multiparty.TwoBuyersProtocol
-  (:require [discourje.multiparty.core :refer :all]
-            [discourje.multiparty.monitoring :as mon :refer :all]))
+  (:require [discourje.multiparty.monitoring :as mon :refer :all]
+            [discourje.multiparty.core :refer :all]))
+
 
 (def channels (generateChannels ["buyer1" "buyer2" "seller"]))
 
@@ -16,10 +17,11 @@
 
 (def protocol (atom (defineProtocol)))
 (def activeMonitor (atom {}))
+
 (mon/setActiveMonitor activeMonitor protocol)
 
 (defn communicate
-  ([action value from to] ; send
+  ([action value from to]                                   ; send
    (mon/tryCommunicate action value from to channels activeMonitor protocol))
-  ([action from to]       ; listen
+  ([action from to]                                         ; listen
    (mon/tryCommunicate action from to channels activeMonitor protocol)))

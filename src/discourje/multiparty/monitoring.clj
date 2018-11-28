@@ -10,6 +10,7 @@
     (reset! activeMonitor current)
     (reset! protocol (subvec @protocol 1))))
 
+
 (defn allowSend
   "send is allowed to put on the channel of the active monitor"
   [channel value]
@@ -66,3 +67,6 @@
          (setActiveMonitor activeMonitor protocol)
          value)
        (incorrectCommunication "protocol does not allow diverging from communication channels!")))))
+
+
+

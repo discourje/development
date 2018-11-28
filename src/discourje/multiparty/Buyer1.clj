@@ -20,7 +20,14 @@
   (let [quote (discourje.multiparty.TwoBuyersProtocol/communicate "quote" "seller" "buyer1")]
     (discourje.multiparty.TwoBuyersProtocol/communicate "quoteDiv" (quoteDiv quote) "buyer1" "buyer2")))
 
-(clojure.core.async/thread (orderBook))
+
+(defn order
+  "order a book from buyer1's perspective (implements new receive monitor)"
+  [protocol]
+  (send! "title" (generateBook) "buyer1" "seller" protocol)
+  (let [quote (recv! "quote" "seller" "buyer1" protocol)]
+    (send! "quoteDiv" (quoteDiv quote) "buyer1" "buyer2" protocol)))
+;(clojure.core.async/thread (orderBook))
 
 ;send title to seller
 ;wait for quote
