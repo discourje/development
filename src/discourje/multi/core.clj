@@ -1,17 +1,13 @@
 (ns discourje.multi.core
   (:require [clojure.core.async :as async :refer :all]
             [clojure.core :refer :all])
+  (use [discourje.multi.monitor :only [incorrectCommunication isCommunicationValid? activateNextMonitor]])
   (:import (clojure.lang Seqable)))
 
 ;Defines a communication channel with a sender, receiver (strings) and a channel Async.Chan.
 (defrecord communicationChannel [sender receiver channel])
 
-;Define a monitor to check communication, this will be used to verify correct conversation.
-;This is just a data structure to group related information.
-(defrecord monitor [action from to])
-;We also need a data structure to create a conditional with branches.
-;When the protocol encounters this it will check the conditional and continue on the correct branch.
-(defrecord choice [trueMonitor falseMonitor trueBranch falseBranch])
+
 
 (defn- generateChannel
   "function to generate a channel between sender and receiver"
@@ -64,15 +60,15 @@
   "send something through the protocol"
   [action value from to protocol]
   (if (nil? (:activeMonitor @protocol))
-    (discourje.multiparty.monitor/incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply send! with an instantiated protocol!")
-    (if (discourje.multiparty.monitor/isCommunicationValid? action from to protocol)
+    (incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply send! with an instantiated protocol!")
+    (if (isCommunicationValid? action from to protocol)
       (let [currentMonitor (:activeMonitor @protocol)]
         (println "oh yes")
-        (discourje.multiparty.monitor/activateNextMonitor protocol)
+        (activateNextMonitor protocol)
         (allowSend (:channel (getChannel (:from currentMonitor) (:to currentMonitor) (:channels @protocol))) value))
-      (discourje.multiparty.monitor/incorrectCommunication (format "Send action: %s is not allowed to proceed from %s to %s" action from to)))))
+      (incorrectCommunication (format "Send action: %s is not allowed to proceed from %s to %s" action from to)))))
 
-(defn recv!
-  "receive something through the protocol"
-  [action from to protocol]
-  (discourje.multiparty.TwoBuyersProtocol/communicate action from to))
+;(defn recv!
+;  "receive something through the protocol"
+;  [action from to protocol]
+;  (discourje.multi.twoBuyers/communicate action from to))

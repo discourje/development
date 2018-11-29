@@ -1,10 +1,8 @@
 (ns discourje.multi.main
-  (:require [discourje.multiparty.Buyer1]
-            [discourje.multiparty.Buyer2]
-            [discourje.multiparty.seller]
-            [discourje.multiparty.monitoring]))
+  (:require [discourje.multiparty.monitoring]
+            [discourje.multi.twoBuyers :refer :all]))
 
 ;first define the protocol
-(def protocol (atom (discourje.multi.TwoBuyersProtocol/getProtocol)))
+(def protocol (atom (getProtocol)))
 
-(discourje.multi.Buyer1/order protocol)
+(discourje.multi.Buyer1/orderBook protocol)

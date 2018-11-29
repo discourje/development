@@ -1,5 +1,6 @@
 (ns discourje.multi.twoBuyers
-  (:require [discourje.multi.core :refer :all] ))
+  (require [discourje.multi.monitor :refer :all])
+  (use [discourje.multi.core :only [generateChannels]]))
 
 (defrecord protocolInstance [channels protocol activeMonitor])
 (defn- defineProtocol []
@@ -11,13 +12,11 @@
               [(->monitor "address" "buyer2" "seller")
                (->monitor "date" "seller" "buyer2")]
               [(->monitor "quit" "buyer2" "seller")])))
+
 (defn getProtocol
   "generate the protocol, channels and set the first monitor active"
   []
   (let [monitors (defineProtocol)
-        prot (->protocolInstance (discourje.multi.core/generateChannels ["buyer1" "buyer2" "seller"]) monitors nil)]
-    (discourje.multi.monitor/activateNextMonitor prot)
+        prot (->protocolInstance (generateChannels ["buyer1" "buyer2" "seller"]) (atom monitors) (atom nil))]
+    (activateNextMonitor prot)
     prot))
-
-
-(def protocol (atom (getProtocol)))
