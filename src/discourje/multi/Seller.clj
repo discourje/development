@@ -24,6 +24,11 @@
   [maxRange]
   (getDate (+ (rand-int maxRange) 1)))
 
+
+(defn orderBook
+  "Order book from seller's perspective"
+  [protocol]
+  (recv! "title" "buyer1" "seller" protocol (fn [x] (println (format "received Title %s" x)))))
 ;wait for title
 ;send quote to buyer1 and buyer2
 ;wait for ok or quit

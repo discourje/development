@@ -1,7 +1,6 @@
 (ns discourje.multi.Buyer1
   (:require [discourje.multi.core :refer :all]))
 
-
 (defn generateBook
   "generate simple book title"
   []
@@ -18,7 +17,19 @@
   [protocol]
   (send! "title" (generateBook) "buyer1" "seller" protocol)
   (let [quote (recv! "quote" "seller" "buyer1" protocol)]
-    (send! "quoteDiv" (quoteDiv quote) "buyer1" "buyer2" protocol)))
+    (send! "quoteDiv" (quoteDiv quote) "buyer1" "buyer2" protocol))
+  )
+(defn orderBook2
+  "order a book from buyer1's perspective (implements new receive monitor)"
+  [protocol]
+  (send! "title" (generateBook) "buyer1" "seller" protocol)
+  (recv! "quote" "seller" "buyer1" protocol
+         (fn [quote] (println (format "received quote = %s" quote)))
+    ;(send! "quoteDiv" (quoteDiv quote) "buyer1" "buyer2" protocol)
+         )
+  )
+
+
 ;(clojure.core.async/thread (orderBook))
 
 ;send title to seller

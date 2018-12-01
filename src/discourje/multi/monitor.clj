@@ -13,7 +13,6 @@
   [protocol]
   (if (instance? Atom protocol)
     (let [nextMonitor (first @(:protocol @protocol))]
-      (println nextMonitor)
       (reset! (:activeMonitor @protocol) nextMonitor)
       (reset! (:protocol @protocol) (subvec @(:protocol @protocol) 1)))
   (let [nextMonitor (first @(:protocol protocol))]
@@ -29,12 +28,10 @@
   "Checks if communication is valid by comparing input to the active monitor"
   [action from to protocol]
   (let [proto @protocol
-        activeM (:activeMonitor proto)]
+        activeM @(:activeMonitor proto)]
     (cond
       (instance? monitor activeM)
       (do
-        (println "yes is monitor")
-        (println (:to activeM))
         (and
           (= action (:action activeM))
           (= from (:from activeM))
