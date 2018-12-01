@@ -12,22 +12,21 @@
   (println (format "received quote: %s" quote))
   (+ (rand-int quote) 1))
 
-(defn orderBook
-  "order a book from buyer1's perspective (implements new receive monitor)"
-  [protocol]
-  (send! "title" (generateBook) "buyer1" "seller" protocol)
-  (let [quote (recv! "quote" "seller" "buyer1" protocol)]
-    (send! "quoteDiv" (quoteDiv quote) "buyer1" "buyer2" protocol))
-  )
+;(defn orderBook
+;  "order a book from buyer1's perspective (implements new receive monitor)"
+;  [protocol]
+;  (send! "title" (generateBook) "buyer1" "seller" protocol)
+;  (let [quote (recv! "quote" "seller" "buyer1" protocol)]
+;    (send! "quoteDiv" (quoteDiv quote) "buyer1" "buyer2" protocol))
+;  )
 (defn orderBook2
   "order a book from buyer1's perspective (implements new receive monitor)"
   [protocol]
   (send! "title" (generateBook) "buyer1" "seller" protocol)
-  (recv! "quote" "seller" "buyer1" protocol
-         (fn [quote] (println (format "received quote = %s" quote)))
-    ;(send! "quoteDiv" (quoteDiv quote) "buyer1" "buyer2" protocol)
-         )
-  )
+  (let [quote (atom nil)]
+    (recv! "quote" "seller" "buyer1" protocol
+           (fn [receivedQuote] (reset! quote receivedQuote)))
+    (send! "quoteDiv" (quoteDiv @quote) "buyer1" "buyer2" protocol)))
 
 
 ;(clojure.core.async/thread (orderBook))
