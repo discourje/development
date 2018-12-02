@@ -24,6 +24,9 @@
   [message]
   (println message))
 
+(defn contains-value? [element coll]
+  (boolean (some #(= element %) coll)))
+
 (defn isCommunicationValid?
   "Checks if communication is valid by comparing input to the active monitor"
   [action from to protocol]
@@ -32,11 +35,17 @@
     (cond
       (instance? monitor activeM)
       (do
+        (println "haha" activeM)
+        (when (instance? Seqable (:to activeM))
+          (println "yes seq")
+          (println to)
+          (println (:to activeM))
+          (println (or (contains-value? to (:to activeM)) (= to (:to activeM)))))
         (and
           (= action (:action activeM))
           (= from (:from activeM))
           (and (if (instance? Seqable (:to activeM))
-                 (or (contains? (:to activeM) to) (= to (:to activeM)))
+                 (or (contains-value? to (:to activeM)) (= to (:to activeM)))
                  (= to (:to activeM))))))
       (instance? choice activeM)
       (do

@@ -34,4 +34,4 @@
     (is (= "hello" @returnV))
     (close! a)))
 
-(for [x [1 2 3]] (println x))
+(for [x ["buyer1" "buyer2"]] (println x))

@@ -7,7 +7,6 @@
 
 ;first define the protocol
 (def protocol (atom (getProtocol)))
-
-(println protocol)
+;(println protocol)
 (b1/orderBook protocol)
 (se/orderBook protocol)

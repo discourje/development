@@ -67,16 +67,10 @@
     (if (isCommunicationValid? action from to protocol)
       (let [currentMonitor @(:activeMonitor @protocol)]
         (if (vector? (:to currentMonitor))
-          (do
-            (println "yes this one is seqable")
-            (println (:to currentMonitor))
-            (for [receiver (:to currentMonitor)]
-              (do(println (format "looping through current monitor To %s" receiver))
-              (allowSend (:channel (getChannel (:from currentMonitor) receiver (:channels @protocol))) value))))
-          (do (println "oh yes sending")
+            (doseq [receiver (:to currentMonitor)]
+              (allowSend (:channel (getChannel (:from currentMonitor) receiver (:channels @protocol))) value))
      ;   (activateNextMonitor protocol) ;only activate new monitor when receive action has finished
-        (println (format "allowing send to channel %s" (:to currentMonitor)))
-        (allowSend (:channel (getChannel (:from currentMonitor) (:to currentMonitor) (:channels @protocol))) value))))
+        (allowSend (:channel (getChannel (:from currentMonitor) (:to currentMonitor) (:channels @protocol))) value)))
       (incorrectCommunication (format "Send action: %s is not allowed to proceed from %s to %s" action from to)))))
 
 (defn recv!
@@ -85,20 +79,16 @@
   (let [channel (getChannel from to (:channels @protocol))]
     (println "")
     (println "started take with callback")
-    (println channel)
     (if (nil? channel)
       (incorrectCommunication "Cannot find channel from %s to %s in the defined channels of the protocol! Please make sure you supply supported sender and receiver pair")
       (take! (:channel channel)
              (fn [x]
                (println "taking!!!")
-               (println channel)
                (if (nil? (:activeMonitor @protocol))
                  (incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply send! with an instantiated protocol!")
                  (if (isCommunicationValid? action from to protocol)
-                   (let [currentMonitor @(:activeMonitor @protocol)]
-                     (println "oh yes recv")
+                   (do (println "oh yes recv")
                      (activateNextMonitor protocol)
-                     (println callback)
                      (callback x))
                    (do
                      (incorrectCommunication (format "recv action: %s is not allowed to proceed from %s to %s" action to from))
