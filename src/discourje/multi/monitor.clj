@@ -36,7 +36,7 @@
           (= action (:action activeM))
           (= from (:from activeM))
           (and (if (instance? Seqable (:to activeM))
-                 (contains? (:to activeM) to)
+                 (or (contains? (:to activeM) to) (= to (:to activeM)))
                  (= to (:to activeM))))))
       (instance? choice activeM)
       (do

@@ -6,7 +6,7 @@
 (defn- defineProtocol []
   (vector
     (->monitor "title" "buyer1" "seller")
-    (->monitor "quote" "seller" {"buyer1" "buyer2"})
+    (->monitor "quote" "seller" ["buyer1" "buyer2"])
     (->monitor "quoteDiv" "buyer1" "buyer2")
     (->choice (->monitor "ok" "buyer2" "seller") (->monitor "quit" "buyer2" "seller")
               [(->monitor "address" "buyer2" "seller")

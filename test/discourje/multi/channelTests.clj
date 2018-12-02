@@ -33,3 +33,5 @@
     (take! a callback)
     (is (= "hello" @returnV))
     (close! a)))
+
+(for [x [1 2 3]] (println x))

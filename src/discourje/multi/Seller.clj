@@ -30,7 +30,7 @@
   [protocol]
   (let [title (atom nil)]
     (recv! "title" "buyer1" "seller" protocol (fn [x] (reset! title x)))
-    (send! "quote" (quoteBook @title) "seller" {"buyer1" "buyer2"} protocol))
+    (send! "quote" (quoteBook @title) "seller" ["buyer1" "buyer2"] protocol))
   (let [response (atom nil)]
     (recv! "contribute" "buyer2" "seller" protocol (fn [x] (reset! response x)))
     (cond

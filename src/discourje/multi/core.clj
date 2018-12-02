@@ -44,6 +44,7 @@
 (defn getChannel
   "finds a channel based on sender and receiver"
   [sender receiver channels]
+  (println (format "Sender: %s and receiver(s) %s" sender receiver))
   (first
     (filter (fn [ch]
               (and
@@ -54,7 +55,7 @@
 (defn- allowSend
   "send is allowed to put on the channel of the active monitor"
   [channel value]
-  (if (instance? Seqable channel)
+  (if (vector? channel)
     (for [receiver channel] (putMessage receiver value))
     (putMessage channel value)))
 
@@ -65,10 +66,17 @@
     (incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply send! with an instantiated protocol!")
     (if (isCommunicationValid? action from to protocol)
       (let [currentMonitor @(:activeMonitor @protocol)]
-        (println "oh yes sending")
+        (if (vector? (:to currentMonitor))
+          (do
+            (println "yes this one is seqable")
+            (println (:to currentMonitor))
+            (for [receiver (:to currentMonitor)]
+              (do(println (format "looping through current monitor To %s" receiver))
+              (allowSend (:channel (getChannel (:from currentMonitor) receiver (:channels @protocol))) value))))
+          (do (println "oh yes sending")
      ;   (activateNextMonitor protocol) ;only activate new monitor when receive action has finished
         (println (format "allowing send to channel %s" (:to currentMonitor)))
-        (allowSend (:channel (getChannel (:from currentMonitor) (:to currentMonitor) (:channels @protocol))) value))
+        (allowSend (:channel (getChannel (:from currentMonitor) (:to currentMonitor) (:channels @protocol))) value))))
       (incorrectCommunication (format "Send action: %s is not allowed to proceed from %s to %s" action from to)))))
 
 (defn recv!
