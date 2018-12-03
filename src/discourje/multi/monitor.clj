@@ -13,9 +13,9 @@
   [protocol]
   (if (instance? Atom protocol)
     (let [nextMonitor (first @(:protocol @protocol))]
-      (println (:activeMonitor @protocol))
-      (if (instance? Seqable (:to (:activeMonitor @protocol)))
-        (println (format "Yes this one is seqable %s "(:to (:activeMonitor @protocol)))))
+      ;(println (:activeMonitor @protocol))
+      ;(if (instance? Seqable (:to (:activeMonitor @protocol)))
+      ;  (println (format "Yes this one is seqable %s "(:to (:activeMonitor @protocol)))))
       (reset! (:activeMonitor @protocol) nextMonitor)
       (reset! (:protocol @protocol) (subvec @(:protocol @protocol) 1)))
     (let [nextMonitor (first @(:protocol protocol))]
