@@ -1,4 +1,4 @@
-(ns discourje.samples
+(ns discourje.coordinateByProtocol.samples
   (:require [clojure.core.async :as async :refer :all]
             [clojure.core :refer :all]))
 

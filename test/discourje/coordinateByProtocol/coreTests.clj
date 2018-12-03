@@ -1,8 +1,8 @@
-(ns discourje.coreTests
+(ns discourje.coordinateByProtocol.coreTests
   (:require [clojure.test :refer :all]
             [clojure.core.async :as async :refer :all]
-            [discourje.core :refer :all]
-            [discourje.samples :refer :all]))
+            [discourje.coordinateByProtocol.core :refer :all]
+            [discourje.coordinateByProtocol.samples :refer :all]))
 
 
 (defn testConsume

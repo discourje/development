@@ -1,7 +1,7 @@
-(ns discourje.blockingChannelTests
+(ns discourje.coordinateByProtocol.blockingChannelTests
   (:require [clojure.test :refer :all]
             [clojure.core.async :as async :refer :all]
-            [discourje.core :refer :all]))
+            [discourje.coordinateByProtocol.core :refer :all]))
 
 (def a (chan))
 

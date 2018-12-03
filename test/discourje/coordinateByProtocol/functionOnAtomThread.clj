@@ -1,8 +1,8 @@
-(ns discourje.functionOnAtomThread
+(ns discourje.coordinateByProtocol.functionOnAtomThread
   (:require [clojure.test :refer :all]
             [clojure.core.async :as async :refer :all]
-            [discourje.core :refer :all]
-            [discourje.samples :refer :all]))
+            [discourje.coordinateByProtocol.core :refer :all]
+            [discourje.coordinateByProtocol.samples :as samples :refer :all]))
 
 (def testParticipant (createParticipant))
 
@@ -31,7 +31,7 @@
 
 (deftest changeStateByDataTest
   "changes the state of alice(participant by swapping data with data)"
-  (changeStateByData carol "changedState")
+  (samples/changeStateByData carol "changedState")
   (is (= "changedState" (:state @carol))))
 
 (def alice(createParticipant))
