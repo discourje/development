@@ -13,11 +13,14 @@
   [protocol]
   (if (instance? Atom protocol)
     (let [nextMonitor (first @(:protocol @protocol))]
+      (println (:activeMonitor @protocol))
+      (if (instance? Seqable (:to (:activeMonitor @protocol)))
+        (println (format "Yes this one is seqable %s "(:to (:activeMonitor @protocol)))))
       (reset! (:activeMonitor @protocol) nextMonitor)
       (reset! (:protocol @protocol) (subvec @(:protocol @protocol) 1)))
-  (let [nextMonitor (first @(:protocol protocol))]
-    (reset! (:activeMonitor protocol) nextMonitor)
-    (reset! (:protocol protocol) (subvec @(:protocol protocol) 1)))))
+    (let [nextMonitor (first @(:protocol protocol))]
+      (reset! (:activeMonitor protocol) nextMonitor)
+      (reset! (:protocol protocol) (subvec @(:protocol protocol) 1)))))
 
 (defn incorrectCommunication
   "communication incorrect, log a message! (or maybe throw exception)"
@@ -35,12 +38,6 @@
     (cond
       (instance? monitor activeM)
       (do
-        (println "haha" activeM)
-        (when (instance? Seqable (:to activeM))
-          (println "yes seq")
-          (println to)
-          (println (:to activeM))
-          (println (or (contains-value? to (:to activeM)) (= to (:to activeM)))))
         (and
           (= action (:action activeM))
           (= from (:from activeM))

@@ -9,4 +9,5 @@
 (def protocol (atom (getProtocol)))
 ;(println protocol)
 (b1/orderBook protocol)
+(b2/orderBook protocol)
 (se/orderBook protocol)

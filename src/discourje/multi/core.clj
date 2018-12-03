@@ -31,8 +31,7 @@
 (defn putMessage
   "Puts message on the channel, non-blocking"
   [channel message]
-  (println (format "setting message %s" message))
-  (println channel)
+  ;(println (format "setting message %s" message))
   (put! channel message))
 
 (defn blockingTakeMessage
@@ -44,7 +43,7 @@
 (defn getChannel
   "finds a channel based on sender and receiver"
   [sender receiver channels]
-  (println (format "Sender: %s and receiver(s) %s" sender receiver))
+  ;(println (format "Sender: %s and receiver(s) %s" sender receiver))
   (first
     (filter (fn [ch]
               (and
@@ -77,20 +76,22 @@
   "receive something through the protocol"
   [action from to protocol callback]
   (let [channel (getChannel from to (:channels @protocol))]
-    (println "")
-    (println "started take with callback")
+    ;(println "")
+    ;(println "started take with callback")
     (if (nil? channel)
       (incorrectCommunication "Cannot find channel from %s to %s in the defined channels of the protocol! Please make sure you supply supported sender and receiver pair")
       (take! (:channel channel)
              (fn [x]
-               (println "taking!!!")
+               ;(println "taking!!!")
                (if (nil? (:activeMonitor @protocol))
                  (incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply send! with an instantiated protocol!")
                  (if (isCommunicationValid? action from to protocol)
-                   (do (println "oh yes recv")
+                   (do
+                     ;(println "oh yes recv")
                      (activateNextMonitor protocol)
                      (callback x))
                    (do
-                     (incorrectCommunication (format "recv action: %s is not allowed to proceed from %s to %s" action to from))
+                     ;(println (:activeMonitor @protocol))
+                     (incorrectCommunication (format "recv action: %s is not allowed to proceed from %s to %s" action from to))
                      (callback nil))
                    )))))))
