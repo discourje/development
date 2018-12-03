@@ -1,7 +1,7 @@
 (ns discourje.multi.core
   (:require [clojure.core.async :as async :refer :all]
             [clojure.core :refer :all])
-  (use [discourje.multi.monitor :only [incorrectCommunication isCommunicationValid? activateNextMonitor]])
+  (use [discourje.multi.monitor :only [incorrectCommunication isCommunicationValid? activateNextMonitor hasMultipleReceivers? removeReceiver]])
   (:import (clojure.lang Seqable)))
 
 ;Defines a communication channel with a sender, receiver (strings) and a channel Async.Chan.
@@ -87,8 +87,12 @@
                  (incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply send! with an instantiated protocol!")
                  (if (isCommunicationValid? action from to protocol)
                    (do
-                     ;(println "oh yes recv")
-                     (activateNextMonitor protocol)
+                     (if (hasMultipleReceivers? protocol)
+                         (do
+                           (removeReceiver protocol to)
+                           (println "seqable and count >1"))
+                         (activateNextMonitor protocol)
+                       )
                      (callback x))
                    (do
                      ;(println (:activeMonitor @protocol))
