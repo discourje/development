@@ -31,7 +31,7 @@
 (defn putMessage
   "Puts message on the channel, non-blocking"
   [channel message]
-  ;(println (format "setting message %s" message))
+  (println (format "setting message %s" message))
   (put! channel message))
 
 (defn blockingTakeMessage
@@ -66,10 +66,10 @@
     (if (isCommunicationValid? action from to protocol)
       (let [currentMonitor @(:activeMonitor @protocol)]
         (if (vector? (:to currentMonitor))
-            (doseq [receiver (:to currentMonitor)]
-              (allowSend (:channel (getChannel (:from currentMonitor) receiver (:channels @protocol))) value))
-     ;   (activateNextMonitor protocol) ;only activate new monitor when receive action has finished
-        (allowSend (:channel (getChannel (:from currentMonitor) (:to currentMonitor) (:channels @protocol))) value)))
+          (doseq [receiver (:to currentMonitor)]
+            (allowSend (:channel (getChannel (:from currentMonitor) receiver (:channels @protocol))) value))
+          ;   (activateNextMonitor protocol) ;only activate new monitor when receive action has finished
+          (allowSend (:channel (getChannel (:from currentMonitor) (:to currentMonitor) (:channels @protocol))) value)))
       (incorrectCommunication (format "Send action: %s is not allowed to proceed from %s to %s" action from to)))))
 
 (defn recv!
@@ -88,14 +88,16 @@
                  (if (isCommunicationValid? action from to protocol)
                    (do
                      (if (hasMultipleReceivers? protocol)
-                         (do
-                           (removeReceiver protocol to)
-                           (println "seqable and count >1"))
+                       (do
+                         (removeReceiver protocol to)
+                         (add-watch (:activeMonitor @protocol) nil
+                                    (fn [key atom old-state new-state] (callback x)(remove-watch (:activeMonitor @protocol) nil))))
+                       (do
                          (activateNextMonitor protocol)
-                       )
-                     (callback x))
-                   (do
-                     ;(println (:activeMonitor @protocol))
-                     (incorrectCommunication (format "recv action: %s is not allowed to proceed from %s to %s" action from to))
-                     (callback nil))
-                   )))))))
+                         (callback x))
+                       ))
+                     (do
+                       (println (:activeMonitor @protocol))
+                       (incorrectCommunication (format "recv action: %s is not allowed to proceed from %s to %s" action from to))
+                       (callback nil))
+                     )))))))

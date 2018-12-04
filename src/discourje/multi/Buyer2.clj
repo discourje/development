@@ -1,12 +1,11 @@
 (ns discourje.multi.Buyer2
   (:require [discourje.multi.core :refer :all]))
 
-
 (defn contribute?
-  "returns true when the received quote is <= 15 (50% chance at this moment)"
+  "returns true when the received quote 50% or greater"
   [quote div]
-  (println (format "Only contribute up to 15, quote is %s" quote))
-  (<= quote 15))
+  (println (format "received quote: %d and div: %d" quote div))
+  (>= (* 100 (float (/ div quote))) 50))
 
 (defn generateAddress
   "generates the address"
@@ -23,7 +22,10 @@
     (add-watch quoteDiv nil
                (fn [key atom old-state new-state]
                  (println (format "quote and quoteDiv are %s %s respectively" @quote new-state))
-                 ;(send! "quoteDiv" (quoteDiv new-state) "buyer1" "buyer2" protocol)
+                 (if (contribute? @quote new-state)
+                   (send! "ok" "ok" "buyer2" "seller" protocol)
+                   (send! "quit" "quit" "buyer2" "seller" protocol)
+                   )
                  (remove-watch quoteDiv nil)))))
 
 
