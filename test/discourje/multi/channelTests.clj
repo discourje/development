@@ -35,3 +35,11 @@
     (close! a)))
 
 (for [x ["buyer1" "buyer2"]] (println x))
+
+(defn contribute?
+  "returns true when the received quote 50% or greater"
+  [quote div]
+  (println (format "received quote: %d and div: %d" quote div))
+  (>= (* 100 (float (/ div quote))) 50))
+
+(contribute? 20 10)

@@ -13,9 +13,6 @@
   [protocol]
   (if (instance? Atom protocol)
     (let [nextMonitor (first @(:protocol @protocol))]
-      ;(println (:activeMonitor @protocol))
-      ;(if (instance? Seqable (:to (:activeMonitor @protocol)))
-      ;  (println (format "Yes this one is seqable %s "(:to (:activeMonitor @protocol)))))
       (reset! (:activeMonitor @protocol) nextMonitor)
       (reset! (:protocol @protocol) (subvec @(:protocol @protocol) 1)))
     (let [nextMonitor (first @(:protocol protocol))]
@@ -30,6 +27,23 @@
 (defn contains-value? [element coll]
   (boolean (some #(= element %) coll)))
 
+(defn hasMultipleReceivers?
+  "Check if the :to key of the active monitor is a Seqable(collection) and if there are more than 1 receivers"
+  [protocol]
+  (and
+    (instance? Seqable (:to @(:activeMonitor @protocol)))
+    (> (count (:to @(:activeMonitor @protocol))) 1)))
+
+(defn removeReceiver
+  "Remove a receiver from the monitor if there are multiple"
+  [protocol to]
+  (when (hasMultipleReceivers? protocol)
+    (let [currentMonitor @(:activeMonitor @protocol)
+          recv (:to currentMonitor)  ;(remove #{to} (:to currentMonitor))
+          newRecv (vec (remove #{to} recv))
+           newMonitor (->monitor (:action currentMonitor) (:from currentMonitor) newRecv)]
+      (reset! (:activeMonitor @protocol) newMonitor))))
+
 (defn isCommunicationValid?
   "Checks if communication is valid by comparing input to the active monitor"
   [action from to protocol]
@@ -38,6 +52,7 @@
     (cond
       (instance? monitor activeM)
       (do
+        (println activeM)
         (and
           (= action (:action activeM))
           (= from (:from activeM))
