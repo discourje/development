@@ -12,17 +12,24 @@
   (println (format "received quote: %s" quote))
   (+ (rand-int quote) 1))
 
+;(defn orderBook
+;  "order a book from buyer1's perspective (implements new receive monitor)"
+;  [protocol]
+;  (send! "title" (generateBook) "buyer1" "seller" protocol)
+;  (let [quote (atom nil)]
+;    (recv! "quote" "seller" "buyer1" protocol (fn [receivedQuote] (reset! quote receivedQuote)))
+;    (add-watch quote nil
+;               (fn [key atom old-state new-state]
+;                 (send! "quoteDiv" (quoteDiv new-state) "buyer1" "buyer2" protocol)
+;                 (remove-watch quote nil)))
+;  ))
+
 (defn orderBook
   "order a book from buyer1's perspective (implements new receive monitor)"
-  [protocol]
-  (send! "title" (generateBook) "buyer1" "seller" protocol)
-  (let [quote (atom nil)]
-    (recv! "quote" "seller" "buyer1" protocol (fn [receivedQuote] (reset! quote receivedQuote)))
-    (add-watch quote nil
-               (fn [key atom old-state new-state]
-                 (send! "quoteDiv" (quoteDiv new-state) "buyer1" "buyer2" protocol)
-                 (remove-watch quote nil)))
-  ))
+  [self protocol]
+  (send! "title" (generateBook) self "seller" protocol)
+  (recv! "quote" "seller" "buyer1" protocol (fn [x]
+                                              (send! "quoteDiv" (quoteDiv x) "buyer1" "buyer2" protocol))))
 
 
 ;(clojure.core.async/thread (orderBook))

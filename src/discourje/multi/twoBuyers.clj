@@ -8,10 +8,11 @@
     (->monitor "title" "buyer1" "seller")
     (->monitor "quote" "seller" ["buyer1" "buyer2"])
     (->monitor "quoteDiv" "buyer1" "buyer2")
-    (->choice (->monitor "ok" "buyer2" "seller") (->monitor "quit" "buyer2" "seller")
-              [(->monitor "address" "buyer2" "seller")
+    (->choice [(->monitor "ok" "buyer2" "seller")
+               (->monitor "address" "buyer2" "seller")
                (->monitor "date" "seller" "buyer2")]
-              [(->monitor "quit" "buyer2" "seller")])))
+              [(->monitor "quit" "buyer2" "seller")
+              (->monitor "quit" "buyer2" "seller")])))
 
 (defn getProtocol
   "generate the protocol, channels and set the first monitor active"

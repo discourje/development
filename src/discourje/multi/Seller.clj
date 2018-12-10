@@ -27,23 +27,18 @@
 
 (defn orderBook
   "Order book from seller's perspective"
-  [protocol]
-  (let [title (atom nil)]
-    (recv! "title" "buyer1" "seller" protocol (fn [x] (reset! title x)))
-    ;(add-watch title nil
-    ;           (fn [key atom old-state new-state]
-                 (send! "quote" (quoteBook @title) "seller" ["buyer1" "buyer2"] protocol)
-                 ;(remove-watch title nil)
-                 ;))
-                 )
-  ;(let [response (atom nil)]
+  [self protocol]
+    (recv! "title" "buyer1" self protocol
+           (fn [title]
+             (send! "quote" (quoteBook title) self ["buyer1" "buyer2"] protocol))))
+      ;(let [response (atom nil)]
   ;  (recv! "contribute" "buyer2" "seller" protocol (fn [x] (reset! response x)))
   ;  (cond
   ;    (= @response "ok") (println "received Ok!")
   ;    (= @response "quit") (println "received quit!")
   ;    (= @response nil) (println "still nil"))
   ;  )
-  )
+
 ;wait for title
 ;send quote to buyer1 and buyer2
 ;wait for ok or quit

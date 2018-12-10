@@ -6,7 +6,7 @@
 (defrecord monitor [action from to])
 ;We also need a data structure to create a conditional with branches.
 ;When the protocol encounters this it will check the conditional and continue on the correct branch.
-(defrecord choice [trueMonitor falseMonitor trueBranch falseBranch])
+(defrecord choice [trueBranch falseBranch])
 
 (defn activateNextMonitor
   "Set the active monitor based on the protocol"

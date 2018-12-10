@@ -8,6 +8,6 @@
 ;first define the protocol
 (def protocol (atom (getProtocol)))
 ;(println protocol)
-(b1/orderBook protocol)
-(b2/orderBook protocol)
-(se/orderBook protocol)
+(b1/orderBook "buyer1" protocol)
+(b2/orderBook "buyer2" protocol)
+(se/orderBook "seller" protocol)
