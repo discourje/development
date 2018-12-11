@@ -5,7 +5,7 @@
             [discourje.multi.Buyer2 :as b2]
             [discourje.multi.Seller :as se]))
 
-;first define the protocol
+;first define the protocol1
 (def protocol (atom (getProtocol)))
 ;(println protocol)
 (b1/orderBook "buyer1" protocol)
