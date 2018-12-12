@@ -26,10 +26,10 @@
 
 (defn orderBook
   "order a book from buyer1's perspective (implements new receive monitor)"
-  [self protocol]
-  (send! "title" (generateBook) self "seller" protocol)
-  (recv! "quote" "seller" self protocol (fn [x]
-                                              (send! "quoteDiv" (quoteDiv x) self "buyer2" protocol))))
+  [this protocol]
+  (send! "title" (generateBook) this "seller" protocol)
+  (recv! "quote" "seller" this protocol (fn [x]
+                                              (send! "quoteDiv" (quoteDiv x) this "buyer2" protocol))))
 
 
 ;(clojure.core.async/thread (orderBook))

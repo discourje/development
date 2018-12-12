@@ -1,6 +1,24 @@
 (ns discourje.multi.pubSub
   (:require [clojure.test :refer :all]
-            [clojure.core.async :refer :all]))
+            ))
+
+
+
+
+(def testVe [1 2 3])
+(def testVe2 [4 5 [6 7]])
+
+(into [] (concat (flatten testVe2) testVe))
+(subvec (vec (mapcat identity [testVe2 testVe])) 1)
+
+
+
+
+
+
+
+
+
 
 (def c (chan 1))
 

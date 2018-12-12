@@ -27,10 +27,12 @@
 
 (defn orderBook
   "Order book from seller's perspective"
-  [self protocol]
-    (recv! "title" "buyer1" self protocol
+  [this protocol]
+    (recv! "title" "buyer1" this protocol
            (fn [title]
-             (send! "quote" (quoteBook title) self ["buyer1" "buyer2"] protocol))))
+             (send! "quote" (quoteBook title) this ["buyer1" "buyer2"] protocol)))
+  ;(recv)
+  )
       ;(let [response (atom nil)]
   ;  (recv! "contribute" "buyer2" "seller" protocol (fn [x] (reset! response x)))
   ;  (cond

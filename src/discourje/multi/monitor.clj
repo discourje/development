@@ -19,15 +19,12 @@
       (reset! (:activeMonitor protocol) nextMonitor)
       (reset! (:protocol protocol) (subvec @(:protocol protocol) 1)))))
 
-(defn activateChoiceBranch [protocol branch]
-  (println "branch =" branch)
-    (reset! (:activeMonitor @protocol) (first branch))
-    (println @(:protocol @protocol))
-  (doseq [monitor branch]
-    (conj @(:protocol @protocol) monitor))
-    (println (reverse (conj @(:protocol @protocol) branch)))
-    (reset! (:protocol @protocol) (first (conj @(:protocol @protocol) branch)))
-    (println "activated b" @(:protocol @protocol)))
+
+(defn activateChoiceBranch
+  "activates the choice branch and filters out the branch which was not chosen"
+  [protocol branch]
+  (reset! (:activeMonitor @protocol) (first branch))
+  (reset! (:protocol @protocol) (subvec (vec (mapcat identity [branch @(:protocol @protocol)])) 1)))
 
 (defn incorrectCommunication
   "communication incorrect, log a message! (or maybe throw exception)"
@@ -54,6 +51,18 @@
           newMonitor (->monitor (:action currentMonitor) (:from currentMonitor) newRecv)]
       (reset! (:activeMonitor @protocol) newMonitor))))
 
+(defn monitorValid?
+  "is the current monitor valid, compared the current monitor's action, from and to to the given values"
+  [activeM action from to]
+  (and
+    (and (if (instance? Seqable action)
+           (or (contains-value? (:action activeM) action) (= action (:action activeM)))
+           (= action (:action activeM))));(= action (:action activeM))
+    (= from (:from activeM))
+    (and (if (instance? Seqable (:to activeM))
+           (or (contains-value? to (:to activeM)) (= to (:to activeM)))
+           (= to (:to activeM))))))
+
 (defn isCommunicationValid?
   "Checks if communication is valid by comparing input to the active monitor"
   [action from to protocol]
@@ -61,29 +70,12 @@
         activeM @(:activeMonitor proto)]
     (cond
       (instance? monitor activeM)
-      (do
-        (and
-          (= action (:action activeM))
-          (= from (:from activeM))
-          (and (if (instance? Seqable (:to activeM))
-                 (or (contains-value? to (:to activeM)) (= to (:to activeM)))
-                 (= to (:to activeM))))))
+       (monitorValid? activeM action from to)
       (instance? choice activeM)
       (let [trueMonitor (first (:trueBranch activeM))
             falseMonitor (first (:falseBranch activeM))
-            trueResult (and
-                         (= action (:action trueMonitor))
-                         (= from (:from trueMonitor))
-                         (if (instance? Seqable (:to trueMonitor))
-                           (or (contains-value? to (:to trueMonitor)) (= to (:to trueMonitor)))
-                           (= to (:to trueMonitor))))
-            falseResult (and
-                          (= action (:action falseMonitor))
-                          (= from (:from falseMonitor))
-                          (and (if (instance? Seqable (:to falseMonitor))
-                                 (or (contains-value? to (:to falseMonitor)) (= to (:to falseMonitor)))
-                                 (= to (:to falseMonitor)))))]
-        (println "yes is choice")
+            trueResult (monitorValid? trueMonitor action from to)
+            falseResult (monitorValid? falseMonitor action from to)]
         (cond trueResult (activateChoiceBranch protocol (:trueBranch activeM))
               falseResult (activateChoiceBranch protocol (:falseBranch activeM)))
         (or trueResult falseResult)))))
