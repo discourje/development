@@ -8,16 +8,17 @@
 ;When the protocol encounters this it will check the conditional and continue on the correct branch.
 (defrecord choice [trueBranch falseBranch])
 
-(defn activateNextMonitor
-  "Set the active monitor based on the protocol"
-  [protocol]
-  (if (instance? Atom protocol)
-    (let [nextMonitor (first @(:protocol @protocol))]
-      (reset! (:activeMonitor @protocol) nextMonitor)
-      (reset! (:protocol @protocol) (subvec @(:protocol @protocol) 1)))
-    (let [nextMonitor (first @(:protocol protocol))]
-      (reset! (:activeMonitor protocol) nextMonitor)
-      (reset! (:protocol protocol) (subvec @(:protocol protocol) 1)))))
+
+;(defn activateNextMonitor
+;  "Set the active monitor based on the protocol"
+;  [protocol]
+;  (if (instance? Atom protocol)
+;    (let [nextMonitor (first @(:protocol @protocol))]
+;      (reset! (:activeMonitor @protocol) nextMonitor)
+;      (reset! (:protocol @protocol) (subvec @(:protocol @protocol) 1)))
+;    (let [nextMonitor (first @(:protocol protocol))]
+;      (reset! (:activeMonitor protocol) nextMonitor)
+;      (reset! (:protocol protocol) (subvec @(:protocol protocol) 1)))))
 
 
 (defn activateChoiceBranch
@@ -54,28 +55,52 @@
 (defn monitorValid?
   "is the current monitor valid, compared the current monitor's action, from and to to the given values"
   [activeM action from to]
+  (when (not (and (if (instance? Seqable action)
+                    (or (contains-value? (:action activeM) action) (= action (:action activeM)))
+                    (= action (:action activeM)))))
+    (println (format "not valid! given action: %s, but in monitor %s" action (:action activeM)))
+    )
+
   (and
-    (and (if (instance? Seqable action)
-           (or (contains-value? (:action activeM) action) (= action (:action activeM)))
-           (= action (:action activeM))));(= action (:action activeM))
+    ;(and (if (instance? Seqable action)
+    ;       (or (contains-value? (:action activeM) action) (= action (:action activeM)))
+    ;       (= action (:action activeM))))
+    (= action (:action activeM))
     (= from (:from activeM))
     (and (if (instance? Seqable (:to activeM))
            (or (contains-value? to (:to activeM)) (= to (:to activeM)))
            (= to (:to activeM))))))
 
+
+(defn activateNextMonitor
+  "Set the active monitor based on the protocol"
+  ([action from to protocol]
+    (let [activeM @(:activeMonitor @protocol)]
+      (cond
+        (instance? monitor activeM)
+        (let [nextMonitor (first @(:protocol @protocol))]
+          (reset! (:activeMonitor @protocol) nextMonitor)
+          (reset! (:protocol @protocol) (subvec @(:protocol @protocol) 1)))
+        (instance? choice activeM)
+        (let [trueResult (monitorValid? (first (:trueBranch activeM)) action from to)
+              falseResult (monitorValid? (first (:falseBranch activeM)) action from to)]
+          (println (format "trueResult %s, falseResult %s", trueResult falseResult))
+          (cond trueResult (activateChoiceBranch protocol (:trueBranch activeM))
+                falseResult (activateChoiceBranch protocol (:falseBranch activeM))))
+        )))
+  ([protocol]
+    (let [nextMonitor (first @(:protocol protocol))]
+      (reset! (:activeMonitor protocol) nextMonitor)
+      (reset! (:protocol protocol) (subvec @(:protocol protocol) 1)))))
+
 (defn isCommunicationValid?
   "Checks if communication is valid by comparing input to the active monitor"
   [action from to protocol]
-  (let [proto @protocol
-        activeM @(:activeMonitor proto)]
+  (let [activeM @(:activeMonitor @protocol)]
     (cond
       (instance? monitor activeM)
-       (monitorValid? activeM action from to)
+      (monitorValid? activeM action from to)
       (instance? choice activeM)
-      (let [trueMonitor (first (:trueBranch activeM))
-            falseMonitor (first (:falseBranch activeM))
-            trueResult (monitorValid? trueMonitor action from to)
-            falseResult (monitorValid? falseMonitor action from to)]
-        (cond trueResult (activateChoiceBranch protocol (:trueBranch activeM))
-              falseResult (activateChoiceBranch protocol (:falseBranch activeM)))
-        (or trueResult falseResult)))))
+      (or
+        (monitorValid? (first (:trueBranch activeM)) action from to)
+        (monitorValid? (first (:falseBranch activeM)) action from to)))))

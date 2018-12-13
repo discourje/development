@@ -28,25 +28,32 @@
 (defn orderBook
   "Order book from seller's perspective"
   [this protocol]
-    (recv! "title" "buyer1" this protocol
-           (fn [title]
-             (send! "quote" (quoteBook title) this ["buyer1" "buyer2"] protocol)))
-  ;(recv)
-  )
-      ;(let [response (atom nil)]
-  ;  (recv! "contribute" "buyer2" "seller" protocol (fn [x] (reset! response x)))
-  ;  (cond
-  ;    (= @response "ok") (println "received Ok!")
-  ;    (= @response "quit") (println "received quit!")
-  ;    (= @response nil) (println "still nil"))
-  ;  )
+  (recv! "title" "buyer1" this protocol
+         (fn [title]
+           (send! "quote" (quoteBook title) this ["buyer1" "buyer2"] protocol)))
+  (recv! ["ok" "quit"] "buyer2" this protocol
+         (fn [response] (
+                          (cond
+                            (= @response "ok") (println "received Ok!")
+                            (= @response "quit") (println "received quit!")
+                            (= @response nil) (println "still nil"))
+                          )
+           )))
+
+;(let [response (atom nil)]
+;  (recv! "contribute" "buyer2" "seller" protocol (fn [x] (reset! response x)))
+;  (cond
+;    (= @response "ok") (println "received Ok!")
+;    (= @response "quit") (println "received quit!")
+;    (= @response nil) (println "still nil"))
+;  )
 
 ;wait for title
 ;send quote to buyer1 and buyer2
 ;wait for ok or quit
-  ;ok
-    ;wait for address
-    ;send date to buyer2
-  ;quit
-    ;quit
+;ok
+;wait for address
+;send date to buyer2
+;quit
+;quit
 ;quit protocol!
