@@ -62,10 +62,10 @@
     )
 
   (and
-    ;(and (if (instance? Seqable action)
-    ;       (or (contains-value? (:action activeM) action) (= action (:action activeM)))
-    ;       (= action (:action activeM))))
-    (= action (:action activeM))
+    (and (if (instance? Seqable action)
+           (or (contains-value? (:action activeM) action) (= action (:action activeM)))
+           (= action (:action activeM))))
+    ;(= action (:action activeM))
     (= from (:from activeM))
     (and (if (instance? Seqable (:to activeM))
            (or (contains-value? to (:to activeM)) (= to (:to activeM)))
@@ -101,6 +101,21 @@
       (instance? monitor activeM)
       (monitorValid? activeM action from to)
       (instance? choice activeM)
-      (or
+      (let [trueResult (monitorValid? (first (:trueBranch activeM)) action from to)
+            falseResult (monitorValid? (first (:falseBranch activeM)) action from to)]
+        (println (format "trueResult %s, falseResult %s", trueResult falseResult))
+        (cond trueResult (activateChoiceBranch protocol (:trueBranch activeM))
+              falseResult (activateChoiceBranch protocol (:falseBranch activeM)))
+        (or trueResult falseResult)))))
+
+(defn getTargetBranch
+  "Get the target branch of a choice construct based on the action, sender and receiver"
+  [action from to protocol]
+  (let [activeM @(:activeMonitor @protocol)]
+    (when
+      (instance? choice activeM)
+      (cond
         (monitorValid? (first (:trueBranch activeM)) action from to)
-        (monitorValid? (first (:falseBranch activeM)) action from to)))))
+        (first (:trueBranch activeM))
+        (monitorValid? (first (:falseBranch activeM)) action from to)
+        (first (:falseBranch activeM))))))

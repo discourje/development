@@ -1,11 +1,8 @@
 (ns discourje.multi.core
   (:require [clojure.core.async :as async :refer :all]
-            [clojure.core :refer :all]
-            ;[discourje.multi.monitor]
-            )
-  (use [discourje.multi.monitor :only [incorrectCommunication isCommunicationValid? activateNextMonitor hasMultipleReceivers? removeReceiver]])
-  (:import [discourje.multi.monitor choice])
-  )
+            [clojure.core :refer :all])
+  (use [discourje.multi.monitor :only [incorrectCommunication isCommunicationValid? activateNextMonitor hasMultipleReceivers? removeReceiver getTargetBranch]])
+  (:import (discourje.multi.monitor choice monitor)))
 
 ;Defines a communication channel with a sender, receiver (strings) and a channel Async.Chan.
 (defrecord communicationChannel [sender receiver channel])
@@ -61,23 +58,28 @@
     (for [receiver channel] (putMessage receiver value))
     (putMessage channel value)))
 
+
 (defn send!
   "send something through the protocol"
-  [action value from to protocol]
+  ([action value from to protocol]
   (if (nil? (:activeMonitor @protocol))
     (incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply send! with an instantiated protocol!")
     (if (isCommunicationValid? action from to protocol)
       (let [currentMonitor @(:activeMonitor @protocol)]
         (cond
+          (instance? monitor currentMonitor)
+          (send! currentMonitor,value,protocol)
           (instance? choice currentMonitor)
-          (if (vector? (:to currentMonitor))
-            (doseq [receiver (:to currentMonitor)]
-              (allowSend (:channel (getChannel (:from currentMonitor) receiver (:channels @protocol))) value))
-            (allowSend (:channel (getChannel (:from currentMonitor) (:to currentMonitor) (:channels @protocol))) value))
-          (instance? choice currentMonitor)
-          (println "yes yes sending to choice target!")
-          ))
+          (do (println "yes yes sending to choice target!")
+              (let [target (getTargetBranch action from to protocol)]
+                (println target)
+                (send! target,value,protocol)))))
       (incorrectCommunication (format "Send action: %s is not allowed to proceed from %s to %s" action from to)))))
+  ([currentMonitor value protocol]
+   (if (vector? (:to currentMonitor))
+     (doseq [receiver (:to currentMonitor)]
+       (allowSend (:channel (getChannel (:from currentMonitor) receiver (:channels @protocol))) value))
+     (allowSend (:channel (getChannel (:from currentMonitor) (:to currentMonitor) (:channels @protocol))) value))))
 
 (defn recv!
   "receive something through the protocol"

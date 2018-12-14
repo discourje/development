@@ -34,9 +34,9 @@
   (recv! ["ok" "quit"] "buyer2" this protocol
          (fn [response] (
                           (cond
-                            (= @response "ok") (println "received Ok!")
-                            (= @response "quit") (println "received quit!")
-                            (= @response nil) (println "still nil"))
+                            (= response "ok") (println "received Ok!")
+                            (= response "quit") (println "received quit!")
+                            (= response nil) (println "still nil"))
                           )
            )))
 
