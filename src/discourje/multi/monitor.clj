@@ -52,24 +52,30 @@
           newMonitor (->monitor (:action currentMonitor) (:from currentMonitor) newRecv)]
       (reset! (:activeMonitor @protocol) newMonitor))))
 
+(defn seqableOrEqual
+  "checks if the target keyword and value are an instance of seqable (collection) if so, check if it contains or matches the monitor
+  We need this to support sending to multiple targets or listening to multiple values"
+  [keyword value monitor]
+  (and (if (instance? Seqable value)
+         (or (contains-value? (keyword monitor) value) (= value (keyword monitor)))
+         (= value (keyword monitor)))))
+
 (defn monitorValid?
   "is the current monitor valid, compared the current monitor's action, from and to to the given values"
   [activeM action from to]
-  (when (not (and (if (instance? Seqable action)
-                    (or (contains-value? (:action activeM) action) (= action (:action activeM)))
-                    (= action (:action activeM)))))
-    (println (format "not valid! given action: %s, but in monitor %s" action (:action activeM)))
-    )
-
   (and
-    (and (if (instance? Seqable action)
-           (or (contains-value? (:action activeM) action) (= action (:action activeM)))
-           (= action (:action activeM))))
-    ;(= action (:action activeM))
+    (seqableOrEqual :action action activeM)
+    (seqableOrEqual :to to activeM)
+
+    ;(and (if (instance? Seqable action)
+    ;       (or (contains-value? (:action activeM) action) (= action (:action activeM)))
+    ;       (= action (:action activeM))))
     (= from (:from activeM))
-    (and (if (instance? Seqable (:to activeM))
-           (or (contains-value? to (:to activeM)) (= to (:to activeM)))
-           (= to (:to activeM))))))
+    ;(and (if (instance? Seqable (:to activeM))
+    ;       (or (contains-value? to (:to activeM)) (= to (:to activeM)))
+    ;       (= to (:to activeM))))
+    ))
+
 
 
 (defn activateNextMonitor
