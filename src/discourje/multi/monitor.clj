@@ -8,19 +8,6 @@
 ;When the protocol encounters this it will check the conditional and continue on the correct branch.
 (defrecord choice [trueBranch falseBranch])
 
-
-;(defn activateNextMonitor
-;  "Set the active monitor based on the protocol"
-;  [protocol]
-;  (if (instance? Atom protocol)
-;    (let [nextMonitor (first @(:protocol @protocol))]
-;      (reset! (:activeMonitor @protocol) nextMonitor)
-;      (reset! (:protocol @protocol) (subvec @(:protocol @protocol) 1)))
-;    (let [nextMonitor (first @(:protocol protocol))]
-;      (reset! (:activeMonitor protocol) nextMonitor)
-;      (reset! (:protocol protocol) (subvec @(:protocol protocol) 1)))))
-
-
 (defn activateChoiceBranch
   "activates the choice branch and filters out the branch which was not chosen"
   [protocol branch]
@@ -32,7 +19,9 @@
   [message]
   (println message))
 
-(defn contains-value? [element coll]
+(defn contains-value?
+  "Does the vector contain a value?"
+  [element coll]
   (boolean (some #(= element %) coll)))
 
 (defn hasMultipleReceivers?
@@ -47,34 +36,22 @@
   [protocol to]
   (when (hasMultipleReceivers? protocol)
     (let [currentMonitor @(:activeMonitor @protocol)
-          recv (:to currentMonitor)                         ;(remove #{to} (:to currentMonitor))
+          recv (:to currentMonitor)
           newRecv (vec (remove #{to} recv))
           newMonitor (->monitor (:action currentMonitor) (:from currentMonitor) newRecv)]
       (reset! (:activeMonitor @protocol) newMonitor))))
-
-(defn seqableOrEqual
-  "checks if the target keyword and value are an instance of seqable (collection) if so, check if it contains or matches the monitor
-  We need this to support sending to multiple targets or listening to multiple values"
-  [keyword value monitor]
-  (and (if (instance? Seqable value)
-         (or (contains-value? (keyword monitor) value) (= value (keyword monitor)))
-         (= value (keyword monitor)))))
 
 (defn monitorValid?
   "is the current monitor valid, compared the current monitor's action, from and to to the given values"
   [activeM action from to]
   (and
-    (seqableOrEqual :action action activeM)
-    (seqableOrEqual :to to activeM)
-
-    ;(and (if (instance? Seqable action)
-    ;       (or (contains-value? (:action activeM) action) (= action (:action activeM)))
-    ;       (= action (:action activeM))))
+    (and (if (instance? Seqable action)
+           (or (contains-value? (:action activeM) action) (= action (:action activeM)))
+           (= action (:action activeM))))
     (= from (:from activeM))
-    ;(and (if (instance? Seqable (:to activeM))
-    ;       (or (contains-value? to (:to activeM)) (= to (:to activeM)))
-    ;       (= to (:to activeM))))
-    ))
+    (and (if (instance? Seqable (:to activeM))
+           (or (contains-value? to (:to activeM)) (= to (:to activeM)))
+           (= to (:to activeM))))))
 
 
 
@@ -90,10 +67,8 @@
         (instance? choice activeM)
         (let [trueResult (monitorValid? (first (:trueBranch activeM)) action from to)
               falseResult (monitorValid? (first (:falseBranch activeM)) action from to)]
-          (println (format "trueResult %s, falseResult %s", trueResult falseResult))
           (cond trueResult (activateChoiceBranch protocol (:trueBranch activeM))
-                falseResult (activateChoiceBranch protocol (:falseBranch activeM))))
-        )))
+                falseResult (activateChoiceBranch protocol (:falseBranch activeM)))))))
   ([protocol]
     (let [nextMonitor (first @(:protocol protocol))]
       (reset! (:activeMonitor protocol) nextMonitor)
@@ -109,7 +84,6 @@
       (instance? choice activeM)
       (let [trueResult (monitorValid? (first (:trueBranch activeM)) action from to)
             falseResult (monitorValid? (first (:falseBranch activeM)) action from to)]
-        (println (format "trueResult %s, falseResult %s", trueResult falseResult))
         (cond trueResult (activateChoiceBranch protocol (:trueBranch activeM))
               falseResult (activateChoiceBranch protocol (:falseBranch activeM)))
         (or trueResult falseResult)))))

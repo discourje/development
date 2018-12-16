@@ -34,23 +34,22 @@
   (recv! "quote" "seller" this protocol
          (fn [receivedQuote]
            (recv! "quoteDiv" "buyer1" this protocol
-                  (fn [receivedQuoteDiv] (do (println (format "received %s Div %s" receivedQuote receivedQuoteDiv))
-                                                      (if (contribute? receivedQuote receivedQuoteDiv)
-                                                        (do  (send! "ok" "ok" this "seller" protocol)
-                                                             ;(println "waiting")
-                                                             ;(println "waiting")
-                                                             ;(println "waiting")
-                                                             ;(send! "address" (generateAddress) this "seller" protocol)
-                                                             (recv! "date" "seller" this protocol (fn [x] (println "Received date!" x))))
-                                                        (send! "quit" "quit" this "seller" protocol))
-                                                      ))))))
+                  (fn [receivedQuoteDiv]
+                      (if (contribute? receivedQuote receivedQuoteDiv)
+                        (do (send! "ok" "ok" this "seller" protocol)
+                            (Thread/sleep 1000) ;quick fix for multiple sends...
+                            (send! "address" (generateAddress) this "seller" protocol)
+                            (recv! "date" "seller" this protocol (fn [x] (println "Received date!" x)))
+                            )
+                        (send! "quit" "quit" this "seller" protocol))
+                      )))))
 
-  ;wait for quote
-  ;wait for quote div
-  ;branch on data
-  ;true
-  ;send ok to seller
-  ;send address to seller
-  ;wait for date
-  ;false
-  ;quit
+;wait for quote
+;wait for quote div
+;branch on data
+;true
+;send ok to seller
+;send address to seller
+;wait for date
+;false
+;quit

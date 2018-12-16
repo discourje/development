@@ -32,12 +32,17 @@
          (fn [title]
            (send! "quote" (quoteBook title) this ["buyer1" "buyer2"] protocol)))
   (recv! ["ok" "quit"] "buyer2" this protocol
-         (fn [response] (
-                          (cond
-                            (= response "ok") (println "received Ok!")
-                            (= response "quit") (println "received quit!")
-                            (= response nil) (println "still nil"))
-                          )
+         (fn [response]
+           (cond
+             (= response "ok")
+             (do (recv! "address" "buyer2" this protocol
+                        (fn [address]
+                          (println "The received address is: " address)
+                          (send! "date" (getRandomDate 5) this "buyer2" protocol)))
+                 response)
+             (= response "quit")
+             (do (send! "end" "protocol complete!" this ["buyer1" "buyer2"] protocol)
+                 response))
            )))
 
 ;(let [response (atom nil)]

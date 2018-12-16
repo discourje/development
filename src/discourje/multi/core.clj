@@ -68,12 +68,11 @@
       (let [currentMonitor @(:activeMonitor @protocol)]
         (cond
           (instance? monitor currentMonitor)
-          (send! currentMonitor,value,protocol)
+          (send! currentMonitor value protocol)
           (instance? choice currentMonitor)
           (do (println "yes yes sending to choice target!")
               (let [target (getTargetBranch action from to protocol)]
-                (println target)
-                (send! target,value,protocol)))))
+                (send! target value protocol)))))
       (incorrectCommunication (format "Send action: %s is not allowed to proceed from %s to %s" action from to)))))
   ([currentMonitor value protocol]
    (if (vector? (:to currentMonitor))
@@ -92,7 +91,6 @@
                (if (nil? (:activeMonitor @protocol))
                  (incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply send! with an instantiated protocol!")
                  (if (isCommunicationValid? action from to protocol)
-                   (do
                      (if (hasMultipleReceivers? protocol)
                        (do
                          (removeReceiver protocol to)
@@ -100,11 +98,12 @@
                                     (fn [key atom old-state new-state] (callback x) (remove-watch (:activeMonitor @protocol) nil))))
                        (do
                          (activateNextMonitor action from to protocol)
-                         (println (:activeMonitor @protocol))
-                         (callback x))
-                       ))
+                         (if (and
+                               (not (nil? callback))
+                               (not (nil? x)))
+                           (callback x)
+                           x))
+                       )
                    (do
-                     (println (:activeMonitor @protocol))
                      (incorrectCommunication (format "recv action: %s is not allowed to proceed from %s to %s" action from to))
-                     (callback nil))
-                   )))))))
+                     (callback nil)))))))))
