@@ -12,7 +12,8 @@
                (->monitor "address" "buyer2" "seller")
                (->monitor "date" "seller" "buyer2")]
               [(->monitor "quit" "buyer2" "seller")])
-    (->monitor "end" "seller" ["buyer1" "buyer2"])))
+    ;(->monitor "end" "seller" ["buyer1" "buyer2"])
+    ))
 
 (defn getProtocol
   "generate the protocol, channels and set the first monitor active"

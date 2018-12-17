@@ -62,8 +62,9 @@
       (cond
         (instance? monitor activeM)
         (let [nextMonitor (first @(:protocol @protocol))]
+          (when (> (count @(:protocol @protocol)) 0)
           (reset! (:activeMonitor @protocol) nextMonitor)
-          (reset! (:protocol @protocol) (subvec @(:protocol @protocol) 1)))
+          (reset! (:protocol @protocol) (subvec @(:protocol @protocol) 1))))
         (instance? choice activeM)
         (let [trueResult (monitorValid? (first (:trueBranch activeM)) action from to)
               falseResult (monitorValid? (first (:falseBranch activeM)) action from to)]

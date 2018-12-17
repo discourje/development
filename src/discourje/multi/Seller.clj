@@ -24,7 +24,8 @@
   [maxRange]
   (getDate (+ (rand-int maxRange) 1)))
 
-
+(defn endReached [quit]
+  (println (format "Protocol ended with: %s" quit)))
 (defn orderBook
   "Order book from seller's perspective"
   [this protocol]
@@ -41,8 +42,9 @@
                           (send! "date" (getRandomDate 5) this "buyer2" protocol)))
                  response)
              (= response "quit")
-             (do (send! "end" "protocol complete!" this ["buyer1" "buyer2"] protocol)
-                 response))
+             (do (endReached response)
+                 response)
+             )
            )))
 
 ;(let [response (atom nil)]
