@@ -1,8 +1,8 @@
-(ns discourje.multi.core
+(ns discourje.core.core
   (:require [clojure.core.async :as async :refer :all]
             [clojure.core :refer :all])
-  (use [discourje.multi.monitor :only [incorrectCommunication isCommunicationValid? activateNextMonitor hasMultipleReceivers? removeReceiver]])
-  (:import (clojure.lang Seqable)))
+  (use [discourje.core.monitor :only [incorrectCommunication isCommunicationValid? activateNextMonitor hasMultipleReceivers? removeReceiver getTargetBranch]])
+  (:import (discourje.core.monitor choice monitor)))
 
 ;Defines a communication channel with a sender, receiver (strings) and a channel Async.Chan.
 (defrecord communicationChannel [sender receiver channel])
@@ -22,11 +22,8 @@
 
 (defn generateChannels
   "Generates communication channels between all participants"
-  ([participants]
+  [participants]
    (map #(apply generateChannel %) (uniqueCartesianProduct participants participants)))
-  ([participants test]
-
-    ))
 
 (defn putMessage
   "Puts message on the channel, non-blocking"
@@ -39,11 +36,9 @@
   [channel]
   (<!! channel))
 
-
 (defn getChannel
   "finds a channel based on sender and receiver"
   [sender receiver channels]
-  ;(println (format "Sender: %s and receiver(s) %s" sender receiver))
   (first
     (filter (fn [ch]
               (and
@@ -60,44 +55,44 @@
 
 (defn send!
   "send something through the protocol"
-  [action value from to protocol]
+  ([action value from to protocol]
   (if (nil? (:activeMonitor @protocol))
     (incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply send! with an instantiated protocol!")
     (if (isCommunicationValid? action from to protocol)
       (let [currentMonitor @(:activeMonitor @protocol)]
-        (if (vector? (:to currentMonitor))
-          (doseq [receiver (:to currentMonitor)]
-            (allowSend (:channel (getChannel (:from currentMonitor) receiver (:channels @protocol))) value))
-          ;   (activateNextMonitor protocol) ;only activate new monitor when receive action has finished
-          (allowSend (:channel (getChannel (:from currentMonitor) (:to currentMonitor) (:channels @protocol))) value)))
+        (cond
+          (instance? monitor currentMonitor)
+          (send! currentMonitor value protocol)
+          (instance? choice currentMonitor)
+          (do (println "yes yes sending to choice target!")
+              (let [target (getTargetBranch action from to protocol)]
+                (send! target value protocol)))))
       (incorrectCommunication (format "Send action: %s is not allowed to proceed from %s to %s" action from to)))))
+  ([currentMonitor value protocol]
+   (if (vector? (:to currentMonitor))
+     (doseq [receiver (:to currentMonitor)]
+       (allowSend (:channel (getChannel (:from currentMonitor) receiver (:channels @protocol))) value))
+     (allowSend (:channel (getChannel (:from currentMonitor) (:to currentMonitor) (:channels @protocol))) value))))
 
 (defn recv!
   "receive something through the protocol"
   [action from to protocol callback]
   (let [channel (getChannel from to (:channels @protocol))]
-    ;(println "")
-    ;(println "started take with callback")
     (if (nil? channel)
       (incorrectCommunication "Cannot find channel from %s to %s in the defined channels of the protocol! Please make sure you supply supported sender and receiver pair")
       (take! (:channel channel)
              (fn [x]
-               ;(println "taking!!!")
                (if (nil? (:activeMonitor @protocol))
                  (incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply send! with an instantiated protocol!")
                  (if (isCommunicationValid? action from to protocol)
-                   (do
                      (if (hasMultipleReceivers? protocol)
                        (do
                          (removeReceiver protocol to)
                          (add-watch (:activeMonitor @protocol) nil
-                                    (fn [key atom old-state new-state] (callback x)(remove-watch (:activeMonitor @protocol) nil))))
+                                    (fn [key atom old-state new-state] (callback x) (remove-watch (:activeMonitor @protocol) nil))))
                        (do
-                         (activateNextMonitor protocol)
-                         (callback x))
-                       ))
-                     (do
-                       (println (:activeMonitor @protocol))
-                       (incorrectCommunication (format "recv action: %s is not allowed to proceed from %s to %s" action from to))
-                       (callback nil))
-                     )))))))
+                         (activateNextMonitor action from to protocol)
+                         (callback x)))
+                   (do
+                     (incorrectCommunication (format "recv action: %s is not allowed to proceed from %s to %s" action from to))
+                     (callback nil)))))))))

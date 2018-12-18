@@ -1,4 +1,4 @@
-(ns discourje.multiparty.debug)
+(ns research.multiparty.debug)
 
 (def ^{:dynamic true} *debug-enabled* false)
 

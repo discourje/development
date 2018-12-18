@@ -1,5 +1,5 @@
-(ns discourje.multiparty.Seller
-  (:require [discourje.multiparty.core :refer :all])
+(ns research.multiparty.Seller
+  (:require [research.multiparty.core :refer :all])
   (:import (java.util Date Calendar)))
 
 (defn quoteBook
