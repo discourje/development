@@ -8,11 +8,11 @@
 ;When the protocol encounters this it will check the conditional and continue on the correct branch.
 (defrecord choice [trueBranch falseBranch])
 ;recursion construct
-(defrecord recursion [protocol])
+(defrecord recursion [name protocol])
 ;recur the recursion block
-(def recur! :recur)
+(defrecord recur! [name])
 ;end the recursion block
-(def end! :end)
+(defrecord end! [name])
 
 (defn activateChoiceBranch
   "activates the choice branch and filters out the branch which was not chosen"
@@ -62,22 +62,29 @@
 (defn activateNextMonitor
   "Set the active monitor based on the protocol"
   ([action from to protocol]
-    (let [activeM @(:activeMonitor @protocol)]
-      (cond
-        (instance? monitor activeM)
-        (let [nextMonitor (first @(:protocol @protocol))]
-          (when (> (count @(:protocol @protocol)) 0)
-          (reset! (:activeMonitor @protocol) nextMonitor)
-          (reset! (:protocol @protocol) (subvec @(:protocol @protocol) 1))))
-        (instance? choice activeM)
-        (let [trueResult (monitorValid? (first (:trueBranch activeM)) action from to)
-              falseResult (monitorValid? (first (:falseBranch activeM)) action from to)]
-          (cond trueResult (activateChoiceBranch protocol (:trueBranch activeM))
-                falseResult (activateChoiceBranch protocol (:falseBranch activeM)))))))
+   (let [activeM @(:activeMonitor @protocol)]
+     (cond
+       (instance? monitor activeM)
+       (let [nextMonitor (first @(:protocol @protocol))]
+         (when (> (count @(:protocol @protocol)) 0)
+           (reset! (:activeMonitor @protocol) nextMonitor)
+           (reset! (:protocol @protocol) (subvec @(:protocol @protocol) 1))))
+       (instance? choice activeM)
+       (let [trueResult (monitorValid? (first (:trueBranch activeM)) action from to)
+             falseResult (monitorValid? (first (:falseBranch activeM)) action from to)]
+         (cond trueResult (activateChoiceBranch protocol (:trueBranch activeM))
+               falseResult (activateChoiceBranch protocol (:falseBranch activeM)))))))
   ([protocol]
-    (let [nextMonitor (first @(:protocol protocol))]
-      (reset! (:activeMonitor protocol) nextMonitor)
-      (reset! (:protocol protocol) (subvec @(:protocol protocol) 1)))))
+   (let [nextMonitor (first @(:protocol protocol))]
+     (if (instance? recursion nextMonitor)
+         (let [firstRecMonitor (first (:protocol nextMonitor))
+             recProt (:protocol nextMonitor)]
+         (reset! (:activeMonitor protocol) firstRecMonitor)
+         (reset! (:protocol protocol) (subvec recProt 1))
+         )
+       (do
+         (reset! (:activeMonitor protocol) nextMonitor)
+         (reset! (:protocol protocol) (subvec @(:protocol protocol) 1)))))))
 
 (defn isCommunicationValid?
   "Checks if communication is valid by comparing input to the active monitor"
