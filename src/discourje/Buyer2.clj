@@ -1,5 +1,5 @@
-(ns discourje.multi.Buyer2
-  (:require [discourje.multi.core :refer :all]))
+(ns discourje.Buyer2
+  (:require [discourje.core.core :refer :all]))
 
 (defn contribute?
   "returns true when the received quote 50% or greater"

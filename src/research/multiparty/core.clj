@@ -1,4 +1,4 @@
-(ns discourje.multiparty.core
+(ns research.multiparty.core
   (:require [clojure.core.async :as async :refer :all]
             [clojure.core :refer :all])
   (:import (clojure.lang Seqable)))

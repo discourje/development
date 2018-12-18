@@ -1,6 +1,6 @@
-(ns discourje.multiparty.TwoBuyersProtocol
-  (:require [discourje.multiparty.monitoring :as mon :refer :all]
-            [discourje.multiparty.core :refer :all]))
+(ns research.multiparty.TwoBuyersProtocol
+  (:require [research.multiparty.monitoring :as mon :refer :all]
+            [research.multiparty.core :refer :all]))
 
 
 (def channels (generateChannels ["buyer1" "buyer2" "seller"]))

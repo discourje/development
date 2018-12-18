@@ -1,4 +1,4 @@
-(ns discourje.multi.monitor
+(ns discourje.core.monitor
   (:import (clojure.lang Seqable Atom)))
 
 ;Define a monitor to check communication, this will be used to verify correct conversation.
@@ -7,6 +7,12 @@
 ;We also need a data structure to create a conditional with branches.
 ;When the protocol encounters this it will check the conditional and continue on the correct branch.
 (defrecord choice [trueBranch falseBranch])
+;recursion construct
+(defrecord recursion [protocol])
+;recur the recursion block
+(def recur! :recur)
+;end the recursion block
+(def end! :end)
 
 (defn activateChoiceBranch
   "activates the choice branch and filters out the branch which was not chosen"
@@ -52,8 +58,6 @@
     (and (if (instance? Seqable (:to activeM))
            (or (contains-value? to (:to activeM)) (= to (:to activeM)))
            (= to (:to activeM))))))
-
-
 
 (defn activateNextMonitor
   "Set the active monitor based on the protocol"

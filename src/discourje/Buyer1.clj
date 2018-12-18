@@ -1,5 +1,5 @@
-(ns discourje.multi.Buyer1
-  (:require [discourje.multi.core :refer :all]))
+(ns discourje.Buyer1
+  (:require [discourje.core.core :refer :all]))
 
 (defn generateBook
   "generate simple book title"

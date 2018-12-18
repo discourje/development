@@ -1,8 +1,8 @@
-(ns discourje.multi.core
+(ns discourje.core.core
   (:require [clojure.core.async :as async :refer :all]
             [clojure.core :refer :all])
-  (use [discourje.multi.monitor :only [incorrectCommunication isCommunicationValid? activateNextMonitor hasMultipleReceivers? removeReceiver getTargetBranch]])
-  (:import (discourje.multi.monitor choice monitor)))
+  (use [discourje.core.monitor :only [incorrectCommunication isCommunicationValid? activateNextMonitor hasMultipleReceivers? removeReceiver getTargetBranch]])
+  (:import (discourje.core.monitor choice monitor)))
 
 ;Defines a communication channel with a sender, receiver (strings) and a channel Async.Chan.
 (defrecord communicationChannel [sender receiver channel])
@@ -22,11 +22,8 @@
 
 (defn generateChannels
   "Generates communication channels between all participants"
-  ([participants]
+  [participants]
    (map #(apply generateChannel %) (uniqueCartesianProduct participants participants)))
-  ([participants test]
-
-    ))
 
 (defn putMessage
   "Puts message on the channel, non-blocking"
@@ -39,11 +36,9 @@
   [channel]
   (<!! channel))
 
-
 (defn getChannel
   "finds a channel based on sender and receiver"
   [sender receiver channels]
-  ;(println (format "Sender: %s and receiver(s) %s" sender receiver))
   (first
     (filter (fn [ch]
               (and
@@ -57,7 +52,6 @@
   (if (vector? channel)
     (for [receiver channel] (putMessage receiver value))
     (putMessage channel value)))
-
 
 (defn send!
   "send something through the protocol"
@@ -98,12 +92,7 @@
                                     (fn [key atom old-state new-state] (callback x) (remove-watch (:activeMonitor @protocol) nil))))
                        (do
                          (activateNextMonitor action from to protocol)
-                         (if (and
-                               (not (nil? callback))
-                               (not (nil? x)))
-                           (callback x)
-                           x))
-                       )
+                         (callback x)))
                    (do
                      (incorrectCommunication (format "recv action: %s is not allowed to proceed from %s to %s" action from to))
                      (callback nil)))))))))

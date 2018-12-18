@@ -1,5 +1,5 @@
-(ns discourje.multiparty.Buyer1
-  (:require [discourje.multiparty.core :refer :all]))
+(ns research.multiparty.Buyer1
+  (:require [research.multiparty.core :refer :all]))
 
 
 (defn generateBook
@@ -16,9 +16,9 @@
 (defn orderBook
   "Order a book from buyer1's perspective"
   []
-  (discourje.multiparty.TwoBuyersProtocol/communicate "title" (generateBook) "buyer1" "seller")
-  (let [quote (discourje.multiparty.TwoBuyersProtocol/communicate "quote" "seller" "buyer1")]
-    (discourje.multiparty.TwoBuyersProtocol/communicate "quoteDiv" (quoteDiv quote) "buyer1" "buyer2")))
+  (research.multiparty.TwoBuyersProtocol/communicate "title" (generateBook) "buyer1" "seller")
+  (let [quote (research.multiparty.TwoBuyersProtocol/communicate "quote" "seller" "buyer1")]
+    (research.multiparty.TwoBuyersProtocol/communicate "quoteDiv" (quoteDiv quote) "buyer1" "buyer2")))
 
 
 ;(clojure.core.async/thread (orderBook))

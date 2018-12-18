@@ -1,6 +1,6 @@
-(ns discourje.multiparty.monitoring
-  (:require [discourje.multiparty.core :refer :all])
-  (:import (discourje.multiparty.core monitor choice)
+(ns research.multiparty.monitoring
+  (:require [research.multiparty.core :refer :all])
+  (:import (research.multiparty.core monitor choice)
            (clojure.lang Seqable)))
 
 (defn setActiveMonitor

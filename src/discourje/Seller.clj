@@ -1,5 +1,5 @@
-(ns discourje.multi.Seller
-  (:require [discourje.multi.core :refer :all])
+(ns discourje.Seller
+  (:require [discourje.core.core :refer :all])
   (:import (java.util Date Calendar)))
 
 (defn quoteBook
@@ -24,8 +24,9 @@
   [maxRange]
   (getDate (+ (rand-int maxRange) 1)))
 
-(defn endReached [quit]
+(defn- endReached [quit]
   (println (format "Protocol ended with: %s" quit)))
+
 (defn orderBook
   "Order book from seller's perspective"
   [this protocol]
