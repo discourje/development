@@ -20,6 +20,29 @@
   (reset! (:activeMonitor @protocol) (first branch))
   (reset! (:protocol @protocol) (subvec (vec (mapcat identity [branch @(:protocol @protocol)])) 1)))
 
+(defn- findNestedRecurByName
+  "Find a (nested) recursion map in the protocol by name, preserves nested structure in result!"
+  [protocol name]
+  (for [element protocol
+        :when (or (instance? recursion element) (instance? choice element))]
+    (cond
+      (instance? recursion element)
+      (if (= (:name element) name)
+        element
+        (findNestedRecurByName (:protocol element) name))
+      (instance? choice element)
+      (let [trueResult (findNestedRecurByName (:trueBranch element) name)
+            falseResult (findNestedRecurByName (:falseBranch element) name)]
+        (if (not (nil? trueResult))
+          trueResult
+          falseResult)))))
+
+(defn findRecurByName
+  "Find a (nested) recursion map in the protocol, returns the recursion map directly!"
+  [protocol name]
+  (let [x (findNestedRecurByName protocol name)]
+    (first (drop-while empty? (flatten x)))))
+
 (defn incorrectCommunication
   "communication incorrect, log a message! (or maybe throw exception)"
   [message]
@@ -66,9 +89,31 @@
      (cond
        (instance? monitor activeM)
        (let [nextMonitor (first @(:protocol @protocol))]
-         (when (> (count @(:protocol @protocol)) 0)
-           (reset! (:activeMonitor @protocol) nextMonitor)
-           (reset! (:protocol @protocol) (subvec @(:protocol @protocol) 1))))
+         (cond
+           (instance? recursion nextMonitor)
+           (let [firstRecMonitor (first (:protocol nextMonitor))
+                 recursionProt (:protocol nextMonitor)]
+             (reset! (:activeMonitor @protocol) firstRecMonitor)
+             (reset! (:protocol @protocol) (subvec recursionProt 1))
+             )
+           (instance? end! nextMonitor)
+           (when (> (count @(:protocol @protocol)) 1)
+             (let [secondNextMonitor (nth @(:protocol @protocol) 1)]
+               (reset! (:activeMonitor @protocol) secondNextMonitor)
+               (reset! (:protocol @protocol) (subvec @(:protocol @protocol) 2)))
+             )
+           (instance? recur! nextMonitor)
+           (let [recursive (findRecurByName @(:template @protocol) (:name recur!))]
+             (let [firstRecMonitor (first (:protocol recursive))
+                   recursionProt (:protocol recursive)]
+               (reset! (:activeMonitor @protocol) firstRecMonitor)
+               (reset! (:protocol @protocol) (subvec recursionProt 1))
+               ))
+           :else
+           (when (> (count @(:protocol @protocol)) 0)
+             (reset! (:activeMonitor @protocol) nextMonitor)
+             (reset! (:protocol @protocol) (subvec @(:protocol @protocol) 1))))
+         )
        (instance? choice activeM)
        (let [trueResult (monitorValid? (first (:trueBranch activeM)) action from to)
              falseResult (monitorValid? (first (:falseBranch activeM)) action from to)]
@@ -77,10 +122,10 @@
   ([protocol]
    (let [nextMonitor (first @(:protocol protocol))]
      (if (instance? recursion nextMonitor)
-         (let [firstRecMonitor (first (:protocol nextMonitor))
-             recProt (:protocol nextMonitor)]
+       (let [firstRecMonitor (first (:protocol nextMonitor))
+             recursionProt (:protocol nextMonitor)]
          (reset! (:activeMonitor protocol) firstRecMonitor)
-         (reset! (:protocol protocol) (subvec recProt 1))
+         (reset! (:protocol protocol) (subvec recursionProt 1))
          )
        (do
          (reset! (:activeMonitor protocol) nextMonitor)
