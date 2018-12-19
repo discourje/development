@@ -103,12 +103,12 @@
                (reset! (:protocol @protocol) (subvec @(:protocol @protocol) 2)))
              )
            (instance? recur! nextMonitor)
-           (let [recursive (findRecurByName @(:template @protocol) (:name recur!))]
-             (let [firstRecMonitor (first (:protocol recursive))
-                   recursionProt (:protocol recursive)]
+           (let [recursive (findRecurByName @(:template @protocol) (:name recur!))
+                 firstRecMonitor (first (:protocol recursive))
+                 recursionProt (:protocol recursive)]
                (reset! (:activeMonitor @protocol) firstRecMonitor)
                (reset! (:protocol @protocol) (subvec recursionProt 1))
-               ))
+               )
            :else
            (when (> (count @(:protocol @protocol)) 0)
              (reset! (:activeMonitor @protocol) nextMonitor)
