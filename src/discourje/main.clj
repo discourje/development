@@ -7,6 +7,6 @@
 ;first define the protocol
 (def protocol (atom (getProtocol)))
 ;(println protocol)
-(b1/orderBook "buyer1" protocol)
-(b2/orderBook "buyer2" protocol)
-(se/orderBook "seller" protocol)
+(clojure.core.async/thread (b1/orderBook "buyer1" protocol))
+(clojure.core.async/thread (b2/orderBook "buyer2" protocol))
+(clojure.core.async/thread (se/orderBook "seller" protocol))

@@ -16,7 +16,7 @@ MEETING AGENDA 01-10-18
 7:  Simple test channel with refs (threadsafe + exploiting STM)
 
 ----
-8:  Additional research ASYNC programing in clojure/best practices
+8:  Additional research ASYNC programming in clojure/best practices
 
 9:  Added Core.ASYNC dependency to project
 

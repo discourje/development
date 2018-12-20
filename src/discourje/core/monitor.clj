@@ -40,6 +40,7 @@
 (defn findRecurByName
   "Find a (nested) recursion map in the protocol, returns the recursion map directly!"
   [protocol name]
+  (println name)
   (let [x (findNestedRecurByName protocol name)]
     (first (drop-while empty? (flatten x)))))
 
@@ -92,9 +93,9 @@
          (cond
            (instance? recursion nextMonitor)
            (let [firstRecMonitor (first (:protocol nextMonitor))
-                 recursionProt (:protocol nextMonitor)]
+                 recursionProtocol (:protocol nextMonitor)]
              (reset! (:activeMonitor @protocol) firstRecMonitor)
-             (reset! (:protocol @protocol) (subvec recursionProt 1))
+             (reset! (:protocol @protocol) (subvec recursionProtocol 1))
              )
            (instance? end! nextMonitor)
            (when (> (count @(:protocol @protocol)) 1)
@@ -103,11 +104,11 @@
                (reset! (:protocol @protocol) (subvec @(:protocol @protocol) 2)))
              )
            (instance? recur! nextMonitor)
-           (let [recursive (findRecurByName @(:template @protocol) (:name recur!))
+           (let [recursive (findRecurByName (:template @protocol) (:name nextMonitor))
                  firstRecMonitor (first (:protocol recursive))
-                 recursionProt (:protocol recursive)]
+                 recursionProtocol (:protocol recursive)]
                (reset! (:activeMonitor @protocol) firstRecMonitor)
-               (reset! (:protocol @protocol) (subvec recursionProt 1))
+               (reset! (:protocol @protocol) (subvec recursionProtocol 1))
                )
            :else
            (when (> (count @(:protocol @protocol)) 0)
@@ -135,6 +136,7 @@
   "Checks if communication is valid by comparing input to the active monitor"
   [action from to protocol]
   (let [activeM @(:activeMonitor @protocol)]
+    (println activeM)
     (cond
       (instance? monitor activeM)
       (monitorValid? activeM action from to)
