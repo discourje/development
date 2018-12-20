@@ -40,6 +40,9 @@
                             (Thread/sleep 1000) ;quick fix for multiple sends...
                             (send! "address" (generateAddress) this "seller" protocol)
                             (recv! "date" "seller" this protocol (fn [x] (println "Received date!" x)))
+                            (recv! "repeat" "seller" this protocol
+                                   (fn [x]
+                                     (orderBook this protocol)))
                             )
                         (send! "quit" "quit" this "seller" protocol))
                       )))))

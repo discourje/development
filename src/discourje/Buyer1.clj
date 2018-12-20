@@ -30,7 +30,10 @@
   (send! "title" (generateBook) this "seller" protocol)
   (recv! "quote" "seller" this protocol
          (fn [x]
-           (send! "quoteDiv" (quoteDiv x) this "buyer2" protocol))))
+           (send! "quoteDiv" (quoteDiv x) this "buyer2" protocol)))
+  (recv! "repeat" "seller" this protocol
+         (fn [x]
+           (orderBook this protocol))))
 
 
 ;(clojure.core.async/thread (orderBook))
