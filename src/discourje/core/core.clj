@@ -1,7 +1,7 @@
 (ns discourje.core.core
   (:require [clojure.core.async :as async :refer :all]
             [clojure.core :refer :all])
-  (use [discourje.core.monitor :only [incorrectCommunication isCommunicationValid? activateNextMonitor hasMultipleReceivers? removeReceiver getTargetBranch]])
+  (use [discourje.core.monitor :only [incorrectCommunication closeProtocol! isCommunicationValid? activateNextMonitor hasMultipleReceivers? removeReceiver getTargetBranch]])
   (:import (discourje.core.monitor choice monitor)))
 
 ;Defines a communication channel with a sender, receiver (strings) and a channel Async.Chan.
@@ -92,7 +92,8 @@
                                     (fn [key atom old-state new-state] (callback x) (remove-watch (:activeMonitor @protocol) nil))))
                        (do
                          (activateNextMonitor action from to protocol)
-                         (callback x)))
+                         (callback x)
+                         (closeProtocol! protocol)))
                    (do
                      (incorrectCommunication (format "recv action: %s is not allowed to proceed from %s to %s" action from to))
                      (callback nil)))))))))

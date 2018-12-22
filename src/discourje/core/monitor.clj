@@ -1,4 +1,5 @@
 (ns discourje.core.monitor
+  (:require [clojure.core.async])
   (:import (clojure.lang Seqable Atom)))
 
 ;Define a monitor to check communication, this will be used to verify correct conversation.
@@ -83,6 +84,19 @@
            (or (contains-value? to (:to activeM)) (= to (:to activeM)))
            (= to (:to activeM))))))
 
+
+(defn canCloseProtocol? [protocol]
+  (= (count @(:protocol @protocol)) 1))
+
+
+(defn closeProtocol! [protocol]
+  (when (canCloseProtocol? protocol)
+  (let [channels (:channels @protocol)]
+    (doseq [chan channels]
+     ;(clojure.core.async/close! (:channel chan))
+      )))
+  )
+
 (defn activateNextMonitor
   "Set the active monitor based on the protocol"
   ([action from to protocol]
@@ -102,6 +116,7 @@
              (let [secondNextMonitor (nth @(:protocol @protocol) 1)]
                (reset! (:activeMonitor @protocol) secondNextMonitor)
                (reset! (:protocol @protocol) (subvec @(:protocol @protocol) 2)))
+             ;(closeProtocol! protocol)
              )
            (instance? recur! nextMonitor)
            (let [recursive (findRecurByName (:template @protocol) (:name nextMonitor))
@@ -112,8 +127,10 @@
                )
            :else
            (when (> (count @(:protocol @protocol)) 0)
-             (reset! (:activeMonitor @protocol) nextMonitor)
-             (reset! (:protocol @protocol) (subvec @(:protocol @protocol) 1))))
+             (do (reset! (:activeMonitor @protocol) nextMonitor)
+             (reset! (:protocol @protocol) (subvec @(:protocol @protocol) 1)))
+             ;(closeProtocol! protocol)
+             ))
          )
        (instance? choice activeM)
        (let [trueResult (monitorValid? (first (:trueBranch activeM)) action from to)
