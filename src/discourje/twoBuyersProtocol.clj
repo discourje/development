@@ -24,10 +24,10 @@
                             (->monitor "address" "buyer2" "seller")
                             (->monitor "date" "seller" "buyer2")
                             (->monitor "repeat" "seller" ["buyer2" "buyer1"])
-                            (->recur! :x)
+                            (generateRecur :x)
                             ]
                            [(->monitor "quit" "buyer2" "seller")
-                            (->end! :x)
+                            (generateRecurStop :x)
                             ])))))
 
 (defn getProtocol
