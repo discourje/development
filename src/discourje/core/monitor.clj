@@ -9,7 +9,7 @@
 ;monitor for a single send action
 (defrecord sendM [action from to])
 ;monitor for a single recv action
-(defrecord receiveM [action from to])
+(defrecord receiveM [action to from])
 ;We also need a data structure to create a conditional with branches.
 ;When the protocol encounters this it will check the conditional and continue on the correct branch.
 (defrecord choice [trueBranch falseBranch])
@@ -81,9 +81,18 @@
   (when (hasMultipleReceivers? protocol)
     (let [currentMonitor @(:activeMonitor @protocol)
           recv (:to currentMonitor)
-          newRecv (vec (remove #{to} recv))
-          newMonitor (->monitor (:action currentMonitor) (:from currentMonitor) newRecv)]
-      (reset! (:activeMonitor @protocol) newMonitor))))
+          newRecv (vec (remove #{to} recv))]
+      (cond
+        (instance? monitor currentMonitor)
+        (reset! (:activeMonitor @protocol) (->monitor (:action currentMonitor) (:from currentMonitor) newRecv))
+        (instance? sendM currentMonitor)
+        (do(println "-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0")
+          (println "yes is sendM and newRecv : "newRecv) (println "-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0")
+          (reset! (:activeMonitor @protocol) (->sendM (:action currentMonitor) (:from currentMonitor) newRecv))
+          )
+        (instance? receiveM currentMonitor)
+        (reset! (:activeMonitor @protocol) (->receiveM (:action currentMonitor) newRecv (:from currentMonitor)))
+        ))))
 
 (defn monitorValid?
   "is the current monitor valid, compared the current monitor's action, from and to to the given values"
@@ -91,18 +100,21 @@
   (and
     (and (if (instance? Seqable action)
            (or (contains-value? (:action activeM) action) (= action (:action activeM)))
-           (= action (:action activeM))))
+           (or (= action (:action activeM)) (contains-value? action (:action activeM) ))))
     (= from (:from activeM))
     (and (if (instance? Seqable (:to activeM))
            (or (contains-value? to (:to activeM)) (= to (:to activeM)))
            (= to (:to activeM))))))
 
-
-(defn canCloseProtocol? [protocol]
+(defn canCloseProtocol?
+  "can all channels of the protocol be closed?"
+  [protocol]
   (= (count @(:protocol @protocol)) 1))
 
 
-(defn closeProtocol! [protocol]
+(defn closeProtocol!
+  "Close all channels of the protocol"
+  [protocol]
   (when (canCloseProtocol? protocol)
     (let [channels (:channels @protocol)]
       (doseq [chan channels]
@@ -110,6 +122,7 @@
         )))
   )
 (defn- resetMonitor!
+  "Reset! the monitor ATOM"
   ([nextMonitor protocol subvecIndex]
    (reset! (:activeMonitor @protocol) nextMonitor)
    (reset! (:protocol @protocol) (subvec @(:protocol @protocol) subvecIndex)))
@@ -122,7 +135,7 @@
   ([action from to protocol]
    (let [activeM @(:activeMonitor @protocol)]
      (cond
-       (instance? monitor activeM)
+       (or (instance? monitor activeM) (instance? receiveM activeM) (instance? sendM activeM))
        (let [nextMonitor (first @(:protocol @protocol))]
          (cond
            (instance? recursion nextMonitor)
@@ -163,13 +176,21 @@
          (reset! (:activeMonitor protocol) nextMonitor)
          (reset! (:protocol protocol) (subvec @(:protocol protocol) 1)))))))
 
+
+(defn activateMonitorOnSend
+  "activate a new monitor when specific sendM is encountered"
+  [action from to protocol]
+  (let [activeM @(:activeMonitor @protocol)]
+    (when (instance? sendM activeM))
+    (activateNextMonitor action from to protocol)))
+
 (defn isCommunicationValid?
   "Checks if communication is valid by comparing input to the active monitor"
   [action from to protocol]
   (let [activeM @(:activeMonitor @protocol)]
     (println activeM)
     (cond
-      (instance? monitor activeM)
+      (or (instance? monitor activeM) (instance? sendM activeM) (instance? receiveM activeM))
       (monitorValid? activeM action from to)
       (instance? choice activeM)
       (let [trueResult (monitorValid? (first (:trueBranch activeM)) action from to)

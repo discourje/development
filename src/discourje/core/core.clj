@@ -1,8 +1,8 @@
 (ns discourje.core.core
   (:require [clojure.core.async :as async :refer :all]
             [clojure.core :refer :all])
-  (use [discourje.core.monitor :only [incorrectCommunication closeProtocol! isCommunicationValid? activateNextMonitor hasMultipleReceivers? removeReceiver getTargetBranch]])
-  (:import (discourje.core.monitor choice monitor)))
+  (use [discourje.core.monitor :only [incorrectCommunication closeProtocol! activateMonitorOnSend isCommunicationValid? activateNextMonitor hasMultipleReceivers? removeReceiver getTargetBranch]])
+  (:import (discourje.core.monitor choice sendM monitor)))
 
 ;Defines a communication channel with a sender, receiver (strings) and a channel Async.Chan.
 (defrecord communicationChannel [sender receiver channel])
@@ -63,10 +63,12 @@
         (cond
           (instance? monitor currentMonitor)
           (send! currentMonitor value protocol)
+          (instance? sendM currentMonitor)
+          (do (activateMonitorOnSend action from to protocol) (send! currentMonitor value protocol)
+              )
           (instance? choice currentMonitor)
-          (do (println "yes yes sending to choice target!")
               (let [target (getTargetBranch action from to protocol)]
-                (send! target value protocol)))))
+                (send! target value protocol))))
       (incorrectCommunication (format "Send action: %s is not allowed to proceed from %s to %s" action from to)))))
   ([currentMonitor value protocol]
    (if (vector? (:to currentMonitor))
@@ -95,5 +97,8 @@
                          (callback x)
                          (closeProtocol! protocol)))
                    (do
+                     (println "_______")
+                     (println "receiving but failed !! " (:activeMonitor @protocol))
+                     (println "_______")
                      (incorrectCommunication (format "recv action: %s is not allowed to proceed from %s to %s" action from to))
                      (callback nil)))))))))

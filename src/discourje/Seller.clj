@@ -37,15 +37,16 @@
          (fn [response]
            (cond
              (= response "ok")
-             (do (recv! "address" "buyer2" this protocol
-                        (fn [address]
-                          (println "The received address is: " address)
-                          (send! "date" (getRandomDate 5) this "buyer2" protocol)
-                          (Thread/sleep 1000) ;quick fix for multiple sends...
-                          (send! "repeat" "repeat" this ["buyer2" "buyer1"] protocol)
-                          (orderBook this protocol)
-                          ))
-                 response)
+             (do
+               (recv! "address" "buyer2" this protocol
+                      (fn [address]
+                        (println "The received address is: " address)
+                        (send! "date" (getRandomDate 5) this "buyer2" protocol)
+                        ;(Thread/sleep 1000) ;quick fix for multiple sends...
+                        (send! "repeat" "repeat" this ["buyer2" "buyer1"] protocol)
+                        (orderBook this protocol)
+                        ))
+               response)
              (= response "quit")
              (do (endReached response)
                  response)
