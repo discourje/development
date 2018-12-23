@@ -6,6 +6,10 @@
 ;This is just a data structure to group related information.
 ;This monitor `embeds' a send! and recv! pair, meaning the monitor will only complete when the receiving end was successful
 (defrecord monitor [action from to])
+;monitor for a single send action
+(defrecord sendM [action from to])
+;monitor for a single recv action
+(defrecord receiveM [action from to])
 ;We also need a data structure to create a conditional with branches.
 ;When the protocol encounters this it will check the conditional and continue on the correct branch.
 (defrecord choice [trueBranch falseBranch])
@@ -105,6 +109,13 @@
         ;(clojure.core.async/close! (:channel chan))
         )))
   )
+(defn- resetMonitor!
+  ([nextMonitor protocol subvecIndex]
+   (reset! (:activeMonitor @protocol) nextMonitor)
+   (reset! (:protocol @protocol) (subvec @(:protocol @protocol) subvecIndex)))
+  ([nextMonitor protocol recursionProtocol subvecIndex]
+   (reset! (:activeMonitor @protocol) nextMonitor)
+   (reset! (:protocol @protocol) (subvec recursionProtocol subvecIndex))))
 
 (defn activateNextMonitor
   "Set the active monitor based on the protocol"
@@ -117,27 +128,21 @@
            (instance? recursion nextMonitor)
            (let [firstRecMonitor (first (:protocol nextMonitor))
                  recursionProtocol (:protocol nextMonitor)]
-             (reset! (:activeMonitor @protocol) firstRecMonitor)
-             (reset! (:protocol @protocol) (subvec recursionProtocol 1))
-             )
+             (resetMonitor! firstRecMonitor protocol recursionProtocol 1))
            (instance? recur! nextMonitor)
            (if (= :recur (:status nextMonitor))
              (let [recursive (findRecurByName (:template @protocol) (:name nextMonitor))
                    firstRecMonitor (first (:protocol recursive))
                    recursionProtocol (:protocol recursive)]
-               (reset! (:activeMonitor @protocol) firstRecMonitor)
-               (reset! (:protocol @protocol) (subvec recursionProtocol 1))
-               )
+               (resetMonitor! firstRecMonitor protocol recursionProtocol 1))
              (when (> (count @(:protocol @protocol)) 1)
                (let [secondNextMonitor (nth @(:protocol @protocol) 1)]
-                 (reset! (:activeMonitor @protocol) secondNextMonitor)
-                 (reset! (:protocol @protocol) (subvec @(:protocol @protocol) 2)))
+                 (resetMonitor! secondNextMonitor protocol 2))
                ;(closeProtocol! protocol)
                ))
            :else
            (when (> (count @(:protocol @protocol)) 0)
-             (do (reset! (:activeMonitor @protocol) nextMonitor)
-                 (reset! (:protocol @protocol) (subvec @(:protocol @protocol) 1)))
+             (resetMonitor! nextMonitor protocol 1)
              ;(closeProtocol! protocol)
              ))
          )
