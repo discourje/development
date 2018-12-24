@@ -86,10 +86,7 @@
         (instance? monitor currentMonitor)
         (reset! (:activeMonitor @protocol) (->monitor (:action currentMonitor) (:from currentMonitor) newRecv))
         (instance? sendM currentMonitor)
-        (do(println "-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0")
-          (println "yes is sendM and newRecv : "newRecv) (println "-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0")
-          (reset! (:activeMonitor @protocol) (->sendM (:action currentMonitor) (:from currentMonitor) newRecv))
-          )
+        (reset! (:activeMonitor @protocol) (->sendM (:action currentMonitor) (:from currentMonitor) newRecv))
         (instance? receiveM currentMonitor)
         (reset! (:activeMonitor @protocol) (->receiveM (:action currentMonitor) newRecv (:from currentMonitor)))
         ))))
@@ -97,14 +94,23 @@
 (defn monitorValid?
   "is the current monitor valid, compared the current monitor's action, from and to to the given values"
   [activeM action from to]
+  (println "+++++++++")
+  (println (format "action = %s || activeM action = %s result : %s" action (:action activeM)(and (if (instance? Seqable action)
+                                                                                                   (or (contains-value? (:action activeM) action) (= action (:action activeM)))
+                                                                                                   (or (= action (:action activeM)) (contains-value? action (:action activeM)))))))
+  (println (format "from = %s || activeM from = %s result: %s" from (:from activeM)  (= from (:from activeM))))
+  (println (format "to = %s || activeM TO = %s result: %s" to (:to activeM)(and (if (instance? Seqable (:to activeM))
+                                                                                  (or (contains-value? to (:to activeM)) (= to (:to activeM)))
+                                                                                  (or (= to (:to activeM)) (contains-value? (:to activeM) to))))))
+  (println "+++++++++")
   (and
     (and (if (instance? Seqable action)
            (or (contains-value? (:action activeM) action) (= action (:action activeM)))
-           (or (= action (:action activeM)) (contains-value? action (:action activeM) ))))
+           (or (= action (:action activeM)) (contains-value? action (:action activeM)))))
     (= from (:from activeM))
     (and (if (instance? Seqable (:to activeM))
            (or (contains-value? to (:to activeM)) (= to (:to activeM)))
-           (= to (:to activeM))))))
+           (or (= to (:to activeM)) (contains-value? (:to activeM) to))))))
 
 (defn canCloseProtocol?
   "can all channels of the protocol be closed?"
@@ -188,7 +194,6 @@
   "Checks if communication is valid by comparing input to the active monitor"
   [action from to protocol]
   (let [activeM @(:activeMonitor @protocol)]
-    (println activeM)
     (cond
       (or (instance? monitor activeM) (instance? sendM activeM) (instance? receiveM activeM))
       (monitorValid? activeM action from to)

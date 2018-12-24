@@ -23,7 +23,7 @@
 (defn generateChannels
   "Generates communication channels between all participants"
   [participants]
-   (map #(apply generateChannel %) (uniqueCartesianProduct participants participants)))
+  (map #(apply generateChannel %) (uniqueCartesianProduct participants participants)))
 
 (defn putMessage
   "Puts message on the channel, non-blocking"
@@ -56,20 +56,30 @@
 (defn send!
   "send something through the protocol"
   ([action value from to protocol]
-  (if (nil? (:activeMonitor @protocol))
-    (incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply send! with an instantiated protocol!")
-    (if (isCommunicationValid? action from to protocol)
-      (let [currentMonitor @(:activeMonitor @protocol)]
-        (cond
-          (instance? monitor currentMonitor)
-          (send! currentMonitor value protocol)
-          (instance? sendM currentMonitor)
-          (do (activateMonitorOnSend action from to protocol) (send! currentMonitor value protocol)
-              )
-          (instance? choice currentMonitor)
-              (let [target (getTargetBranch action from to protocol)]
-                (send! target value protocol))))
-      (incorrectCommunication (format "Send action: %s is not allowed to proceed from %s to %s" action from to)))))
+   (if (nil? (:activeMonitor @protocol))
+     (incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply send! with an instantiated protocol!")
+     (if (isCommunicationValid? action from to protocol)
+       (let [currentMonitor @(:activeMonitor @protocol)]
+         (cond
+           (instance? monitor currentMonitor)
+           (send! currentMonitor value protocol)
+           (instance? sendM currentMonitor)
+           (if (hasMultipleReceivers? protocol)
+             (do (removeReceiver protocol to)
+                 (send! currentMonitor value protocol))
+             (do (activateMonitorOnSend action from to protocol)
+                 (send! currentMonitor value protocol)
+                 ))
+           (instance? choice currentMonitor)
+           (let [target (getTargetBranch action from to protocol)]
+             (instance? sendM target)
+             (if (hasMultipleReceivers? protocol)
+               (do (removeReceiver protocol to)
+                   (send! currentMonitor value protocol))
+               (do (activateMonitorOnSend action from to protocol)
+                   (send! currentMonitor value protocol)
+                   )))))
+       (incorrectCommunication (format "Send action: %s is not allowed to proceed from %s to %s" action from to)))))
   ([currentMonitor value protocol]
    (if (vector? (:to currentMonitor))
      (doseq [receiver (:to currentMonitor)]
@@ -87,15 +97,15 @@
                (if (nil? (:activeMonitor @protocol))
                  (incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply send! with an instantiated protocol!")
                  (if (isCommunicationValid? action from to protocol)
-                     (if (hasMultipleReceivers? protocol)
-                       (do
-                         (removeReceiver protocol to)
-                         (add-watch (:activeMonitor @protocol) nil
-                                    (fn [key atom old-state new-state] (callback x) (remove-watch (:activeMonitor @protocol) nil))))
-                       (do
-                         (activateNextMonitor action from to protocol)
-                         (callback x)
-                         (closeProtocol! protocol)))
+                   (if (hasMultipleReceivers? protocol)
+                     (do
+                       (removeReceiver protocol to)
+                       (add-watch (:activeMonitor @protocol) nil
+                                  (fn [key atom old-state new-state] (callback x) (remove-watch (:activeMonitor @protocol) nil))))
+                     (do
+                       (activateNextMonitor action from to protocol)
+                       (callback x)
+                       (closeProtocol! protocol)))
                    (do
                      (println "_______")
                      (println "receiving but failed !! " (:activeMonitor @protocol))

@@ -24,8 +24,8 @@
                  (->monitor "quoteDiv" "buyer1" "buyer2")
                  (->choice [
                             (->sendM "ok" "buyer2" "seller")
-                            (->sendM "address" "buyer2" "seller")
-                            (->receiveM "ok" "seller" "buyer2")
+                            (->sendM "address" "buyer2" "seller") ; is active
+                            (->receiveM "ok" "seller" "buyer2") ; but this completes, if we switch them around, the send in buyer2 does not succeed since async!
                             (->receiveM "address" "seller" "buyer2")
                             ;(->monitor "ok" "buyer2" "seller")
                             ;(->monitor "address" "buyer2" "seller")
