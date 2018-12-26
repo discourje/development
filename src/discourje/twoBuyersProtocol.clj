@@ -20,8 +20,12 @@
                  ;(->monitor "title" "buyer1" "seller")
                  (->sendM "title" "buyer1" "seller")
                  (->receiveM "title" "seller" "buyer1")
-                 (->monitor "quote" "seller" ["buyer1" "buyer2"])
-                 (->monitor "quoteDiv" "buyer1" "buyer2")
+                 (->sendM "quote" "seller" ["buyer1" "buyer2"])
+                 (->receiveM "quote" ["buyer1" "buyer2"] "seller")
+                 ;(->monitor "quote" "seller" ["buyer1" "buyer2"])
+                 (->sendM"quoteDiv" "buyer1" "buyer2")
+                 (->receiveM "quoteDiv" "buyer2" "buyer1")
+                 ;(->monitor "quoteDiv" "buyer1" "buyer2")
                  (->choice [
                             (->sendM "ok" "buyer2" "seller")
                             (->sendM "address" "buyer2" "seller") ; is active
@@ -32,11 +36,13 @@
                             (->sendM "date" "seller" "buyer2")
                             (->sendM "repeat" "seller" ["buyer2" "buyer1"])
                             (->receiveM "date" "buyer2" "seller")
-                            ;(->monitor "repeat" "seller" ["buyer2" "buyer1"])
                             (->receiveM "repeat" ["buyer2" "buyer1"] "seller")
+                            ;(->monitor "repeat" "seller" ["buyer2" "buyer1"])
                             (generateRecur :x)
                             ]
-                           [(->monitor "quit" "buyer2" "seller")
+                           [
+                            (->sendM "quit" "buyer2" "seller")
+                            ;(->monitor "quit" "buyer2" "seller")
                             (generateRecurStop :x)
                             ])))))
 

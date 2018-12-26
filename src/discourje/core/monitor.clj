@@ -94,15 +94,6 @@
 (defn monitorValid?
   "is the current monitor valid, compared the current monitor's action, from and to to the given values"
   [activeM action from to]
-  (println "+++++++++")
-  (println (format "action = %s || activeM action = %s result : %s" action (:action activeM)(and (if (instance? Seqable action)
-                                                                                                   (or (contains-value? (:action activeM) action) (= action (:action activeM)))
-                                                                                                   (or (= action (:action activeM)) (contains-value? action (:action activeM)))))))
-  (println (format "from = %s || activeM from = %s result: %s" from (:from activeM)  (= from (:from activeM))))
-  (println (format "to = %s || activeM TO = %s result: %s" to (:to activeM)(and (if (instance? Seqable (:to activeM))
-                                                                                  (or (contains-value? to (:to activeM)) (= to (:to activeM)))
-                                                                                  (or (= to (:to activeM)) (contains-value? (:to activeM) to))))))
-  (println "+++++++++")
   (and
     (and (if (instance? Seqable action)
            (or (contains-value? (:action activeM) action) (= action (:action activeM)))
@@ -127,14 +118,39 @@
         ;(clojure.core.async/close! (:channel chan))
         )))
   )
+
+(defn- getChannel
+  "finds a channel based on sender and receiver"
+  [sender receiver channels]
+  (first
+    (filter (fn [ch]
+              (and
+                (= (:sender ch) sender)
+                (= (:receiver ch) receiver)))
+            channels)))
+
+(defn invokeReceiveMCallback
+  "When the nextmonitor is of ReceiveM type we will invoke the first callback in the queue if there is one."
+  [nextMonitor protocol]
+  (when (instance? receiveM nextMonitor)
+    (do (println (:to nextMonitor))
+    (when-let [channel (getChannel (:from nextMonitor) (:to nextMonitor) (:channels @protocol))]
+      (when-let [cb (peek @(:receivingQueue channel))]
+        (reset! (:receivingQueue channel) (pop @(:receivingQueue channel)))
+        (cb))))))
+
 (defn- resetMonitor!
   "Reset! the monitor ATOM"
   ([nextMonitor protocol subvecIndex]
    (reset! (:activeMonitor @protocol) nextMonitor)
-   (reset! (:protocol @protocol) (subvec @(:protocol @protocol) subvecIndex)))
+   (reset! (:protocol @protocol) (subvec @(:protocol @protocol) subvecIndex))
+   (invokeReceiveMCallback nextMonitor protocol)
+    )
   ([nextMonitor protocol recursionProtocol subvecIndex]
    (reset! (:activeMonitor @protocol) nextMonitor)
-   (reset! (:protocol @protocol) (subvec recursionProtocol subvecIndex))))
+   (reset! (:protocol @protocol) (subvec recursionProtocol subvecIndex))
+   (invokeReceiveMCallback nextMonitor protocol)
+    ))
 
 (defn activateNextMonitor
   "Set the active monitor based on the protocol"
