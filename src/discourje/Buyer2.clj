@@ -31,18 +31,22 @@
 (defn orderBook
   "Order a book from buyer2's perspective"
   [this protocol]
-  (recvDelayed! "quote" "seller" this protocol (fn [receivedQuote]
-                                                 (println "buyer2 received!")(recvDelayed! "quoteDiv" "buyer1" this protocol (fn [receivedQuoteDiv]
-                      (if (contribute? receivedQuote receivedQuoteDiv)
-                        (do (send! "ok" "ok" this "seller" protocol)
-                            ;(Thread/sleep 2000) ;quick fix for multiple sends...
-                            (send! "address" (generateAddress) this "seller" protocol)
-                            (recvDelayed! "date" "seller" this protocol (fn [x] (println "Received date!" x)))
-                            ;(recvDelayed! "repeat" "seller" this protocol (fn [x]
-                            ;         (orderBook this protocol)))
-                            )
-                        (send! "quit" "quit" this "seller" protocol))
-                      )))))
+  (recvDelayed! "quote" "seller" this protocol
+                (fn [receivedQuote]
+                  (println "buyer2 received!")
+                  (recvDelayed! "quoteDiv" "buyer1" this protocol
+                                (fn [receivedQuoteDiv]
+                                  (if (contribute? receivedQuote receivedQuoteDiv)
+                                    (do (send! "ok" "ok" this "seller" protocol)
+                                        (send! "address" (generateAddress) this "seller" protocol)
+                                        (recvDelayed! "date" "seller" this protocol (fn [x] (println "Received date!" x)))
+                                        (recvDelayed! "repeat" "seller" this protocol
+                                                      (fn [x]
+                                                        (println "repeat received on buyer2 from seller!")
+                                                        (orderBook this protocol)))
+                                        )
+                                    (send! "quit" "quit" this "seller" protocol))
+                                  )))))
 
 ;wait for quote
 ;wait for quote div

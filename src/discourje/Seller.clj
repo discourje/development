@@ -30,20 +30,17 @@
 (defn orderBook
   "Order book from seller's perspective"
   [this protocol]
-  (recvDelayed! "title" "buyer1" this protocol
-         (fn [title]
+  (recvDelayed! "title" "buyer1" this protocol (fn [title]
            (send! "quote" (quoteBook title) this ["buyer1" "buyer2"] protocol)))
-  (recvDelayed! ["ok" "quit"] "buyer2" this protocol
-         (fn [response]
+  (recvDelayed! ["ok" "quit"] "buyer2" this protocol (fn [response]
            (cond
              (= response "ok")
-               (recvDelayed! "address" "buyer2" this protocol
-                      (fn [address]
+               (recvDelayed! "address" "buyer2" this protocol (fn [address]
                         (println "The received address is: " address)
                         (send! "date" (getRandomDate 5) this "buyer2" protocol)
                         ;(Thread/sleep 2000) ;quick fix for multiple sends...
-                        ;(send! "repeat" "repeat" this ["buyer2" "buyer1"] protocol)
-                        ;(orderBook this protocol)
+                        (send! "repeat" "repeat" this ["buyer2" "buyer1"] protocol)
+                        (orderBook this protocol)
                         ))
              (= response "quit")
              (endReached response)

@@ -93,15 +93,18 @@
 
 (defn monitorValid?
   "is the current monitor valid, compared the current monitor's action, from and to to the given values"
-  [activeM action from to]
+  ([activeM action from to]
   (and
     (and (if (instance? Seqable action)
            (or (contains-value? (:action activeM) action) (= action (:action activeM)))
            (or (= action (:action activeM)) (contains-value? action (:action activeM)))))
-    (= from (:from activeM))
-    (and (if (instance? Seqable (:to activeM))
-           (or (contains-value? to (:to activeM)) (= to (:to activeM)))
-           (or (= to (:to activeM)) (contains-value? (:to activeM) to))))))
+    (monitorValid? activeM from to)))
+  ([activeM from to]
+   (and
+     (= from (:from activeM))
+     (and (if (instance? Seqable (:to activeM))
+            (or (contains-value? to (:to activeM)) (= to (:to activeM)))
+            (or (= to (:to activeM)) (contains-value? (:to activeM) to)))))))
 
 (defn canCloseProtocol?
   "can all channels of the protocol be closed?"
@@ -115,7 +118,7 @@
   (when (canCloseProtocol? protocol)
     (let [channels (:channels @protocol)]
       (doseq [chan channels]
-        (clojure.core.async/close! (:channel chan))
+       ; (clojure.core.async/close! (:channel chan))
         )))
   )
 
@@ -216,6 +219,13 @@
   (let [activeM @(:activeMonitor @protocol)]
     (when (instance? sendM activeM)
         (activateNextMonitor action from to protocol))))
+
+(defn activateMonitorOnReceive
+  "activate a new monitor when specific receiveM is encountered"
+  [protocol]
+  (let [activeM @(:activeMonitor @protocol)]
+    (when (instance? receiveM activeM)
+      (invokeReceiveMCallback activeM protocol))))
 
 (defn isCommunicationValid?
   "Checks if communication is valid by comparing input to the active monitor"
