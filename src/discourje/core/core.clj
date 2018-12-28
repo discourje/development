@@ -1,7 +1,7 @@
 (ns discourje.core.core
   (:require [clojure.core.async :as async :refer :all]
             [clojure.core :refer :all])
-  (use [discourje.core.monitor :only [incorrectCommunication closeProtocol! activateMonitorOnSend isCommunicationValid? activateNextMonitor hasMultipleReceivers? removeReceiver getTargetBranch]])
+  (use [discourje.core.monitor :only [incorrectCommunication isReceiveMActive? closeProtocol! activateMonitorOnSend isCommunicationValid? activateNextMonitor hasMultipleReceivers? removeReceiver getTargetBranch]])
   (:import (discourje.core.monitor choice sendM receiveM monitor)
            (clojure.lang PersistentQueue)))
 
@@ -65,23 +65,36 @@
            (instance? sendM currentMonitor)
            (if (hasMultipleReceivers? protocol)
              (do
-               (println "removing multiple receiver")
-               (removeReceiver protocol to)
-                 (send! currentMonitor value protocol))
+               (doseq [receiver (:to currentMonitor)]
+                   (println "removing multiple receiver: " receiver)
+                   (send! currentMonitor value protocol)
+                   )
+                   (activateMonitorOnSend action from to protocol)
+               )
              (do
                  (send! currentMonitor value protocol)
                  (println "Is sendm yet, single recv")
                  (activateMonitorOnSend action from to protocol)
-                 ))
+                 )
+             )
            (instance? choice currentMonitor)
            (let [target (getTargetBranch action from to protocol)]
              (instance? sendM target)
              (if (hasMultipleReceivers? protocol)
-               (do (removeReceiver protocol to)
-                   (send! currentMonitor value protocol))
-               (do (send! currentMonitor value protocol)
-                   (activateMonitorOnSend action from to protocol)
-                   )))))
+               (do
+                 (doseq [receiver (:to target)]
+                   (println "removing multiple receiver: " receiver)
+                   (send! target value protocol)
+                   )
+                 (activateMonitorOnSend action from to protocol)
+                 )
+               (do
+                 (send! target value protocol)
+                 (println "Is sendm yet, single recv")
+                 (activateMonitorOnSend action from to protocol)
+                 )
+               )
+             )))
        (incorrectCommunication (format "Send action: %s is not allowed to proceed from %s to %s" action from to)))))
   ([currentMonitor value protocol]
    (if (vector? (:to currentMonitor))
@@ -116,27 +129,26 @@
 (defn recvDelayed!
   "receive something through the protocol"
   [action from to protocol callback]
-  (let [channel (getChannel from to (:channels @protocol))]
+  (let [channel (getChannel from to (:channels @protocol))
+        f (fn [] (take! (:channel channel) ;TODO after multiple runs throws a stackoverflow exception: loop?
+                        (fn [x]
+                          (if (nil? (:activeMonitor @protocol))
+                            (incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply send! with an instantiated protocol!")
+                            (if (isCommunicationValid? action from to protocol)
+                              (if (hasMultipleReceivers? protocol)
+                                (do
+                                  (removeReceiver protocol to)
+                                  (add-watch (:activeMonitor @protocol) nil
+                                             (fn [key atom old-state new-state] (callback x) (remove-watch (:activeMonitor @protocol) nil))))
+                                (do
+                                  (activateNextMonitor action from to protocol)
+                                  (callback x)
+                                  (closeProtocol! protocol)))
+                              (do
+                                (incorrectCommunication (format "recv action: %s is not allowed to proceed from %s to %s" action from to))
+                                (callback nil)))))))]
     (if (nil? channel)
       (incorrectCommunication "Cannot find channel from %s to %s in the defined channels of the protocol! Please make sure you supply supported sender and receiver pair")
-      (reset! (:receivingQueue channel)
-              (conj
-                @(:receivingQueue channel)
-                (fn [] (take! (:channel channel)
-                       (fn [x]
-                         (if (nil? (:activeMonitor @protocol))
-                           (incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply send! with an instantiated protocol!")
-                           (if (isCommunicationValid? action from to protocol)
-                             (if (hasMultipleReceivers? protocol)
-                               (do
-                                 (removeReceiver protocol to)
-                                 (add-watch (:activeMonitor @protocol) nil
-                                            (fn [key atom old-state new-state] (callback x) (remove-watch (:activeMonitor @protocol) nil))))
-                               (do
-                                 (activateNextMonitor action from to protocol)
-                                 (callback x)
-                                 (closeProtocol! protocol)))
-                             (do
-                               (incorrectCommunication (format "recv action: %s is not allowed to proceed from %s to %s" action from to))
-                               (callback nil)))))))
-                )))))
+      (if (isReceiveMActive? action from to protocol)
+        (f)
+        (reset! (:receivingQueue channel) (conj @(:receivingQueue channel) f))))))

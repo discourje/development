@@ -31,9 +31,10 @@
   (recvDelayed! "quote" "seller" this protocol
          (fn [x]
            (send! "quoteDiv" (quoteDiv x) this "buyer2" protocol)))
-  (recvDelayed! "repeat" "seller" this protocol
-         (fn [x]
-           (orderBook this protocol))))
+  ;(recvDelayed! "repeat" "seller" this protocol
+  ;       (fn [x]
+  ;         (orderBook this protocol)))
+  )
 
 
 

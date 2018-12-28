@@ -35,11 +35,12 @@
                                                  (println "buyer2 received!")(recvDelayed! "quoteDiv" "buyer1" this protocol (fn [receivedQuoteDiv]
                       (if (contribute? receivedQuote receivedQuoteDiv)
                         (do (send! "ok" "ok" this "seller" protocol)
-                            (Thread/sleep 2000) ;quick fix for multiple sends...
+                            ;(Thread/sleep 2000) ;quick fix for multiple sends...
                             (send! "address" (generateAddress) this "seller" protocol)
                             (recvDelayed! "date" "seller" this protocol (fn [x] (println "Received date!" x)))
-                            (recvDelayed! "repeat" "seller" this protocol (fn [x]
-                                     (orderBook this protocol))))
+                            ;(recvDelayed! "repeat" "seller" this protocol (fn [x]
+                            ;         (orderBook this protocol)))
+                            )
                         (send! "quit" "quit" this "seller" protocol))
                       )))))
 

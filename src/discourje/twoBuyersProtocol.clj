@@ -23,7 +23,7 @@
                  (->sendM "quote" "seller" ["buyer1" "buyer2"])
                  (->receiveM "quote" ["buyer1" "buyer2"] "seller")
                  ;(->monitor "quote" "seller" ["buyer1" "buyer2"])
-                 (->sendM"quoteDiv" "buyer1" "buyer2")
+                 (->sendM "quoteDiv" "buyer1" "buyer2")
                  (->receiveM "quoteDiv" "buyer2" "buyer1")
                  ;(->monitor "quoteDiv" "buyer1" "buyer2")
                  (->choice [
@@ -42,9 +42,11 @@
                             ]
                            [
                             (->sendM "quit" "buyer2" "seller")
+                            (->receiveM "quit" "seller" "buyer2")
                             ;(->monitor "quit" "buyer2" "seller")
                             (generateRecurStop :x)
-                            ])))))
+                            ])))
+))
 
 (defn getProtocol
   "generate the protocol, channels and set the first monitor active"

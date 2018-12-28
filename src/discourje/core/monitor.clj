@@ -115,7 +115,7 @@
   (when (canCloseProtocol? protocol)
     (let [channels (:channels @protocol)]
       (doseq [chan channels]
-        ;(clojure.core.async/close! (:channel chan))
+        (clojure.core.async/close! (:channel chan))
         )))
   )
 
@@ -130,18 +130,29 @@
             channels)))
 
 (defn invokeReceiveMCallback
-  "When the nextmonitor is of ReceiveM type we will invoke the first callback in the queue if there is one."
-  [nextMonitor protocol]
+  "When the nextMonitor is of ReceiveM type we will invoke the first callback in the queue if there is one."
+  ([nextMonitor protocol]
   (when (instance? receiveM nextMonitor)
-    (do (println (:to nextMonitor))
-    (when-let [channel (getChannel (:from nextMonitor) (:to nextMonitor) (:channels @protocol))]
-      (when-let [cb (peek @(:receivingQueue channel))]
-        (reset! (:receivingQueue channel) (pop @(:receivingQueue channel)))
-        (cb))))))
+    (do (println (:to nextMonitor) (:action nextMonitor))
+        (if (instance? Seqable (:to nextMonitor))
+          (doseq [to (:to nextMonitor)]
+            (println "invoking callback on: " to)
+            (invokeReceiveMCallback nextMonitor to protocol))
+          (invokeReceiveMCallback nextMonitor (:to nextMonitor) protocol)))))
+  ([nextMonitor to protocol]
+   (when-let [channel (getChannel (:from nextMonitor) to (:channels @protocol))]
+     (when-let [cb (peek @(:receivingQueue channel))]
+       (println "callback found at: " to)
+       (reset! (:receivingQueue channel) (pop @(:receivingQueue channel)))
+       (cb)))))
+
+(defn isReceiveMActive? [action from to protocol]
+  (and (instance? receiveM @(:activeMonitor @protocol)) (monitorValid? @(:activeMonitor @protocol) action from to)))
 
 (defn- resetMonitor!
   "Reset! the monitor ATOM"
   ([nextMonitor protocol subvecIndex]
+   (println "resetting monitor to: " nextMonitor)
    (reset! (:activeMonitor @protocol) nextMonitor)
    (reset! (:protocol @protocol) (subvec @(:protocol @protocol) subvecIndex))
    (invokeReceiveMCallback nextMonitor protocol)
@@ -203,8 +214,8 @@
   "activate a new monitor when specific sendM is encountered"
   [action from to protocol]
   (let [activeM @(:activeMonitor @protocol)]
-    (when (instance? sendM activeM))
-    (activateNextMonitor action from to protocol)))
+    (when (instance? sendM activeM)
+        (activateNextMonitor action from to protocol))))
 
 (defn isCommunicationValid?
   "Checks if communication is valid by comparing input to the active monitor"
