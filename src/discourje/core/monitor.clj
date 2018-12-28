@@ -2,10 +2,6 @@
   (:require [clojure.core.async])
   (:import (clojure.lang Seqable Atom)))
 
-;Define a monitor to check communication, this will be used to verify correct conversation.
-;This is just a data structure to group related information.
-;This monitor `embeds' a send! and recv! pair, meaning the monitor will only complete when the receiving end was successful
-(defrecord monitor [action from to])
 ;monitor for a single send action
 (defrecord sendM [action from to])
 ;monitor for a single recv action
@@ -83,8 +79,6 @@
           recv (:to currentMonitor)
           newRecv (vec (remove #{to} recv))]
       (cond
-        (instance? monitor currentMonitor)
-        (reset! (:activeMonitor @protocol) (->monitor (:action currentMonitor) (:from currentMonitor) newRecv))
         (instance? sendM currentMonitor)
         (reset! (:activeMonitor @protocol) (->sendM (:action currentMonitor) (:from currentMonitor) newRecv))
         (instance? receiveM currentMonitor)
@@ -136,16 +130,13 @@
   "When the nextMonitor is of ReceiveM type we will invoke the first callback in the queue if there is one."
   ([nextMonitor protocol]
   (when (instance? receiveM nextMonitor)
-    (do (println (:to nextMonitor) (:action nextMonitor))
-        (if (instance? Seqable (:to nextMonitor))
+    (do (if (instance? Seqable (:to nextMonitor))
           (doseq [to (:to nextMonitor)]
-            (println "invoking callback on: " to)
             (invokeReceiveMCallback nextMonitor to protocol))
           (invokeReceiveMCallback nextMonitor (:to nextMonitor) protocol)))))
   ([nextMonitor to protocol]
    (when-let [channel (getChannel (:from nextMonitor) to (:channels @protocol))]
      (when-let [cb (peek @(:receivingQueue channel))]
-       (println "callback found at: " to)
        (reset! (:receivingQueue channel) (pop @(:receivingQueue channel)))
        (cb)))))
 
@@ -155,7 +146,6 @@
 (defn- resetMonitor!
   "Reset! the monitor ATOM"
   ([nextMonitor protocol subvecIndex]
-   (println "resetting monitor to: " nextMonitor)
    (reset! (:activeMonitor @protocol) nextMonitor)
    (reset! (:protocol @protocol) (subvec @(:protocol @protocol) subvecIndex))
    (invokeReceiveMCallback nextMonitor protocol)
@@ -171,7 +161,7 @@
   ([action from to protocol]
    (let [activeM @(:activeMonitor @protocol)]
      (cond
-       (or (instance? monitor activeM) (instance? receiveM activeM) (instance? sendM activeM))
+       (or (instance? receiveM activeM) (instance? sendM activeM))
        (let [nextMonitor (first @(:protocol @protocol))]
          (cond
            (instance? recursion nextMonitor)
@@ -232,7 +222,7 @@
   [action from to protocol]
   (let [activeM @(:activeMonitor @protocol)]
     (cond
-      (or (instance? monitor activeM) (instance? sendM activeM) (instance? receiveM activeM))
+      (or (instance? sendM activeM) (instance? receiveM activeM))
       (monitorValid? activeM action from to)
       (instance? choice activeM)
       (let [trueResult (monitorValid? (first (:trueBranch activeM)) action from to)

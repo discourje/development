@@ -2,7 +2,7 @@
   (:require [clojure.core.async :as async :refer :all]
             [clojure.core :refer :all])
   (use [discourje.core.monitor :only [incorrectCommunication isReceiveMActive? closeProtocol! activateMonitorOnSend activateMonitorOnReceive isCommunicationValid? activateNextMonitor hasMultipleReceivers? removeReceiver getTargetBranch]])
-  (:import (discourje.core.monitor choice sendM receiveM monitor)
+  (:import (discourje.core.monitor choice sendM)
            (clojure.lang PersistentQueue)))
 
 ;Defines a communication channel with a sender, receiver (strings), a channel Async.Chan and a queue for receivers.
@@ -60,8 +60,6 @@
      (if (isCommunicationValid? action from to protocol)
        (let [currentMonitor @(:activeMonitor @protocol)]
          (cond
-           (instance? monitor currentMonitor)
-           (send! currentMonitor value protocol)
            (instance? sendM currentMonitor)
            (do (send! currentMonitor value protocol)
              (activateMonitorOnSend action from to protocol))
@@ -73,7 +71,6 @@
              )))
        (incorrectCommunication (format "Send action: %s is not allowed to proceed from %s to %s" action from to)))))
   ([currentMonitor value protocol]
-   (println "allowing send on: " currentMonitor)
    (if (vector? (:to currentMonitor))
      (doseq [receiver (:to currentMonitor)]
        (allowSend (:channel (getChannel (:from currentMonitor) receiver (:channels @protocol))) value))
@@ -83,11 +80,8 @@
   "receive something through the protocol"
   [action from to protocol callback]
   (let [channel (getChannel from to (:channels @protocol))
-        f (fn [] (take! (:channel channel)                  ;TODO after multiple runs throws a stackoverflow exception: loop?
+        f (fn [] (take! (:channel channel)
                         (fn [x]
-                          (println "received: ____________")
-                          (println "received: " x)
-                          (println "received: ____________")
                           (if (nil? (:activeMonitor @protocol))
                             (incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply send! with an instantiated protocol!")
                             (if (isCommunicationValid? action from to protocol)
