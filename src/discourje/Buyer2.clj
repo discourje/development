@@ -17,7 +17,7 @@
   [this protocol]
   (recvDelayed! "quote" "seller" this protocol
                 (fn [receivedQuote]
-                  (println "buyer2 received!")
+                  (println "buyer2 received quote! " receivedQuote)
                   (recvDelayed! "quoteDiv" "buyer1" this protocol
                                 (fn [receivedQuoteDiv]
                                   (if (contribute? receivedQuote receivedQuoteDiv)

@@ -10,6 +10,11 @@
 ;We could also allow for blocking recv! now, without callbacks, but this needs testing!
 (defrecord communicationChannel [sender receiver channel receivingQueue])
 
+;(defprotocol role
+;  (ssend [this action value to])
+;  (rreceive [this action from callback]))
+
+
 (defn- generateChannel
   "function to generate a channel between sender and receiver"
   [sender receiver]
@@ -88,8 +93,12 @@
                               (if (hasMultipleReceivers? protocol)
                                 (do
                                   (removeReceiver protocol to)
-                                  (add-watch (:activeMonitor @protocol) nil
-                                             (fn [key atom old-state new-state] (callback x) (remove-watch (:activeMonitor @protocol) nil))))
+                                  (let [rec (:activeMonitor @protocol)]
+                                  (add-watch rec nil
+                                             (fn [key atom old-state new-state]
+                                               (remove-watch rec nil)
+                                               (callback x)
+                                               ))))
                                 (do
                                   (activateNextMonitor action from to protocol)
                                   (callback x)
@@ -104,3 +113,9 @@
         (when (isReceiveMActive? action from to protocol)
           (activateMonitorOnReceive protocol))
         ))))
+;
+;(defrecord participant [name protocol]
+;  role
+;  (ssend [this action value to] (send! action value name to protocol))
+;  (rreceive [this action from callback] (recvDelayed! action from name protocol callback))
+;  )
