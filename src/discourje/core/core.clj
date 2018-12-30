@@ -10,9 +10,9 @@
 ;We could also allow for blocking recv! now, without callbacks, but this needs testing!
 (defrecord communicationChannel [sender receiver channel receivingQueue])
 
-;(defprotocol role
-;  (ssend [this action value to])
-;  (rreceive [this action from callback]))
+(defprotocol role
+  (ssend [this action value to])
+  (rreceive [this action from callback]))
 
 
 (defn- generateChannel
@@ -113,9 +113,9 @@
         (when (isReceiveMActive? action from to protocol)
           (activateMonitorOnReceive protocol))
         ))))
-;
-;(defrecord participant [name protocol]
-;  role
-;  (ssend [this action value to] (send! action value name to protocol))
-;  (rreceive [this action from callback] (recvDelayed! action from name protocol callback))
-;  )
+
+(defrecord participant [name protocol]
+  role
+  (ssend [this action value to] (send! action value name to protocol))
+  (rreceive [this action from callback] (recvDelayed! action from name protocol callback))
+  )

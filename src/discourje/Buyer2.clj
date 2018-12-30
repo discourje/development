@@ -32,6 +32,26 @@
                                     (send! "quit" "quit" this "seller" protocol))
                                   )))))
 
+(defn orderBookParticipant
+  "Order a book from buyer2's perspective"
+  [participant]
+  (rreceive participant "quote" "seller"
+                (fn [receivedQuote]
+                  (println "buyer2 received quote! " receivedQuote)
+                  (rreceive participant "quoteDiv" "buyer1"
+                                (fn [receivedQuoteDiv]
+                                  (if (contribute? receivedQuote receivedQuoteDiv)
+                                    (do (ssend participant "ok" "ok" "seller")
+                                        (ssend participant "address" (generateAddress) "seller")
+                                        (rreceive participant "date" "seller"  (fn [x] (println "Received date!" x)))
+                                        (rreceive participant "repeat" "seller"
+                                                      (fn [x]
+                                                        (println "repeat received on buyer2 from seller!")
+                                                        (orderBookParticipant participant)))
+                                        )
+                                    (ssend participant "quit" "quit" "seller"))
+                                  )))))
+
 ;wait for quote
 ;wait for quote div
 ;branch on data

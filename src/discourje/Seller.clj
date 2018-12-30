@@ -32,21 +32,46 @@
 (defn orderBook
   "Order book from seller's perspective"
   [this protocol]
-  (recvDelayed! "title" "buyer1" this protocol (fn [title]
-           (send! "quote" (quoteBook title) this ["buyer1" "buyer2"] protocol)))
-  (recvDelayed! ["ok" "quit"] "buyer2" this protocol (fn [response]
-           (cond
-             (= response "ok")
-               (recvDelayed! "address" "buyer2" this protocol (fn [address]
-                        (println "The received address is: " address)
-                        (send! "date" (getRandomDate 5) this "buyer2" protocol)
-                        (send! "repeat" "repeat" this ["buyer2" "buyer1"] protocol)
-                        (orderBook this protocol)
-                        ))
-             (= response "quit")
-             (endReached response)
-             )
-           )))
+  (recvDelayed! "title" "buyer1" this protocol
+                (fn [title]
+                  (send! "quote" (quoteBook title) this ["buyer1" "buyer2"] protocol)))
+  (recvDelayed! ["ok" "quit"] "buyer2" this protocol
+                (fn [response]
+                  (cond
+                    (= response "ok")
+                    (recvDelayed! "address" "buyer2" this protocol
+                                  (fn [address]
+                                    (println "The received address is: " address)
+                                    (send! "date" (getRandomDate 5) this "buyer2" protocol)
+                                    (send! "repeat" "repeat" this ["buyer2" "buyer1"] protocol)
+                                    (orderBook this protocol)
+                                    ))
+                    (= response "quit")
+                    (endReached response)
+                    )
+                  )))
+
+(defn orderBookParticipant
+  "Order book from seller's perspective"
+  [participant]
+  (rreceive participant "title" "buyer1"
+            (fn [title] (ssend participant "quote" (quoteBook title) ["buyer1" "buyer2"])))
+  (rreceive participant ["ok" "quit"] "buyer2"
+            (fn [response]
+              (cond
+                (= response "ok")
+                (rreceive participant "address" "buyer2"
+                              (fn [address]
+                                (println "The received address is: " address)
+                                (ssend participant "date" (getRandomDate 5) "buyer2")
+                                (ssend participant"repeat" "repeat" ["buyer2" "buyer1"])
+                                (orderBookParticipant participant)
+                                ))
+                (= response "quit")
+                (endReached response)
+                )
+              ))
+  )
 ;wait for title
 ;send quote to buyer1 and buyer2
 ;wait for ok or quit

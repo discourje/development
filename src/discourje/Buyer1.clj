@@ -38,6 +38,20 @@
   )
 
 
+(defn orderBookParticipant
+  "order a book from buyer1's perspective (implements new receive monitor)"
+  [participant]
+  (ssend participant "title" (generateBook) "seller")
+  (rreceive participant "quote" "seller"
+                (fn [x]
+                  (ssend participant "quoteDiv" (quoteDiv x) "buyer2")))
+  (rreceive participant "repeat" "seller"
+                (fn [x](println "repeat received on buyer1 from seller!")
+                  (orderBookParticipant participant))
+                )
+  )
+
+
 
 ;(clojure.core.async/thread (orderBook))
 
