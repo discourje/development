@@ -1,18 +1,9 @@
 (ns discourje.core.monitor
-  (:require [clojure.core.async])
-  (:import (clojure.lang Seqable Atom)))
-
-;monitor for a single send action
-(defrecord sendM [action from to])
-;monitor for a single recv action
-(defrecord receiveM [action to from])
-;We also need a data structure to create a conditional with branches.
-;When the protocol encounters this it will check the conditional and continue on the correct branch.
-(defrecord choice [trueBranch falseBranch])
-;recursion construct
-(defrecord recursion [name protocol])
-;recur or end the recursion block
-(defrecord recur! [name status])
+  (:require [clojure.core.async]
+            [discourje.core.dataStructures :refer :all])
+  (use [discourje.core.protocolCore :only [findRecurByName]])
+  (:import (clojure.lang Seqable)
+           (discourje.core.dataStructures choice sendM recur! receiveM recursion)))
 
 (defn generateRecur
   "generate recursion"
@@ -29,30 +20,6 @@
   [protocol branch]
   (reset! (:activeMonitor @protocol) (first branch))
   (reset! (:protocol @protocol) (subvec (vec (mapcat identity [branch @(:protocol @protocol)])) 1)))
-
-(defn- findNestedRecurByName
-  "Find a (nested) recursion map in the protocol by name, preserves nested structure in result!"
-  [protocol name]
-  (for [element protocol
-        :when (or (instance? recursion element) (instance? choice element))]
-    (cond
-      (instance? recursion element)
-      (if (= (:name element) name)
-        element
-        (findNestedRecurByName (:protocol element) name))
-      (instance? choice element)
-      (let [trueResult (findNestedRecurByName (:trueBranch element) name)
-            falseResult (findNestedRecurByName (:falseBranch element) name)]
-        (if (not (nil? trueResult))
-          trueResult
-          falseResult)))))
-
-(defn findRecurByName
-  "Find a (nested) recursion map in the protocol, returns the recursion map directly!"
-  [protocol name]
-  (println name)
-  (let [x (findNestedRecurByName protocol name)]
-    (first (drop-while empty? (flatten x)))))
 
 (defn incorrectCommunication
   "communication incorrect, log a message! (or maybe throw exception)"
@@ -170,7 +137,7 @@
              (resetMonitor! firstRecMonitor protocol recursionProtocol 1))
            (instance? recur! nextMonitor)
            (if (= :recur (:status nextMonitor))
-             (let [recursive (findRecurByName (:template @protocol) (:name nextMonitor))
+             (let [recursive (discourje.core.protocolCore/findRecurByName (:template @protocol) (:name nextMonitor))
                    firstRecMonitor (first (:protocol recursive))
                    recursionProtocol (:protocol recursive)]
                (resetMonitor! firstRecMonitor protocol recursionProtocol 1))

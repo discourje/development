@@ -53,24 +53,27 @@
 
 (defn orderBookParticipant
   "Order book from seller's perspective"
-  [participant]
-  (rreceive participant "title" "buyer1"
-            (fn [title] (ssend participant "quote" (quoteBook title) ["buyer1" "buyer2"])))
-  (rreceive participant ["ok" "quit"] "buyer2"
-            (fn [response]
+  ([participant]
+  (receive-from participant "title" "buyer1"
+                (fn [title] (send-to participant "quote" (quoteBook title) ["buyer1" "buyer2"])))
+  (receive-from participant ["ok" "quit"] "buyer2"
+                (fn [response]
               (cond
                 (= response "ok")
-                (rreceive participant "address" "buyer2"
+                (receive-from participant "address" "buyer2"
                               (fn [address]
                                 (println "The received address is: " address)
-                                (ssend participant "date" (getRandomDate 5) "buyer2")
-                                (ssend participant"repeat" "repeat" ["buyer2" "buyer1"])
+                                (send-to participant "date" (getRandomDate 5) "buyer2")
+                                (send-to participant "repeat" "repeat" ["buyer2" "buyer1"])
                                 (orderBookParticipant participant)
                                 ))
                 (= response "quit")
                 (endReached response)
                 )
-              ))
+              )))
+  ([name protocol] ; example how function would operate when participants are constructed internally
+   (let [participant (discourje.core.core/->participant name protocol)]
+     (orderBookParticipant participant)))
   )
 ;wait for title
 ;send quote to buyer1 and buyer2

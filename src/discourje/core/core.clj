@@ -2,36 +2,7 @@
   (:require [clojure.core.async :as async :refer :all]
             [clojure.core :refer :all])
   (use [discourje.core.monitor :only [incorrectCommunication isReceiveMActive? closeProtocol! activateMonitorOnSend activateMonitorOnReceive isCommunicationValid? activateNextMonitor hasMultipleReceivers? removeReceiver getTargetBranch]])
-  (:import (discourje.core.monitor choice sendM)
-           (clojure.lang PersistentQueue)))
-
-;Defines a communication channel with a sender, receiver (strings), a channel Async.Chan and a queue for receivers.
-;We need a receivers queue to allow for multiple send! operations on the same channel without taking values from it by registered receives
-;We could also allow for blocking recv! now, without callbacks, but this needs testing!
-(defrecord communicationChannel [sender receiver channel receivingQueue])
-
-(defprotocol role
-  (ssend [this action value to])
-  (rreceive [this action from callback]))
-
-
-(defn- generateChannel
-  "function to generate a channel between sender and receiver"
-  [sender receiver]
-  (->communicationChannel sender receiver (chan) (atom PersistentQueue/EMPTY)))
-
-(defn uniqueCartesianProduct
-  "Generate channels between all participants and filters out duplicates e.g.: buyer1<->buyer1"
-  [x y]
-  (filter some?
-          (for [x x y y]
-            (when (not (identical? x y))
-              (vector x y)))))
-
-(defn generateChannels
-  "Generates communication channels between all participants"
-  [participants]
-  (map #(apply generateChannel %) (uniqueCartesianProduct participants participants)))
+  (:import (discourje.core.dataStructures choice sendM)))
 
 (defn putMessage
   "Puts message on the channel, non-blocking"
@@ -55,7 +26,6 @@
   (if (vector? channel)
     (for [receiver channel] (putMessage receiver value))
     (putMessage channel value)))
-
 
 (defn send!
   "send something through the protocol"
@@ -114,8 +84,11 @@
           (activateMonitorOnReceive protocol))
         ))))
 
+(defprotocol role
+  (send-to [this action value to])
+  (receive-from [this action from callback]))
+
 (defrecord participant [name protocol]
   role
-  (ssend [this action value to] (send! action value name to protocol))
-  (rreceive [this action from callback] (recvDelayed! action from name protocol callback))
-  )
+  (send-to [this action value to] (send! action value name to protocol))
+  (receive-from [this action from callback] (recvDelayed! action from name protocol callback)))

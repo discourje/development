@@ -35,21 +35,21 @@
 (defn orderBookParticipant
   "Order a book from buyer2's perspective"
   [participant]
-  (rreceive participant "quote" "seller"
+  (receive-from participant "quote" "seller"
                 (fn [receivedQuote]
                   (println "buyer2 received quote! " receivedQuote)
-                  (rreceive participant "quoteDiv" "buyer1"
+                  (receive-from participant "quoteDiv" "buyer1"
                                 (fn [receivedQuoteDiv]
                                   (if (contribute? receivedQuote receivedQuoteDiv)
-                                    (do (ssend participant "ok" "ok" "seller")
-                                        (ssend participant "address" (generateAddress) "seller")
-                                        (rreceive participant "date" "seller"  (fn [x] (println "Received date!" x)))
-                                        (rreceive participant "repeat" "seller"
+                                    (do (send-to participant "ok" "ok" "seller")
+                                        (send-to participant "address" (generateAddress) "seller")
+                                        (receive-from participant "date" "seller" (fn [x] (println "Received date!" x)))
+                                        (receive-from participant "repeat" "seller"
                                                       (fn [x]
                                                         (println "repeat received on buyer2 from seller!")
                                                         (orderBookParticipant participant)))
                                         )
-                                    (ssend participant "quit" "quit" "seller"))
+                                    (send-to participant "quit" "quit" "seller"))
                                   )))))
 
 ;wait for quote
