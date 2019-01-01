@@ -15,4 +15,3 @@
 (clojure.core.async/thread (se/orderBookParticipant seller))
 (clojure.core.async/thread (b1/orderBookParticipant buyer1))
 (clojure.core.async/thread (b2/orderBookParticipant buyer2))
-

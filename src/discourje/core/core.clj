@@ -1,6 +1,7 @@
 (ns discourje.core.core
   (:require [clojure.core.async :as async :refer :all]
-            [clojure.core :refer :all])
+            [clojure.core :refer :all]
+            [discourje.core.dataStructures :refer :all])
   (use [discourje.core.monitor :only [incorrectCommunication isReceiveMActive? closeProtocol! activateMonitorOnSend activateMonitorOnReceive isCommunicationValid? activateNextMonitor hasMultipleReceivers? removeReceiver getTargetBranch]])
   (:import (discourje.core.dataStructures choice sendM)))
 
@@ -37,13 +38,12 @@
          (cond
            (instance? sendM currentMonitor)
            (do (send! currentMonitor value protocol)
-             (activateMonitorOnSend action from to protocol))
+               (activateMonitorOnSend action from to protocol))
            (instance? choice currentMonitor)
            (let [target (getTargetBranch action from to protocol)]
              (instance? sendM target)
              (do (send! target value protocol)
-               (activateMonitorOnSend action from to protocol))
-             )))
+                 (activateMonitorOnSend action from to protocol)))))
        (incorrectCommunication (format "Send action: %s is not allowed to proceed from %s to %s" action from to)))))
   ([currentMonitor value protocol]
    (if (vector? (:to currentMonitor))
@@ -64,15 +64,13 @@
                                 (do
                                   (removeReceiver protocol to)
                                   (let [rec (:activeMonitor @protocol)]
-                                  (add-watch rec nil
-                                             (fn [key atom old-state new-state]
-                                               (remove-watch rec nil)
-                                               (callback x)
-                                               ))))
-                                (do
-                                  (activateNextMonitor action from to protocol)
-                                  (callback x)
-                                  (closeProtocol! protocol)))
+                                    (add-watch rec nil
+                                               (fn [key atom old-state new-state]
+                                                 (remove-watch rec nil)
+                                                 (callback x)))))
+                                (do (activateNextMonitor action from to protocol)
+                                    (callback x)
+                                    (closeProtocol! protocol)))
                               (do
                                 (incorrectCommunication (format "recv action: %s is not allowed to proceed from %s to %s" action from to))
                                 (callback nil)))))))]
@@ -81,12 +79,7 @@
       (do
         (reset! (:receivingQueue channel) (conj @(:receivingQueue channel) f))
         (when (isReceiveMActive? action from to protocol)
-          (activateMonitorOnReceive protocol))
-        ))))
-
-(defprotocol role
-  (send-to [this action value to])
-  (receive-from [this action from callback]))
+          (activateMonitorOnReceive protocol))))))
 
 (defrecord participant [name protocol]
   role

@@ -11,3 +11,7 @@
 (defrecord recursion [name protocol])
 ;recur or end the recursion block
 (defrecord recur! [name status])
+;protocol(interface) to implement in object
+(defprotocol role
+  (send-to [this action value to])
+  (receive-from [this action from callback]))

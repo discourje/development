@@ -1,5 +1,6 @@
 (ns discourje.Seller
-  (:require [discourje.core.core :refer :all])
+  (:require [discourje.core.core :refer :all]
+            [discourje.core.dataStructures :refer :all])
   (:import (java.util Date Calendar)))
 
 (defn quoteBook
