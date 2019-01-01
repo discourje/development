@@ -1,5 +1,6 @@
 (ns discourje.Buyer1
-  (:require [discourje.core.core :refer :all]))
+  (:require [discourje.core.core :refer :all]
+            [discourje.core.dataStructures :refer :all]))
 
 (defn generateBook
   "generate simple book title"
@@ -28,9 +29,29 @@
   "order a book from buyer1's perspective (implements new receive monitor)"
   [this protocol]
   (send! "title" (generateBook) this "seller" protocol)
-  (recv! "quote" "seller" this protocol
+  (recvDelayed! "quote" "seller" this protocol
          (fn [x]
-           (send! "quoteDiv" (quoteDiv x) this "buyer2" protocol))))
+           (send! "quoteDiv" (quoteDiv x) this "buyer2" protocol)))
+  (recvDelayed! "repeat" "seller" this protocol
+                (fn [x](println "repeat received on buyer1 from seller!")
+                  (orderBook this protocol))
+                )
+  )
+
+
+(defn orderBookParticipant
+  "order a book from buyer1's perspective (implements new receive monitor)"
+  [participant]
+  (send-to participant "title" (generateBook) "seller")
+  (receive-from participant "quote" "seller"
+                (fn [x]
+                  (send-to participant "quoteDiv" (quoteDiv x) "buyer2")))
+  (receive-from participant "repeat" "seller"
+                (fn [x](println "repeat received on buyer1 from seller!")
+                  (orderBookParticipant participant))
+                )
+  )
+
 
 
 ;(clojure.core.async/thread (orderBook))

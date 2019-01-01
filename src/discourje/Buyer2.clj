@@ -1,5 +1,6 @@
 (ns discourje.Buyer2
-  (:require [discourje.core.core :refer :all]))
+  (:require [discourje.core.core :refer :all]
+            [discourje.core.dataStructures :refer :all]))
 
 (defn contribute?
   "returns true when the received quote 50% or greater"
@@ -12,37 +13,45 @@
   []
   "Open University, Valkenburgerweg 177, 6419 AT, Heerlen")
 
-;(defn orderBook
-;  "Order a book from buyer2's perspective"
-;  [protocol]
-;  (let [quote (atom nil)
-;        quoteDiv (atom nil)]
-;    (recv! "quote" "seller" "buyer2" protocol (fn [receivedQuote] (reset! quote receivedQuote)))
-;    (recv! "quoteDiv" "buyer1" "buyer2" protocol (fn [receivedQuoteDiv] (reset! quoteDiv receivedQuoteDiv)))
-;    (add-watch quoteDiv nil
-;               (fn [key atom old-state new-state]
-;                 (println (format "quote and quoteDiv are %s %s respectively" @quote new-state))
-;                 (if (contribute? @quote new-state)
-;                   (send! "ok" "ok" "buyer2" "seller" protocol)
-;                   (send! "quit" "quit" "buyer2" "seller" protocol)
-;                   )
-;                 (remove-watch quoteDiv nil)))))
-
 (defn orderBook
   "Order a book from buyer2's perspective"
   [this protocol]
-  (recv! "quote" "seller" this protocol
-         (fn [receivedQuote]
-           (recv! "quoteDiv" "buyer1" this protocol
-                  (fn [receivedQuoteDiv]
-                      (if (contribute? receivedQuote receivedQuoteDiv)
-                        (do (send! "ok" "ok" this "seller" protocol)
-                            (Thread/sleep 1000) ;quick fix for multiple sends...
-                            (send! "address" (generateAddress) this "seller" protocol)
-                            (recv! "date" "seller" this protocol (fn [x] (println "Received date!" x)))
-                            )
-                        (send! "quit" "quit" this "seller" protocol))
-                      )))))
+  (recvDelayed! "quote" "seller" this protocol
+                (fn [receivedQuote]
+                  (println "buyer2 received quote! " receivedQuote)
+                  (recvDelayed! "quoteDiv" "buyer1" this protocol
+                                (fn [receivedQuoteDiv]
+                                  (if (contribute? receivedQuote receivedQuoteDiv)
+                                    (do (send! "ok" "ok" this "seller" protocol)
+                                        (send! "address" (generateAddress) this "seller" protocol)
+                                        (recvDelayed! "date" "seller" this protocol (fn [x] (println "Received date!" x)))
+                                        (recvDelayed! "repeat" "seller" this protocol
+                                                      (fn [x]
+                                                        (println "repeat received on buyer2 from seller!")
+                                                        (orderBook this protocol)))
+                                        )
+                                    (send! "quit" "quit" this "seller" protocol))
+                                  )))))
+
+(defn orderBookParticipant
+  "Order a book from buyer2's perspective"
+  [participant]
+  (receive-from participant "quote" "seller"
+                (fn [receivedQuote]
+                  (println "buyer2 received quote! " receivedQuote)
+                  (receive-from participant "quoteDiv" "buyer1"
+                                (fn [receivedQuoteDiv]
+                                  (if (contribute? receivedQuote receivedQuoteDiv)
+                                    (do (send-to participant "ok" "ok" "seller")
+                                        (send-to participant "address" (generateAddress) "seller")
+                                        (receive-from participant "date" "seller" (fn [x] (println "Received date!" x)))
+                                        (receive-from participant "repeat" "seller"
+                                                      (fn [x]
+                                                        (println "repeat received on buyer2 from seller!")
+                                                        (orderBookParticipant participant)))
+                                        )
+                                    (send-to participant "quit" "quit" "seller"))
+                                  )))))
 
 ;wait for quote
 ;wait for quote div
