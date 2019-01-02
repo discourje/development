@@ -26,7 +26,7 @@
 (def bob (discourje.core.core/->participant "bob" protocol))
 (def carol (discourje.core.core/->participant "carol" protocol))
 
-(defn- GreetBobAndCarol
+(defn- greetBobAndCarol
   "This function will use the protocol to send the greet message to bob and carol."
   [participant]
   (println (format "%s will now send greet." (:name participant)))
@@ -41,7 +41,7 @@
                   (println (format "%s Received message: %s" (:name participant) message)))))
 
 ;start the `GreetBobAndCarol' function on thread and add `alice' participant
-(clojure.core.async/thread (GreetBobAndCarol alice))
+(clojure.core.async/thread (greetBobAndCarol alice))
 ;start the `receiveGreet' function on thread and add `bob' participant
 (clojure.core.async/thread (receiveGreet bob))
 ;start the `receiveGreet' function on thread and add `carol' participant
