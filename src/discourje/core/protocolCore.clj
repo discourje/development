@@ -1,8 +1,7 @@
 (ns discourje.core.protocolCore
-  (:require [discourje.core.dataStructures :refer :all])
-  (:import
-    (clojure.lang PersistentQueue)
-    (discourje.core.dataStructures recursion choice)))
+  (:require [discourje.core.dataStructures :refer :all] [clojure.core.async])
+  (:import (clojure.lang PersistentQueue)
+           (discourje.core.dataStructures recursion choice)))
 
 
 ;Defines a communication channel with a sender, receiver (strings), a channel Async.Chan and a queue for receivers.

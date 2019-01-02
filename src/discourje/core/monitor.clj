@@ -102,7 +102,7 @@
             (invokeReceiveMCallback nextMonitor to protocol))
           (invokeReceiveMCallback nextMonitor (:to nextMonitor) protocol)))))
   ([nextMonitor to protocol]
-   (when-let [channel (getChannel (:from nextMonitor) to (:channels @protocol))]
+     (when-let [channel (getChannel (:from nextMonitor) to (:channels @protocol))]
      (when-let [cb (peek @(:receivingQueue channel))]
        (reset! (:receivingQueue channel) (pop @(:receivingQueue channel)))
        (cb)))))
@@ -115,13 +115,14 @@
   ([nextMonitor protocol subvecIndex]
    (reset! (:activeMonitor @protocol) nextMonitor)
    (reset! (:protocol @protocol) (subvec @(:protocol @protocol) subvecIndex))
-   (invokeReceiveMCallback nextMonitor protocol)
-    )
+   (invokeReceiveMCallback nextMonitor protocol))
   ([nextMonitor protocol recursionProtocol subvecIndex]
    (reset! (:activeMonitor @protocol) nextMonitor)
    (reset! (:protocol @protocol) (subvec recursionProtocol subvecIndex))
-   (invokeReceiveMCallback nextMonitor protocol)
-    ))
+   (invokeReceiveMCallback nextMonitor protocol))
+  ([protocol]
+   ;(invokeReceiveMCallback (:activeMonitor @protocol) protocol)
+   (reset! (:activeMonitor @protocol) nil)))
 
 (defn activateNextMonitor
   "Set the active monitor based on the protocol"
@@ -147,9 +148,9 @@
                ;(closeProtocol! protocol)
                ))
            :else
-           (when (> (count @(:protocol @protocol)) 0)
+           (if (> (count @(:protocol @protocol)) 0)
              (resetMonitor! nextMonitor protocol 1)
-             ;(closeProtocol! protocol)
+             (resetMonitor! protocol)
              ))
          )
        (instance? choice activeM)

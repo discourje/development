@@ -1,4 +1,4 @@
-(ns discourje.Buyer2
+(ns discourje.TwoBuyerProtocol.Buyer2
   (:require [discourje.core.core :refer :all]
             [discourje.core.dataStructures :refer :all]))
 
@@ -36,17 +36,17 @@
 (defn orderBookParticipant
   "Order a book from buyer2's perspective"
   [participant]
-  (receive-from participant "quote" "seller"
-                (fn [receivedQuote]
+  (receive-by participant "quote" "seller"
+              (fn [receivedQuote]
                   (println "buyer2 received quote! " receivedQuote)
-                  (receive-from participant "quoteDiv" "buyer1"
-                                (fn [receivedQuoteDiv]
+                  (receive-by participant "quoteDiv" "buyer1"
+                              (fn [receivedQuoteDiv]
                                   (if (contribute? receivedQuote receivedQuoteDiv)
                                     (do (send-to participant "ok" "ok" "seller")
                                         (send-to participant "address" (generateAddress) "seller")
-                                        (receive-from participant "date" "seller" (fn [x] (println "Received date!" x)))
-                                        (receive-from participant "repeat" "seller"
-                                                      (fn [x]
+                                        (receive-by participant "date" "seller" (fn [x] (println "Received date!" x)))
+                                        (receive-by participant "repeat" "seller"
+                                                    (fn [x]
                                                         (println "repeat received on buyer2 from seller!")
                                                         (orderBookParticipant participant)))
                                         )
