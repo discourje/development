@@ -24,6 +24,8 @@ Communication is never blocking and order among messages, and on channels is pre
 As a proof of concept we choose to implement a protocol called the [Two buyer protocol](https://www.doc.ic.ac.uk/~yoshida/multiparty/multiparty.pdf) and extended it with recursion.
 This simple protocol embeds all fundamental functionality a protocol language should support: sequencing, parallelisation, branching, recursion.
 
+<i>See [TwoBuyerProtocol](src/discourje/TwoBuyerProtocol) for implementation.</i>
+
 <b>Usage</b>
 -
 A protocol can be specified by the following constructs:
