@@ -34,9 +34,54 @@ A protocol can be specified by the following constructs:
 - choice [trueBranch falseBranch]: Specifies a `choice monitor` which validates the first monitor is both the `true and false branch` and continues on target branch when an action is verified. 
 - recursion [name protocol]: Specifies a `recursion monitor` which recurs or ends when the protocol encounters a `recur![:status recur]` or `recur![:status end]` Recur is matched by name and also supports nesting!.
 
+```clojure
+(defn- defineHelloWorldProtocol
+  "This function will generate a vector with 2 monitors to send and receive the hello world message."
+  []
+  (vector
+    (->sendM "helloWorld" "user" "world")
+    (->receiveM "helloWorld" "world" "user")))
+```
+Then generate a protocol object with the specified roles and monitors:
+```clojure
+(defn generateHelloWorldProtocol
+  "Generate the protocol, channels and set the first monitor active."
+  []
+  (generateProtocol ["user" "world"] (defineHelloWorldProtocol)))
+  
+  
+;define the protocol
+(def protocol (atom (generateHelloWorldProtocol)))
+```
+
 When the developer is satisfied with the defined protocol he/she can start on writing the code that follows the protocol.
 The developer should implement a function with a `participant` as parameter.
 The participant record implements the `role` protocol (native Clojure interface-like construct, not to be confused with any Discourje constructs!) which implements `send-to` and `receive-by` functions.
-The developer is then able to communicate safely among participants.
+```clojure
+;define the participants
+(def user (discourje.core.core/->participant "user" protocol))
+(def world (discourje.core.core/->participant "world" protocol))
 
-<i>See [hello world](src/discourje/examples/helloWorld.clj) for a simple example.</i>
+(defn- sendToWorld
+  "This function will use the protocol to send the Hello World! message to world."
+  [participant]
+  (println "Will now send Hello World! to world.")
+  (send-to participant "helloWorld" "Hello World!" "world"))
+
+(defn- receiveFromUser
+  "This function will use the protocol to listen for the helloWorld message."
+  [participant]
+  (receive-by participant "helloWorld" "user"
+              (fn [message]
+                  (println (format "Received message: %s" message)))))
+```
+
+The developer is then able to communicate safely among participants.
+```clojure
+;start the `sendToWorld' function on thread and add `user' participant
+(clojure.core.async/thread (sendToWorld user))
+;start the `receiveFromUser' function on thread and add `world' participant
+(clojure.core.async/thread (receiveFromUser world))
+```
+
+<i>See [hello world](src/discourje/examples/helloWorld.clj) for a this example.</i>
