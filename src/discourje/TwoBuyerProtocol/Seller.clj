@@ -1,4 +1,4 @@
-(ns discourje.Seller
+(ns discourje.TwoBuyerProtocol.Seller
   (:require [discourje.core.core :refer :all]
             [discourje.core.dataStructures :refer :all])
   (:import (java.util Date Calendar)))
@@ -55,14 +55,14 @@
 (defn orderBookParticipant
   "Order book from seller's perspective"
   ([participant]
-  (receive-from participant "title" "buyer1"
-                (fn [title] (send-to participant "quote" (quoteBook title) ["buyer1" "buyer2"])))
-  (receive-from participant ["ok" "quit"] "buyer2"
-                (fn [response]
+  (receive-by participant "title" "buyer1"
+              (fn [title] (send-to participant "quote" (quoteBook title) ["buyer1" "buyer2"])))
+  (receive-by participant ["ok" "quit"] "buyer2"
+              (fn [response]
               (cond
                 (= response "ok")
-                (receive-from participant "address" "buyer2"
-                              (fn [address]
+                (receive-by participant "address" "buyer2"
+                            (fn [address]
                                 (println "The received address is: " address)
                                 (send-to participant "date" (getRandomDate 5) "buyer2")
                                 (send-to participant "repeat" "repeat" ["buyer2" "buyer1"])

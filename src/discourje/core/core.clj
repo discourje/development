@@ -84,4 +84,4 @@
 (defrecord participant [name protocol]
   role
   (send-to [this action value to] (send! action value name to protocol))
-  (receive-from [this action from callback] (recvDelayed! action from name protocol callback)))
+  (receive-by [this action from callback] (recvDelayed! action from name protocol callback)))

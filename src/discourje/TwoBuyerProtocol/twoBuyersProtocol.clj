@@ -1,8 +1,7 @@
-(ns discourje.twoBuyersProtocol
+(ns discourje.TwoBuyerProtocol.twoBuyersProtocol
   (require [discourje.core.monitor :refer :all]
            [discourje.core.protocol :refer :all]
-           [discourje.core.dataStructures :refer :all])
-  )
+           [discourje.core.dataStructures :refer :all]))
 
 (defn- defineRecurringProtocol []
   (vector (->recursion :x
@@ -33,4 +32,4 @@
 (defn getProtocol
   "generate the protocol, channels and set the first monitor active"
   []
-  (generateProtocol (defineRecurringProtocol)))
+  (generateProtocol ["buyer1" "buyer2" "seller"] (defineRecurringProtocol)))
