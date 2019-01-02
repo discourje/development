@@ -1,5 +1,8 @@
 <b>Discourje</b>
 -
+- [Getting Started](GettingStarted.md)
+- [Library Name](LibraryName.md)
+- [Project information](ProjectInformation.md)
 
 <b>Introduction:</b>
 -
