@@ -12,6 +12,7 @@ E-mail 				r.hamers@bluetea.nl
 
 
 <b>Research Committee:</b>
+
 Supervisor Name 	dr. Sung-Shik Jongmans
 
 E-mail 				ssj@ou.nl

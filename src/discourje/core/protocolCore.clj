@@ -1,7 +1,7 @@
 (ns discourje.core.protocolCore
   (:require [discourje.core.dataStructures :refer :all] [clojure.core.async])
   (:import (clojure.lang PersistentQueue)
-           (discourje.core.dataStructures recursion choice)))
+           (discourje.core.dataStructures recursion recur! choice)))
 
 
 ;Defines a communication channel with a sender, receiver (strings), a channel Async.Chan and a queue for receivers.
@@ -62,6 +62,26 @@
           trueResult
           falseResult)))))
 
+(defn- findRecurByTag
+  "Find a (nested) recursion :end or :recur in the protocol by name"
+  [protocol name tag]
+  (for [element protocol
+        :when (or (instance? recursion element) (instance? choice element) (instance? recur! element))]
+    (cond
+      (instance? recursion element)
+      (findRecurByTag (:protocol element) name tag)
+      (instance? choice element)
+      (let [trueResult (filter some? (findRecurByTag (:trueBranch element) name tag))
+            falseResult (filter some? (findRecurByTag (:falseBranch element) name tag))]
+        (if (not (empty? trueResult))
+          trueResult
+          falseResult))
+      (instance? recur! element)
+      (when (and
+              (= (:name element) name)
+              (= (:status element) tag))
+        element))))
+
 (defn duplicates?
   "returns true when duplicates inside collection"
   [coll except]
@@ -80,19 +100,29 @@
   (let [x (findAllRecursions protocol [])]
     (vec (first (drop-while empty? x)))))
 
-(defn isProtocolValid?
-  "returns true when there are no duplicate recursion definitions and,=>
-  we will include checking for proper recur! [recur, end] definitions!"
-  [protocol]
-  (let [definedRecursion (findAllRecursionsInProtocol protocol)]
-    (not (containsDuplicates? definedRecursion))))
-
 (defn findRecurByName
   "Find a (nested) recursion map in the protocol, returns the recursion map directly!"
   [protocol name]
   (println name)
   (let [x (findNestedRecurByName protocol name)]
     (first (drop-while empty? (flatten x)))))
+
+(defn- hasCorrectRecurAndEnd?
+  "is the protocol correctly recured and ended?"
+  [protocol definedRecursions]
+  (let [recurs (distinct definedRecursions)]
+    (every? true?  (for [rec recurs]
+                     (let [recursionVector (findRecurByName protocol rec)
+                           recurElement (first (filter some? (findRecurByTag (:protocol recursionVector) rec :recur)))
+                           endElement (first (filter some? (findRecurByTag (:protocol recursionVector) rec :end)))]
+                       (and (not (empty? recurElement)) (not (empty? endElement))))))))
+
+(defn isProtocolValid?
+  "returns true when there are no duplicate recursion definitions and,=>
+  we will include checking for proper recur! [recur, end] definitions!"
+  [protocol]
+  (let [definedRecursion (findAllRecursionsInProtocol protocol)]
+    (and (not (containsDuplicates? definedRecursion)) (hasCorrectRecurAndEnd? protocol definedRecursion))))
 
 (defn- validateRecursion
   "checks the protocol for duplicate recursion definitions and if recur/ended correctly"
