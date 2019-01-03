@@ -3,6 +3,7 @@
 - [Getting Started](GettingStarted.md)
 - [Library Name](LibraryName.md)
 - [Project information](ProjectInformation.md)
+- [ToDo](ToDo.md)
 
 <b>Introduction:</b>
 -
@@ -21,6 +22,8 @@ Communication is never blocking and order among messages, and on channels is pre
 - [Parallelisation](src/discourje/examples/parallelisation.clj)
 - [Branching](src/discourje/examples/branching.clj)
 - [Recursion](src/discourje/examples/recursion.clj)
+- Queueing of messages on channels
+- Queueing of receive actions on channels when no data is available yet (order preserved)
 
 <i>See examples for each function for more info.</i>
 
@@ -34,8 +37,8 @@ This simple protocol embeds all fundamental functionality a protocol language sh
 A protocol can be specified by the following constructs:
 - sendM [action from to]: Specifies a `send monitor` which validates that the current communication through the protocol is a send action with name `action` from `from` to `to`.
 - receiveM [action to from]: Specifies a `receive monitor` which validates that the current communication through the protocol is a receive action with name `action` to `from` from `to`.
-- choice [trueBranch falseBranch]: Specifies a `choice monitor` which validates the first monitor is both the `true and false branch` and continues on target branch when an action is verified. 
-- recursion [name protocol]: Specifies a `recursion monitor` which recurs or ends when the protocol encounters a `recur![:status recur]` or `recur![:status end]` Recur is matched by name and also supports nesting!.
+- choice [trueBranch falseBranch]: Specifies a `choice monitor` which validates the first monitor in both the `true and false branch` and continues on target branch when an action is verified. 
+- recursion [name protocol]: Specifies a `recursion monitor` which recurs or ends when the protocol encounters a `recur![:status recur]` or `recur![:status end]`. Recur is matched by name and also supports nesting!
 
 ```clojure
 (defn- defineHelloWorldProtocol
