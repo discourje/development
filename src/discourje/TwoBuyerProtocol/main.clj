@@ -6,8 +6,13 @@
 
 ;first define the protocol
 (def protocol (atom (getProtocol)))
-;(println protocol)
-(clojure.core.async/thread (se/orderBook "seller" protocol))
-(clojure.core.async/thread (b1/orderBook "buyer1" protocol))
-(clojure.core.async/thread (b2/orderBook "buyer2" protocol))
+;define the participants on the protocol
+;we could also define the participants inside the functions too!
+(def seller (discourje.core.core/->participant "seller" protocol))
+(def buyer1 (discourje.core.core/->participant "buyer1" protocol))
+(def buyer2 (discourje.core.core/->participant "buyer2" protocol))
 
+
+(clojure.core.async/thread (b1/orderBookParticipant buyer1))
+(clojure.core.async/thread (b2/orderBookParticipant buyer2))
+(clojure.core.async/thread (se/orderBookParticipant seller))

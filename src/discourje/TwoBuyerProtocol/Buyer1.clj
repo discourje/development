@@ -25,19 +25,6 @@
 ;                 (remove-watch quote nil)))
 ;  ))
 
-(defn orderBook
-  "order a book from buyer1's perspective (implements new receive monitor)"
-  [this protocol]
-  (send! "title" (generateBook) this "seller" protocol)
-  (recvDelayed! "quote" "seller" this protocol
-         (fn [x]
-           (send! "quoteDiv" (quoteDiv x) this "buyer2" protocol)))
-  (recvDelayed! "repeat" "seller" this protocol
-                (fn [x](println "repeat received on buyer1 from seller!")
-                  (orderBook this protocol))
-                )
-  )
-
 
 (defn orderBookParticipant
   "order a book from buyer1's perspective (implements new receive monitor)"

@@ -83,45 +83,15 @@
         )))
   )
 
-(defn- getChannel
-  "finds a channel based on sender and receiver"
-  [sender receiver channels]
-  (first
-    (filter (fn [ch]
-              (and
-                (= (:sender ch) sender)
-                (= (:receiver ch) receiver)))
-            channels)))
-
-(defn invokeReceiveMCallback
-  "When the nextMonitor is of ReceiveM type we will invoke the first callback in the queue if there is one."
-  ([nextMonitor protocol]
-  (when (instance? receiveM nextMonitor)
-    (do (if (instance? Seqable (:to nextMonitor))
-          (doseq [to (:to nextMonitor)]
-            (invokeReceiveMCallback nextMonitor to protocol))
-          (invokeReceiveMCallback nextMonitor (:to nextMonitor) protocol)))))
-  ([nextMonitor to protocol]
-     (when-let [channel (getChannel (:from nextMonitor) to (:channels @protocol))]
-     (when-let [cb (peek @(:receivingQueue channel))]
-       (reset! (:receivingQueue channel) (pop @(:receivingQueue channel)))
-       (cb)))))
-
-(defn isReceiveMActive? [action from to protocol]
-  (and (instance? receiveM @(:activeMonitor @protocol)) (monitorValid? @(:activeMonitor @protocol) action from to)))
-
 (defn- resetMonitor!
   "Reset! the monitor ATOM"
   ([nextMonitor protocol subvecIndex]
    (reset! (:activeMonitor @protocol) nextMonitor)
-   (reset! (:protocol @protocol) (subvec @(:protocol @protocol) subvecIndex))
-   (invokeReceiveMCallback nextMonitor protocol))
+   (reset! (:protocol @protocol) (subvec @(:protocol @protocol) subvecIndex)))
   ([nextMonitor protocol recursionProtocol subvecIndex]
    (reset! (:activeMonitor @protocol) nextMonitor)
-   (reset! (:protocol @protocol) (subvec recursionProtocol subvecIndex))
-   (invokeReceiveMCallback nextMonitor protocol))
+   (reset! (:protocol @protocol) (subvec recursionProtocol subvecIndex)))
   ([protocol]
-   ;(invokeReceiveMCallback (:activeMonitor @protocol) protocol)
    (reset! (:activeMonitor @protocol) nil)))
 
 (defn activateNextMonitor
@@ -149,7 +119,9 @@
                ))
            :else
            (if (> (count @(:protocol @protocol)) 0)
-             (resetMonitor! nextMonitor protocol 1)
+             (do
+               (println "next monitor =  "nextMonitor)
+             (resetMonitor! nextMonitor protocol 1))
              (resetMonitor! protocol)
              ))
          )
@@ -177,13 +149,6 @@
   (let [activeM @(:activeMonitor @protocol)]
     (when (instance? sendM activeM)
         (activateNextMonitor action from to protocol))))
-
-(defn activateMonitorOnReceive
-  "activate a new monitor when specific receiveM is encountered"
-  [protocol]
-  (let [activeM @(:activeMonitor @protocol)]
-    (when (instance? receiveM activeM)
-      (invokeReceiveMCallback activeM protocol))))
 
 (defn isCommunicationValid?
   "Checks if communication is valid by comparing input to the active monitor"

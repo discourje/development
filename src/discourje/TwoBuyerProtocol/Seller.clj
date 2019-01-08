@@ -8,7 +8,6 @@
   [title]
   (println (format "received title: %s" title))
   (let [x (+ (rand-int 30) 1)]
-    (println (format "random number is: %s" x))
     x))
 
 (defn getDate
@@ -30,27 +29,6 @@
   [quit]
   (println (format "Protocol ended with: %s" quit)))
 
-(defn orderBook
-  "Order book from seller's perspective"
-  [this protocol]
-  (recvDelayed! "title" "buyer1" this protocol
-                (fn [title]
-                  (send! "quote" (quoteBook title) this ["buyer1" "buyer2"] protocol)))
-  (recvDelayed! ["ok" "quit"] "buyer2" this protocol
-                (fn [response]
-                  (cond
-                    (= response "ok")
-                    (recvDelayed! "address" "buyer2" this protocol
-                                  (fn [address]
-                                    (println "The received address is: " address)
-                                    (send! "date" (getRandomDate 5) this "buyer2" protocol)
-                                    (send! "repeat" "repeat" this ["buyer2" "buyer1"] protocol)
-                                    (orderBook this protocol)
-                                    ))
-                    (= response "quit")
-                    (endReached response)
-                    )
-                  )))
 
 (defn orderBookParticipant
   "Order book from seller's perspective"
@@ -61,13 +39,14 @@
               (fn [response]
               (cond
                 (= response "ok")
-                (receive-by participant "address" "buyer2"
+                (do (println "yes yes received Ok")
+                    (receive-by participant "address" "buyer2"
                             (fn [address]
                                 (println "The received address is: " address)
                                 (send-to participant "date" (getRandomDate 5) "buyer2")
                                 (send-to participant "repeat" "repeat" ["buyer2" "buyer1"])
                                 (orderBookParticipant participant)
-                                ))
+                                )))
                 (= response "quit")
                 (endReached response)
                 )
