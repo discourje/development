@@ -51,6 +51,32 @@
        (allowSend (:channel (getChannel (:from currentMonitor) receiver (:channels @protocol))) value))
      (allowSend (:channel (getChannel (:from currentMonitor) (:to currentMonitor) (:channels @protocol))) value))))
 
+(defn recv!
+  "receive something through the protocol"
+  [action from to protocol callback]
+  (let [channel (getChannel from to (:channels @protocol))]
+    (if (nil? channel)
+      (incorrectCommunication "Cannot find channel from %s to %s in the defined channels of the protocol! Please make sure you supply supported sender and receiver pair")
+      (take! (:channel channel)
+             (fn [x]
+               (if (nil? (:activeMonitor @protocol))
+                 (incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply send! with an instantiated protocol!")
+                 (if (isCommunicationValid? action from to protocol)
+                   (if (hasMultipleReceivers? protocol)
+                     (do
+                       (removeReceiver protocol to)
+                       (add-watch (:activeMonitor @protocol) nil
+                                  (fn [key atom old-state new-state] (remove-watch (:activeMonitor @protocol) nil) (callback x))))
+                     (do
+                       (activateNextMonitor action from to protocol)
+                       (callback x)
+                       (closeProtocol! protocol)))
+                   (do
+                     (incorrectCommunication (format "recv action: %s is not allowed to proceed from %s to %s" action from to))
+                     (callback nil)))))))))
+
+
+
 (defn recvDelayed!
   "receive something through the protocol"
   [action from to protocol callback]

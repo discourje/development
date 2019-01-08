@@ -80,7 +80,8 @@
     (let [channels (:channels @protocol)]
       (doseq [chan channels]
        ; (clojure.core.async/close! (:channel chan))
-        ))))
+        )))
+  )
 
 (defn- getChannel
   "finds a channel based on sender and receiver"
