@@ -94,7 +94,7 @@
   ([protocol]
    (reset! (:activeMonitor @protocol) nil)))
 
-(defn activateNextMonitor
+(defn activateNextMonitor ;todo type of monitor to compare recv to send!
   "Set the active monitor based on the protocol"
   ([action from to protocol]
    (let [activeM @(:activeMonitor @protocol)]
@@ -120,7 +120,7 @@
            :else
            (if (> (count @(:protocol @protocol)) 0)
              (do
-               (println "next monitor =  "nextMonitor)
+               ;(println "next monitor =  "nextMonitor)
              (resetMonitor! nextMonitor protocol 1))
              (resetMonitor! protocol)
              ))

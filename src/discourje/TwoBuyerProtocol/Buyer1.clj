@@ -11,7 +11,9 @@
   "returns true when the received quote is <= 15 (50% chance at this moment)"
   [quote]
   (println (format "received quote: %s" quote))
-  (+ (rand-int quote) 1))
+  (let [randomN (+ (rand-int quote) 1)]
+    (println "QD = " randomN)
+    randomN))
 
 ;(defn orderBook
 ;  "order a book from buyer1's perspective (implements new receive monitor)"
@@ -32,6 +34,7 @@
   (send-to participant "title" (generateBook) "seller")
   (receive-by participant "quote" "seller"
               (fn [x]
+                (println "buyer1 received quote!")
                   (send-to participant "quoteDiv" (quoteDiv x) "buyer2")))
   (receive-by participant "repeat" "seller"
               (fn [x](println "repeat received on buyer1 from seller!")
