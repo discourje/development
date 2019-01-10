@@ -35,6 +35,7 @@
      (incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply send! with an instantiated protocol!")
      (if (and (isCommunicationValid? action from to protocol) (not (instance? receiveM @(:activeMonitor @protocol))))
        (let [currentMonitor @(:activeMonitor @protocol)]
+         (println "currently sending! " currentMonitor)
          (cond
            (instance? sendM currentMonitor)
            (do
@@ -89,7 +90,7 @@
                       (when (and
                               (not= (:action activeMonitorRef) (:action new-state))
                               (not= (:from activeMonitorRef) (:from new-state)))
-                        (println (format "Watch removed! Active: %s %s----NewState %s %s" (:action activeMonitorRef) (:from activeMonitorRef) (:action new-state) (:from new-state)))
+                        ;(println (format "Watch removed! Active: %s %s----NewState %s %s" (:action activeMonitorRef) (:from activeMonitorRef) (:action new-state) (:from new-state)))
                         (remove-watch activeMonitor nil)
                         (callback value))))))
      (do

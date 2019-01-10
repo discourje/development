@@ -86,11 +86,13 @@
 (defn- resetMonitor!
   "Reset! the monitor ATOM"
   ([nextMonitor protocol subvecIndex]
-   (reset! (:activeMonitor @protocol) nextMonitor)
-   (reset! (:protocol @protocol) (subvec @(:protocol @protocol) subvecIndex)))
+   (reset! (:protocol @protocol) (subvec @(:protocol @protocol) subvecIndex))
+   (reset! (:activeMonitor @protocol) nextMonitor))
+   ;(println "before_______" @(:protocol @protocol))
+   ;(println "after_______" @(:protocol @protocol)))
   ([nextMonitor protocol recursionProtocol subvecIndex]
-   (reset! (:activeMonitor @protocol) nextMonitor)
-   (reset! (:protocol @protocol) (subvec recursionProtocol subvecIndex)))
+   (reset! (:protocol @protocol) (subvec recursionProtocol subvecIndex))
+   (reset! (:activeMonitor @protocol) nextMonitor))
   ([protocol]
    (reset! (:activeMonitor @protocol) nil)))
 

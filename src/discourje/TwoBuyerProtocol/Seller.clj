@@ -30,7 +30,7 @@
   (println (format "Protocol ended with: %s" quit)))
 
 
-(defn orderBookParticipant
+(defn orderBook
   "Order book from seller's perspective"
   ([participant]
   (receive-by participant "title" "buyer1"
@@ -45,7 +45,7 @@
                                 (println "The received address is: " address)
                                 (send-to participant "date" (getRandomDate 5) "buyer2")
                                 (send-to participant "repeat" "repeat" ["buyer2" "buyer1"])
-                                (orderBookParticipant participant)
+                                (orderBook participant)
                                 )))
                 (= response "quit")
                 (endReached response)
@@ -53,7 +53,7 @@
               )))
   ([name protocol] ; example how function would operate when participants are constructed internally
    (let [participant (discourje.core.core/->participant name protocol)]
-     (orderBookParticipant participant)))
+     (orderBook participant)))
   )
 ;wait for title
 ;send quote to buyer1 and buyer2

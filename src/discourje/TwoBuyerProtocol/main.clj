@@ -13,6 +13,6 @@
 (def buyer2 (discourje.core.core/->participant "buyer2" protocol))
 
 
-(clojure.core.async/thread (b1/orderBookParticipant buyer1))
-(clojure.core.async/thread (b2/orderBookParticipant buyer2))
-(clojure.core.async/thread (se/orderBookParticipant seller))
+(clojure.core.async/thread (b1/orderBook buyer1))
+(clojure.core.async/thread (b2/orderBook buyer2))
+(clojure.core.async/thread (se/orderBook seller))

@@ -13,7 +13,7 @@
   []
   "Open University, Valkenburgerweg 177, 6419 AT, Heerlen")
 
-(defn orderBookParticipant
+(defn orderBook
   "Order a book from buyer2's perspective"
   [participant]
   (receive-by participant "quote" "seller"
@@ -28,7 +28,7 @@
                                         (receive-by participant "repeat" "seller"
                                                     (fn [x]
                                                         (println "repeat received on buyer2 from seller!")
-                                                        (orderBookParticipant participant)))
+                                                        (orderBook participant)))
                                         )
                                     (send-to participant "quit" "quit" "seller"))
                                   )))))

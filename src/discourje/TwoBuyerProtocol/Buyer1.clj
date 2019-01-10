@@ -15,20 +15,7 @@
     (println "QD = " randomN)
     randomN))
 
-;(defn orderBook
-;  "order a book from buyer1's perspective (implements new receive monitor)"
-;  [protocol]
-;  (send! "title" (generateBook) "buyer1" "seller" protocol)
-;  (let [quote (atom nil)]
-;    (recv! "quote" "seller" "buyer1" protocol (fn [receivedQuote] (reset! quote receivedQuote)))
-;    (add-watch quote nil
-;               (fn [key atom old-state new-state]
-;                 (send! "quoteDiv" (quoteDiv new-state) "buyer1" "buyer2" protocol)
-;                 (remove-watch quote nil)))
-;  ))
-
-
-(defn orderBookParticipant
+(defn orderBook
   "order a book from buyer1's perspective (implements new receive monitor)"
   [participant]
   (send-to participant "title" (generateBook) "seller")
@@ -38,13 +25,9 @@
                   (send-to participant "quoteDiv" (quoteDiv x) "buyer2")))
   (receive-by participant "repeat" "seller"
               (fn [x](println "repeat received on buyer1 from seller!")
-                  (orderBookParticipant participant))
+                  (orderBook participant))
               )
   )
-
-
-
-;(clojure.core.async/thread (orderBook))
 
 ;send title to seller
 ;wait for quote
