@@ -95,10 +95,17 @@
   ([protocol]
    (reset! (:activeMonitor @protocol) nil)))
 
+(defn monitorsEqual?
+"Are monitor a and b equal?
+Checked by equal action-from-to"
+  [monitor-a monitor-b]
+  (let [a @monitor-a
+        b @monitor-b]
+    (and
+      (= (:to a) (:to b))
+      (= (:from a) (:from b))
+      (= (:action a) (:action b)))))
 
-(defn monitorsEqual? [ma mb]
-  (let [a @ma
-        b @mb]))
 (defn activateNextMonitor ;todo type of monitor to compare recv to send!
   "Set the active monitor based on the protocol"
   ([action from to protocol]
@@ -134,8 +141,10 @@
        (let [trueResult (monitorValid? (first (:trueBranch activeM)) action from to)
              falseResult (monitorValid? (first (:falseBranch activeM)) action from to)]
          (cond
-           (and trueResult (not= (first (:falseBranch activeM)) activeM)) (activateChoiceBranch protocol (:trueBranch activeM))
-           (and falseResult (not= (first (:trueBranch activeM)) activeM)) (activateChoiceBranch protocol (:falseBranch activeM)))))))
+           (and trueResult (not= (monitorsEqual? (first (:falseBranch activeM)) (:activeMonitor @protocol))))
+           (activateChoiceBranch protocol (:trueBranch activeM))
+           (and falseResult (not= (monitorsEqual? (first (:trueBranch activeM)) (:activeMonitor @protocol))))
+           (activateChoiceBranch protocol (:falseBranch activeM)))))))
   ([protocol]
    (let [nextMonitor (first @(:protocol protocol))]
      (if (instance? recursion nextMonitor)

@@ -38,14 +38,12 @@
          (println "yes sending: " action)
          (cond
            (instance? sendM currentMonitor)
-           (do
-             (activateMonitorOnSend action from to protocol)
+           (do (activateMonitorOnSend action from to protocol)
              (send! currentMonitor value protocol))
            (instance? choice currentMonitor)
            (let [target (getTargetBranch action from to protocol)]
              (if (instance? sendM target)
-             (do
-               (activateMonitorOnSend action from to protocol)
+             (do (activateMonitorOnSend action from to protocol)
                (send! target value protocol))
              (println "target choice is not a sendM")))))
        (incorrectCommunication (format "Send action: %s is not allowed to proceed from %s to %s" action from to)))))
