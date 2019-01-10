@@ -35,7 +35,7 @@
      (incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply send! with an instantiated protocol!")
      (if (and (isCommunicationValid? action from to protocol) (not (instance? receiveM @(:activeMonitor @protocol))))
        (let [currentMonitor @(:activeMonitor @protocol)]
-         (println "currently sending! " currentMonitor)
+         (println "yes sending: " action)
          (cond
            (instance? sendM currentMonitor)
            (do
@@ -43,10 +43,11 @@
              (send! currentMonitor value protocol))
            (instance? choice currentMonitor)
            (let [target (getTargetBranch action from to protocol)]
-             (when (instance? sendM target)
+             (if (instance? sendM target)
              (do
                (activateMonitorOnSend action from to protocol)
-               (send! target value protocol))))))
+               (send! target value protocol))
+             (println "target choice is not a sendM")))))
        (incorrectCommunication (format "Send action: %s is not allowed to proceed from %s to %s" action from to)))))
   ([currentMonitor value protocol]
    (if (vector? (:to currentMonitor))
@@ -73,25 +74,43 @@
                         (instance? choice currentMonitor)
                         (let [target (getTargetBranch action from to protocol)]
                           (if (instance? receiveM target)
-                            (recv! action from to protocol callback x)
+                            (recv! action from to protocol callback x target)
                             (println "target choice is not a receiveM"))
                           )))
                     (do
                       (incorrectCommunication (format "recv action: %s is not allowed to proceed from %s to %s___Current monitor: Type: %s Action: %s, From: %s To: %s" action from to @(:activeMonitor @protocol) (:action @(:activeMonitor @protocol)) (:from @(:activeMonitor @protocol)) (:to @(:activeMonitor @protocol))))
                       (callback nil)))))))))
   ([action from to protocol callback value]
+   (recv! action from to protocol callback value (:activeMonitor @protocol))
+   ;(if (hasMultipleReceivers? protocol)
+   ;  (do
+   ;    (removeReceiver protocol to)                         ;todo choice branch?
+   ;    (let [activeMonitor (:activeMonitor @protocol)
+   ;          activeMonitorRef @activeMonitor]
+   ;      (add-watch (:activeMonitor @protocol) nil
+   ;                 (fn [key atom old-state new-state]
+   ;                   (when (and
+   ;                           (not= (:action activeMonitorRef) (:action new-state))
+   ;                           (not= (:from activeMonitorRef) (:from new-state)))
+   ;                     ;(println (format "Watch removed! Active: %s %s----NewState %s %s" (:action activeMonitorRef) (:from activeMonitorRef) (:action new-state) (:from new-state)))
+   ;                     (remove-watch activeMonitor nil)
+   ;                     (callback value))))))
+   ;  (do
+   ;    (activateNextMonitor action from to protocol)
+   ;    (callback value)
+   ;    (closeProtocol! protocol)))
+    )
+  ([action from to protocol callback value targetM]
    (if (hasMultipleReceivers? protocol)
      (do
-       (removeReceiver protocol to)                         ;todo choice branch?
-       (let [activeMonitor (:activeMonitor @protocol)
-             activeMonitorRef @activeMonitor]
+       (removeReceiver protocol to)
+       (let [targetMRef @targetM]
          (add-watch (:activeMonitor @protocol) nil
                     (fn [key atom old-state new-state]
                       (when (and
-                              (not= (:action activeMonitorRef) (:action new-state))
-                              (not= (:from activeMonitorRef) (:from new-state)))
-                        ;(println (format "Watch removed! Active: %s %s----NewState %s %s" (:action activeMonitorRef) (:from activeMonitorRef) (:action new-state) (:from new-state)))
-                        (remove-watch activeMonitor nil)
+                              (not= (:action targetMRef) (:action new-state))
+                              (not= (:from targetMRef) (:from new-state)))
+                        (remove-watch targetM nil)
                         (callback value))))))
      (do
        (activateNextMonitor action from to protocol)
