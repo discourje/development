@@ -51,7 +51,7 @@
    (if (vector? (:to currentMonitor))
      (doseq [receiver (:to currentMonitor)]
        (allowSend (:channel (getChannel (:from currentMonitor) receiver (:channels @protocol))) value))
-     (allowSend (:channel (getChannel (:from currentMonitor) (:to currentMonitor) (:channels @protocol))) value))))
+       (allowSend (:channel (getChannel (:from currentMonitor) (:to currentMonitor) (:channels @protocol))) value))))
 
 (defn recv!
   "receive something through the protocol"
@@ -59,7 +59,7 @@
    (let [channel (getChannel from to (:channels @protocol))]
      (if (nil? channel)
        (incorrectCommunication "Cannot find channel from %s to %s in the defined channels of the protocol! Please make sure you supply supported sender and receiver pair")
-       (take! (:channel channel)
+         (take! (:channel channel)
               (fn [x]
                 (println "recv! got " x)
                 (if (nil? (:activeMonitor @protocol))
@@ -73,30 +73,28 @@
                         (let [target (getTargetBranch action from to protocol)]
                           (if (instance? receiveM target)
                             (recv! action from to protocol callback x target)
-                            (println "target choice is not a receiveM"))
+                            (println "target choice is not a receiveM" target))
                           )))
                     (do
                       (incorrectCommunication (format "recv action: %s is not allowed to proceed from %s to %s___Current monitor: Type: %s Action: %s, From: %s To: %s" action from to @(:activeMonitor @protocol) (:action @(:activeMonitor @protocol)) (:from @(:activeMonitor @protocol)) (:to @(:activeMonitor @protocol))))
                       (callback nil)))))))))
   ([action from to protocol callback value]
-   (recv! action from to protocol callback value (:activeMonitor @protocol))
-   ;(if (hasMultipleReceivers? protocol)
-   ;  (do
-   ;    (removeReceiver protocol to)                         ;todo choice branch?
-   ;    (let [activeMonitor (:activeMonitor @protocol)
-   ;          activeMonitorRef @activeMonitor]
-   ;      (add-watch (:activeMonitor @protocol) nil
-   ;                 (fn [key atom old-state new-state]
-   ;                   (when (and
-   ;                           (not= (:action activeMonitorRef) (:action new-state))
-   ;                           (not= (:from activeMonitorRef) (:from new-state)))
-   ;                     ;(println (format "Watch removed! Active: %s %s----NewState %s %s" (:action activeMonitorRef) (:from activeMonitorRef) (:action new-state) (:from new-state)))
-   ;                     (remove-watch activeMonitor nil)
-   ;                     (callback value))))))
-   ;  (do
-   ;    (activateNextMonitor action from to protocol)
-   ;    (callback value)
-   ;    (closeProtocol! protocol)))
+   (if (hasMultipleReceivers? protocol)
+     (do
+       (removeReceiver protocol to)
+       (let [activeMonitor (:activeMonitor @protocol)
+             activeMonitorRef @activeMonitor]
+         (add-watch (:activeMonitor @protocol) nil
+                    (fn [key atom old-state new-state]
+                      (when (and
+                              (not= (:action activeMonitorRef) (:action new-state))
+                              (not= (:from activeMonitorRef) (:from new-state)))
+                        (remove-watch activeMonitor nil)
+                        (callback value))))))
+     (do
+       (activateNextMonitor action from to protocol)
+       (callback value)
+       (closeProtocol! protocol)))
     )
   ([action from to protocol callback value targetM]
    (if (hasMultipleReceivers? protocol)

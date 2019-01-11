@@ -18,9 +18,11 @@
 (defn activateChoiceBranch
   "activates the choice branch and filters out the branch which was not chosen"
   [protocol branch]
-  (reset! (:protocol @protocol) (subvec (vec (mapcat identity [branch @(:protocol @protocol)])) 1))
-  (reset! (:activeMonitor @protocol) (first branch))
-  (println "CHOICE next monitor is "@(:activeMonitor @protocol) )) ;todo protocol calls this function twice, for both actions! so both activate the next monitor!
+  (reset! (:protocol @protocol) (subvec (vec (mapcat identity [branch @(:protocol @protocol)])) 1)) ;todo check if long enough to select index 1!!!
+  (reset! (:activeMonitor @protocol) (nth branch 1))
+  (println "next monitor IN CHOICE is "(nth branch 1))
+  ;(println "CHOICE next monitor is "@(:activeMonitor @protocol))
+  )
 
 (defn incorrectCommunication
   "communication incorrect, log a message! (or maybe throw exception)"
@@ -71,8 +73,7 @@
 (defn canCloseProtocol?
   "can all channels of the protocol be closed?"
   [protocol]
-  (= (count @(:protocol @protocol)) 1))
-
+  (= (count @(:protocol @protocol)) 0))
 
 (defn closeProtocol!
   "Close all channels of the protocol"
@@ -99,8 +100,11 @@
 "Are monitor a and b equal?
 Checked by equal action-from-to"
   [monitor-a monitor-b]
-  (let [a @monitor-a
+  (let [a monitor-a
         b @monitor-b]
+    (println a)
+    (println "_____")
+    (println b)
     (and
       (= (:to a) (:to b))
       (= (:from a) (:from b))
@@ -132,7 +136,7 @@ Checked by equal action-from-to"
            :else
            (if (> (count @(:protocol @protocol)) 0)
              (do
-               (println "next monitor =  "nextMonitor)
+       ;        (println "next monitor =  "nextMonitor)
              (resetMonitor! nextMonitor protocol 1))
              (resetMonitor! protocol)
              ))
@@ -141,10 +145,14 @@ Checked by equal action-from-to"
        (let [trueResult (monitorValid? (first (:trueBranch activeM)) action from to)
              falseResult (monitorValid? (first (:falseBranch activeM)) action from to)]
          (cond
-           (and trueResult (not= (monitorsEqual? (first (:falseBranch activeM)) (:activeMonitor @protocol))))
-           (activateChoiceBranch protocol (:trueBranch activeM))
-           (and falseResult (not= (monitorsEqual? (first (:trueBranch activeM)) (:activeMonitor @protocol))))
-           (activateChoiceBranch protocol (:falseBranch activeM)))))))
+           (and trueResult
+                ;(not= (monitorsEqual? (first (:falseBranch activeM)) (:activeMonitor @protocol)))
+                )
+           (do (println "Taking TrueBranch") (activateChoiceBranch protocol (:trueBranch activeM)))
+           (and falseResult
+                ;(not= (monitorsEqual? (first (:trueBranch activeM)) (:activeMonitor @protocol)))
+                )
+           (do (println "Taking falseBranch") (activateChoiceBranch protocol (:falseBranch activeM))))))))
   ([protocol]
    (let [nextMonitor (first @(:protocol protocol))]
      (if (instance? recursion nextMonitor)
@@ -162,7 +170,7 @@ Checked by equal action-from-to"
   "activate a new monitor when specific sendM is encountered"
   [action from to protocol]
   (let [activeM @(:activeMonitor @protocol)]
-    (when (instance? sendM activeM)
+    (when (or (instance? sendM activeM) (instance? choice activeM))
         (activateNextMonitor action from to protocol))))
 
 (defn isCommunicationValid?
@@ -175,8 +183,8 @@ Checked by equal action-from-to"
       (instance? choice activeM)
       (let [trueResult (monitorValid? (first (:trueBranch activeM)) action from to)
             falseResult (monitorValid? (first (:falseBranch activeM)) action from to)]
-        (cond trueResult (activateChoiceBranch protocol (:trueBranch activeM))
-              falseResult (activateChoiceBranch protocol (:falseBranch activeM)))
+        ;(cond trueResult (activateChoiceBranch protocol (:trueBranch activeM)) ;todo here the choice gets set !!! this should not happen i think
+        ;      falseResult (activateChoiceBranch protocol (:falseBranch activeM)))
         (or trueResult falseResult)))))
 
 (defn getTargetBranch
