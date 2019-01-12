@@ -6,7 +6,7 @@
   "returns true when the received quote 50% or greater"
   [quote div]
   (println (format "received quote: %d and div: %d, contribute = %s" quote div (>= (* 100 (float (/ div quote))) 50)))
-  (>= (* 100 (float (/ div quote))) 50))
+  (>= (* 100 (float (/ div quote))) 0)) ;todo set value to 50% when done debugging!
 
 (defn generateAddress
   "generates the address"
@@ -14,26 +14,6 @@
   "Open University, Valkenburgerweg 177, 6419 AT, Heerlen")
 
 (defn orderBook
-  "Order a book from buyer2's perspective"
-  [this protocol]
-  (recvDelayed! "quote" "seller" this protocol
-                (fn [receivedQuote]
-                  (println "buyer2 received quote! " receivedQuote)
-                  (recvDelayed! "quoteDiv" "buyer1" this protocol
-                                (fn [receivedQuoteDiv]
-                                  (if (contribute? receivedQuote receivedQuoteDiv)
-                                    (do (send! "ok" "ok" this "seller" protocol)
-                                        (send! "address" (generateAddress) this "seller" protocol)
-                                        (recvDelayed! "date" "seller" this protocol (fn [x] (println "Received date!" x)))
-                                        (recvDelayed! "repeat" "seller" this protocol
-                                                      (fn [x]
-                                                        (println "repeat received on buyer2 from seller!")
-                                                        (orderBook this protocol)))
-                                        )
-                                    (send! "quit" "quit" this "seller" protocol))
-                                  )))))
-
-(defn orderBookParticipant
   "Order a book from buyer2's perspective"
   [participant]
   (receive-by participant "quote" "seller"
@@ -44,11 +24,10 @@
                                   (if (contribute? receivedQuote receivedQuoteDiv)
                                     (do (send-to participant "ok" "ok" "seller")
                                         (send-to participant "address" (generateAddress) "seller")
-                                        (receive-by participant "date" "seller" (fn [x] (println "Received date!" x)))
-                                        (receive-by participant "repeat" "seller"
-                                                    (fn [x]
-                                                        (println "repeat received on buyer2 from seller!")
-                                                        (orderBookParticipant participant)))
+                                        (receive-by participant "date" "seller"
+                                                    (fn [x] (println "Received date!" x)
+                                                      (send-to participant "repeat" "repeat" ["seller" "buyer1"])
+                                                      (orderBook participant)))
                                         )
                                     (send-to participant "quit" "quit" "seller"))
                                   )))))

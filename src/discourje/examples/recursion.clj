@@ -60,7 +60,7 @@
               (fn [numberMap]
                 (let [threshold (:threshold numberMap)
                       generated (:generatedNumber numberMap)]
-                  (if (> threshold generated)
+                  (if (> generated threshold)
                     (do (send-to participant "greaterThan" "Greater!" "alice")
                         (receiveNumber participant))
                     (send-to participant "lessThan" "Smaller!" "alice"))))))

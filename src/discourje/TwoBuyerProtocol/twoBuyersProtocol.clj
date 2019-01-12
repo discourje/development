@@ -14,13 +14,20 @@
                  (->receiveM "quoteDiv" "buyer2" "buyer1")
                  (->choice [
                             (->sendM "ok" "buyer2" "seller")
-                            (->sendM "address" "buyer2" "seller")
-                            (->receiveM "ok" "seller" "buyer2")
-                            (->receiveM "address" "seller" "buyer2")
+                            (->choice [
+                                       (->sendM "address" "buyer2" "seller")
+                                       (->receiveM "ok" "seller" "buyer2")
+                                       (->receiveM "address" "seller" "buyer2")
+                                       ]
+                                      [
+                                       (->receiveM "ok" "seller" "buyer2")
+                                       (->sendM "address" "buyer2" "seller")
+                                       (->receiveM "address" "seller" "buyer2")
+                                       ])
                             (->sendM "date" "seller" "buyer2")
-                            (->sendM "repeat" "seller" ["buyer2" "buyer1"])
                             (->receiveM "date" "buyer2" "seller")
-                            (->receiveM "repeat" ["buyer2" "buyer1"] "seller")
+                            (->sendM "repeat" "buyer2" ["seller" "buyer1"])
+                            (->receiveM "repeat" ["seller" "buyer1"] "buyer2")
                             (generateRecur :x)
                             ]
                            [

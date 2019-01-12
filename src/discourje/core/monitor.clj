@@ -15,11 +15,33 @@
   [name]
   (->recur! name :end))
 
+(defn- resetMonitor!
+  "Reset! the monitor ATOM"
+  ([nextMonitor protocol subvecIndex]
+   (reset! (:protocol @protocol) (subvec @(:protocol @protocol) subvecIndex))
+   (reset! (:activeMonitor @protocol) nextMonitor))
+  ([nextMonitor protocol recursionProtocol subvecIndex]
+   (reset! (:protocol @protocol) (subvec recursionProtocol subvecIndex))
+   (reset! (:activeMonitor @protocol) nextMonitor))
+  ([protocol]
+   (reset! (:activeMonitor @protocol) nil)))
+
 (defn activateChoiceBranch
   "activates the choice branch and filters out the branch which was not chosen"
   [protocol branch]
-  (reset! (:activeMonitor @protocol) (first branch))
-  (reset! (:protocol @protocol) (subvec (vec (mapcat identity [branch @(:protocol @protocol)])) 1)))
+  ;(reset! (:protocol @protocol) (subvec (vec (mapcat identity [branch @(:protocol @protocol)])) 2)) ;todo check if long enough to select index 1!!!
+  (if (= 1 (count branch))
+    (if (> (count @(:protocol @protocol)) 0)
+      (let [nextMonitor (first @(:protocol @protocol))]
+        ;(println "next monitor =  " nextMonitor)
+        (resetMonitor! nextMonitor protocol 1))
+      (resetMonitor! protocol))
+    (do
+      (reset! (:protocol @protocol) (subvec (vec (mapcat identity [branch @(:protocol @protocol)])) 2)) ;todo check if long enough to select index 1!!!
+      (reset! (:activeMonitor @protocol) (nth branch 1))
+        (println "next monitor IN CHOICE is " (nth branch 1))
+      ))
+  )
 
 (defn incorrectCommunication
   "communication incorrect, log a message! (or maybe throw exception)"
@@ -55,11 +77,11 @@
 (defn monitorValid?
   "is the current monitor valid, compared the current monitor's action, from and to to the given values"
   ([activeM action from to]
-  (and
-    (and (if (instance? Seqable action)
-           (or (contains-value? (:action activeM) action) (= action (:action activeM)))
-           (or (= action (:action activeM)) (contains-value? action (:action activeM)))))
-    (monitorValid? activeM from to)))
+   (and
+     (and (if (instance? Seqable action)
+            (or (contains-value? (:action activeM) action) (= action (:action activeM)))
+            (or (= action (:action activeM)) (contains-value? action (:action activeM)))))
+     (monitorValid? activeM from to)))
   ([activeM from to]
    (and
      (= from (:from activeM))
@@ -70,8 +92,7 @@
 (defn canCloseProtocol?
   "can all channels of the protocol be closed?"
   [protocol]
-  (= (count @(:protocol @protocol)) 1))
-
+  (= (count @(:protocol @protocol)) 0))
 
 (defn closeProtocol!
   "Close all channels of the protocol"
@@ -79,51 +100,26 @@
   (when (canCloseProtocol? protocol)
     (let [channels (:channels @protocol)]
       (doseq [chan channels]
-       ; (clojure.core.async/close! (:channel chan))
-        ))))
+        ; (clojure.core.async/close! (:channel chan))
+        )))
+  )
 
-(defn- getChannel
-  "finds a channel based on sender and receiver"
-  [sender receiver channels]
-  (first
-    (filter (fn [ch]
-              (and
-                (= (:sender ch) sender)
-                (= (:receiver ch) receiver)))
-            channels)))
 
-(defn invokeReceiveMCallback
-  "When the nextMonitor is of ReceiveM type we will invoke the first callback in the queue if there is one."
-  ([nextMonitor protocol]
-  (when (instance? receiveM nextMonitor)
-    (do (if (instance? Seqable (:to nextMonitor))
-          (doseq [to (:to nextMonitor)]
-            (invokeReceiveMCallback nextMonitor to protocol))
-          (invokeReceiveMCallback nextMonitor (:to nextMonitor) protocol)))))
-  ([nextMonitor to protocol]
-     (when-let [channel (getChannel (:from nextMonitor) to (:channels @protocol))]
-     (when-let [cb (peek @(:receivingQueue channel))]
-       (reset! (:receivingQueue channel) (pop @(:receivingQueue channel)))
-       (cb)))))
+(defn monitorsEqual?
+  "Are monitor a and b equal?
+  Checked by equal action-from-to"
+  [monitor-a monitor-b]
+  (let [a monitor-a
+        b @monitor-b]
+    ;(println "a = " (type a))
+    ;(println "b = " (type b))
+    (and
+      (= (:to a) (:to b))
+      (= (:from a) (:from b))
+      (= (:action a) (:action b))
+      (= (type a) (type b)))))
 
-(defn isReceiveMActive? [action from to protocol]
-  (and (instance? receiveM @(:activeMonitor @protocol)) (monitorValid? @(:activeMonitor @protocol) action from to)))
-
-(defn- resetMonitor!
-  "Reset! the monitor ATOM"
-  ([nextMonitor protocol subvecIndex]
-   (reset! (:activeMonitor @protocol) nextMonitor)
-   (reset! (:protocol @protocol) (subvec @(:protocol @protocol) subvecIndex))
-   (invokeReceiveMCallback nextMonitor protocol))
-  ([nextMonitor protocol recursionProtocol subvecIndex]
-   (reset! (:activeMonitor @protocol) nextMonitor)
-   (reset! (:protocol @protocol) (subvec recursionProtocol subvecIndex))
-   (invokeReceiveMCallback nextMonitor protocol))
-  ([protocol]
-   ;(invokeReceiveMCallback (:activeMonitor @protocol) protocol)
-   (reset! (:activeMonitor @protocol) nil)))
-
-(defn activateNextMonitor
+(defn activateNextMonitor                                   ;todo type of monitor to compare recv to send!
   "Set the active monitor based on the protocol"
   ([action from to protocol]
    (let [activeM @(:activeMonitor @protocol)]
@@ -148,41 +144,50 @@
                ))
            :else
            (if (> (count @(:protocol @protocol)) 0)
-             (resetMonitor! nextMonitor protocol 1)
+             (do
+               ;(println "next monitor =  " nextMonitor)
+               (resetMonitor! nextMonitor protocol 1))
              (resetMonitor! protocol)
              ))
          )
        (instance? choice activeM)
        (let [trueResult (monitorValid? (first (:trueBranch activeM)) action from to)
              falseResult (monitorValid? (first (:falseBranch activeM)) action from to)]
-         (cond trueResult (activateChoiceBranch protocol (:trueBranch activeM))
-               falseResult (activateChoiceBranch protocol (:falseBranch activeM)))))))
+         (cond
+           ;(and
+           trueResult
+           ;(not= (monitorsEqual? (first (:falseBranch activeM)) (:activeMonitor @protocol)))                )
+           ;(do
+             ;(println "Taking TrueBranch")
+             (activateChoiceBranch protocol (:trueBranch activeM))
+             ;)
+           ;(and
+           falseResult
+           ;(not= (monitorsEqual? (first (:trueBranch activeM)) (:activeMonitor @protocol)))                )
+           ;(do
+             ;(println "Taking falseBranch")
+             (activateChoiceBranch protocol (:falseBranch activeM))
+             ;)
+           )))))
   ([protocol]
    (let [nextMonitor (first @(:protocol protocol))]
      (if (instance? recursion nextMonitor)
        (let [firstRecMonitor (first (:protocol nextMonitor))
              recursionProt (:protocol nextMonitor)]
-         (reset! (:activeMonitor protocol) firstRecMonitor)
          (reset! (:protocol protocol) (subvec recursionProt 1))
+         (reset! (:activeMonitor protocol) firstRecMonitor)
          )
        (do
-         (reset! (:activeMonitor protocol) nextMonitor)
-         (reset! (:protocol protocol) (subvec @(:protocol protocol) 1)))))))
+         (reset! (:protocol protocol) (subvec @(:protocol protocol) 1))
+         (reset! (:activeMonitor protocol) nextMonitor))))))
 
 
 (defn activateMonitorOnSend
   "activate a new monitor when specific sendM is encountered"
   [action from to protocol]
   (let [activeM @(:activeMonitor @protocol)]
-    (when (instance? sendM activeM)
-        (activateNextMonitor action from to protocol))))
-
-(defn activateMonitorOnReceive
-  "activate a new monitor when specific receiveM is encountered"
-  [protocol]
-  (let [activeM @(:activeMonitor @protocol)]
-    (when (instance? receiveM activeM)
-      (invokeReceiveMCallback activeM protocol))))
+    (when (or (instance? sendM activeM) (instance? choice activeM))
+      (activateNextMonitor action from to protocol))))
 
 (defn isCommunicationValid?
   "Checks if communication is valid by comparing input to the active monitor"
@@ -194,8 +199,8 @@
       (instance? choice activeM)
       (let [trueResult (monitorValid? (first (:trueBranch activeM)) action from to)
             falseResult (monitorValid? (first (:falseBranch activeM)) action from to)]
-        (cond trueResult (activateChoiceBranch protocol (:trueBranch activeM))
-              falseResult (activateChoiceBranch protocol (:falseBranch activeM)))
+        ;(cond trueResult (activateChoiceBranch protocol (:trueBranch activeM)) ;todo here the choice gets set !!! this should not happen i think
+        ;      falseResult (activateChoiceBranch protocol (:falseBranch activeM)))
         (or trueResult falseResult)))))
 
 (defn getTargetBranch
