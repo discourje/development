@@ -39,4 +39,4 @@
 (defn getProtocol
   "generate the protocol, channels and set the first monitor active"
   []
-  (generateProtocol ["buyer1" "buyer2" "seller"] (defineRecurringProtocol)))
+  (generateProtocol (defineRecurringProtocol)))

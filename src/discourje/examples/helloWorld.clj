@@ -14,7 +14,7 @@
 (defn generateHelloWorldProtocol
   "Generate the protocol, channels and set the first monitor active."
   []
-  (generateProtocol ["user" "world"] (defineHelloWorldProtocol)))
+  (generateProtocol (defineHelloWorldProtocol)))
 
 ;define the protocol
 (def protocol (atom (generateHelloWorldProtocol)))

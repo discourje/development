@@ -59,7 +59,7 @@
   ([action from to protocol callback]
    (let [channel (getChannel from to (:channels @protocol))]
      (if (nil? channel)
-       (incorrectCommunication "Cannot find channel from %s to %s in the defined channels of the protocol! Please make sure you supply supported sender and receiver pair")
+       (incorrectCommunication (format "Cannot find channel from %s to %s in the defined channels of the protocol! Please make sure you supply supported sender and receiver pair" from to))
          (take! (:channel channel)
               (fn [x]
                 ;(println "recv! got " x)

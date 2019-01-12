@@ -16,7 +16,7 @@
 (defn generateParallelProtocol
   "Generate the protocol, channels and set the first monitor active."
   []
-  (generateProtocol ["alice" "bob" "carol"] (defineParallelProtocol)))
+  (generateProtocol (defineParallelProtocol)))
 
 ;define the protocol
 (def protocol (atom (generateParallelProtocol)))

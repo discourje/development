@@ -17,7 +17,7 @@
 (defn generateSequenceProtocol
   "Generate the protocol, channels and set the first monitor active."
   []
-  (generateProtocol ["alice" "bob" "carol"] (defineSequenceProtocol)))
+  (generateProtocol (defineSequenceProtocol)))
 
 ;define the protocol
 (def protocol (atom (generateSequenceProtocol)))

@@ -25,7 +25,7 @@
 (defn generateRecursiveProtocol
   "Generate the protocol, channels and set the first monitor active."
   []
-  (generateProtocol ["alice" "bob"] (defineRecursiveProtocol)))
+  (generateProtocol (defineRecursiveProtocol)))
 
 ;define the protocol
 (def protocol (atom (generateRecursiveProtocol)))

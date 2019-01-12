@@ -21,7 +21,7 @@
 (defn generateBranchProtocol
   "Generate the protocol, channels and set the first monitor active."
   []
-  (generateProtocol ["alice" "bob"] (defineBranchProtocol)))
+  (generateProtocol (defineBranchProtocol)))
 
 ;define the protocol
 (def protocol (atom (generateBranchProtocol)))
