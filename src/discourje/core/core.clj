@@ -8,7 +8,7 @@
 (defn putMessage
   "Puts message on the channel, non-blocking"
   [channel message]
-  (println (format "setting message %s" message))
+  ;(println (format "setting message %s" message))
   (put! channel message))
 
 (defn getChannel
@@ -35,7 +35,7 @@
      (incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply send! with an instantiated protocol!")
      (if (and (isCommunicationValid? action from to protocol) (not (instance? receiveM @(:activeMonitor @protocol))))
        (let [currentMonitor @(:activeMonitor @protocol)]
-         (println "yes sending: " action)
+         ;(println "yes sending: " action)
          (cond
            (instance? sendM currentMonitor)
            (do (activateMonitorOnSend action from to protocol)
@@ -45,7 +45,8 @@
              (if (instance? sendM target)
              (do (activateMonitorOnSend action from to protocol)
                (send! target value protocol))
-             (println "target choice is not a sendM")))))
+             (println "target choice is not a sendM")
+             ))))
        (incorrectCommunication (format "Send action: %s is not allowed to proceed from %s to %s" action from to)))))
   ([currentMonitor value protocol]
    (if (vector? (:to currentMonitor))
@@ -61,7 +62,7 @@
        (incorrectCommunication "Cannot find channel from %s to %s in the defined channels of the protocol! Please make sure you supply supported sender and receiver pair")
          (take! (:channel channel)
               (fn [x]
-                (println "recv! got " x)
+                ;(println "recv! got " x)
                 (if (nil? (:activeMonitor @protocol))
                   (incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply recv! with an instantiated protocol!")
                   (if (and (isCommunicationValid? action from to protocol) (not (instance? sendM @(:activeMonitor @protocol))))

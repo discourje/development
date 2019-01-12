@@ -15,13 +15,32 @@
   [name]
   (->recur! name :end))
 
+(defn- resetMonitor!
+  "Reset! the monitor ATOM"
+  ([nextMonitor protocol subvecIndex]
+   (reset! (:protocol @protocol) (subvec @(:protocol @protocol) subvecIndex))
+   (reset! (:activeMonitor @protocol) nextMonitor))
+  ([nextMonitor protocol recursionProtocol subvecIndex]
+   (reset! (:protocol @protocol) (subvec recursionProtocol subvecIndex))
+   (reset! (:activeMonitor @protocol) nextMonitor))
+  ([protocol]
+   (reset! (:activeMonitor @protocol) nil)))
+
 (defn activateChoiceBranch
   "activates the choice branch and filters out the branch which was not chosen"
   [protocol branch]
-  (reset! (:protocol @protocol) (subvec (vec (mapcat identity [branch @(:protocol @protocol)])) 2)) ;todo check if long enough to select index 1!!!
-  (reset! (:activeMonitor @protocol) (nth branch 1))
-  (println "next monitor IN CHOICE is "(nth branch 1))
-  ;(println "CHOICE next monitor is "@(:activeMonitor @protocol))
+  ;(reset! (:protocol @protocol) (subvec (vec (mapcat identity [branch @(:protocol @protocol)])) 2)) ;todo check if long enough to select index 1!!!
+  (if (= 1 (count branch))
+    (if (> (count @(:protocol @protocol)) 0)
+      (let [nextMonitor (first @(:protocol @protocol))]
+        ;(println "next monitor =  " nextMonitor)
+        (resetMonitor! nextMonitor protocol 1))
+      (resetMonitor! protocol))
+    (do
+      (reset! (:protocol @protocol) (subvec (vec (mapcat identity [branch @(:protocol @protocol)])) 2)) ;todo check if long enough to select index 1!!!
+      (reset! (:activeMonitor @protocol) (nth branch 1))
+        (println "next monitor IN CHOICE is " (nth branch 1))
+      ))
   )
 
 (defn incorrectCommunication
@@ -58,11 +77,11 @@
 (defn monitorValid?
   "is the current monitor valid, compared the current monitor's action, from and to to the given values"
   ([activeM action from to]
-  (and
-    (and (if (instance? Seqable action)
-           (or (contains-value? (:action activeM) action) (= action (:action activeM)))
-           (or (= action (:action activeM)) (contains-value? action (:action activeM)))))
-    (monitorValid? activeM from to)))
+   (and
+     (and (if (instance? Seqable action)
+            (or (contains-value? (:action activeM) action) (= action (:action activeM)))
+            (or (= action (:action activeM)) (contains-value? action (:action activeM)))))
+     (monitorValid? activeM from to)))
   ([activeM from to]
    (and
      (= from (:from activeM))
@@ -81,36 +100,26 @@
   (when (canCloseProtocol? protocol)
     (let [channels (:channels @protocol)]
       (doseq [chan channels]
-       ; (clojure.core.async/close! (:channel chan))
+        ; (clojure.core.async/close! (:channel chan))
         )))
   )
 
-(defn- resetMonitor!
-  "Reset! the monitor ATOM"
-  ([nextMonitor protocol subvecIndex]
-   (reset! (:protocol @protocol) (subvec @(:protocol @protocol) subvecIndex))
-   (reset! (:activeMonitor @protocol) nextMonitor))
-  ([nextMonitor protocol recursionProtocol subvecIndex]
-   (reset! (:protocol @protocol) (subvec recursionProtocol subvecIndex))
-   (reset! (:activeMonitor @protocol) nextMonitor))
-  ([protocol]
-   (reset! (:activeMonitor @protocol) nil)))
 
 (defn monitorsEqual?
-"Are monitor a and b equal?
-Checked by equal action-from-to"
+  "Are monitor a and b equal?
+  Checked by equal action-from-to"
   [monitor-a monitor-b]
   (let [a monitor-a
         b @monitor-b]
-    (println "a = " (type a))
-    (println "b = " (type b))
+    ;(println "a = " (type a))
+    ;(println "b = " (type b))
     (and
       (= (:to a) (:to b))
       (= (:from a) (:from b))
       (= (:action a) (:action b))
       (= (type a) (type b)))))
 
-(defn activateNextMonitor ;todo type of monitor to compare recv to send!
+(defn activateNextMonitor                                   ;todo type of monitor to compare recv to send!
   "Set the active monitor based on the protocol"
   ([action from to protocol]
    (let [activeM @(:activeMonitor @protocol)]
@@ -136,8 +145,8 @@ Checked by equal action-from-to"
            :else
            (if (> (count @(:protocol @protocol)) 0)
              (do
-               (println "next monitor =  "nextMonitor)
-             (resetMonitor! nextMonitor protocol 1))
+               ;(println "next monitor =  " nextMonitor)
+               (resetMonitor! nextMonitor protocol 1))
              (resetMonitor! protocol)
              ))
          )
@@ -146,13 +155,20 @@ Checked by equal action-from-to"
              falseResult (monitorValid? (first (:falseBranch activeM)) action from to)]
          (cond
            ;(and
-             trueResult
-             ;(not= (monitorsEqual? (first (:falseBranch activeM)) (:activeMonitor @protocol)))                )
-           (do (println "Taking TrueBranch") (activateChoiceBranch protocol (:trueBranch activeM)))
+           trueResult
+           ;(not= (monitorsEqual? (first (:falseBranch activeM)) (:activeMonitor @protocol)))                )
+           ;(do
+             ;(println "Taking TrueBranch")
+             (activateChoiceBranch protocol (:trueBranch activeM))
+             ;)
            ;(and
-             falseResult
-             ;(not= (monitorsEqual? (first (:trueBranch activeM)) (:activeMonitor @protocol)))                )
-           (do (println "Taking falseBranch") (activateChoiceBranch protocol (:falseBranch activeM))))))))
+           falseResult
+           ;(not= (monitorsEqual? (first (:trueBranch activeM)) (:activeMonitor @protocol)))                )
+           ;(do
+             ;(println "Taking falseBranch")
+             (activateChoiceBranch protocol (:falseBranch activeM))
+             ;)
+           )))))
   ([protocol]
    (let [nextMonitor (first @(:protocol protocol))]
      (if (instance? recursion nextMonitor)
@@ -171,7 +187,7 @@ Checked by equal action-from-to"
   [action from to protocol]
   (let [activeM @(:activeMonitor @protocol)]
     (when (or (instance? sendM activeM) (instance? choice activeM))
-        (activateNextMonitor action from to protocol))))
+      (activateNextMonitor action from to protocol))))
 
 (defn isCommunicationValid?
   "Checks if communication is valid by comparing input to the active monitor"

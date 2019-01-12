@@ -29,3 +29,5 @@
 (def aTest (->a))
 (def bTest (->b))
 (println (= (type aTest) (type bTest)))
+
+(subvec [0 1] 2)
