@@ -12,9 +12,11 @@
     (->sendM "number" "alice" "bob")
     (->receiveM "number" "bob" "alice")
     (->choice [(->sendM "greaterThan" "bob" "alice")
-               (->receiveM "greaterThan" "alice" "bob")]
+               (->receiveM "greaterThan" "alice" "bob")
+               ]
               [(->sendM "lessThan" "bob" "alice")
-               (->receiveM "lessThan" "alice" "bob")])))
+               (->receiveM "lessThan" "alice" "bob")
+               ])))
 
 (defn generateBranchProtocol
   "Generate the protocol, channels and set the first monitor active."
@@ -51,7 +53,8 @@
               (fn [numberMap]
                 (let [threshold (:threshold numberMap)
                       generated (:generatedNumber numberMap)]
-                  (if (> threshold generated)
+                  (println (:name participant) " received " numberMap)
+                  (if (> generated threshold)
                     (send-to participant "greaterThan" "Greater!" "alice")
                     (send-to participant "lessThan" "Smaller!" "alice"))))))
 

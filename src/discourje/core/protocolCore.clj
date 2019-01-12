@@ -5,14 +5,12 @@
 
 
 ;Defines a communication channel with a sender, receiver (strings), a channel Async.Chan and a queue for receivers.
-;We need a receivers queue to allow for multiple send! operations on the same channel without taking values from it by registered receives
-;We could also allow for blocking recv! now, without callbacks, but this needs testing!
-(defrecord communicationChannel [sender receiver channel receivingQueue])
+(defrecord communicationChannel [sender receiver channel])
 
 (defn- generateChannel
   "function to generate a channel between sender and receiver"
   [sender receiver]
-  (->communicationChannel sender receiver (clojure.core.async/chan) (atom PersistentQueue/EMPTY)))
+  (->communicationChannel sender receiver (clojure.core.async/chan)))
 
 (defn uniqueCartesianProduct
   "Generate channels between all participants and filters out duplicates e.g.: buyer1<->buyer1"

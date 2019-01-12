@@ -8,7 +8,6 @@
   [title]
   (println (format "received title: %s" title))
   (let [x (+ (rand-int 30) 1)]
-    (println (format "random number is: %s" x))
     x))
 
 (defn getDate
@@ -30,51 +29,33 @@
   [quit]
   (println (format "Protocol ended with: %s" quit)))
 
+
 (defn orderBook
   "Order book from seller's perspective"
-  [this protocol]
-  (recvDelayed! "title" "buyer1" this protocol
-                (fn [title]
-                  (send! "quote" (quoteBook title) this ["buyer1" "buyer2"] protocol)))
-  (recvDelayed! ["ok" "quit"] "buyer2" this protocol
-                (fn [response]
-                  (cond
-                    (= response "ok")
-                    (recvDelayed! "address" "buyer2" this protocol
-                                  (fn [address]
-                                    (println "The received address is: " address)
-                                    (send! "date" (getRandomDate 5) this "buyer2" protocol)
-                                    (send! "repeat" "repeat" this ["buyer2" "buyer1"] protocol)
-                                    (orderBook this protocol)
-                                    ))
-                    (= response "quit")
-                    (endReached response)
-                    )
-                  )))
-
-(defn orderBookParticipant
-  "Order book from seller's perspective"
   ([participant]
-  (receive-by participant "title" "buyer1"
-              (fn [title] (send-to participant "quote" (quoteBook title) ["buyer1" "buyer2"])))
-  (receive-by participant ["ok" "quit"] "buyer2"
-              (fn [response]
-              (cond
-                (= response "ok")
-                (receive-by participant "address" "buyer2"
-                            (fn [address]
-                                (println "The received address is: " address)
-                                (send-to participant "date" (getRandomDate 5) "buyer2")
-                                (send-to participant "repeat" "repeat" ["buyer2" "buyer1"])
-                                (orderBookParticipant participant)
-                                ))
-                (= response "quit")
-                (endReached response)
-                )
-              )))
-  ([name protocol] ; example how function would operate when participants are constructed internally
+   (receive-by participant "title" "buyer1"
+               (fn [title] (send-to participant "quote" (quoteBook title) ["buyer1" "buyer2"])))
+   (receive-by participant ["ok" "quit"] "buyer2"
+               (fn [response]
+                 (cond
+                   (= response "ok")
+                   (do (println "yes yes received Ok")
+                       (receive-by participant "address" "buyer2"
+                                   (fn [address]
+                                     (println "The received address is: " address)
+                                     (send-to participant "date" (getRandomDate 5) "buyer2")
+                                     (receive-by participant "repeat" "buyer2"
+                                                 (fn [repeat]
+                                                   (println "repeat received on seller from buyer2!")
+                                                   (orderBook participant)))
+                                     )))
+                   (= response "quit")
+                   (endReached response)
+                   )
+                 )))
+  ([name protocol]                                          ; example how function would operate when participants are constructed internally
    (let [participant (discourje.core.core/->participant name protocol)]
-     (orderBookParticipant participant)))
+     (orderBook participant)))
   )
 ;wait for title
 ;send quote to buyer1 and buyer2
