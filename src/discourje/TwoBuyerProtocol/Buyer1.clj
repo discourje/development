@@ -23,8 +23,8 @@
               (fn [x]
                 (println "buyer1 received quote!")
                   (send-to participant "quoteDiv" (quoteDiv x) "buyer2")))
-  (receive-by participant "repeat" "seller"
-              (fn [x](println "repeat received on buyer1 from seller!")
+  (receive-by participant "repeat" "buyer2"
+              (fn [repeat](println "repeat received on buyer1 from buyer2!")
                   (orderBook participant))
               )
   )

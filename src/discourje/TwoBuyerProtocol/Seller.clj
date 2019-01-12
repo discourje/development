@@ -33,25 +33,27 @@
 (defn orderBook
   "Order book from seller's perspective"
   ([participant]
-  (receive-by participant "title" "buyer1"
-              (fn [title] (send-to participant "quote" (quoteBook title) ["buyer1" "buyer2"])))
-  (receive-by participant ["ok" "quit"] "buyer2"
-              (fn [response]
-              (cond
-                (= response "ok")
-                (do (println "yes yes received Ok")
-                    (receive-by participant "address" "buyer2"
-                            (fn [address]
-                                (println "The received address is: " address)
-                                (send-to participant "date" (getRandomDate 5) "buyer2")
-                                (send-to participant "repeat" "repeat" ["buyer2" "buyer1"])
-                                (orderBook participant)
-                                )))
-                (= response "quit")
-                (endReached response)
-                )
-              )))
-  ([name protocol] ; example how function would operate when participants are constructed internally
+   (receive-by participant "title" "buyer1"
+               (fn [title] (send-to participant "quote" (quoteBook title) ["buyer1" "buyer2"])))
+   (receive-by participant ["ok" "quit"] "buyer2"
+               (fn [response]
+                 (cond
+                   (= response "ok")
+                   (do (println "yes yes received Ok")
+                       (receive-by participant "address" "buyer2"
+                                   (fn [address]
+                                     (println "The received address is: " address)
+                                     (send-to participant "date" (getRandomDate 5) "buyer2")
+                                     (receive-by participant "repeat" "buyer2"
+                                                 (fn [repeat]
+                                                   (println "repeat received on seller from buyer2!")
+                                                   (orderBook participant)))
+                                     )))
+                   (= response "quit")
+                   (endReached response)
+                   )
+                 )))
+  ([name protocol]                                          ; example how function would operate when participants are constructed internally
    (let [participant (discourje.core.core/->participant name protocol)]
      (orderBook participant)))
   )

@@ -32,3 +32,9 @@ recv action: address is not allowed to proceed from buyer2 to seller___Current m
 The received address is:  nil
 Send action: date is not allowed to proceed from seller to buyer2
 Send action: repeat is not allowed to proceed from seller to ["buyer2" "buyer1"]
+
+Ok and address are both put on channel and succeeded.
+Recv Ok succeeded, but has not yet reset the monitor for revc address.
+this happens since taking from async channel happens whenever a value is available.
+so, since  2 values are on the channel, ok and address both try to complete, giving our validation no chance to reset the monitor although the communication is correct.
+take! completes asynchronously!!

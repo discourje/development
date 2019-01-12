@@ -24,11 +24,10 @@
                                   (if (contribute? receivedQuote receivedQuoteDiv)
                                     (do (send-to participant "ok" "ok" "seller")
                                         (send-to participant "address" (generateAddress) "seller")
-                                        (receive-by participant "date" "seller" (fn [x] (println "Received date!" x)))
-                                        (receive-by participant "repeat" "seller"
-                                                    (fn [x]
-                                                        (println "repeat received on buyer2 from seller!")
-                                                        (orderBook participant)))
+                                        (receive-by participant "date" "seller"
+                                                    (fn [x] (println "Received date!" x)
+                                                      (send-to participant "repeat" "repeat" ["seller" "buyer1"])
+                                                      (orderBook participant)))
                                         )
                                     (send-to participant "quit" "quit" "seller"))
                                   )))))

@@ -18,7 +18,7 @@
 (defn activateChoiceBranch
   "activates the choice branch and filters out the branch which was not chosen"
   [protocol branch]
-  (reset! (:protocol @protocol) (subvec (vec (mapcat identity [branch @(:protocol @protocol)])) 1)) ;todo check if long enough to select index 1!!!
+  (reset! (:protocol @protocol) (subvec (vec (mapcat identity [branch @(:protocol @protocol)])) 2)) ;todo check if long enough to select index 1!!!
   (reset! (:activeMonitor @protocol) (nth branch 1))
   (println "next monitor IN CHOICE is "(nth branch 1))
   ;(println "CHOICE next monitor is "@(:activeMonitor @protocol))
@@ -102,13 +102,13 @@ Checked by equal action-from-to"
   [monitor-a monitor-b]
   (let [a monitor-a
         b @monitor-b]
-    (println a)
-    (println "_____")
-    (println b)
+    (println "a = " (type a))
+    (println "b = " (type b))
     (and
       (= (:to a) (:to b))
       (= (:from a) (:from b))
-      (= (:action a) (:action b)))))
+      (= (:action a) (:action b))
+      (= (type a) (type b)))))
 
 (defn activateNextMonitor ;todo type of monitor to compare recv to send!
   "Set the active monitor based on the protocol"
@@ -136,7 +136,7 @@ Checked by equal action-from-to"
            :else
            (if (> (count @(:protocol @protocol)) 0)
              (do
-       ;        (println "next monitor =  "nextMonitor)
+               (println "next monitor =  "nextMonitor)
              (resetMonitor! nextMonitor protocol 1))
              (resetMonitor! protocol)
              ))
@@ -145,13 +145,13 @@ Checked by equal action-from-to"
        (let [trueResult (monitorValid? (first (:trueBranch activeM)) action from to)
              falseResult (monitorValid? (first (:falseBranch activeM)) action from to)]
          (cond
-           (and trueResult
-                ;(not= (monitorsEqual? (first (:falseBranch activeM)) (:activeMonitor @protocol)))
-                )
+           ;(and
+             trueResult
+             ;(not= (monitorsEqual? (first (:falseBranch activeM)) (:activeMonitor @protocol)))                )
            (do (println "Taking TrueBranch") (activateChoiceBranch protocol (:trueBranch activeM)))
-           (and falseResult
-                ;(not= (monitorsEqual? (first (:trueBranch activeM)) (:activeMonitor @protocol)))
-                )
+           ;(and
+             falseResult
+             ;(not= (monitorsEqual? (first (:trueBranch activeM)) (:activeMonitor @protocol)))                )
            (do (println "Taking falseBranch") (activateChoiceBranch protocol (:falseBranch activeM))))))))
   ([protocol]
    (let [nextMonitor (first @(:protocol protocol))]
