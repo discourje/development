@@ -1,9 +1,5 @@
 (ns discourje.examples.helloWorld
-  (require [discourje.core.monitor :refer :all]
-           [discourje.core.core :refer :all]
-           [discourje.api.api :refer :all]
-           [discourje.core.protocol :refer :all]
-           [discourje.core.dataStructures :refer :all]))
+  (require [discourje.api.api :refer :all]))
 
 (defn- defineHelloWorldProtocol
   "This function will generate a vector with 2 monitors to send and receive the hello world message."
@@ -12,7 +8,7 @@
     (monitor-receive "helloWorld" "world" "user")])
 
 ;define the protocol
-(def protocol (generateProtocol (defineHelloWorldProtocol)))
+(def protocol (generateProtocolFromMonitors (defineHelloWorldProtocol)))
 ;define the participants
 (def user (generateParticipant "user" protocol))
 (def world (generateParticipant "world" protocol))

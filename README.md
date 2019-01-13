@@ -34,6 +34,9 @@ This simple protocol embeds all fundamental functionality a protocol language sh
 
 <b>Usage</b>
 -
+
+<i>See [api](src/discourje/api/api.clj) for more info.</i>
+
 A protocol can be specified by the following constructs:
 - <b>monitor-send [action sender receiver]</b>: Specifies a `send monitor` which validates that the current communication through the protocol is a send action with name `action` from `sender` to `receiver`.
 - <b>monitor-receive [action receiver sender]</b>: Specifies a `receive monitor` which validates that the current communication through the protocol is a receive action with name `action` to `receiver` from `sender`.
@@ -60,7 +63,7 @@ Safe Send and Receive abstractions:
 Then generate a protocol object with the specified roles and monitors:
 ```clojure
 ;define the protocol
-(def protocol (generateProtocol (defineHelloWorldProtocol)))
+(def protocol (generateProtocolFromMonitors (defineHelloWorldProtocol)))
 ```
 
 The next step is to generate `participants` specified by name(unique) for the protocol. A participant object implements send and receive functions in order to communicate through Discourje.
@@ -94,4 +97,4 @@ The developer is then able to communicate safely among participants.
 (clojure.core.async/thread (receiveFromUser world))
 ```
 
-<i>See [hello world](src/discourje/examples/helloWorld.clj) for a this example.</i>
+<i>See [hello world](src/discourje/examples/helloWorld.clj) for this example.</i>

@@ -1,9 +1,5 @@
 (ns discourje.examples.recursion
-  (require [discourje.core.monitor :refer :all]
-           [discourje.core.core :refer :all]
-           [discourje.api.api :refer :all]
-           [discourje.core.protocol :refer :all]
-           [discourje.core.dataStructures :refer :all]))
+  (require [discourje.api.api :refer :all]))
 
 (defn- defineRecursiveProtocol
   "This function will generate a vector with 3 monitors to send and receive the number message.
@@ -22,7 +18,7 @@
                               (do-end-recur :generateNumbers)])])])
 
 ;define the protocol
-(def protocol  (generateProtocol (defineRecursiveProtocol)))
+(def protocol (generateProtocolFromMonitors (defineRecursiveProtocol)))
 ;define the participants
 (def alice (generateParticipant "alice" protocol))
 (def bob (generateParticipant "bob" protocol))

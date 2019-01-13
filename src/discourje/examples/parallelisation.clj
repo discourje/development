@@ -1,9 +1,5 @@
 (ns discourje.examples.parallelisation
-  (require [discourje.core.monitor :refer :all]
-           [discourje.core.core :refer :all]
-           [discourje.api.api :refer :all]
-           [discourje.core.protocol :refer :all]
-           [discourje.core.dataStructures :refer :all]))
+  (require [discourje.api.api :refer :all]))
 
 (defn- defineParallelProtocol
   "This function will generate a vector with 2 monitors to send and receive the greet message.
@@ -12,7 +8,7 @@
   [(monitor-send "greet" "alice" ["bob" "carol"])
    (monitor-receive "greet" ["bob" "carol"] "alice")])
 ;define the protocol
-(def protocol (generateProtocol (defineParallelProtocol)))
+(def protocol (generateProtocolFromMonitors (defineParallelProtocol)))
 ;define the participants
 (def alice (generateParticipant "alice" protocol))
 (def bob (generateParticipant "bob" protocol))
