@@ -1,5 +1,6 @@
 (ns discourje.examples.sequencing
   (require [discourje.core.monitor :refer :all]
+           [discourje.api.api :refer :all]
            [discourje.core.core :refer :all]
            [discourje.core.protocol :refer :all]
            [discourje.core.dataStructures :refer :all]))
@@ -8,35 +9,29 @@
   "This function will generate a vector with 4 monitors to send and receive the greet message.
   Notice how send and receivers are defined separately in order to allow for sequencing of actions!"
   []
-  (vector
-    (->sendM "greet" "alice" "bob")
-    (->sendM "greet" "alice" "carol")
-    (->receiveM "greet" "bob" "alice")
-    (->receiveM "greet" "carol" "alice")))
-
-(defn generateSequenceProtocol
-  "Generate the protocol, channels and set the first monitor active."
-  []
-  (generateProtocol (defineSequenceProtocol)))
+  [(monitor-send "greet" "alice" "bob")
+    (monitor-send "greet" "alice" "carol")
+    (monitor-receive "greet" "bob" "alice")
+    (monitor-receive "greet" "carol" "alice")])
 
 ;define the protocol
-(def protocol (atom (generateSequenceProtocol)))
+(def protocol (generateProtocolFromMonitors (defineSequenceProtocol)))
 ;define the participants
-(def alice (discourje.core.core/->participant "alice" protocol))
-(def bob (discourje.core.core/->participant "bob" protocol))
-(def carol (discourje.core.core/->participant "carol" protocol))
+(def alice (generateParticipant "alice" protocol))
+(def bob (generateParticipant "bob" protocol))
+(def carol (generateParticipant "carol" protocol))
 
 (defn- greetBobAndCarol
   "This function will use the protocol to send the greet message to bob and carol."
   [participant]
   (println (format "%s will now send greet." (:name participant)))
-  (send-to participant "greet" (format "Greetings, from %s!" (:name participant)) "bob")
-  (send-to participant "greet" (format "Greetings, from %s!" (:name participant)) "carol"))
+  (s! "greet" (format "Greetings, from %s!" (:name participant)) participant "bob")
+  (s! "greet" (format "Greetings, from %s!" (:name participant)) participant "carol"))
 
 (defn- receiveGreet
   "This function will use the protocol to listen for the greet message."
   [participant]
-  (receive-by participant "greet" "alice"
+  (r! "greet" "alice" participant
               (fn [message]
                   (println (format "%s Received message: %s" (:name participant) message)))))
 

@@ -1,6 +1,7 @@
 (ns discourje.examples.parallelisation
   (require [discourje.core.monitor :refer :all]
            [discourje.core.core :refer :all]
+           [discourje.api.api :refer :all]
            [discourje.core.protocol :refer :all]
            [discourje.core.dataStructures :refer :all]))
 
@@ -8,35 +9,27 @@
   "This function will generate a vector with 2 monitors to send and receive the greet message.
   Notice how receivers are defined as a vector in order to allow for parallelisation!"
   []
-  (vector
-    (->sendM "greet" "alice" ["bob" "carol"])
-    (->receiveM "greet" ["bob" "carol"] "alice")
-    ))
-
-(defn generateParallelProtocol
-  "Generate the protocol, channels and set the first monitor active."
-  []
-  (generateProtocol (defineParallelProtocol)))
-
+  [(monitor-send "greet" "alice" ["bob" "carol"])
+   (monitor-receive "greet" ["bob" "carol"] "alice")])
 ;define the protocol
-(def protocol (atom (generateParallelProtocol)))
+(def protocol (generateProtocol (defineParallelProtocol)))
 ;define the participants
-(def alice (discourje.core.core/->participant "alice" protocol))
-(def bob (discourje.core.core/->participant "bob" protocol))
-(def carol (discourje.core.core/->participant "carol" protocol))
+(def alice (generateParticipant "alice" protocol))
+(def bob (generateParticipant "bob" protocol))
+(def carol (generateParticipant "carol" protocol))
 
 (defn- greetBobAndCarol
   "This function will use the protocol to send the greet message to bob and carol."
   [participant]
   (println (format "%s will now send greet." (:name participant)))
-  (send-to participant "greet" (format "Greetings, from %s!" (:name participant)) ["bob" "carol"]))
+  (s! "greet" (format "Greetings, from %s!" (:name participant)) participant ["bob" "carol"]))
 
 (defn- receiveGreet
   "This function will use the protocol to listen for the greet message."
   [participant]
-  (receive-by participant "greet" "alice"
+  (r! "greet" "alice" participant
               (fn [message]
-                  (println (format "%s Received message: %s" (:name participant) message)))))
+                (println (format "%s Received message: %s" (:name participant) message)))))
 
 ;start the `GreetBobAndCarol' function on thread and add `alice' participant
 (clojure.core.async/thread (greetBobAndCarol alice))

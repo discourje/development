@@ -8,4 +8,4 @@
   (when (isProtocolValid? monitors)
     (let [protocol (->protocolInstance (generateChannels (getDistinctParticipants monitors)) (atom monitors) (atom nil) monitors)]
       (activateNextMonitor protocol)
-      protocol)))
+      (atom protocol))))

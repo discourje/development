@@ -28,7 +28,7 @@
     (for [receiver channel] (putMessage receiver value))
     (putMessage channel value)))
 
-(defn send!
+(defn dcj-send!
   "send something through the protocol"
   ([action value from to protocol]
    (if (nil? (:activeMonitor @protocol))
@@ -39,12 +39,12 @@
          (cond
            (instance? sendM currentMonitor)
            (do (activateMonitorOnSend action from to protocol)
-             (send! currentMonitor value protocol))
+             (dcj-send! currentMonitor value protocol))
            (instance? choice currentMonitor)
            (let [target (getTargetBranch action from to protocol)]
              (if (instance? sendM target)
              (do (activateMonitorOnSend action from to protocol)
-               (send! target value protocol))
+               (dcj-send! target value protocol))
              (println "target choice is not a sendM")
              ))))
        (incorrectCommunication (format "Send action: %s is not allowed to proceed from %s to %s" action from to)))))
@@ -54,7 +54,7 @@
        (allowSend (:channel (getChannel (:from currentMonitor) receiver (:channels @protocol))) value))
        (allowSend (:channel (getChannel (:from currentMonitor) (:to currentMonitor) (:channels @protocol))) value))))
 
-(defn recv!
+(defn dcj-recv!
   "receive something through the protocol"
   ([action from to protocol callback]
    (let [channel (getChannel from to (:channels @protocol))]
@@ -69,11 +69,11 @@
                     (let [currentMonitor @(:activeMonitor @protocol)]
                       (cond
                         (instance? receiveM currentMonitor)
-                        (recv! action from to protocol callback x)
+                        (dcj-recv! action from to protocol callback x)
                         (instance? choice currentMonitor)
                         (let [target (getTargetBranch action from to protocol)]
                           (if (instance? receiveM target)
-                            (recv! action from to protocol callback x target)
+                            (dcj-recv! action from to protocol callback x target)
                             (println "target choice is not a receiveM" target))
                           )))
                     (do
@@ -116,5 +116,5 @@
 
 (defrecord participant [name protocol]
   role
-  (send-to [this action value to] (send! action value name to protocol))
-  (receive-by [this action from callback] (recv! action from name protocol callback)))
+  (send-to [this action value to] (dcj-send! action value name to protocol))
+  (receive-by [this action from callback] (dcj-recv! action from name protocol callback)))
