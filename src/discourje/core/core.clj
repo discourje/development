@@ -39,20 +39,20 @@
          (cond
            (instance? sendM currentMonitor)
            (do (activateMonitorOnSend action from to protocol)
-             (dcj-send! currentMonitor value protocol))
+               (dcj-send! currentMonitor value protocol))
            (instance? choice currentMonitor)
            (let [target (getTargetBranch action from to protocol)]
              (if (instance? sendM target)
-             (do (activateMonitorOnSend action from to protocol)
-               (dcj-send! target value protocol))
-             (println "target choice is not a sendM")
-             ))))
+               (do (activateMonitorOnSend action from to protocol)
+                   (dcj-send! target value protocol))
+               (println "target choice is not a sendM")
+               ))))
        (incorrectCommunication (format "Send action: %s is not allowed to proceed from %s to %s" action from to)))))
   ([currentMonitor value protocol]
    (if (vector? (:to currentMonitor))
      (doseq [receiver (:to currentMonitor)]
        (allowSend (:channel (getChannel (:from currentMonitor) receiver (:channels @protocol))) value))
-       (allowSend (:channel (getChannel (:from currentMonitor) (:to currentMonitor) (:channels @protocol))) value))))
+     (allowSend (:channel (getChannel (:from currentMonitor) (:to currentMonitor) (:channels @protocol))) value))))
 
 (defn dcj-recv!
   "receive something through the protocol"
@@ -60,7 +60,7 @@
    (let [channel (getChannel from to (:channels @protocol))]
      (if (nil? channel)
        (incorrectCommunication (format "Cannot find channel from %s to %s in the defined channels of the protocol! Please make sure you supply supported sender and receiver pair" from to))
-         (take! (:channel channel)
+       (take! (:channel channel)
               (fn [x]
                 ;(println "recv! got " x)
                 (if (nil? (:activeMonitor @protocol))
@@ -80,35 +80,18 @@
                       (incorrectCommunication (format "recv action: %s is not allowed to proceed from %s to %s___Current monitor: Type: %s Action: %s, From: %s To: %s" action from to @(:activeMonitor @protocol) (:action @(:activeMonitor @protocol)) (:from @(:activeMonitor @protocol)) (:to @(:activeMonitor @protocol))))
                       (callback nil)))))))))
   ([action from to protocol callback value]
-   (if (hasMultipleReceivers? protocol)
-     (do
-       (removeReceiver protocol to)
-       (let [activeMonitor (:activeMonitor @protocol)
-             activeMonitorRef @activeMonitor]
-         (add-watch (:activeMonitor @protocol) nil
-                    (fn [key atom old-state new-state]
-                      (when (and
-                              (not= (:action activeMonitorRef) (:action new-state))
-                              (not= (:from activeMonitorRef) (:from new-state)))
-                        (remove-watch activeMonitor nil)
-                        (callback value))))))
-     (do
-       (activateNextMonitor action from to protocol)
-       (callback value)
-       (closeProtocol! protocol)))
-    )
+   (dcj-recv! action from to protocol callback value (:activeMonitor @protocol)))
   ([action from to protocol callback value targetM]
    (if (hasMultipleReceivers? protocol)
      (do
        (removeReceiver protocol to)
-       (let [targetMRef @targetM]
-         (add-watch (:activeMonitor @protocol) nil
-                    (fn [key atom old-state new-state]
-                      (when (and
-                              (not= (:action targetMRef) (:action new-state))
-                              (not= (:from targetMRef) (:from new-state)))
-                        (remove-watch targetM nil)
-                        (callback value))))))
+       (add-watch targetM nil (fn [_ atom old-state new-state]
+           (when (and
+                   (not= (:action old-state) (:action new-state))
+                   (not= (:from old-state) (:from new-state)))
+             (remove-watch atom nil)
+             (callback value))))
+       )
      (do
        (activateNextMonitor action from to protocol)
        (callback value)
