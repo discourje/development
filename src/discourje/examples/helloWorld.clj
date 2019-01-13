@@ -8,8 +8,8 @@
 (defn- defineHelloWorldProtocol
   "This function will generate a vector with 2 monitors to send and receive the hello world message."
   []
-  [(->sendM "helloWorld" "user" "world")
-    (->receiveM "helloWorld" "world" "user")])
+  [(monitor-send "helloWorld" "user" "world")
+    (monitor-receive "helloWorld" "world" "user")])
 
 ;define the protocol
 (def protocol (generateProtocol (defineHelloWorldProtocol)))
