@@ -1,7 +1,8 @@
 (ns discourje.core.protocolCore
-  (:require [discourje.core.dataStructures :refer :all] [clojure.core.async])
-  (:import (clojure.lang PersistentQueue)
-           (discourje.core.dataStructures recursion recur! choice)))
+  (:require [discourje.core.dataStructures :refer :all]
+            [clojure.core.async])
+  (:import (clojure.lang Seqable)
+           (discourje.core.dataStructures recursion recur! choice sendM receiveM)))
 
 
 ;Defines a communication channel with a sender, receiver (strings), a channel Async.Chan and a queue for receivers.
@@ -10,7 +11,8 @@
 (defn- generateChannel
   "function to generate a channel between sender and receiver"
   [sender receiver]
-  (->communicationChannel sender receiver (clojure.core.async/chan)))
+  ;(println (format "generating channel from %s to %s" sender receiver))
+  (->communicationChannel (str sender) (str receiver) (clojure.core.async/chan)))
 
 (defn uniqueCartesianProduct
   "Generate channels between all participants and filters out duplicates e.g.: buyer1<->buyer1"
@@ -109,11 +111,11 @@
   "is the protocol correctly recured and ended?"
   [protocol definedRecursions]
   (let [recurs (distinct definedRecursions)]
-    (every? true?  (for [rec recurs]
-                     (let [recursionVector (findRecurByName protocol rec)
-                           recurElement (first (filter some? (findRecurByTag (:protocol recursionVector) rec :recur)))
-                           endElement (first (filter some? (findRecurByTag (:protocol recursionVector) rec :end)))]
-                       (and (not (empty? recurElement)) (not (empty? endElement))))))))
+    (every? true? (for [rec recurs]
+                    (let [recursionVector (findRecurByName protocol rec)
+                          recurElement (first (filter some? (findRecurByTag (:protocol recursionVector) rec :recur)))
+                          endElement (first (filter some? (findRecurByTag (:protocol recursionVector) rec :end)))]
+                      (and (not (empty? recurElement)) (not (empty? endElement))))))))
 
 (defn isProtocolValid?
   "returns true when there are no duplicate recursion definitions and,=>
@@ -126,3 +128,31 @@
   "checks the protocol for duplicate recursion definitions and if recur/ended correctly"
   [monitors]
   (isProtocolValid? monitors))
+
+
+(defn- findAllParticipants
+  "List all sender and receivers in the protocol"
+  [protocol result]
+  (let [result2 (flatten (vec (conj result [])))]
+    (conj result2
+          (flatten
+            (for [element protocol]
+              (cond
+                (instance? recursion element)
+                (flatten (vec (conj result2 (findAllParticipants (:protocol element) result2))))
+                (instance? choice element)
+                (let [trueResult (findAllParticipants (:trueBranch element) result2)
+                      falseResult (findAllParticipants (:falseBranch element) result2)]
+                  (if (not (nil? trueResult))
+                    (flatten (vec (conj result2 trueResult)))
+                    (flatten (vec (conj result2 falseResult)))))
+                (or (instance? sendM element) (instance? receiveM element))
+                (do
+                  (if (instance? Seqable (:to element))
+                    (conj result2 (flatten (:to element)) (:from element))
+                    (conj result2 (:to element) (:from element))))))))))
+
+(defn getDistinctParticipants
+  "Get all distinct senders and receivers in the protocol"
+  [monitors]
+  (vec (filter some? (distinct (flatten (first (findAllParticipants monitors [])))))))

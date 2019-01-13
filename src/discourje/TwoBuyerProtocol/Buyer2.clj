@@ -1,6 +1,5 @@
 (ns discourje.TwoBuyerProtocol.Buyer2
-  (:require [discourje.core.core :refer :all]
-            [discourje.core.dataStructures :refer :all]))
+  (:require [discourje.api.api :refer :all]))
 
 (defn contribute?
   "returns true when the received quote 50% or greater"
@@ -16,21 +15,19 @@
 (defn orderBook
   "Order a book from buyer2's perspective"
   [participant]
-  (receive-by participant "quote" "seller"
+  (r! "quote" "seller" participant
               (fn [receivedQuote]
                   (println "buyer2 received quote! " receivedQuote)
-                  (receive-by participant "quoteDiv" "buyer1"
+                  (r! "quoteDiv" "buyer1" participant
                               (fn [receivedQuoteDiv]
                                   (if (contribute? receivedQuote receivedQuoteDiv)
-                                    (do (send-to participant "ok" "ok" "seller")
-                                        (send-to participant "address" (generateAddress) "seller")
-                                        (receive-by participant "date" "seller"
+                                    (do (s! "ok" "ok" participant "seller")
+                                        (s! "address" (generateAddress) participant  "seller")
+                                        (r! "date" "seller" participant
                                                     (fn [x] (println "Received date!" x)
-                                                      (send-to participant "repeat" "repeat" ["seller" "buyer1"])
-                                                      (orderBook participant)))
-                                        )
-                                    (send-to participant "quit" "quit" "seller"))
-                                  )))))
+                                                      (s! "repeat" "repeat" participant  ["seller" "buyer1"])
+                                                      (orderBook participant))))
+                                    (s! "quit" "quit" participant "seller")))))))
 
 ;wait for quote
 ;wait for quote div

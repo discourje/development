@@ -1,8 +1,9 @@
 (ns discourje.findRecurtests
   (:require [clojure.test :refer :all])
-  (require [discourje.core.monitor :refer :all])
+  (require [discourje.core.monitor :refer :all]
+           [discourje.core.dataStructures :refer :all])
   (use [discourje.core.core :only [generateChannels]])
-  (:import (discourje.core.monitor recursion choice)))
+  (:import (discourje.core.dataStructures recursion choice)))
 
 (defn flatten-map [path m]
   (if (map? m)

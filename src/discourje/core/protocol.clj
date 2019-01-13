@@ -4,8 +4,8 @@
 
 (defn generateProtocol
   "generate the protocol, channels and set the first monitor active"
-  [roles monitors]
+  [monitors]
   (when (isProtocolValid? monitors)
-    (let [protocol (->protocolInstance (generateChannels roles) (atom monitors) (atom nil) monitors)]
+    (let [protocol (->protocolInstance (generateChannels (getDistinctParticipants monitors)) (atom monitors) (atom nil) monitors)]
       (activateNextMonitor protocol)
-      protocol)))
+      (atom protocol))))

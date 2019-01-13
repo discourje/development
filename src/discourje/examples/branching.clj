@@ -1,6 +1,7 @@
 (ns discourje.examples.branching
   (require [discourje.core.monitor :refer :all]
            [discourje.core.core :refer :all]
+           [discourje.api.api :refer :all]
            [discourje.core.protocol :refer :all]
            [discourje.core.dataStructures :refer :all]))
 
@@ -8,26 +9,20 @@
   "This function will generate a vector with 3 monitors to send and receive the number message.
   The protocol offers a choice (with internal monitors) to send messages called greaterThan or lessThan to alice depending on the data received"
   []
-  (vector
-    (->sendM "number" "alice" "bob")
-    (->receiveM "number" "bob" "alice")
-    (->choice [(->sendM "greaterThan" "bob" "alice")
-               (->receiveM "greaterThan" "alice" "bob")
-               ]
-              [(->sendM "lessThan" "bob" "alice")
-               (->receiveM "lessThan" "alice" "bob")
-               ])))
-
-(defn generateBranchProtocol
-  "Generate the protocol, channels and set the first monitor active."
-  []
-  (generateProtocol ["alice" "bob"] (defineBranchProtocol)))
+  [(monitor-send "number" "alice" "bob")
+   (monitor-receive "number" "bob" "alice")
+   (monitor-choice [(monitor-send "greaterThan" "bob" "alice")
+                    (monitor-receive "greaterThan" "alice" "bob")
+                    ]
+                   [(monitor-send "lessThan" "bob" "alice")
+                    (monitor-receive "lessThan" "alice" "bob")
+                    ])])
 
 ;define the protocol
-(def protocol (atom (generateBranchProtocol)))
+(def protocol (generateProtocol (defineBranchProtocol)))
 ;define the participants
-(def alice (discourje.core.core/->participant "alice" protocol))
-(def bob (discourje.core.core/->participant "bob" protocol))
+(def alice (generateParticipant "alice" protocol))
+(def bob (generateParticipant "bob" protocol))
 
 (defn- displayResult
   "print the result to the REPL"
@@ -39,8 +34,8 @@
   [participant threshold]
   (println (format "%s will now send number." (:name participant)))
   ;We send a map (data structure) in order to send both the threshold and the generated number
-  (send-to participant "number" {:threshold threshold :generatedNumber (rand-int (+ threshold 10))} "bob")
-  (receive-by participant ["greaterThan" "lessThan"] "bob"
+  (s! "number" {:threshold threshold :generatedNumber (rand-int (+ threshold 10))} participant "bob")
+  (r! ["greaterThan" "lessThan"] "bob" participant
               (fn [response]
                 (cond
                   (= response "Greater!") (displayResult (format "greaterThan received by %s" (:name participant)))
@@ -49,14 +44,14 @@
 (defn- receiveNumber
   "This function will use the protocol to listen for the number message. Check the number and threshold and send result"
   [participant]
-  (receive-by participant "number" "alice"
+  (r! "number" "alice" participant
               (fn [numberMap]
                 (let [threshold (:threshold numberMap)
                       generated (:generatedNumber numberMap)]
                   (println (:name participant) " received " numberMap)
                   (if (> generated threshold)
-                    (send-to participant "greaterThan" "Greater!" "alice")
-                    (send-to participant "lessThan" "Smaller!" "alice"))))))
+                    (s! "greaterThan" "Greater!" participant "alice")
+                    (s! "lessThan" "Smaller!" participant  "alice"))))))
 
 ;start the `GreetBobAndCarol' function on thread and add `alice' participant
 (clojure.core.async/thread (sendNumberAndAwaitResult alice 10))
