@@ -35,18 +35,18 @@ This simple protocol embeds all fundamental functionality a protocol language sh
 <b>Usage</b>
 -
 A protocol can be specified by the following constructs:
-- monitor-send [action sender receiver]: Specifies a `send monitor` which validates that the current communication through the protocol is a send action with name `action` from `sender` to `receiver`.
-- monitor-receive [action receiver sender]: Specifies a `receive monitor` which validates that the current communication through the protocol is a receive action with name `action` to `receiver` from `sender`.
-- monitor-choice [trueBranch falseBranch]: Specifies a `choice monitor` which validates the first monitor in both the `true and false branch` and continues on target branch when an action is verified. 
-- monitor-recursion [name protocol]: Specifies a `recursion monitor` which recurs or ends when the protocol encounters a `do-recur[name]` or `do-end-recur[name]`. Recur is matched by name and also supports nesting!
-- do-recur [name]: specifies a recursion back to the `monitor-recursion` matching its name.
-- do-end-recur [name]: specifies an end in recursion matching the name of the `monitor-recursion`.
+- <b>monitor-send [action sender receiver]</b>: Specifies a `send monitor` which validates that the current communication through the protocol is a send action with name `action` from `sender` to `receiver`.
+- <b>monitor-receive [action receiver sender]</b>: Specifies a `receive monitor` which validates that the current communication through the protocol is a receive action with name `action` to `receiver` from `sender`.
+- <b>monitor-choice [trueBranch falseBranch]</b>: Specifies a `choice monitor` which validates the first monitor in both the `true and false branch` and continues on target branch when an action is verified. 
+- <b>monitor-recursion [name protocol]</b>: Specifies a `recursion monitor` which recurs or ends when the protocol encounters a `do-recur[name]` or `do-end-recur[name]`. Recur is matched by name and also supports nesting!
+- <b>do-recur [name]</b>: specifies a recursion back to the `monitor-recursion` matching its name.
+- <b>do-end-recur [name]</b>: specifies an end in recursion matching the name of the `monitor-recursion`.
 
 Safe Send and Receive abstractions:
-- send! [action value sender receiver]: Calls send <i>function</i> to send `action` with `value` from `sender` to `receiver`.
-- s! [action value sender receiver]: Calls Send <i>macro</i> to send `action` with `value` from `sender` to `receiver`.
-- recv! [action sender receiver callback]: Calls receive <i>function</i> to receive `action` from `sender` on `receiver` invoking `callback`.
-- r! [action sender receiver callback]: Calls receive <i>macro</i> to receive `action` from `sender` on `receiver` invoking `callback`.
+- <b>send! [action value sender receiver]</b>: Calls send <i>function</i> to send `action` with `value` from `sender` to `receiver`.
+- <b>s! [action value sender receiver]</b>: Calls Send <i>macro</i> to send `action` with `value` from `sender` to `receiver`.
+- <b>recv! [action sender receiver callback]</b>: Calls receive <i>function</i> to receive `action` from `sender` on `receiver` invoking `callback`.
+- <b>r! [action sender receiver callback]</b>: Calls receive <i>macro</i> to receive `action` from `sender` on `receiver` invoking `callback`.
 
 <i>*Reminder: Macros are not first class. This means when you want to treat send and receive as first class objects, you should use the functions instead of macros.</i>
 
