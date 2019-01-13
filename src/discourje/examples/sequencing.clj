@@ -1,9 +1,5 @@
 (ns discourje.examples.sequencing
-  (require [discourje.core.monitor :refer :all]
-           [discourje.api.api :refer :all]
-           [discourje.core.core :refer :all]
-           [discourje.core.protocol :refer :all]
-           [discourje.core.dataStructures :refer :all]))
+  (require [discourje.api.api :refer :all]))
 
 (defn- defineSequenceProtocol
   "This function will generate a vector with 4 monitors to send and receive the greet message.
