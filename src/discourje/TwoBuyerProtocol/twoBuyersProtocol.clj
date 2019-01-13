@@ -1,42 +1,41 @@
 (ns discourje.TwoBuyerProtocol.twoBuyersProtocol
-  (require [discourje.core.monitor :refer :all]
-           [discourje.core.protocol :refer :all]
-           [discourje.core.dataStructures :refer :all]))
+  (require [discourje.api.api :refer :all]
+           [discourje.core.protocol :refer :all]))
 
 (defn- defineRecurringProtocol []
-  (vector (->recursion :x
-               (vector
-                 (->sendM "title" "buyer1" "seller")
-                 (->receiveM "title" "seller" "buyer1")
-                 (->sendM "quote" "seller" ["buyer1" "buyer2"])
-                 (->receiveM "quote" ["buyer1" "buyer2"] "seller")
-                 (->sendM "quoteDiv" "buyer1" "buyer2")
-                 (->receiveM "quoteDiv" "buyer2" "buyer1")
-                 (->choice [
-                            (->sendM "ok" "buyer2" "seller")
-                            (->choice [
-                                       (->sendM "address" "buyer2" "seller")
-                                       (->receiveM "ok" "seller" "buyer2")
-                                       (->receiveM "address" "seller" "buyer2")
-                                       ]
-                                      [
-                                       (->receiveM "ok" "seller" "buyer2")
-                                       (->sendM "address" "buyer2" "seller")
-                                       (->receiveM "address" "seller" "buyer2")
-                                       ])
-                            (->sendM "date" "seller" "buyer2")
-                            (->receiveM "date" "buyer2" "seller")
-                            (->sendM "repeat" "buyer2" ["seller" "buyer1"])
-                            (->receiveM "repeat" ["seller" "buyer1"] "buyer2")
-                            (generateRecur :x)
-                            ]
-                           [
-                            (->sendM "quit" "buyer2" "seller")
-                            (->receiveM "quit" "seller" "buyer2")
-                            (generateRecurStop :x)
-                            ])))))
+  [(monitor-recursion :x
+                      [
+                       (monitor-send "title" "buyer1" "seller")
+                       (monitor-receive "title" "seller" "buyer1")
+                       (monitor-send "quote" "seller" ["buyer1" "buyer2"])
+                       (monitor-receive "quote" ["buyer1" "buyer2"] "seller")
+                       (monitor-send "quoteDiv" "buyer1" "buyer2")
+                       (monitor-receive "quoteDiv" "buyer2" "buyer1")
+                       (monitor-choice [
+                                        (monitor-send "ok" "buyer2" "seller")
+                                        (monitor-choice [
+                                                         (monitor-send "address" "buyer2" "seller")
+                                                         (monitor-receive "ok" "seller" "buyer2")
+                                                         (monitor-receive "address" "seller" "buyer2")
+                                                         ]
+                                                        [
+                                                         (monitor-receive "ok" "seller" "buyer2")
+                                                         (monitor-send "address" "buyer2" "seller")
+                                                         (monitor-receive "address" "seller" "buyer2")
+                                                         ])
+                                        (monitor-send "date" "seller" "buyer2")
+                                        (monitor-receive "date" "buyer2" "seller")
+                                        (monitor-send "repeat" "buyer2" ["seller" "buyer1"])
+                                        (monitor-receive "repeat" ["seller" "buyer1"] "buyer2")
+                                        (do-recur :x)
+                                        ]
+                                       [
+                                        (monitor-send "quit" "buyer2" "seller")
+                                        (monitor-receive "quit" "seller" "buyer2")
+                                        (do-end-recur :x)
+                                        ])])])
 
 (defn getProtocol
   "generate the protocol, channels and set the first monitor active"
   []
-  (generateProtocol ["buyer1" "buyer2" "seller"] (defineRecurringProtocol)))
+  (generateProtocol (defineRecurringProtocol)))

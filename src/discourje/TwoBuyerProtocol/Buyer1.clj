@@ -1,6 +1,5 @@
 (ns discourje.TwoBuyerProtocol.Buyer1
-  (:require [discourje.core.core :refer :all]
-            [discourje.core.dataStructures :refer :all]))
+  (:require [discourje.api.api :refer :all]))
 
 (defn generateBook
   "generate simple book title"
@@ -18,16 +17,14 @@
 (defn orderBook
   "order a book from buyer1's perspective (implements new receive monitor)"
   [participant]
-  (send-to participant "title" (generateBook) "seller")
-  (receive-by participant "quote" "seller"
+  (s! "title" (generateBook) participant "seller")
+  (r! "quote" "seller" participant
               (fn [x]
                 (println "buyer1 received quote!")
-                  (send-to participant "quoteDiv" (quoteDiv x) "buyer2")))
-  (receive-by participant "repeat" "buyer2"
+                  (s! "quoteDiv" (quoteDiv x) participant "buyer2")))
+  (r! "repeat" "buyer2" participant
               (fn [repeat](println "repeat received on buyer1 from buyer2!")
-                  (orderBook participant))
-              )
-  )
+                  (orderBook participant))))
 
 ;send title to seller
 ;wait for quote

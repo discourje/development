@@ -1,6 +1,7 @@
 (ns discourje.examples.recursion
   (require [discourje.core.monitor :refer :all]
            [discourje.core.core :refer :all]
+           [discourje.api.api :refer :all]
            [discourje.core.protocol :refer :all]
            [discourje.core.dataStructures :refer :all]))
 
@@ -10,28 +11,21 @@
   When the number is greater than the threshold, the protocol will recur, if not the protocol will stop.
   Recur is matched by name, in this case: :generateNumbers"
   []
-  (vector
-    (->recursion :generateNumbers
-                 (vector
-                   (->sendM "number" "alice" "bob")
-                   (->receiveM "number" "bob" "alice")
-                   (->choice [(->sendM "greaterThan" "bob" "alice")
-                              (->receiveM "greaterThan" "alice" "bob")
-                              (generateRecur :generateNumbers)]
-                             [(->sendM "lessThan" "bob" "alice")
-                              (->receiveM "lessThan" "alice" "bob")
-                              (generateRecurStop :generateNumbers)])))))
-
-(defn generateRecursiveProtocol
-  "Generate the protocol, channels and set the first monitor active."
-  []
-  (generateProtocol ["alice" "bob"] (defineRecursiveProtocol)))
+  [(monitor-recursion :generateNumbers [
+                   (monitor-send "number" "alice" "bob")
+                   (monitor-receive "number" "bob" "alice")
+                   (monitor-choice [(monitor-send "greaterThan" "bob" "alice")
+                              (monitor-receive "greaterThan" "alice" "bob")
+                              (do-recur :generateNumbers)]
+                             [(monitor-send "lessThan" "bob" "alice")
+                              (monitor-receive "lessThan" "alice" "bob")
+                              (do-end-recur :generateNumbers)])])])
 
 ;define the protocol
-(def protocol (atom (generateRecursiveProtocol)))
+(def protocol  (generateProtocol (defineRecursiveProtocol)))
 ;define the participants
-(def alice (discourje.core.core/->participant "alice" protocol))
-(def bob (discourje.core.core/->participant "bob" protocol))
+(def alice (generateParticipant "alice" protocol))
+(def bob (generateParticipant "bob" protocol))
 
 (defn- displayResult
   "print the result to the REPL"
@@ -44,8 +38,8 @@
   [participant threshold]
   (println (format "%s will now send number." (:name participant)))
   ;We send a map (data structure) in order to send both the threshold and the generated number
-  (send-to participant "number" {:threshold threshold :generatedNumber (rand-int (+ threshold 10))} "bob")
-  (receive-by participant ["greaterThan" "lessThan"] "bob"
+  (s! "number" {:threshold threshold :generatedNumber (rand-int (+ threshold 10))} participant "bob")
+  (r! ["greaterThan" "lessThan"] "bob" participant
               (fn [response]
                 (cond
                   (= response "Greater!") (do (displayResult (format "greaterThan received by %s" (:name participant)))
@@ -56,14 +50,14 @@
   "This function will use the protocol to listen for the number message. Check the number and threshold and send result
   Notice, when the number is greater than, the function will call itself"
   [participant]
-  (receive-by participant "number" "alice"
+  (r! "number" "alice" participant
               (fn [numberMap]
                 (let [threshold (:threshold numberMap)
                       generated (:generatedNumber numberMap)]
                   (if (> generated threshold)
-                    (do (send-to participant "greaterThan" "Greater!" "alice")
+                    (do (s! "greaterThan" "Greater!" participant "alice")
                         (receiveNumber participant))
-                    (send-to participant "lessThan" "Smaller!" "alice"))))))
+                    (s! "lessThan" "Smaller!" participant "alice"))))))
 
 ;start the `GreetBobAndCarol' function on thread and add `alice' participant
 (clojure.core.async/thread (sendNumberAndAwaitResult alice 10))
