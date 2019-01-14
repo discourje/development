@@ -4,6 +4,7 @@
 - [Library Name](LibraryName.md)
 - [Project information](ProjectInformation.md)
 - [ToDo](ToDo.md)
+- [Dependencies](Dependencies.md)
 
 <b>Introduction:</b>
 -
