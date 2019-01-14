@@ -2,7 +2,8 @@
   (:require [clojure.core.async :as async :refer :all]
             [clojure.core :refer :all]
             [discourje.core.dataStructures :refer :all])
-  (use [discourje.core.monitor :only [incorrectCommunication closeProtocol! activateMonitorOnSend isCommunicationValid? activateNextMonitor hasMultipleReceivers? removeReceiver getTargetBranch]])
+  (use [discourje.core.monitor :only [closeProtocol! activateMonitorOnSend isCommunicationValid? activateNextMonitor hasMultipleReceivers? removeReceiver getTargetBranch]]
+       [discourje.core.validator :only [log-error]])
   (:import (discourje.core.dataStructures choice sendM receiveM)))
 
 (defn putMessage
@@ -12,7 +13,7 @@
   (put! channel message))
 
 (defn getChannel
-  "finds a channel based on sender and receiver"
+  "Finds a channel based on sender and receiver"
   [sender receiver channels]
   (first
     (filter (fn [ch]
@@ -22,17 +23,22 @@
             channels)))
 
 (defn- allowSend
-  "send is allowed to put on the channel of the active monitor"
+  "Send is allowed to put on the channel of the active monitor"
   [channel value]
   (if (vector? channel)
     (for [receiver channel] (putMessage receiver value))
     (putMessage channel value)))
 
+(defn incorrectCommunication
+  "Log invalid communication."
+  [type message]
+  (log-error type message))
+
 (defn dcj-send!
-  "send something through the protocol"
+  "Send something through the protocol"
   ([action value from to protocol]
    (if (nil? (:activeMonitor @protocol))
-     (incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply send! with an instantiated protocol!")
+     (incorrectCommunication :monitor-nil "Protocol does not have a defined channel to monitor! Make sure you supply send! with an instantiated protocol!")
      (if (and (isCommunicationValid? action from to protocol) (not (instance? receiveM @(:activeMonitor @protocol))))
        (let [currentMonitor @(:activeMonitor @protocol)]
          ;(println "yes sending: " action)
@@ -45,9 +51,9 @@
              (if (instance? sendM target)
                (do (activateMonitorOnSend action from to protocol)
                    (dcj-send! target value protocol))
-               (println "target choice is not a sendM")
+               (incorrectCommunication :invalid-communication (format "target choice is not a sendM"))
                ))))
-       (incorrectCommunication (format "Send action: %s is not allowed to proceed from %s to %s" action from to)))))
+       (incorrectCommunication :invalid-communication (format "Send action: %s is not allowed to proceed from %s to %s" action from to)))))
   ([currentMonitor value protocol]
    (if (vector? (:to currentMonitor))
      (doseq [receiver (:to currentMonitor)]
@@ -55,16 +61,16 @@
      (allowSend (:channel (getChannel (:from currentMonitor) (:to currentMonitor) (:channels @protocol))) value))))
 
 (defn dcj-recv!
-  "receive something through the protocol"
+  "Receive something through the protocol"
   ([action from to protocol callback]
    (let [channel (getChannel from to (:channels @protocol))]
      (if (nil? channel)
-       (incorrectCommunication (format "Cannot find channel from %s to %s in the defined channels of the protocol! Please make sure you supply supported sender and receiver pair" from to))
+       (incorrectCommunication :undefined-channel (format "Cannot find channel from %s to %s in the defined channels of the protocol! Please make sure you supply supported sender and receiver pair" from to))
        (take! (:channel channel)
               (fn [x]
                 ;(println "recv! got " x)
                 (if (nil? (:activeMonitor @protocol))
-                  (incorrectCommunication "protocol does not have a defined channel to monitor! Make sure you supply recv! with an instantiated protocol!")
+                  (incorrectCommunication :monitor-nil "protocol does not have a defined channel to monitor! Make sure you supply recv! with an instantiated protocol!")
                   (if (and (isCommunicationValid? action from to protocol) (not (instance? sendM @(:activeMonitor @protocol))))
                     (let [currentMonitor @(:activeMonitor @protocol)]
                       (cond
@@ -74,10 +80,10 @@
                         (let [target (getTargetBranch action from to protocol)]
                           (if (instance? receiveM target)
                             (dcj-recv! action from to protocol callback x target)
-                            (println "target choice is not a receiveM" target))
+                            (incorrectCommunication :invalid-communication (format "target choice is not a receiveM" target)))
                           )))
                     (do
-                      (incorrectCommunication (format "recv action: %s is not allowed to proceed from %s to %s___Current monitor: Type: %s Action: %s, From: %s To: %s" action from to @(:activeMonitor @protocol) (:action @(:activeMonitor @protocol)) (:from @(:activeMonitor @protocol)) (:to @(:activeMonitor @protocol))))
+                      (incorrectCommunication :invalid-communication (format "recv action: %s is not allowed to proceed from %s to %s___Current monitor: Type: %s Action: %s, From: %s To: %s" action from to @(:activeMonitor @protocol) (:action @(:activeMonitor @protocol)) (:from @(:activeMonitor @protocol)) (:to @(:activeMonitor @protocol))))
                       (callback nil)))))))))
   ([action from to protocol callback value]
    (dcj-recv! action from to protocol callback value (:activeMonitor @protocol)))

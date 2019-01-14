@@ -6,12 +6,12 @@
            (discourje.core.dataStructures choice sendM recur! receiveM recursion)))
 
 (defn generateRecur
-  "generate recursion"
+  "Generate recursion"
   [name]
   (->recur! name :recur))
 
 (defn generateRecurStop
-  "generate end recursion"
+  "Generate end recursion"
   [name]
   (->recur! name :end))
 
@@ -27,7 +27,7 @@
    (reset! (:activeMonitor @protocol) nil)))
 
 (defn activateChoiceBranch
-  "activates the choice branch and filters out the branch which was not chosen"
+  "Activates the choice branch and filters out the branch which was not chosen"
   [protocol branch]
   ;(reset! (:protocol @protocol) (subvec (vec (mapcat identity [branch @(:protocol @protocol)])) 2)) ;todo check if long enough to select index 1!!!
   (if (= 1 (count branch))
@@ -42,11 +42,6 @@
         (println "next monitor IN CHOICE is " (nth branch 1))
       ))
   )
-
-(defn incorrectCommunication
-  "communication incorrect, log a message! (or maybe throw exception)"
-  [message]
-  (println message))
 
 (defn contains-value?
   "Does the vector contain a value?"
@@ -75,7 +70,7 @@
         ))))
 
 (defn monitorValid?
-  "is the current monitor valid, compared the current monitor's action, from and to to the given values"
+  "Is the current monitor valid, compared the current monitor's action, from and to to the given values"
   ([activeM action from to]
    (and
      (and (if (instance? Seqable action)
@@ -90,7 +85,7 @@
             (or (= to (:to activeM)) (contains-value? (:to activeM) to)))))))
 
 (defn canCloseProtocol?
-  "can all channels of the protocol be closed?"
+  "Can all channels of the protocol be closed?"
   [protocol]
   (= (count @(:protocol @protocol)) 0))
 
@@ -104,15 +99,12 @@
         )))
   )
 
-
 (defn monitorsEqual?
   "Are monitor a and b equal?
-  Checked by equal action-from-to"
+  Checked by equal action-from-to."
   [monitor-a monitor-b]
   (let [a monitor-a
         b @monitor-b]
-    ;(println "a = " (type a))
-    ;(println "b = " (type b))
     (and
       (= (:to a) (:to b))
       (= (:from a) (:from b))
@@ -183,7 +175,7 @@
 
 
 (defn activateMonitorOnSend
-  "activate a new monitor when specific sendM is encountered"
+  "Activate a new monitor when specific sendM is encountered"
   [action from to protocol]
   (let [activeM @(:activeMonitor @protocol)]
     (when (or (instance? sendM activeM) (instance? choice activeM))
@@ -199,8 +191,6 @@
       (instance? choice activeM)
       (let [trueResult (monitorValid? (first (:trueBranch activeM)) action from to)
             falseResult (monitorValid? (first (:falseBranch activeM)) action from to)]
-        ;(cond trueResult (activateChoiceBranch protocol (:trueBranch activeM)) ;todo here the choice gets set !!! this should not happen i think
-        ;      falseResult (activateChoiceBranch protocol (:falseBranch activeM)))
         (or trueResult falseResult)))))
 
 (defn getTargetBranch

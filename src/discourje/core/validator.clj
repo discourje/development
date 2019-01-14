@@ -1,5 +1,6 @@
 (ns discourje.core.validator
-  (require [clojure.core.async :as async :refer :all])
+  (require [clojure.core.async :as async :refer :all]
+           [slingshot.slingshot  :refer :all])
   (:use [slingshot.slingshot :only [throw+]]))
 
 ;set logging level to messages only, and do not block communication when diverting from protocol.
@@ -36,7 +37,7 @@
 (defn log-error
   "Always log message but throw exception (error) if exceptions level is set!"
   [type message]
-  (log-message message)
+  (log-message (format "ERROR-[%s] - %s" type message))
   (when (= (@logging-level level-exceptions))
     (throw+ (generate-exception type message))))
 
