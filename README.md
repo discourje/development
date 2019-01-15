@@ -54,12 +54,13 @@ Safe Send and Receive abstractions:
 
 <i>*Reminder: Macros are not first class. This means when you want to treat send and receive as first class objects, you should use the functions instead of macros.</i>
 
-Discourje also allows two levels of logging when communication does not comply with the protocol:
+Logging
 -
+Discourje also allows two levels of logging when communication does not comply with the protocol:
 - <b>Logging (not-blocking)</b>: Enable logging to print to the console when communication is invalid, this will not block communication.
 - <b>Exceptions (blocking)</b>: Enable exception logging to log to the consolse and throw exceptions when communication is invalid, this will block communication.
 
-Default configuration: Exceptions!
+<b>Default configuration: Exceptions!</b>
 
 See [Logging](src/discourje/examples/logging.clj) for an example.
 <i>*Logging levels are set as global configurations!</i>
