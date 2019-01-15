@@ -15,7 +15,7 @@ When participants deviate from the specified protocol, the communication will no
 
 Discourje is written in Clojure (v1.8.0) and is built as an abstraction layer on clojure.core.async.
 Discourje extends Core.async channels, put and take functions with validation logic to verify if the correct communication flow is followed. 
-Communication is never blocking and order among messages, and on channels is preserved.
+Communication is blocking when desired (configure logging levels) and order among messages, and on channels is preserved.
 
 <b>Current supported functionality:</b>
 - 
@@ -23,8 +23,6 @@ Communication is never blocking and order among messages, and on channels is pre
 - [Parallelisation](src/discourje/examples/parallelisation.clj)
 - [Branching](src/discourje/examples/branching.clj)
 - [Recursion](src/discourje/examples/recursion.clj)
-- Queueing of messages on channels
-- Queueing of receive actions on channels when no data is available yet (order preserved)
 
 <i>See examples for each function for more info.</i>
 
@@ -53,6 +51,13 @@ Safe Send and Receive abstractions:
 - <b>r! [action sender receiver callback]</b>: Calls receive <i>macro</i> to receive `action` from `sender` on `receiver` invoking `callback`.
 
 <i>*Reminder: Macros are not first class. This means when you want to treat send and receive as first class objects, you should use the functions instead of macros.</i>
+
+Discourje also allows two levels of logging when communication does not comply with the protocol:
+- <b>Logging (not-blocking)</b>: Enable logging to print to the console when communication is invalid, this <b>will NOT BLOCK</b> communication.
+- <b> Exceptions (blocking)</b>: Enable exception logging to log to the consolse and throw exceptions when communication is invalid, this <b> WILL BLOCK </b> communication.
+
+See [Logging](src/discourje/examples/logging.clj) for an example.
+<i>*Logging levels are set as global configurations!</i>
 
 ```clojure
 (defn- defineHelloWorldProtocol
