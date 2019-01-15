@@ -17,7 +17,7 @@
 (defn- greetBobAndCarol
   "This function will use the protocol to send the greet message to bob and carol."
   [participant]
-  (println (format "%s will now send greet." (:name participant)))
+  (log (format "%s will now send greet." (:name participant)))
   (s! "greet" (format "Greetings, from %s!" (:name participant)) participant ["bob" "carol"]))
 
 (defn- receiveGreet
@@ -25,7 +25,7 @@
   [participant]
   (r! "greet" "alice" participant
               (fn [message]
-                (println (format "%s Received message: %s" (:name participant) message)))))
+                (log (format "%s Received message: %s" (:name participant) message)))))
 
 ;start the `GreetBobAndCarol' function on thread and add `alice' participant
 (clojure.core.async/thread (greetBobAndCarol alice))

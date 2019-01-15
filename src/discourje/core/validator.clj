@@ -1,6 +1,6 @@
 (ns discourje.core.validator
   (require [clojure.core.async :as async :refer :all]
-           [slingshot.slingshot  :refer :all])
+           [slingshot.slingshot :refer :all])
   (:use [slingshot.slingshot :only [throw+]]))
 
 ;set logging level to messages only, and do not block communication when diverting from protocol.
@@ -10,7 +10,7 @@
 ;set default exception logging
 (def logging-level (atom level-exceptions))
 
-(defn generate-exception
+(defn- generate-exception
   "Generate a custom exception, as map data structure."
   [type message]
   {:type type :message message})
@@ -31,16 +31,17 @@
 (defn log-message
   "Put a message on the logging channel.
   We use a channel to preserve order among messages!"
-  [message]
-  (>!! logging-channel message))
+  [message & more]
+  (when (not (nil? logging-channel))
+      (>!! logging-channel (format "%s %s" message (apply str (flatten more))))))
 
 (defn log-error
   "Always log message but throw exception (error) if exceptions level is set!"
-  [type message]
-  (log-message (format "ERROR-[%s] - %s" type message))
-  (when (= (@logging-level level-exceptions))
-    (throw+ (generate-exception type message))))
-
+  [type message & more]
+  (let [msg (format "%s %s" message (apply str (flatten more)))]
+     (log-message (format "ERROR-[%s] - %s" type msg))
+     (when (= @logging-level level-exceptions)
+       (throw+ (generate-exception type msg)))))
 
 ;loop take on channel as long as the channel is open.
 (thread

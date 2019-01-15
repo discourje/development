@@ -23,24 +23,19 @@
 (def alice (generateParticipant "alice" protocol))
 (def bob (generateParticipant "bob" protocol))
 
-(defn- displayResult
-  "print the result to the REPL"
-  [result]
-  (println result))
-
 (defn- sendNumberAndAwaitResult
   "This function will use the protocol to send the number message to bob and wait for the result to know if it is greaterThan or lessThan threshold.
    Notice, when the number is greater than, the function will call itself"
   [participant threshold]
-  (println (format "%s will now send number." (:name participant)))
+  (log (format "%s will now send number." (:name participant)))
   ;We send a map (data structure) in order to send both the threshold and the generated number
   (s! "number" {:threshold threshold :generatedNumber (rand-int (+ threshold 10))} participant "bob")
   (r! ["greaterThan" "lessThan"] "bob" participant
               (fn [response]
                 (cond
-                  (= response "Greater!") (do (displayResult (format "greaterThan received by %s" (:name participant)))
+                  (= response "Greater!") (do (log (format "greaterThan received by %s" (:name participant)))
                                               (sendNumberAndAwaitResult participant threshold))
-                  (= response "Smaller!") (displayResult (format "lessThan received by %s" (:name participant)))))))
+                  (= response "Smaller!") (log (format "lessThan received by %s" (:name participant)))))))
 
 (defn- receiveNumber
   "This function will use the protocol to listen for the number message. Check the number and threshold and send result
