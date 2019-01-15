@@ -65,6 +65,8 @@ Discourje also allows two levels of logging when communication does not comply w
 See [Logging](src/discourje/examples/logging.clj) for an example.
 <i>*Logging levels are set as global configurations!</i>
 
+Example: Hello World
+-
 ```clojure
 (defn- defineHelloWorldProtocol
   "This function will generate a vector with 2 monitors to send and receive the hello world message."
@@ -90,7 +92,7 @@ In these functions we use the s! (send macro) and r! (receive macro) for communi
 (defn- sendToWorld
   "This function will use the protocol to send the Hello World! message to world."
   [participant]
-  (println "Will now send Hello World! to world.")
+  (log "Will now send Hello World! to world.")
   (s! "helloWorld" "Hello World!" participant "world"))
 
 (defn- receiveFromUser
@@ -98,7 +100,7 @@ In these functions we use the s! (send macro) and r! (receive macro) for communi
   [participant]
   (r! "helloWorld" "user" participant
               (fn [message]
-                  (println (format "Received message: %s" message)))))
+                  (log (format "Received message: %s" message)))))
 ```
 
 The developer is then able to communicate safely among participants.
