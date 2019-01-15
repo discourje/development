@@ -4,6 +4,7 @@
 - [Library Name](LibraryName.md)
 - [Project information](ProjectInformation.md)
 - [ToDo](ToDo.md)
+- [Dependencies](Dependencies.md)
 
 <b>Introduction:</b>
 -
@@ -14,7 +15,7 @@ When participants deviate from the specified protocol, the communication will no
 
 Discourje is written in Clojure (v1.8.0) and is built as an abstraction layer on clojure.core.async.
 Discourje extends Core.async channels, put and take functions with validation logic to verify if the correct communication flow is followed. 
-Communication is never blocking and order among messages, and on channels is preserved.
+Communication is blocking when desired (configure logging levels) and order among messages, and on channels is preserved.
 
 <b>Current supported functionality:</b>
 - 
@@ -22,8 +23,6 @@ Communication is never blocking and order among messages, and on channels is pre
 - [Parallelisation](src/discourje/examples/parallelisation.clj)
 - [Branching](src/discourje/examples/branching.clj)
 - [Recursion](src/discourje/examples/recursion.clj)
-- Queueing of messages on channels
-- Queueing of receive actions on channels when no data is available yet (order preserved)
 
 <i>See examples for each function for more info.</i>
 
@@ -38,6 +37,7 @@ This simple protocol embeds all fundamental functionality a protocol language sh
 <i>See [api](src/discourje/api/api.clj) for more info.</i>
 
 A protocol can be specified by the following constructs:
+-
 - <b>monitor-send [action sender receiver]</b>: Specifies a `send monitor` which validates that the current communication through the protocol is a send action with name `action` from `sender` to `receiver`.
 - <b>monitor-receive [action receiver sender]</b>: Specifies a `receive monitor` which validates that the current communication through the protocol is a receive action with name `action` to `receiver` from `sender`.
 - <b>monitor-choice [trueBranch falseBranch]</b>: Specifies a `choice monitor` which validates the first monitor in both the `true and false branch` and continues on target branch when an action is verified. 
@@ -46,6 +46,7 @@ A protocol can be specified by the following constructs:
 - <b>do-end-recur [name]</b>: specifies an end in recursion matching the name of the `monitor-recursion`.
 
 Safe Send and Receive abstractions:
+-
 - <b>send! [action value sender receiver]</b>: Calls send <i>function</i> to send `action` with `value` from `sender` to `receiver`.
 - <b>s! [action value sender receiver]</b>: Calls Send <i>macro</i> to send `action` with `value` from `sender` to `receiver`.
 - <b>recv! [action sender receiver callback]</b>: Calls receive <i>function</i> to receive `action` from `sender` on `receiver` invoking `callback`.
@@ -53,6 +54,19 @@ Safe Send and Receive abstractions:
 
 <i>*Reminder: Macros are not first class. This means when you want to treat send and receive as first class objects, you should use the functions instead of macros.</i>
 
+Logging
+-
+Discourje also allows two levels of logging when communication does not comply with the protocol:
+- <b>Logging (not-blocking)</b>: Enable logging to print to the console when communication is invalid, this will not block communication.
+- <b>Exceptions (blocking)</b>: Enable exception logging to log to the consolse and throw exceptions when communication is invalid, this will block communication.
+
+<b>Default configuration: Exceptions!</b>
+
+See [Logging](src/discourje/examples/logging.clj) for an example.
+<i>*Logging levels are set as global configurations!</i>
+
+Example: Hello World
+-
 ```clojure
 (defn- defineHelloWorldProtocol
   "This function will generate a vector with 2 monitors to send and receive the hello world message."
@@ -78,7 +92,7 @@ In these functions we use the s! (send macro) and r! (receive macro) for communi
 (defn- sendToWorld
   "This function will use the protocol to send the Hello World! message to world."
   [participant]
-  (println "Will now send Hello World! to world.")
+  (log "Will now send Hello World! to world.")
   (s! "helloWorld" "Hello World!" participant "world"))
 
 (defn- receiveFromUser
@@ -86,7 +100,7 @@ In these functions we use the s! (send macro) and r! (receive macro) for communi
   [participant]
   (r! "helloWorld" "user" participant
               (fn [message]
-                  (println (format "Received message: %s" message)))))
+                  (log (format "Received message: %s" message)))))
 ```
 
 The developer is then able to communicate safely among participants.

@@ -3,7 +3,8 @@
            [discourje.core.core :refer :all]
            [discourje.core.protocol :refer :all]
            [discourje.core.protocolCore :refer :all]
-           [discourje.core.dataStructures :refer :all]))
+           [discourje.core.dataStructures :refer :all]
+           [discourje.core.validator :refer :all]))
 
 (defn monitor-send
   "make send monitor, sending action from sender to receiver."
@@ -65,5 +66,28 @@
   [action sender receiver callback]
   `(receive-by ~receiver ~action ~sender ~callback))
 
+(defn set-monitor-logging
+  "Set logging level to messages only, continuing communication when invalid communication occurs"
+  []
+  (set-logging))
 
+(defn set-monitor-exceptions
+  "Set logging level to exceptions, blocking communication when invalid communication occurs."
+  []
+  (set-logging-exceptions))
+
+(defn log
+  "Log a message to the logging channel"
+  [message & more]
+  (discourje.core.validator/log-message message more))
+
+(defn log-exception
+  "Log a message to the logging channel"
+  [type message & more]
+  (discourje.core.validator/log-error type message more))
+
+(defn close-logging
+  "close the logging channel"
+  []
+  (discourje.core.validator/stop-logging))
 

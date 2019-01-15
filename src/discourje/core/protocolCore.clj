@@ -9,9 +9,8 @@
 (defrecord communicationChannel [sender receiver channel])
 
 (defn- generateChannel
-  "function to generate a channel between sender and receiver"
+  "Function to generate a channel between sender and receiver"
   [sender receiver]
-  ;(println (format "generating channel from %s to %s" sender receiver))
   (->communicationChannel (str sender) (str receiver) (clojure.core.async/chan)))
 
 (defn uniqueCartesianProduct
@@ -31,6 +30,7 @@
 (defrecord protocolInstance [channels protocol activeMonitor template])
 
 (defn- findAllRecursions
+  "Find all recursions in protocol"
   ([protocol result]
    (let [result2 (flatten (vec (conj result [])))]
      (for [element protocol
@@ -83,19 +83,19 @@
         element))))
 
 (defn duplicates?
-  "returns true when duplicates inside collection"
+  "Returns true when duplicates inside collection"
   [coll except]
   (let [except (set except)
         filtered (remove #(contains? except %) coll)]
     (not= filtered (distinct filtered))))
 
 (defn containsDuplicates?
-  "checks the recursion vector for recursions"
+  "Checks the recursion vector for recursions"
   [definedRecursions]
   (duplicates? definedRecursions ""))
 
 (defn findAllRecursionsInProtocol
-  "find all recursions inside protocol definition, this will include duplicates to later check for"
+  "Find all recursions inside protocol definition, this will include duplicates to later check for"
   [protocol]
   (let [x (findAllRecursions protocol [])]
     (vec (first (drop-while empty? x)))))
@@ -108,7 +108,7 @@
     (first (drop-while empty? (flatten x)))))
 
 (defn- hasCorrectRecurAndEnd?
-  "is the protocol correctly recured and ended?"
+  "Is the protocol correctly recurred and ended?"
   [protocol definedRecursions]
   (let [recurs (distinct definedRecursions)]
     (every? true? (for [rec recurs]
@@ -118,14 +118,14 @@
                       (and (not (empty? recurElement)) (not (empty? endElement))))))))
 
 (defn isProtocolValid?
-  "returns true when there are no duplicate recursion definitions and,=>
+  "Returns true when there are no duplicate recursion definitions and,=>
   we will include checking for proper recur! [recur, end] definitions!"
   [protocol]
   (let [definedRecursion (findAllRecursionsInProtocol protocol)]
     (and (not (containsDuplicates? definedRecursion)) (hasCorrectRecurAndEnd? protocol definedRecursion))))
 
 (defn- validateRecursion
-  "checks the protocol for duplicate recursion definitions and if recur/ended correctly"
+  "Checks the protocol for duplicate recursion definitions and if recur/ended correctly"
   [monitors]
   (isProtocolValid? monitors))
 

@@ -16,7 +16,7 @@
 (defn- sendToWorld
   "This function will use the protocol to send the Hello World! message to world."
   [participant]
-  (println "Will now send Hello World! to world.")
+  (log "Will now send Hello World! to world.")
   (s! "helloWorld" "Hello World!" participant "world"))
 
 (defn- receiveFromUser
@@ -24,7 +24,7 @@
   [participant]
   (r! "helloWorld" "user" participant
               (fn [message]
-                  (println (format "Received message: %s" message)))))
+                  (log (format "Received message: %s" message)))))
 
 ;start the `sendToWorld' function on thread and add `user' participant
 (clojure.core.async/thread (sendToWorld user))
