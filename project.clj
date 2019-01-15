@@ -5,4 +5,5 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/test.check "0.9.0"]
-                 [org.clojure/core.async "0.4.474"]])
+                 [org.clojure/core.async "0.4.474"]
+                 [slingshot "0.12.2"]])
