@@ -5,7 +5,7 @@
 (defn quoteBook
   "generate random integer between 1(inclusive) and 30(inclusive)"
   [title]
-  (println (format "received title: %s" title))
+  (log (format "received title: %s" title))
   (let [x (+ (rand-int 30) 1)]
     x))
 
@@ -26,36 +26,30 @@
 (defn- endReached
   "log protocol end reached"
   [quit]
-  (println (format "Protocol ended with: %s" quit)))
+  (log (format "Protocol ended with: %s" quit)))
 
 
 (defn orderBook
   "Order book from seller's perspective"
-  ([participant]
+  [participant]
    (r! "title" "buyer1" participant
                (fn [title] (s! "quote" (quoteBook title) participant ["buyer1" "buyer2"])))
    (r! ["ok" "quit"] "buyer2" participant
                (fn [response]
                  (cond
                    (= response "ok")
-                   (do (println "yes yes received Ok")
+                   (do (log "yes yes received Ok")
                        (r! "address" "buyer2" participant
                                    (fn [address]
-                                     (println "The received address is: " address)
+                                     (log "The received address is: " address)
                                      (s! "date" (getRandomDate 5) participant "buyer2")
                                      (r! "repeat" "buyer2" participant
                                                  (fn [repeat]
-                                                   (println "repeat received on seller from buyer2!")
+                                                   (log "repeat received on seller from buyer2!")
                                                    (orderBook participant)))
                                      )))
                    (= response "quit")
-                   (endReached response)
-                   )
-                 )))
-  ([name protocol]                                          ; example how function would operate when participants are constructed internally
-   (let [participant (discourje.core.core/->participant name protocol)]
-     (orderBook participant)))
-  )
+                   (endReached response)))))
 ;wait for title
 ;send quote to buyer1 and buyer2
 ;wait for ok or quit

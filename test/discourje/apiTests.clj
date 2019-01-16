@@ -4,4 +4,5 @@
 (def participant(generateParticipant "buyer1" []))
 
 (macroexpand '(s! "title" "helloWorld" participant "seller"))
-(s! "title" "helloWorld" participant "seller")
+
+(macroexpand '(>s! "tester" "title" "helloWorld" participant "seller"))

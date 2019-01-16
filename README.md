@@ -11,7 +11,7 @@
 Discourje is a library to describe communication between systems as protocols.
 A protocol acts as an agreement on how participants interact with each other.
 All communication between participants is monitored by the protocol to ensure the correct flow of communication.
-When participants deviate from the specified protocol, the communication will not be allowed to proceed.
+When participants deviate from the specified protocol the communication will be logged, but will never block unless configured to throw exceptions.
 
 Discourje is written in Clojure (v1.8.0) and is built as an abstraction layer on clojure.core.async.
 Discourje extends Core.async channels, put and take functions with validation logic to verify if the correct communication flow is followed. 
@@ -58,7 +58,7 @@ Logging
 -
 Discourje also allows two levels of logging when communication does not comply with the protocol:
 - <b>Logging (not-blocking)</b>: Enable logging to print to the console when communication is invalid, this will not block communication.
-- <b>Exceptions (blocking)</b>: Enable exception logging to log to the consolse and throw exceptions when communication is invalid, this will block communication.
+- <b>Exceptions (blocking)</b>: Enable exception logging to log to the console and throw exceptions when communication is invalid, this will block communication.
 
 <b>Default configuration: Exceptions!</b>
 
