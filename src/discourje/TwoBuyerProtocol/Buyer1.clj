@@ -9,9 +9,9 @@
 (defn quoteDiv
   "returns true when the received quote is <= 15 (50% chance at this moment)"
   [quote]
-  (println (format "received quote: %s" quote))
+  (log (format "received quote: %s" quote))
   (let [randomN (+ (rand-int quote) 1)]
-    (println "QD = " randomN)
+    (log "QD = " randomN)
     randomN))
 
 (defn orderBook
@@ -20,11 +20,12 @@
   (s! "title" (generateBook) participant "seller")
   (r! "quote" "seller" participant
               (fn [x]
-                (println "buyer1 received quote!")
+                (log "buyer1 received quote!")
                   (s! "quoteDiv" (quoteDiv x) participant "buyer2")))
   (r! "repeat" "buyer2" participant
-              (fn [repeat](println "repeat received on buyer1 from buyer2!")
+              (fn [repeat](log "repeat received on buyer1 from buyer2!")
                   (orderBook participant))))
+
 
 ;send title to seller
 ;wait for quote

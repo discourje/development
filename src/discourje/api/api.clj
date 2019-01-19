@@ -56,6 +56,26 @@
   [action value sender receiver]
   `(send-to ~sender ~action ~value ~receiver))
 
+(defmacro >s!
+  "fn [x] value into send! chained macro"
+  ([action function sender receiver]
+   `(fn [~'callback-value-for-fn]
+      (send-to ~sender ~action (~function ~'callback-value-for-fn) ~receiver))))
+
+(defmacro s!>
+  "Send! and invoke function-after-send"
+  [action value sender receiver function-after-send]
+  `(do ~`(send-to ~sender ~action ~value ~receiver)
+       ~function-after-send))
+
+(defmacro >s!>
+  "fn [x] value into send! and invoke function-after-send chained macro"
+  ([action function sender receiver function-after-send]
+   `(fn [~'callback-value]
+      `(do
+         ~(send-to ~sender ~action (~function ~'callback-value) ~receiver)
+      ~~function-after-send))))
+
 (defn recv!
   "receive action from sender on receiver, invoking callback"
   [action sender receiver callback]
