@@ -60,7 +60,7 @@ For chaining send and receive functions the developer can use specialized macros
 - <b>s!> [action value sender receiver function-after-send]</b> First calls Send <i>macro</i> to send `action` with `value` from `sender` to `receiver`. Second, also invokes `function-after-send`.
 - <b>>s!> [action function sender receiver function-after-send]</b> First, creates an anonymous function with 1 parameter and feeds it as input to `function`. Then sends `action` with value, result of the `function`, from `sender` to `receiver`. Second, also invokes `function-after-send`.
 
-For an example on chaining macros see:[Chaining](src/discourje/examples/macroChaining.clj).
+For an example on chaining macros see: [Chaining](src/discourje/examples/macroChaining.clj).
 
 <i>*Reminder: Macros are not first class. This means when you want to treat send and receive as first class objects, you should use the functions instead of macros.</i>
 
@@ -73,6 +73,7 @@ Discourje also allows two levels of logging when communication does not comply w
 <b>Default configuration: Exceptions!</b>
 
 See [Logging](src/discourje/examples/logging.clj) for an example.
+
 <i>*Logging levels are set as global configurations!</i>
 
 Example: Hello World
