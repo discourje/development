@@ -9,6 +9,7 @@
    (monitor-receive "greet" ["bob" "carol"] "alice")])
 ;define the protocol
 (def protocol (generateProtocolFromMonitors (defineParallelProtocol)))
+(println (:channels @protocol))
 ;define the participants
 (def alice (generateParticipant "alice" protocol))
 (def bob (generateParticipant "bob" protocol))

@@ -56,17 +56,25 @@
   [action value sender receiver]
   `(send-to ~sender ~action ~value ~receiver))
 
-(defmacro ssend
-  "takes a function and prepends a quote at the front to delay evaluation"
-  ([f]`'~f)
-  ([f tag] `(~f ~tag))
-  ([f participant tag] `(~f (~tag ~participant))))
-
 (defmacro >s!
-  "chained-send macro -> WIP!"
-  [callback-value action value sender receiver]
-  `(fn [~callback-value]
-     (send-to ~sender ~action ~value ~receiver)))
+  "fn [x] value into send! chained macro"
+  ([action function sender receiver]
+   `(fn [~'callback-value-for-fn]
+      (send-to ~sender ~action (~function ~'callback-value-for-fn) ~receiver))))
+
+(defmacro s!>
+  "Send! and invoke function-after-send"
+  [action value sender receiver function-after-send]
+  `(do ~`(send-to ~sender ~action ~value ~receiver)
+       ~function-after-send))
+
+(defmacro >s!>
+  "fn [x] value into send! and invoke function-after-send chained macro"
+  ([action function sender receiver function-after-send]
+   `(fn [~'callback-value]
+      `(do
+         ~(send-to ~sender ~action (~function ~'callback-value) ~receiver)
+      ~~function-after-send))))
 
 (defn recv!
   "receive action from sender on receiver, invoking callback"
@@ -77,12 +85,6 @@
   "receive macro"
   [action sender receiver callback]
   `(receive-by ~receiver ~action ~sender ~callback))
-
-(defmacro >r!
-  "chained-receive macro -> WIP!"
-  [callback-value action sender receiver callback]
-  `(fn [~callback-value]
-     (receive-by ~receiver ~action ~sender ~callback)))
 
 (defn set-monitor-logging
   "Set logging level to messages only, continuing communication when invalid communication occurs"

@@ -23,6 +23,7 @@ Communication is blocking when desired (configure logging levels) and order amon
 - [Parallelisation](src/discourje/examples/parallelisation.clj)
 - [Branching](src/discourje/examples/branching.clj)
 - [Recursion](src/discourje/examples/recursion.clj)
+- Nesting: Recursion and Branching constructs support nesting!
 
 <i>See examples for each function for more info.</i>
 
@@ -52,6 +53,16 @@ Safe Send and Receive abstractions:
 - <b>recv! [action sender receiver callback]</b>: Calls receive <i>function</i> to receive `action` from `sender` on `receiver` invoking `callback`.
 - <b>r! [action sender receiver callback]</b>: Calls receive <i>macro</i> to receive `action` from `sender` on `receiver` invoking `callback`.
 
+For chaining send and receive functions the developer can use specialized macros that handle callbacks;
+<b>(Chained macros support nesting)</b>
+
+<i>In the naming below `>` stands for the conceptual data flow.</i>
+- <b>>s! [action function sender receiver]</b> Creates an anonymous function with 1 parameter and feeds it as input to `function`. Then sends `action` with value, result of the `function`, from `sender` to `receiver`.
+- <b>s!> [action value sender receiver function-after-send]</b> First calls Send <i>macro</i> to send `action` with `value` from `sender` to `receiver`. Second, also invokes `function-after-send`.
+- <b>>s!> [action function sender receiver function-after-send]</b> First, creates an anonymous function with 1 parameter and feeds it as input to `function`. Then sends `action` with value, result of the `function`, from `sender` to `receiver`. Second, also invokes `function-after-send`.
+
+For an example on chaining macros see: [Chaining](src/discourje/examples/macroChaining.clj).
+
 <i>*Reminder: Macros are not first class. This means when you want to treat send and receive as first class objects, you should use the functions instead of macros.</i>
 
 Logging
@@ -63,6 +74,7 @@ Discourje also allows two levels of logging when communication does not comply w
 <b>Default configuration: Exceptions!</b>
 
 See [Logging](src/discourje/examples/logging.clj) for an example.
+
 <i>*Logging levels are set as global configurations!</i>
 
 Example: Hello World
