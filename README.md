@@ -53,12 +53,14 @@ Safe Send and Receive abstractions:
 - <b>r! [action sender receiver callback]</b>: Calls receive <i>macro</i> to receive `action` from `sender` on `receiver` invoking `callback`.
 
 For chaining send and receive functions the developer can use specialized macros that handle callbacks;
+(Chained macros support nesting)
 <i>In the naming below `>` stands for the conceptual data flow.</i>
 - <b>>s! [action function sender receiver]</b> Creates an anonymous function with 1 parameter and feeds it as input to `function`. Then sends `action` with value, result of the `function`, from `sender` to `receiver`.
-- <b>s!> [action value sender receiver]</b> First calls Send <i>macro</i> to send `action` with `value` from `sender` to `receiver`. Second, also invokes `function-after-send`.
-- <b>>s!> [action function sender receiver f]</b> First, creates an anonymous function with 1 parameter and feeds it as input to `function`. Then sends `action` with value, result of the `function`, from `sender` to `receiver`. Second, also invokes `function-after-send`.
+- <b>s!> [action value sender receiver function-after-send]</b> First calls Send <i>macro</i> to send `action` with `value` from `sender` to `receiver`. Second, also invokes `function-after-send`.
+- <b>>s!> [action function sender receiver function-after-send]</b> First, creates an anonymous function with 1 parameter and feeds it as input to `function`. Then sends `action` with value, result of the `function`, from `sender` to `receiver`. Second, also invokes `function-after-send`.
 
 For an example on chaining macros see:[Chaining](src/discourje/examples/macroChaining.clj).
+
 <i>*Reminder: Macros are not first class. This means when you want to treat send and receive as first class objects, you should use the functions instead of macros.</i>
 
 Logging

@@ -69,12 +69,12 @@
        ~function-after-send))
 
 (defmacro >s!>
-  "fn [x] value into send! and invoke f chained macro"
-  ([action function sender receiver f]
+  "fn [x] value into send! and invoke function-after-send chained macro"
+  ([action function sender receiver function-after-send]
    `(fn [~'callback-value]
       `(do
          ~(send-to ~sender ~action (~function ~'callback-value) ~receiver)
-      ~~f))))
+      ~~function-after-send))))
 
 (defn recv!
   "receive action from sender on receiver, invoking callback"
