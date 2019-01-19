@@ -53,7 +53,8 @@ Safe Send and Receive abstractions:
 - <b>r! [action sender receiver callback]</b>: Calls receive <i>macro</i> to receive `action` from `sender` on `receiver` invoking `callback`.
 
 For chaining send and receive functions the developer can use specialized macros that handle callbacks;
-(Chained macros support nesting)
+<b>(Chained macros support nesting)</b>
+
 <i>In the naming below `>` stands for the conceptual data flow.</i>
 - <b>>s! [action function sender receiver]</b> Creates an anonymous function with 1 parameter and feeds it as input to `function`. Then sends `action` with value, result of the `function`, from `sender` to `receiver`.
 - <b>s!> [action value sender receiver function-after-send]</b> First calls Send <i>macro</i> to send `action` with `value` from `sender` to `receiver`. Second, also invokes `function-after-send`.
