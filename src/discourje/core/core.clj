@@ -50,7 +50,8 @@
              (instance? choice currentMonitor)
              (let [target (getTargetBranch action from to :send protocol)]
                (if (nil? target)
-                 (incorrectCommunication :monitor-nil "Protocol does not have a defined channel to monitor after checking CHOICE branch! Make sure you supply send! with an instantiated protocol!")
+                 (incorrectCommunication :monitor-nil (format "Protocol does not have a defined channel to monitor after checking CHOICE branch! Make sure you supply send! with an instantiated protocol!
+                 trying to send action %s from %s to %s, but active: %s" action from to currentMonitor))
                  (do
                  (when (not (instance? sendM target))
                  (incorrectCommunication :invalid-communication (format "Target choice is not a sendM, but is %s" (to-string target))))
@@ -84,7 +85,8 @@
                           (instance? choice currentMonitor)
                           (let [target (getTargetBranch action from to :receive protocol)]
                             (if (nil? target)
-                              (incorrectCommunication :monitor-nil "Protocol does not have a defined channel to monitor after checking CHOICE branch! Make sure you supply recv! with an instantiated protocol!")
+                              (incorrectCommunication :monitor-nil (format "Protocol does not have a defined channel to monitor after checking CHOICE branch! Make sure you supply recv! with an instantiated protocol!
+                                                                           trying to receive action %s from %s to %s, but active: %s" action from to currentMonitor))
                               (do
                             (when (not (instance? receiveM target))
                               (incorrectCommunication :invalid-communication (format "target choice is not a receiveM. But is: %s" (to-string target))))
@@ -92,13 +94,14 @@
   ([action from to protocol callback value]
    (dcj-recv! action from to protocol callback value (:activeMonitor @protocol)))
   ([action from to protocol callback value targetM]
-  ; (log-message targetM)
+   ;(log-message targetM)
    (if (hasMultipleReceivers? protocol)
      (do (removeReceiver protocol to)
          (add-watch targetM nil (fn [_ atom old-state new-state]
-                                  (when (and
-                                          (not= (:action old-state) (:action new-state))
-                                          (not= (:from old-state) (:from new-state)))
+                                  (when (not= (:id old-state) (:id new-state)) ; todo: not sure about this!
+                                    ;(and
+                                    ;      (not= (:action old-state) (:action new-state))
+                                    ;      (not= (:from old-state) (:from new-state)))
                                     (do (remove-watch atom nil)
                                     (callback value)))))
          )

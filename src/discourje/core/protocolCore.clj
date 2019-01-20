@@ -24,7 +24,6 @@
 (defn generateChannels
   "Generates communication channels between all participants"
   [participants]
-  (println participants)
   (map #(apply generateChannel %) (uniqueCartesianProduct participants participants)))
 
 ;an instance of a protocol consists of a collection of channels, protocol definition and a monitor flagged active

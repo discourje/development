@@ -1,6 +1,7 @@
 (ns discourje.core.monitor
   (:require [clojure.core.async]
-            [discourje.core.dataStructures :refer :all])
+            [discourje.core.dataStructures :refer :all]
+            [clj-uuid :as uuid])
   (use [discourje.core.protocolCore :only [findRecurByName]]
        [discourje.core.validator :only [log-error log-message]])
   (:import (clojure.lang Seqable)
@@ -9,12 +10,12 @@
 (defn generateRecur
   "Generate recursion"
   [name]
-  (->recur! name :recur))
+  (->recur! (uuid/v1) name :recur))
 
 (defn generateRecurStop
   "Generate end recursion"
   [name]
-  (->recur! name :end))
+  (->recur! (uuid/v1) name :end))
 
 (defn- resetMonitor!
   "Reset! the monitor ATOM"
@@ -39,7 +40,7 @@
     (do
       (reset! (:protocol @protocol) (subvec (vec (mapcat identity [branch @(:protocol @protocol)])) 2)) ;todo check if long enough to select index 1!!!
       (reset! (:activeMonitor @protocol) (nth branch 1))
-     ; (log-message "next monitor IN CHOICE is " (to-string (nth branch 1)))
+      ; (log-message "next monitor IN CHOICE is " (to-string (nth branch 1)))
       ))
   )
 
@@ -64,10 +65,9 @@
           newRecv (vec (remove #{to} recv))]
       (cond
         (instance? sendM currentMonitor)
-        (reset! (:activeMonitor @protocol) (->sendM (:action currentMonitor) (:from currentMonitor) newRecv))
+        (reset! (:activeMonitor @protocol) (->sendM (:id currentMonitor) (:action currentMonitor) (:from currentMonitor) newRecv))
         (instance? receiveM currentMonitor)
-        (reset! (:activeMonitor @protocol) (->receiveM (:action currentMonitor) newRecv (:from currentMonitor)))
-        ))))
+        (reset! (:activeMonitor @protocol) (->receiveM (:id currentMonitor) (:action currentMonitor) newRecv (:from currentMonitor)))))))
 
 (defn monitorValid?
   "Is the current monitor valid, compared the current monitor's action, from and to to the given values"
@@ -100,19 +100,7 @@
         )))
   )
 
-(defn monitorsEqual?
-  "Are monitor a and b equal?
-  Checked by equal action-from-to."
-  [monitor-a monitor-b]
-  (let [a monitor-a
-        b @monitor-b]
-    (and
-      (= (:to a) (:to b))
-      (= (:from a) (:from b))
-      (= (:action a) (:action b))
-      (= (type a) (type b)))))
-
-(defn activateNextMonitor                                   ;todo type of monitor to compare recv to send!
+(defn activateNextMonitor
   "Set the active monitor based on the protocol"
   ([action from to operation protocol]
    (let [activeM @(:activeMonitor @protocol)]
@@ -147,20 +135,10 @@
        (let [trueResult (monitorValid? (first (:trueBranch activeM)) action from to operation)
              falseResult (monitorValid? (first (:falseBranch activeM)) action from to operation)]
          (cond
-           ;(and
            trueResult
-           ;(not= (monitorsEqual? (first (:falseBranch activeM)) (:activeMonitor @protocol)))                )
-           ;(do
-           ;(println "Taking TrueBranch")
            (activateChoiceBranch protocol (:trueBranch activeM))
-           ;)
-           ;(and
            falseResult
-           ;(not= (monitorsEqual? (first (:trueBranch activeM)) (:activeMonitor @protocol)))                )
-           ;(do
-           ;(println "Taking falseBranch")
            (activateChoiceBranch protocol (:falseBranch activeM))
-           ;)
            )))))
   ([protocol]
    (let [nextMonitor (first @(:protocol protocol))]
@@ -204,4 +182,7 @@
         (monitorValid? (first (:trueBranch activeM)) action from to operation)
         (first (:trueBranch activeM))
         (monitorValid? (first (:falseBranch activeM)) action from to operation)
-        (first (:falseBranch activeM))))))
+        (first (:falseBranch activeM))
+        :else
+        (do (log-message (format "no choice branch: action %s from %s to %s in choice: %s" action from to (to-string activeM)))
+            nil)))))

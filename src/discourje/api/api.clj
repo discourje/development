@@ -4,27 +4,28 @@
            [discourje.core.protocol :refer :all]
            [discourje.core.protocolCore :refer :all]
            [discourje.core.dataStructures :refer :all]
-           [discourje.core.validator :refer :all]))
+           [discourje.core.validator :refer :all]
+           [clj-uuid :as uuid]))
 
 (defn monitor-send
   "make send monitor, sending action from sender to receiver."
   [action sender receiver]
-  (->sendM action sender receiver))
+  (->sendM (uuid/v1) action sender receiver))
 
 (defn monitor-receive
   "make receive monitor, listening for action on receiver send by sender."
   [action receiver sender]
-  (->receiveM action receiver sender))
+  (->receiveM (uuid/v1) action receiver sender))
 
 (defn monitor-recursion
   "make recursion monitor, which will recur or end after encountering recur record."
   [name protocol]
-  (->recursion name protocol))
+  (->recursion (uuid/v1) name protocol))
 
 (defn monitor-choice
   "make choice monitor, allowing to observe both first monitors in branches"
   [trueBranch falseBranch]
-  (->choice trueBranch falseBranch))
+  (->choice (uuid/v1) trueBranch falseBranch))
 
 (defn do-recur
   "recur back to recursion monitor, matching name!"
