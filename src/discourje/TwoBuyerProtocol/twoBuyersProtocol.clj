@@ -12,8 +12,8 @@
                        (monitor-send "quoteDiv" "buyer1" "buyer2")
                        (monitor-receive "quoteDiv" "buyer2" "buyer1")
                        (monitor-choice [
-                                        (monitor-send "ok" "buyer2" "seller")
-                                        (monitor-choice [
+                                        (monitor-send "ok" "buyer2" "seller") ;0
+                                        (monitor-choice [                     ;1
                                                          (monitor-send "address" "buyer2" "seller")
                                                          (monitor-receive "ok" "seller" "buyer2")
                                                          (monitor-receive "address" "seller" "buyer2")
@@ -23,7 +23,7 @@
                                                          (monitor-send "address" "buyer2" "seller")
                                                          (monitor-receive "address" "seller" "buyer2")
                                                          ])
-                                        (monitor-send "date" "seller" "buyer2")
+                                        (monitor-send "date" "seller" "buyer2");2
                                         (monitor-receive "date" "buyer2" "seller")
                                         (monitor-send "repeat" "buyer2" ["seller" "buyer1"])
                                         (monitor-receive "repeat" ["seller" "buyer1"] "buyer2")
