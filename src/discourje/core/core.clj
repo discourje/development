@@ -72,7 +72,7 @@
   ([action value from to protocol]
    (dcj-send! action value from to protocol nil))
   ([currentMonitor value protocol callback]
-   (if (vector? (:to currentMonitor))
+   (if (vector? (:to currentMonitor)) ;todo check for multiple receivers must be done here! not in allowsend!
      (doseq [receiver (:to currentMonitor)]
        (allowSend (:channel (getChannel (:from currentMonitor) receiver (:channels @protocol))) value callback))
      (allowSend (:channel (getChannel (:from currentMonitor) (:to currentMonitor) (:channels @protocol))) value callback))))

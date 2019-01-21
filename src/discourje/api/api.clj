@@ -79,16 +79,18 @@
          ~(send-to ~sender ~action (~function ~'callback-value) ~receiver)
       ~~function-after-send))))
 
-(defmacro s!->
-  "send macro which also invokes callback if the put value is taken"
+(defmacro s!!>
+  "send macro which also invokes callback if the put value is taken
+  Simulates blocking functionality by delaying callback!"
   [action value sender receiver callback]
-   `(send-to-> ~sender ~action ~value ~receiver `(fn [~'callback-value-for-fn] (~~callback))))
+   `(send-to-> ~sender ~action ~value ~receiver (fn [~'callback-value-for-fn] (~callback))))
 
-(defmacro >s!->
-  "fn [x] value into send! and invoke function-after-send only when the put is taken chained macro"
+(defmacro >s!!>
+  "fn [x] value into send! and invoke function-after-send only when the put is taken chained macro
+  Simulates blocking functionality by delaying callback!"
   ([action function sender receiver function-after-send]
    `(fn [~'callback-value]
-         ~(send-to-> ~sender ~action (~function ~'callback-value) ~receiver ~function-after-send))))
+         (send-to-> ~sender ~action (~function ~'callback-value) ~receiver ~function-after-send))))
 
 (defn recv!
   "receive action from sender on receiver, invoking callback"
@@ -96,6 +98,11 @@
   (receive-by receiver action sender callback))
 
 (defmacro r!
+  "receive macro"
+  [action sender receiver callback]
+  `(receive-by ~receiver ~action ~sender ~callback))
+
+(defmacro >r!
   "receive macro"
   [action sender receiver callback]
   `(receive-by ~receiver ~action ~sender ~callback))
