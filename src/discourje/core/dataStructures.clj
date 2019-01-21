@@ -39,4 +39,5 @@
 ;protocol(interface) to implement in object
 (defprotocol role
   (send-to [this action value to])
+  (send-to-> [this action value to callback])
   (receive-by [this action from callback]))

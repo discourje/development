@@ -49,8 +49,10 @@
 
 (defn send!
   "send action with value from sender to receiver"
-  [action value sender receiver]
+  ([action value sender receiver]
   (send-to sender action value receiver))
+  ([action value sender receiver callback]
+   (send-to-> sender action value receiver callback)))
 
 (defmacro s!
   "send macro"
@@ -76,6 +78,17 @@
       `(do
          ~(send-to ~sender ~action (~function ~'callback-value) ~receiver)
       ~~function-after-send))))
+
+(defmacro s!->
+  "send macro which also invokes callback if the put value is taken"
+  [action value sender receiver callback]
+   `(send-to-> ~sender ~action ~value ~receiver `(fn [~'callback-value-for-fn] (~~callback))))
+
+(defmacro >s!->
+  "fn [x] value into send! and invoke function-after-send only when the put is taken chained macro"
+  ([action function sender receiver function-after-send]
+   `(fn [~'callback-value]
+         ~(send-to-> ~sender ~action (~function ~'callback-value) ~receiver ~function-after-send))))
 
 (defn recv!
   "receive action from sender on receiver, invoking callback"

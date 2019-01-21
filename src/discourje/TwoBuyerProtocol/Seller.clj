@@ -41,12 +41,13 @@
                    (do (log "yes yes received Ok")
                        (r! "address" "buyer2" participant
                                    (fn [address]
+                                     (do
                                      (log "The received address is: " address)
                                      (s!> "date" (getRandomDate 5) participant "buyer2"
                                      (r! "repeat" "buyer2" participant
                                                  (fn [repeat]
                                                    (log "repeat received on seller from buyer2!")
-                                                   (orderBook participant))))
+                                                   (orderBook participant)))))
                                      )))
                    (= response "quit")
                    (endReached response)))))
