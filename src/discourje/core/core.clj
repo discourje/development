@@ -30,13 +30,7 @@
    If there are multiple receivers, the callback will be invoked when ALL of them have taken!"
   [channel value callback]
   (if (vector? channel)
-    (if (nil? callback)
-      (for [receiver channel] (putMessage receiver value nil))
-      (let [amount (atom 0)
-            cb (fn [x] (do (swap! amount inc)
-                           (when (= (count channel) @amount)
-                             (callback x))))]
-        (for [receiver channel] (putMessage receiver value cb))))
+    (for [receiver channel] (putMessage receiver value callback))
     (putMessage channel value callback)))
 
 (defn incorrectCommunication
@@ -72,9 +66,16 @@
   ([action value from to protocol]
    (dcj-send! action value from to protocol nil))
   ([currentMonitor value protocol callback]
-   (if (vector? (:to currentMonitor)) ;todo check for multiple receivers must be done here! not in allowsend!
-     (doseq [receiver (:to currentMonitor)]
-       (allowSend (:channel (getChannel (:from currentMonitor) receiver (:channels @protocol))) value callback))
+   (if (vector? (:to currentMonitor))
+     (if (nil? callback)
+       (doseq [receiver (:to currentMonitor)]
+         (allowSend (:channel (getChannel (:from currentMonitor) receiver (:channels @protocol))) value nil))
+       (let [amount (atom 0)
+             cb (fn [x] (do (swap! amount inc)
+                            (when (= (count (:to currentMonitor)) @amount)
+                              (callback x))))]
+         (doseq [receiver (:to currentMonitor)]
+           (allowSend (:channel (getChannel (:from currentMonitor) receiver (:channels @protocol))) value cb))))
      (allowSend (:channel (getChannel (:from currentMonitor) (:to currentMonitor) (:channels @protocol))) value callback))))
 
 (defn dcj-recv!
