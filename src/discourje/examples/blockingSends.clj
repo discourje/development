@@ -2,8 +2,8 @@
   (require [discourje.api.api :refer :all]))
 
 (defn- defineSequenceProtocol
-  "This function will generate a vector with 4 monitors to send and receive the greet message back and forth.
-  Notice that the monitors below send greet 5 and 6 from alice to bob.
+  "This function will generate a vector with 4 monitors to send and receive the greet message.
+  Notice that the monitors below send both greets from alice to bob.
   Since the protocol does not describe any way for bob to notify alice that the value is received you need to know when the value is taken.\n  To be able to add some synchronous send operations you can use a callback function for send.
   This callback will be invoked when a value is successfully taken, so you can now chain send functions.
   This simulates blocking behavior"
@@ -27,31 +27,25 @@
   (log (format "greet%s" x))
   (+ x 1))
 
-;(defn- greetForAlice
-;  "This function will use the protocol to send the greet message to bob and carol."
-;  [participant]
-;  (s!> "greet" 1 participant "bob"
-;       (r! "greet2" "bob" participant
-;           (>s!> "greet3" helperFunction participant "bob"
-;                 (r! "greet4" "bob" participant helperFunction)))))
-
 (defn- greetForAlice
-  "This function will use the protocol to send the greet message to bob and carol."
+  "This function will use the protocol to send the greet message to bob."
   [participant]
-  (s!!> "greet" helperFunction participant "bob"
-        (s! "greet2" helperFunction participant "bob")))
-
+  (s!!> "greet" (helperFunction 0) participant "bob"
+        (s! "greet2" (helperFunction 1) participant "bob")))
 
 (defn- greetForBob
   "This function will use the protocol to listen for the greet message."
   [participant]
-  (r! "greet" "alice" participant (fn [x] (r! "greet2" "alice" participant log))))
+  (r! "greet" "alice" participant (>r!> "greet2" "alice" participant (fn [x] (log (format "greet%s %s" x "Done!"))))))
 
-;start the `GreetBobAndCarol' function on thread and add `alice' participant
+;start the `greetForAlice' function on thread and add `alice' participant
 (clojure.core.async/thread (greetForAlice alice))
-;start the `receiveGreet' function on thread and add `bob' participant
+;start the `greetForBob' function on thread and add `bob' participant
 (clojure.core.async/thread (greetForBob bob))
 
 ;execute the following macroexpand-all to view generated code
-(clojure.walk/macroexpand-all `(s!!> "greet" helperFunction alice "bob"
-                                     (s! "greet2" helperFunction alice "bob")))
+(clojure.walk/macroexpand-all `(s!!> "greet" (helperFunction 0) alice "bob"
+                                     (s! "greet2" (helperFunction 1) alice "bob")))
+
+(clojure.walk/macroexpand-all `(r! "greet" "alice" bob
+                                   (>r!> "greet2" "alice" bob helperFunction)))

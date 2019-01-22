@@ -32,25 +32,20 @@
 ;define the participants
 (def alice (generateParticipant "alice" protocol))
 (def bob (generateParticipant "bob" protocol))
+;use an atom to help with printing the greet number
+(def greetCounter (atom 1))
 ;define a helper function to print and return value for chained macros
 (defn helperFunction
-  "prints greet<input> and return input + 1"
+  "prints greet amount and increments it"
   [x]
-  (println (format "greet%s" x))
-  (+ x 1))
-
-;(defn- greetForAlice
-;  "This function will use the protocol to send the greet message to bob and carol."
-;  [participant]
-;  (s!> "greet" 1 participant "bob"
-;       (r! "greet2" "bob" participant
-;           (>s!> "greet3" helperFunction participant "bob"
-;                 (r! "greet4" "bob" participant helperFunction)))))
+  (println (format "greet%s" @greetCounter))
+  (swap! greetCounter inc)
+  @greetCounter)
 
 (defn- greetForAlice
-  "This function will use the protocol to send the greet message to bob and carol."
+  "This function will use the protocol to send the greet message to bob."
   [participant]
-  (s!> "greet" 1 participant "bob"
+  (s!> "greet" (helperFunction 1) participant "bob"
        (r! "greet2" "bob" participant
            (>s!> "greet3" helperFunction participant "bob"
                  (r! "greet4" "bob" participant
@@ -65,20 +60,15 @@
       (>s!> "greet2" helperFunction participant "alice"
             (r! "greet3" "alice" participant
                 (>s!> "greet4" helperFunction participant "alice"
-                      (r! "greet5" "alice" participant (fn [x] (r! "greet6" "alice" participant log))))))))
+                      (r! "greet5" "alice" participant (>r!> "greet6" "alice" participant (fn [x] (log (format "greet%s %s" x "Done!"))))))))))
 
-;start the `GreetBobAndCarol' function on thread and add `alice' participant
+;start the `greetForAlice' function on thread and add `alice' participant
 (clojure.core.async/thread (greetForAlice alice))
-;start the `receiveGreet' function on thread and add `bob' participant
+;start the `greetForBob' function on thread and add `bob' participant
 (clojure.core.async/thread (greetForBob bob))
 
 ;execute the following macroexpand-all to view generated code
-(clojure.walk/macroexpand-all `(s!> "greet" 1 alice "bob"
-                                    (r! "greet2" "bob" alice
-                                        (>s!> "greet3" helperFunction alice "bob"
-                                              (r! "greet4" "bob" alice helperFunction)))))
-
-(clojure.walk/macroexpand-all `(s!> "greet" 1 alice "bob"
+(clojure.walk/macroexpand-all `(s!> "greet" (helperFunction 1) alice "bob"
                                     (r! "greet2" "bob" alice
                                         (>s!> "greet3" helperFunction alice "bob"
                                               (r! "greet4" "bob" alice
@@ -88,10 +78,6 @@
 (clojure.walk/macroexpand-all `(r! "greet" "alice" bob
                                    (>s!> "greet2" helperFunction bob "alice"
                                          (r! "greet3" "alice" bob
-                                             (>s! "greet4" helperFunction bob "alice")))))
-
-(clojure.walk/macroexpand-all `(r! "greet" "alice" bob
-                                   (>s!> "greet2" helperFunction bob "alice"
-                                         (r! "greet3" "alice" bob
                                              (>s!> "greet4" helperFunction bob "alice"
-                                                   (r! "greet5" "alice" bob (r! "greet6" "alice" bob log)))))))
+                                                   (r! "greet5" "alice" bob (>r!> "greet6" "alice" bob (fn [x] (log (format "greet%s %s" x "Done!"))))))))))
+

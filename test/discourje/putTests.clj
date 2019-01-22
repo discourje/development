@@ -5,7 +5,7 @@
 
 ;; We can wait until the put is finished by passing a callback
 
-(put! c "Hello World" (fn [v] (println "Done putting")))
+(put! c "Hello World" (fn [v] (println "Done putting " v)))
 
 
 (take! c (fn [v] (println "Got " v)))

@@ -50,7 +50,7 @@
 (defn send!
   "send action with value from sender to receiver"
   ([action value sender receiver]
-  (send-to sender action value receiver))
+   (send-to sender action value receiver))
   ([action value sender receiver callback]
    (send-to-> sender action value receiver callback)))
 
@@ -77,20 +77,27 @@
    `(fn [~'callback-value]
       `(do
          ~(send-to ~sender ~action (~function ~'callback-value) ~receiver)
-      ~~function-after-send))))
+         ~~function-after-send))))
 
 (defmacro s!!>
   "send macro which also invokes callback if the put value is taken
   Simulates blocking functionality by delaying callback!"
   [action value sender receiver callback]
-   `(send-to-> ~sender ~action ~value ~receiver (fn [~'callback-value-for-fn] (~callback))))
+  `(send-to-> ~sender ~action ~value ~receiver (fn [~'callback-value-for-fn] (~callback))))
 
 (defmacro >s!!>
   "fn [x] value into send! and invoke function-after-send only when the put is taken chained macro
   Simulates blocking functionality by delaying callback!"
+  ([action function sender receiver callback]
+   `(fn [~'callback-value]
+      (send-to-> ~sender ~action (~function ~'callback-value) ~receiver (fn [~'callback-value-for-fn] (~callback))))))
+
+(defmacro >s!!->
+  "fn [x] value into send! and invoke function-after-send only when the put is taken chained macro
+  Simulates blocking functionality by delaying callback!"
   ([action function sender receiver function-after-send]
    `(fn [~'callback-value]
-         (send-to-> ~sender ~action (~function ~'callback-value) ~receiver ~function-after-send))))
+      (send-to-> ~sender ~action (~function ~'callback-value) ~receiver ~function-after-send))))
 
 (defn recv!
   "receive action from sender on receiver, invoking callback"
@@ -102,10 +109,17 @@
   [action sender receiver callback]
   `(receive-by ~receiver ~action ~sender ~callback))
 
+(defmacro >r!>
+  "receive macro"
+  [action sender receiver callback]
+  `(fn [~'callback-value]
+     (receive-by ~receiver ~action ~sender (~callback ~'callback-value))))
+
 (defmacro >r!
   "receive macro"
   [action sender receiver callback]
-  `(receive-by ~receiver ~action ~sender ~callback))
+  `(fn [~'callback-value]
+     (receive-by ~receiver ~action ~sender ~callback)))
 
 (defn set-monitor-logging
   "Set logging level to messages only, continuing communication when invalid communication occurs"
