@@ -9,7 +9,7 @@
 
 (defn generateAddress
   "generates the address"
-  []
+  [x]
   (log "generating address now")
   "Open University, Valkenburgerweg 177, 6419 AT, Heerlen")
 
@@ -22,8 +22,8 @@
                   (r! "quoteDiv" "buyer1" participant
                               (fn [receivedQuoteDiv]
                                   (if (contribute? receivedQuote receivedQuoteDiv)
-                                    (do (s!!-> "ok" "ok" participant "seller"
-                                        (s!!> "address" (generateAddress) participant  "seller"
+                                    (do (s!!->> "ok" "ok" participant "seller"
+                                        (>s!!-> "address" generateAddress participant  "seller"
                                         (r! "date" "seller" participant
                                                     (fn [x] (println "Received date!" x)
                                                       (s! "repeat" "repeat" participant  ["seller" "buyer1"])
@@ -42,9 +42,9 @@
 ;quit
 
 
-(clojure.walk/macroexpand-all `(s!!-> "ok" "ok" "participant" "seller"
-                                     (s!!> "address" (generateAddress) "participant"  "seller"
-                                           (r! "date" "seller" "participant"
-                                                (fn [x] (println "Received date!" x)
-                                                  (s! "repeat" "repeat" "participant"  ["seller" "buyer1"])
-                                                  (orderBook "participant"))))))
+(clojure.walk/macroexpand-all `(s!!->> "ok" "ok" participant "seller"
+                                      (>s!!-> "address" generateAddress participant  "seller"
+                                             (r! "date" "seller" participant
+                                                 (fn [x] (println "Received date!" x)
+                                                   (s! "repeat" "repeat" participant  ["seller" "buyer1"])
+                                                   (orderBook participant))))))

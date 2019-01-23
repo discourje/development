@@ -9,8 +9,7 @@
 (defn putMessage
   "Puts message on the channel, non-blocking, invoking callback when not= when done "
   [channel message callback]
-  ;(log-message (format "setting message %s" message))
-  (if (not= (nil? callback))
+  (if (not (nil? callback))
     (put! channel message callback)
     (put! channel message)))
 
@@ -73,7 +72,8 @@
        (let [amount (atom 0)
              cb (fn [x] (do (swap! amount inc)
                             (when (= (count (:to currentMonitor)) @amount)
-                              (callback x))))]
+                              (do (log-message (format "callback is nil?: %s with callback %s and value %s" (nil? callback) callback x))
+                              (callback x)))))]
          (doseq [receiver (:to currentMonitor)]
            (allowSend (:channel (getChannel (:from currentMonitor) receiver (:channels @protocol))) value cb))))
      (allowSend (:channel (getChannel (:from currentMonitor) (:to currentMonitor) (:channels @protocol))) value callback))))
@@ -81,12 +81,13 @@
 (defn dcj-recv!
   "Receive something through the protocol"
   ([action from to protocol callback]
+   (log-message (format "recv started: %s %s %s" action from to))
    (let [channel (getChannel from to (:channels @protocol))]
      (if (nil? channel)
        (incorrectCommunication :undefined-channel (format "Cannot find channel from %s to %s in the defined channels of the protocol! Please make sure you supply supported sender and receiver pair" from to))
        (take! (:channel channel)
               (fn [x]
-                ;    (log-message "recv! got " x)
+                (log-message "recv! got " x)
                 (if (nil? (:activeMonitor @protocol))
                   (incorrectCommunication :monitor-nil "protocol does not have a defined channel to monitor! Make sure you supply recv! with an instantiated protocol!")
                   (do (when (not (and (isCommunicationValid? action from to :receive protocol) (not (instance? sendM @(:activeMonitor @protocol)))))

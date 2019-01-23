@@ -17,14 +17,19 @@
 (defn orderBook
   "order a book from buyer1's perspective (implements new receive monitor)"
   [participant]
-  (s! "title" (generateBook) participant "seller")
-  (r! "quote" "seller" participant
-              (fn [x]
-                (log "buyer1 received quote!")
-                  (s! "quoteDiv" (quoteDiv x) participant "buyer2")))
-  (r! "repeat" "buyer2" participant
-              (fn [repeat](log "repeat received on buyer1 from buyer2!")
-                  (orderBook participant))))
+  (s!!-> "title" (generateBook) participant "seller"
+         (r! "quote" "seller" participant
+             (>s!!-> "quoteDiv" quoteDiv participant "buyer2"
+                     (r! "repeat" "buyer2" participant
+                         (fn [repeat] (log "repeat received on buyer1 from buyer2!")
+                           (orderBook participant)))))))
+
+(clojure.walk/macroexpand-all `(s!!-> "title" (generateBook) "b1" "seller"
+                                      (r! "quote" "seller" "b1"
+                                          (>s!!-> "quoteDiv" quoteDiv "b1" "buyer2"
+                                                  (r! "repeat" "buyer2" "b1"
+                                                      (fn [repeat] (log "repeat received on buyer1 from buyer2!")
+                                                        (orderBook "b1")))))))
 
 
 ;send title to seller

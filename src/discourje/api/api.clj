@@ -91,6 +91,12 @@
   [action value sender receiver callback]
   `(send-to-> ~sender ~action ~value ~receiver (fn [~'callback-value-for-fn] ~callback)))
 
+(defmacro s!!->>
+  "send macro which also invokes callback if the put value is taken
+  Simulates blocking functionality by delaying callback!"
+  [action value sender receiver callback]
+  `(send-to-> ~sender ~action ~value ~receiver ~callback))
+
 (defmacro >s!!>
   "fn [x] value into send! and invoke function-after-send only when the put is taken chained macro
   Simulates blocking functionality by delaying callback!"

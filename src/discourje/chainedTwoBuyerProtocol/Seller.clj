@@ -32,25 +32,30 @@
 (defn orderBook
   "Order book from seller's perspective"
   [participant]
-   (r! "title" "buyer1" participant
-               (fn [title] (s! "quote" (quoteBook title) participant ["buyer1" "buyer2"])))
-   (r! ["ok" "quit"] "buyer2" participant
-               (fn [response]
-                 (cond
-                   (= response "ok")
-                   (do (log "yes yes received Ok")
-                       (r! "address" "buyer2" participant
-                                   (fn [address]
-                                     (do
-                                     (log "The received address is: " address)
-                                     (s!!> "date" (getRandomDate 5) participant "buyer2"
-                                     (>r! "repeat" "buyer2" participant
-                                                 (fn [repeat]
-                                                   (log "repeat received on seller from buyer2!")
-                                                   (orderBook participant)))))
-                                     )))
-                   (= response "quit")
-                   (endReached response)))))
+  (r! "title" "buyer1" participant
+      (>s!!-> "quote" quoteBook participant ["buyer1" "buyer2"]
+             (r! ["ok" "quit"] "buyer2" participant
+                 (fn [response]
+                   (cond
+                     (= response "ok")
+                     (do (log "yes yes received Ok")
+                         (r! "address" "buyer2" participant
+                             (fn [address]
+                               (do
+                                 (log "The received address is: " address)
+                                 (s!!> "date" (getRandomDate 5) participant "buyer2"
+                                       (>r! "repeat" "buyer2" participant
+                                            (fn [repeat]
+                                              (log "repeat received on seller from buyer2!")
+                                              (orderBook participant)))))
+                               )))
+                     (= response "quit")
+                     (endReached response)))))))
+(clojure.walk/macroexpand-all `(r! "title" "buyer1" "se"
+                                   (>s!!-> "quote" quoteBook "se" ["buyer1" "buyer2"]
+                                          (r! ["ok" "quit"] "buyer2" "se"
+                                              (fn [response])))))
+
 ;wait for title
 ;send quote to buyer1 and buyer2
 ;wait for ok or quit
