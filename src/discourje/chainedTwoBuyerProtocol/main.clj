@@ -1,9 +1,9 @@
-(ns discourje.TwoBuyerProtocol.main
-  (:require [discourje.TwoBuyerProtocol.twoBuyersProtocol :refer :all]
+(ns discourje.chainedTwoBuyerProtocol.main
+  (:require [discourje.chainedTwoBuyerProtocol.twoBuyersProtocol :refer :all]
             [discourje.api.api :refer :all]
-            [discourje.TwoBuyerProtocol.Buyer1 :as b1]
-            [discourje.TwoBuyerProtocol.Buyer2 :as b2]
-            [discourje.TwoBuyerProtocol.Seller :as se]))
+            [discourje.chainedTwoBuyerProtocol.Buyer1 :as b1]
+            [discourje.chainedTwoBuyerProtocol.Buyer2 :as b2]
+            [discourje.chainedTwoBuyerProtocol.Seller :as se]))
 
 ;first define the protocol
 (def protocol (getProtocol))
@@ -16,5 +16,3 @@
 (clojure.core.async/thread (b1/orderBook buyer1))
 (clojure.core.async/thread (b2/orderBook buyer2))
 (clojure.core.async/thread (se/orderBook seller))
-
-;(println (:activeMonitor @protocol))

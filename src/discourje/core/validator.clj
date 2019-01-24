@@ -39,9 +39,9 @@
   "Always log message but throw exception (error) if exceptions level is set!"
   [type message & more]
   (let [msg (format "%s %s" message (apply str (flatten more)))]
-     (log-message (format "ERROR-[%s] - %s" type msg))
-     (when (= @logging-level level-exceptions)
-       (throw+ (generate-exception type msg)))))
+     (if (= @logging-level level-exceptions)
+       (throw+ (generate-exception type msg))
+       (log-message (format "ERROR-[%s] - %s" type msg)))))
 
 ;loop take on channel as long as the channel is open.
 (thread

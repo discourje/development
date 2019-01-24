@@ -1,15 +1,16 @@
-(ns discourje.TwoBuyerProtocol.Buyer2
+(ns discourje.chainedTwoBuyerProtocol.Buyer2
   (:require [discourje.api.api :refer :all]))
 
 (defn contribute?
   "returns true when the received quote 50% or greater"
   [quote div]
-  (log (format "received quote: %d and div: %d, contribute = %s" quote div (>= (* 100 (float (/ div quote))) 50)))
-  (>= (* 100 (float (/ div quote))) 50))
+  (log (format "received quote: %d and div: %d, contribute = %s" quote div (>= (* 100 (float (/ div quote))) 10)))
+  (>= (* 100 (float (/ div quote))) 10))
 
 (defn generateAddress
   "generates the address"
-  []
+  [x]
+  (log "generating address now")
   "Open University, Valkenburgerweg 177, 6419 AT, Heerlen")
 
 (defn orderBook
@@ -21,8 +22,8 @@
                   (r! "quoteDiv" "buyer1" participant
                               (fn [receivedQuoteDiv]
                                   (if (contribute? receivedQuote receivedQuoteDiv)
-                                    (do (s!> "ok" "ok" participant "seller"
-                                        (s!> "address" (generateAddress) participant  "seller"
+                                    (do (s!!->> "ok" "ok" participant "seller"
+                                        (>As!!-> "address" generateAddress participant  "seller"
                                         (r! "date" "seller" participant
                                                     (fn [x] (println "Received date!" x)
                                                       (s! "repeat" "repeat" participant  ["seller" "buyer1"])
@@ -39,3 +40,10 @@
 ;wait for date
 ;false
 ;quit
+
+(fn[x] (println x))
+
+
+(clojure.walk/macroexpand-all `(s!!->> "ok" "ok" participant "seller"
+                                      (>As!!-> "address" generateAddress participant  "seller"
+                                               (println))))

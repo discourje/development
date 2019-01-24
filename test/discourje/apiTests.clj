@@ -18,3 +18,11 @@
 (macroexpand '(>s!!> "title" generateBook participant "seller" (fn [x] (format "hi "x))))
 
 (fn [x] (format "hi "x))
+(defmacro op
+  "send macro"
+  ([action value sender receiver]
+   `(send-to ~sender ~action ~value ~receiver))
+  ([action value sender receiver callback]
+   `(send-to-> ~sender ~action ~value ~receiver `(fn [~'callback-value-for-fn] (~~callback)))))
+
+(macroexpand '(op "title" generateBook participant "seller" (println "hi")))
