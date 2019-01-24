@@ -16,5 +16,3 @@
 (clojure.core.async/thread (b1/orderBook buyer1))
 (clojure.core.async/thread (b2/orderBook buyer2))
 (clojure.core.async/thread (se/orderBook seller))
-
-;(println (:activeMonitor @protocol))

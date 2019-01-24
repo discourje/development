@@ -110,7 +110,6 @@
   ([action from to protocol callback value]
    (dcj-recv! action from to protocol callback value (:activeMonitor @protocol)))
   ([action from to protocol callback value targetM]
-    ;(log-message targetM)
    (if (hasMultipleReceivers? protocol)
      (do (removeReceiver protocol to)
          (add-watch targetM nil (fn [_ atom old-state new-state]
@@ -119,8 +118,7 @@
                                     ;      (not= (:action old-state) (:action new-state))
                                     ;      (not= (:from old-state) (:from new-state)))
                                     (do (remove-watch atom nil)
-                                        (callback value)))))
-         )
+                                        (callback value))))))
      (do (activateNextMonitor action from to :receive protocol)
          (callback value)
          (closeProtocol! protocol)))))

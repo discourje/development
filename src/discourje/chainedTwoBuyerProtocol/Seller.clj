@@ -20,8 +20,9 @@
       (.getTime))))
 
 (defn getRandomDate "Get a random date, in the future, up to a maximum range (inclusive)"
-  [maxRange]
-  (getDate (+ (rand-int maxRange) 1)))
+  ([] (getRandomDate 5))
+  ([maxRange]
+  (getDate (+ (rand-int maxRange) 1))))
 
 (defn- endReached
   "log protocol end reached"
@@ -38,23 +39,23 @@
                  (fn [response]
                    (cond
                      (= response "ok")
-                     (do (log "yes yes received Ok")
                          (r! "address" "buyer2" participant
                              (fn [address]
-                               (do
-                                 (log "The received address is: " address)
-                                 (s!!> "date" (getRandomDate 5) participant "buyer2"
-                                       (>r! "repeat" "buyer2" participant
+                                 (s!!-> "date" (getRandomDate 5) participant "buyer2"
+                                       (r! "repeat" "buyer2" participant
                                             (fn [repeat]
                                               (log "repeat received on seller from buyer2!")
-                                              (orderBook participant)))))
-                               )))
+                                              (orderBook participant))))
+                               ))
                      (= response "quit")
                      (endReached response)))))))
-(clojure.walk/macroexpand-all `(r! "title" "buyer1" "se"
-                                   (>s!!-> "quote" quoteBook "se" ["buyer1" "buyer2"]
-                                          (r! ["ok" "quit"] "buyer2" "se"
-                                              (fn [response])))))
+(clojure.walk/macroexpand-all `(r! "address" "buyer2" participant
+                                   (fn [address]
+                                     (s!!-> "date" (getRandomDate 5) participant "buyer2"
+                                            (r! "repeat" "buyer2" participant
+                                                (fn [repeat]
+                                                  (log "repeat received on seller from buyer2!")
+                                                  (orderBook participant)))))))
 
 ;wait for title
 ;send quote to buyer1 and buyer2

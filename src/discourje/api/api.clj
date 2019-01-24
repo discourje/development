@@ -111,6 +111,15 @@
    `(fn [~'callback-value]
       (send-to-> ~sender ~action (~function ~'callback-value) ~receiver ~function-after-send))))
 
+(defmacro >As!!->
+  "fn [x] value into send! and invoke function-after-send only when the put is taken chained macro
+  Simulates blocking functionality by delaying callback, this will also wait until the active monitor has changed!"
+  ([action function sender receiver function-after-send]
+   `(fn [~'callback-value]
+      (add-watch (:activeMonitor @(:protocol ~sender)) nil
+                 (fn [~'key ~'atom ~'old-state ~'new-state]
+                   (remove-watch ~'atom nil)
+                   (send-to-> ~sender ~action (~function ~'callback-value) ~receiver ~function-after-send))))))
 
 (defn recv!
   "receive action from sender on receiver, invoking callback"

@@ -4,8 +4,8 @@
 (defn contribute?
   "returns true when the received quote 50% or greater"
   [quote div]
-  (log (format "received quote: %d and div: %d, contribute = %s" quote div (>= (* 100 (float (/ div quote))) 50)))
-  (>= (* 100 (float (/ div quote))) 50))
+  (log (format "received quote: %d and div: %d, contribute = %s" quote div (>= (* 100 (float (/ div quote))) 10)))
+  (>= (* 100 (float (/ div quote))) 10))
 
 (defn generateAddress
   "generates the address"
@@ -23,7 +23,7 @@
                               (fn [receivedQuoteDiv]
                                   (if (contribute? receivedQuote receivedQuoteDiv)
                                     (do (s!!->> "ok" "ok" participant "seller"
-                                        (>s!!-> "address" generateAddress participant  "seller"
+                                        (>As!!-> "address" generateAddress participant  "seller"
                                         (r! "date" "seller" participant
                                                     (fn [x] (println "Received date!" x)
                                                       (s! "repeat" "repeat" participant  ["seller" "buyer1"])
@@ -41,10 +41,9 @@
 ;false
 ;quit
 
+(fn[x] (println x))
+
 
 (clojure.walk/macroexpand-all `(s!!->> "ok" "ok" participant "seller"
-                                      (>s!!-> "address" generateAddress participant  "seller"
-                                             (r! "date" "seller" participant
-                                                 (fn [x] (println "Received date!" x)
-                                                   (s! "repeat" "repeat" participant  ["seller" "buyer1"])
-                                                   (orderBook participant))))))
+                                      (>As!!-> "address" generateAddress participant  "seller"
+                                               (println))))
