@@ -38,7 +38,7 @@
 (defn helperFunction
   "prints greet amount and increments it"
   [x]
-  (println (format "greet%s" @greetCounter))
+  (log (format "greet%s" @greetCounter))
   (swap! greetCounter inc)
   @greetCounter)
 
@@ -49,8 +49,8 @@
        (r! "greet2" "bob" participant
            (>s!> "greet3" helperFunction participant "bob"
                  (r! "greet4" "bob" participant
-                     (>s!!> "greet5" helperFunction participant "bob"
-                            (>s! "greet6" helperFunction participant "bob")))))))
+                     (>s!!-> "greet5" helperFunction participant "bob"
+                            (>As!!-> "greet6" helperFunction participant "bob" (log "DONE!"))))))))
 
 
 (defn- greetForBob
@@ -60,7 +60,7 @@
       (>s!> "greet2" helperFunction participant "alice"
             (r! "greet3" "alice" participant
                 (>s!> "greet4" helperFunction participant "alice"
-                      (r! "greet5" "alice" participant (>r!> "greet6" "alice" participant (fn [x] (log (format "greet%s %s" x "Done!"))))))))))
+                      (r! "greet5" "alice" participant (>r!> "greet6" "alice" participant helperFunction)))))))
 
 ;start the `greetForAlice' function on thread and add `alice' participant
 (clojure.core.async/thread (greetForAlice alice))

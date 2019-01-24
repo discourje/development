@@ -27,16 +27,23 @@
   (log (format "greet%s" x))
   (+ x 1))
 
+(defn done
+  "protocol done"
+  [x]
+   (println "done sending greet messages"))
+
 (defn- greetForAlice
   "This function will use the protocol to send the greet message to bob."
   [participant]
-  (s!!-> "greet" (helperFunction 0) participant "bob"
-        (s! "greet2" (helperFunction 1) participant "bob")))
+  (s!!->> "greet" (helperFunction 0) participant "bob"
+        (>As!!-> "greet2" (fn [x] (helperFunction 1)) participant "bob" done)))
 
 (defn- greetForBob
   "This function will use the protocol to listen for the greet message."
   [participant]
-  (r! "greet" "alice" participant (>r!> "greet2" "alice" participant (fn [x] (log (format "greet%s %s" x "Done!"))))))
+  (r! "greet" "alice" participant
+      (>r! "greet2" "alice" participant
+            (fn [x] (log (format "greet%s %s" x "Done!"))))))
 
 ;start the `greetForAlice' function on thread and add `alice' participant
 (clojure.core.async/thread (greetForAlice alice))
@@ -44,8 +51,9 @@
 (clojure.core.async/thread (greetForBob bob))
 
 ;execute the following macroexpand-all to view generated code
-(clojure.walk/macroexpand-all `(s!!-> "greet" (helperFunction 0) alice "bob"
-                                     (s! "greet2" (helperFunction 1) alice "bob")))
+(clojure.walk/macroexpand-all ` (s!!->> "greet" (helperFunction 0) alice "bob"
+                                        (>As!!-> "greet2" (fn [x] (helperFunction 1)) alice "bob" done)))
 
 (clojure.walk/macroexpand-all `(r! "greet" "alice" bob
-                                   (>r!> "greet2" "alice" bob helperFunction)))
+                                   (>r! "greet2" "alice" bob
+                                        (fn [x] (log (format "greet%s %s" x "Done!"))))))
