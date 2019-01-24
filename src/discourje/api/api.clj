@@ -4,27 +4,28 @@
            [discourje.core.protocol :refer :all]
            [discourje.core.protocolCore :refer :all]
            [discourje.core.dataStructures :refer :all]
-           [discourje.core.validator :refer :all]))
+           [discourje.core.validator :refer :all]
+           [clj-uuid :as uuid]))
 
 (defn monitor-send
   "make send monitor, sending action from sender to receiver."
   [action sender receiver]
-  (->sendM action sender receiver))
+  (->sendM (uuid/v1) action sender receiver))
 
 (defn monitor-receive
   "make receive monitor, listening for action on receiver send by sender."
   [action receiver sender]
-  (->receiveM action receiver sender))
+  (->receiveM (uuid/v1) action receiver sender))
 
 (defn monitor-recursion
   "make recursion monitor, which will recur or end after encountering recur record."
   [name protocol]
-  (->recursion name protocol))
+  (->recursion (uuid/v1) name protocol))
 
 (defn monitor-choice
   "make choice monitor, allowing to observe both first monitors in branches"
   [trueBranch falseBranch]
-  (->choice trueBranch falseBranch))
+  (->choice (uuid/v1) trueBranch falseBranch))
 
 (defn do-recur
   "recur back to recursion monitor, matching name!"
@@ -48,8 +49,10 @@
 
 (defn send!
   "send action with value from sender to receiver"
-  [action value sender receiver]
-  (send-to sender action value receiver))
+  ([action value sender receiver]
+   (send-to sender action value receiver))
+  ([action value sender receiver callback]
+   (send-to-> sender action value receiver callback)))
 
 (defmacro s!
   "send macro"
@@ -74,7 +77,49 @@
    `(fn [~'callback-value]
       `(do
          ~(send-to ~sender ~action (~function ~'callback-value) ~receiver)
-      ~~function-after-send))))
+         ~~function-after-send))))
+
+(defmacro s!!>
+  "send macro which also invokes callback if the put value is taken
+  Simulates blocking functionality by delaying callback!"
+  [action value sender receiver callback]
+  `(send-to-> ~sender ~action ~value ~receiver (fn [~'callback-value-for-fn] (~callback))))
+
+(defmacro s!!->
+  "send macro which also invokes callback if the put value is taken
+  Simulates blocking functionality by delaying callback!"
+  [action value sender receiver callback]
+  `(send-to-> ~sender ~action ~value ~receiver (fn [~'callback-value-for-fn] ~callback)))
+
+(defmacro s!!->>
+  "send macro which also invokes callback if the put value is taken
+  Simulates blocking functionality by delaying callback!"
+  [action value sender receiver callback]
+  `(send-to-> ~sender ~action ~value ~receiver ~callback))
+
+(defmacro >s!!>
+  "fn [x] value into send! and invoke function-after-send only when the put is taken chained macro
+  Simulates blocking functionality by delaying callback!"
+  ([action function sender receiver callback]
+   `(fn [~'callback-value]
+      (send-to-> ~sender ~action (~function ~'callback-value) ~receiver (fn [~'callback-value-for-fn] (~callback))))))
+
+(defmacro >s!!->
+  "fn [x] value into send! and invoke function-after-send only when the put is taken chained macro
+  Simulates blocking functionality by delaying callback!"
+  ([action function sender receiver function-after-send]
+   `(fn [~'callback-value]
+      (send-to-> ~sender ~action (~function ~'callback-value) ~receiver ~function-after-send))))
+
+(defmacro >As!!->
+  "fn [x] value into send! and invoke function-after-send only when the put is taken chained macro
+  Simulates blocking functionality by delaying callback, this will also wait until the active monitor has changed!"
+  ([action function sender receiver function-after-send]
+   `(fn [~'callback-value]
+      (add-watch (:activeMonitor @(:protocol ~sender)) nil
+                 (fn [~'key ~'atom ~'old-state ~'new-state]
+                   (remove-watch ~'atom nil)
+                   (send-to-> ~sender ~action (~function ~'callback-value) ~receiver ~function-after-send))))))
 
 (defn recv!
   "receive action from sender on receiver, invoking callback"
@@ -85,6 +130,18 @@
   "receive macro"
   [action sender receiver callback]
   `(receive-by ~receiver ~action ~sender ~callback))
+
+(defmacro >r!>
+  "receive macro"
+  [action sender receiver callback]
+  `(fn [~'callback-value]
+     (receive-by ~receiver ~action ~sender (~callback ~'callback-value))))
+
+(defmacro >r!
+  "receive macro"
+  [action sender receiver callback]
+  `(fn [~'callback-value]
+     (receive-by ~receiver ~action ~sender ~callback)))
 
 (defn set-monitor-logging
   "Set logging level to messages only, continuing communication when invalid communication occurs"
