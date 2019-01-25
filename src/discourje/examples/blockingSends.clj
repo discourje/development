@@ -35,8 +35,8 @@
 (defn- greetForAlice
   "This function will use the protocol to send the greet message to bob."
   [participant]
-  (s!!->> "greet" (helperFunction 0) participant "bob"
-        (>As!!-> "greet2" (fn [x] (helperFunction 1)) participant "bob" done)))
+  (s!!> "greet" (helperFunction 0) participant "bob"
+        (>!!s!!> "greet2" (fn [x] (helperFunction 1)) participant "bob" done)))
 
 (defn- greetForBob
   "This function will use the protocol to listen for the greet message."
@@ -51,8 +51,8 @@
 (clojure.core.async/thread (greetForBob bob))
 
 ;execute the following macroexpand-all to view generated code
-(clojure.walk/macroexpand-all ` (s!!->> "greet" (helperFunction 0) alice "bob"
-                                        (>As!!-> "greet2" (fn [x] (helperFunction 1)) alice "bob" done)))
+(clojure.walk/macroexpand-all ` (s!!> "greet" (helperFunction 0) alice "bob"
+                                      (>!!s!!> "greet2" (fn [x] (helperFunction 1)) alice "bob" done)))
 
 (clojure.walk/macroexpand-all `(r! "greet" "alice" bob
                                    (>r! "greet2" "alice" bob

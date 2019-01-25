@@ -34,14 +34,14 @@
   "Order book from seller's perspective"
   [participant]
   (r! "title" "buyer1" participant
-      (>s!!-> "quote" quoteBook participant ["buyer1" "buyer2"]
+      (>s!!> "quote" quoteBook participant ["buyer1" "buyer2"]
              (r! ["ok" "quit"] "buyer2" participant
                  (fn [response]
                    (cond
                      (= response "ok")
                          (r! "address" "buyer2" participant
                              (fn [address]
-                                 (s!!-> "date" (getRandomDate 5) participant "buyer2"
+                                 (s!!> "date" (getRandomDate 5) participant "buyer2"
                                        (r! "repeat" "buyer2" participant
                                             (fn [repeat]
                                               (log "repeat received on seller from buyer2!")
@@ -51,8 +51,8 @@
                      (endReached response)))))))
 (clojure.walk/macroexpand-all `(r! "address" "buyer2" participant
                                    (fn [address]
-                                     (s!!-> "date" (getRandomDate 5) participant "buyer2"
-                                            (r! "repeat" "buyer2" participant
+                                     (s!!> "date" (getRandomDate 5) participant "buyer2"
+                                           (r! "repeat" "buyer2" participant
                                                 (fn [repeat]
                                                   (log "repeat received on seller from buyer2!")
                                                   (orderBook participant)))))))
