@@ -119,6 +119,12 @@
   [action sender receiver callback]
   `(receive-by ~receiver ~action ~sender ~callback))
 
+(defmacro r!>
+  "Receive macro which generates an anonymous function  with 1 parameter which invokes callback with the value of the function"
+  [action sender receiver callback]
+  `(receive-by ~receiver ~action ~sender
+               (fn [~'callback-value] (~callback ~'callback-value))))
+
 (defmacro >r!>
   "fn [x] value into receive! callback chained macro"
   [action sender receiver callback]

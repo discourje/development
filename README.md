@@ -73,6 +73,7 @@ Macros:
 - <b>>s!!> [action value sender receiver function-after-send]</b>  First, creates an anonymous function with 1 parameter and feeds it as input to `function`. Then sends `action` with value, result of the `function`, from `sender` to `receiver` and invokes function-after-send AFTER send succeeds AND is taken from the target channel.
 - <b>>!!s!!> [action value sender receiver function-after-send]</b>  First, creates an anonymous function with 1 parameter which ads a watch (event-handler, observer-like relation) to the currently active monitor. When the currently active monitor changes state, feeds value from anonymous as input to `function`. Then sends `action` with value, result of the `function`, from `sender` to `receiver` and invokes function-after-send AFTER send succeeds AND is taken from the target channel.
 
+- <b>r!> [action sender receiver callback]</b>: Calls receive to receive `action` from `sender` on `receiver` and creates an anonymous function with 1 parameter and feeds it to `callback`.
 - <b>>r! [action sender receiver callback]</b>: Creates an anonymous function with 1 parameter which calls receive to receive `action` from `sender` on `receiver` invoking `callback`.
 - <b>>r!> [action sender receiver callback]</b>: Creates an anonymous function with 1 parameter which calls receive to receive `action` from `sender` on `receiver` invoking `callback` with the value of the anonymous function as input.
 
@@ -95,8 +96,8 @@ Logging configuration functions:
 - <b>close-logging</b>: Close the logging channel. <i>*We use a channel for showing logs to preserve order among logged messages and exceptions!</i>
 
 Log functions:
-- <b>log[message & more]</b>: Logs a `message` to the logging channel, takes a variable amount of input parameters which get concatenated!
-- <b>log-exception[type message & more]</b>: Throws an exception of type `type` with `message` to the logging channel, takes a variable amount of input parameters which get concatenated!
+- <b>log [message & more]</b>: Logs a `message` to the logging channel, takes a variable amount of input parameters which get concatenated!
+- <b>log-exception [type message & more]</b>: Throws an exception of type `type` with `message` to the logging channel, takes a variable amount of input parameters which get concatenated!
 
 See [Logging](src/discourje/examples/logging.clj) for an example.
 
@@ -135,9 +136,7 @@ In these functions we use the s! (send macro) and r! (receive macro) for communi
 (defn- receiveFromUser
   "This function will use the protocol to listen for the helloWorld message."
   [participant]
-  (r! "helloWorld" "user" participant
-              (fn [message]
-                  (log (format "Received message: %s" message)))))
+  (r!> "helloWorld" "user" participant log))
 ```
 
 The developer is then able to communicate safely among participants.

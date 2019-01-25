@@ -22,9 +22,7 @@
 (defn- receiveFromUser
   "This function will use the protocol to listen for the helloWorld message."
   [participant]
-  (r! "helloWorld" "user" participant
-              (fn [message]
-                  (log (format "Received message: %s" message)))))
+  (r!> "helloWorld" "user" participant log))
 
 ;start the `sendToWorld' function on thread and add `user' participant
 (clojure.core.async/thread (sendToWorld user))
