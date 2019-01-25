@@ -22,9 +22,9 @@
                   (r! "quoteDiv" "buyer1" participant
                               (fn [receivedQuoteDiv]
                                   (if (contribute? receivedQuote receivedQuoteDiv)
-                                    (do (s!!->> "ok" "ok" participant "seller"
-                                        (>As!!-> "address" generateAddress participant  "seller"
-                                        (r! "date" "seller" participant
+                                    (do (s!!> "ok" "ok" participant "seller"
+                                              (>!!s!!> "address" generateAddress participant "seller"
+                                                       (r! "date" "seller" participant
                                                     (fn [x] (println "Received date!" x)
                                                       (s! "repeat" "repeat" participant  ["seller" "buyer1"])
                                                       (orderBook participant))))))
@@ -41,9 +41,6 @@
 ;false
 ;quit
 
-(fn[x] (println x))
-
-
-(clojure.walk/macroexpand-all `(s!!->> "ok" "ok" participant "seller"
-                                      (>As!!-> "address" generateAddress participant  "seller"
-                                               (println))))
+(clojure.walk/macroexpand-all `(s!!> "ok" "ok" participant "seller"
+                                     (>!!s!!> "address" generateAddress participant "seller"
+                                              (println))))
