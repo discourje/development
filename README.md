@@ -48,20 +48,36 @@ A protocol can be specified by the following constructs:
 
 Safe Send and Receive abstractions:
 -
+Basic Send and receive functions and macros:
 - <b>send! [action value sender receiver]</b>: Calls send <i>function</i> to send `action` with `value` from `sender` to `receiver`.
 - <b>s! [action value sender receiver]</b>: Calls Send <i>macro</i> to send `action` with `value` from `sender` to `receiver`.
 - <b>recv! [action sender receiver callback]</b>: Calls receive <i>function</i> to receive `action` from `sender` on `receiver` invoking `callback`.
 - <b>r! [action sender receiver callback]</b>: Calls receive <i>macro</i> to receive `action` from `sender` on `receiver` invoking `callback`.
 
-For chaining send and receive functions the developer can use specialized macros that handle callbacks;
+For chaining send and receive options the developer can use specialized macros that handle callbacks and input values;
 <b>(Chained macros support nesting)</b>
 
-<i>In the naming below `>` stands for the conceptual data flow.</i>
-- <b>>s! [action function sender receiver]</b> Creates an anonymous function with 1 parameter and feeds it as input to `function`. Then sends `action` with value, result of the `function`, from `sender` to `receiver`.
-- <b>s!> [action value sender receiver function-after-send]</b> First calls Send <i>macro</i> to send `action` with `value` from `sender` to `receiver`. Second, also invokes `function-after-send`.
-- <b>>s!> [action function sender receiver function-after-send]</b> First, creates an anonymous function with 1 parameter and feeds it as input to `function`. Then sends `action` with value, result of the `function`, from `sender` to `receiver`. Second, also invokes `function-after-send`.
+<i> In the naming below:
 
-For an example on chaining macros see: [Chaining](src/discourje/examples/macroChaining.clj).
+- `>`: Stands for the conceptual data flow.
+- `!': Stands for non-blocking.
+- `!!': Stands for blocking.
+</i>
+
+Macros:
+- <b>>s! [action function sender receiver]</b> Creates an anonymous function with 1 parameter and feeds it as input to `function`. Then sends `action` with value, result of the `function`, from `sender` to `receiver`.
+- <b>s!> [action value sender receiver function-after-send]</b> First calls Send <i>macro</i> to send `action` with `value` from `sender` to `receiver`. Second, immediately invokes `function-after-send`.
+- <b>>s!> [action function sender receiver function-after-send]</b> First, creates an anonymous function with 1 parameter and feeds it as input to `function`. Then sends `action` with value, result of the `function`, from `sender` to `receiver`. Second, immediately invokes `function-after-send`.
+- <b>s!!#> [action value sender receiver callback]</b> Calls Send to send `action` with value `value`, from `sender` to `receiver` and generates an anonymous function which invokes callback AFTER send succeeds AND is taken from the target channel.
+- <b>s!!> [action value sender receiver callback]</b> Calls Send to send `action` with value `value`, from `sender` to `receiver` and invokes callback AFTER send succeeds AND is taken from the target channel.
+- <b>>s!!> [action value sender receiver function-after-send]</b>  First, creates an anonymous function with 1 parameter and feeds it as input to `function`. Then sends `action` with value, result of the `function`, from `sender` to `receiver` and invokes function-after-send AFTER send succeeds AND is taken from the target channel.
+- <b>>!!s!!> [action value sender receiver function-after-send]</b>  First, creates an anonymous function with 1 parameter which ads a watch (event-handler, observer-like relation) to the currently active monitor. When the currently active monitor changes state, feeds value from anonymous as input to `function`. Then sends `action` with value, result of the `function`, from `sender` to `receiver` and invokes function-after-send AFTER send succeeds AND is taken from the target channel.
+
+- <b>>r! [action sender receiver callback]</b>: Creates an anonymous function with 1 parameter which calls receive to receive `action` from `sender` on `receiver` invoking `callback`.
+- <b>>r!> [action sender receiver callback]</b>: Creates an anonymous function with 1 parameter which calls receive to receive `action` from `sender` on `receiver` invoking `callback` with the value of the anonymous function as input.
+
+
+For an example on chaining macros see: [Chaining](src/discourje/examples/macroChaining.clj) and [blockingSends](src/discourje/examples/blockingSends.clj).
 
 <i>*Reminder: Macros are not first class. This means when you want to treat send and receive as first class objects, you should use the functions instead of macros.</i>
 
@@ -72,6 +88,15 @@ Discourje also allows two levels of logging when communication does not comply w
 - <b>Exceptions (blocking)</b>: Enable exception logging to log to the console and throw exceptions when communication is invalid, this will block communication.
 
 <b>Default configuration: Exceptions!</b>
+
+Logging configuration functions:
+- <b>set-monitor-logging</b>: Enables Logging messages.
+- <b>set-monitor-exceptions</b>: Enables throwing exceptions.
+- <b>close-logging</b>: Close the logging channel. <i>*We use a channel for showing logs to preserve order among logged messages and exceptions!</i>
+
+Log functions:
+- <b>log[message & more]</b>: Logs a `message` to the logging channel, takes a variable amount of input parameters which get concatenated!
+- <b>log-exception[type message & more]</b>: Throws an exception of type `type` with `message` to the logging channel, takes a variable amount of input parameters which get concatenated!
 
 See [Logging](src/discourje/examples/logging.clj) for an example.
 

@@ -23,6 +23,6 @@
   ([action value sender receiver]
    `(send-to ~sender ~action ~value ~receiver))
   ([action value sender receiver callback]
-   `(send-to-> ~sender ~action ~value ~receiver `(fn [~'callback-value-for-fn] (~~callback)))))
+   `(send-to!! ~sender ~action ~value ~receiver `(fn [~'callback-value-for-fn] (~~callback)))))
 
 (macroexpand '(op "title" generateBook participant "seller" (println "hi")))
