@@ -2,7 +2,6 @@
   (require [discourje.core.monitor :refer :all]
            [discourje.core.core :refer :all]
            [discourje.core.protocol :refer :all]
-           [discourje.core.protocolCore :refer :all]
            [discourje.core.dataStructures :refer :all]
            [discourje.core.validator :refer :all]
            [clj-uuid :as uuid]))
@@ -40,7 +39,7 @@
 (defn generateProtocolFromMonitors
   "Generate the protocol, channels and set the first monitor active"
   [monitors]
-  (generateProtocol monitors))
+  (generateProtocol monitors activateNextMonitor))
 
 (defn generateParticipant
   "Generate participant record"

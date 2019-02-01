@@ -184,6 +184,11 @@
 
 (defrecord participant [name protocol]
   role
+  ;non-blocking variations
   (send-to! [this action value to] (dcj-send! action value name to protocol))
   (send-to! [this action value to callback] (dcj-send! action value name to protocol callback))
-  (receive-by! [this action from callback] (dcj-recv! action from name protocol callback)))
+  (receive-by! [this action from callback] (dcj-recv! action from name protocol callback))
+  ;blocking variations
+  (send-to!! [this action value to] (dcj-send!! action value name to protocol))
+  (send-to!! [this action value to callback] (dcj-send!! action value name to protocol callback))
+  (receive-by!! [this action from callback] (dcj-recv! action from name protocol callback)))

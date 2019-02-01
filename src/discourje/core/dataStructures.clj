@@ -1,5 +1,9 @@
 (ns discourje.core.dataStructures)
 
+
+;an instance of a protocol consists of a collection of channels, protocol definition and a monitor flagged active
+(defrecord protocolInstance [channels protocol activeMonitor template])
+
 ;protocol to generate string of the current object (for exception/logging!)
 (defprotocol stringify
   (to-string [this])
