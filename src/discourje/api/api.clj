@@ -52,7 +52,7 @@
   ([action value sender receiver]
    (send-to sender action value receiver))
   ([action value sender receiver callback]
-   (send-to!! sender action value receiver callback)))
+   (send-to sender action value receiver callback)))
 
 (defmacro s!
   "Send macro"
@@ -84,20 +84,20 @@
   Generates anonymous function which invokes the callback.
   Simulates blocking functionality by delaying callback!"
   [action value sender receiver callback]
-  `(send-to!! ~sender ~action ~value ~receiver (fn [~'callback-value-for-fn] ~callback)))
+  `(send-to ~sender ~action ~value ~receiver (fn [~'callback-value-for-fn] ~callback)))
 
 (defmacro s!!>
   "Send macro which also invokes callback if the put value is taken
   Simulates blocking functionality by delaying callback!"
   [action value sender receiver callback]
-  `(send-to!! ~sender ~action ~value ~receiver ~callback))
+  `(send-to ~sender ~action ~value ~receiver ~callback))
 
 (defmacro >s!!>
   "fn [x] value into send! and invoke function-after-send only when the put is taken chained macro.
   Simulates blocking functionality by delaying callback!"
   ([action function sender receiver function-after-send]
    `(fn [~'callback-value]
-      (send-to!! ~sender ~action (~function ~'callback-value) ~receiver ~function-after-send))))
+      (send-to ~sender ~action (~function ~'callback-value) ~receiver ~function-after-send))))
 
 (defmacro >!!s!!>
   "fn [x] value into when the active monitor has changed state and then send! and invoke function-after-send only when the put is taken chained macro
@@ -107,7 +107,7 @@
       (add-watch (:activeMonitor @(:protocol ~sender)) nil
                  (fn [~'key ~'atom ~'old-state ~'new-state]
                    (remove-watch ~'atom nil)
-                   (send-to!! ~sender ~action (~function ~'callback-value) ~receiver ~function-after-send))))))
+                   (send-to ~sender ~action (~function ~'callback-value) ~receiver ~function-after-send))))))
 
 (defn recv!
   "Receive action from sender on receiver, invoking callback"
