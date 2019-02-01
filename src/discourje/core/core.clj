@@ -184,6 +184,6 @@
 
 (defrecord participant [name protocol]
   role
-  (send-to [this action value to] (dcj-send! action value name to protocol))
-  (send-to [this action value to callback] (dcj-send! action value name to protocol callback))
-  (receive-by [this action from callback] (dcj-recv! action from name protocol callback)))
+  (send-to! [this action value to] (dcj-send! action value name to protocol))
+  (send-to! [this action value to callback] (dcj-send! action value name to protocol callback))
+  (receive-by! [this action from callback] (dcj-recv! action from name protocol callback)))
