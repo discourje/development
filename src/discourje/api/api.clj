@@ -38,8 +38,10 @@
 
 (defn generateProtocolFromMonitors
   "Generate the protocol, channels and set the first monitor active"
-  [monitors]
+  ([monitors]
   (generateProtocol monitors activateNextMonitor))
+  ([monitors buffer]
+   (generateProtocol monitors activateNextMonitor buffer)))
 
 (defn generateParticipant
   "Generate participant record"

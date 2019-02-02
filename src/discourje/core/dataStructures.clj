@@ -3,6 +3,8 @@
 
 ;an instance of a protocol consists of a collection of channels, protocol definition and a monitor flagged active
 (defrecord protocolInstance [channels protocol activeMonitor template])
+;Defines a communication channel with a sender, receiver (strings), a channel Async.Chan and a queue for receivers.
+(defrecord communicationChannel [sender receiver channel])
 
 ;protocol to generate string of the current object (for exception/logging!)
 (defprotocol stringify

@@ -5,13 +5,14 @@
            (discourje.core.dataStructures recursion recur! choice sendM receiveM))
   (use [discourje.core.validator :only [log-error]]))
 
-;Defines a communication channel with a sender, receiver (strings), a channel Async.Chan and a queue for receivers.
-(defrecord communicationChannel [sender receiver channel])
-
 (defn- generateChannel
   "Function to generate a channel between sender and receiver"
-  [sender receiver]
-  (->communicationChannel (str sender) (str receiver) (clojure.core.async/chan 1)))
+  ([sender receiver]
+   (generateChannel sender receiver nil))
+  ([sender receiver buffer]
+   (if (nil? buffer)
+     (->communicationChannel (str sender) (str receiver) (clojure.core.async/chan))
+     (->communicationChannel (str sender) (str receiver) (clojure.core.async/chan buffer)))))
 
 (defn uniqueCartesianProduct
   "Generate channels between all participants and filters out duplicates e.g.: buyer1<->buyer1"
@@ -23,8 +24,8 @@
 
 (defn generateChannels
   "Generates communication channels between all participants"
-  [participants]
-  (map #(apply generateChannel %) (uniqueCartesianProduct participants participants)))
+  [participants buffer]
+  (map #(apply (fn [s r] (generateChannel s r buffer)) %) (uniqueCartesianProduct participants participants)))
 
 
 (defn- findAllRecursions
@@ -157,9 +158,11 @@
 
 (defn generateProtocol
   "Generate the protocol, channels and set the first monitor active through supplied function"
-  [monitors activateFirstMonitor]
-  (if (isProtocolValid? monitors)
-    (let [protocol (->protocolInstance (generateChannels (getDistinctParticipants monitors)) (atom monitors) (atom nil) monitors)]
-      (activateFirstMonitor protocol)
-      (atom protocol))
-    (log-error :invalid-protocol "Supplied monitors are invalid! Make sure there are no duplicate monitor-recursion and that they are recurred and ended correctly!")))
+  ([monitors activateFirstMonitor]
+   (generateProtocol monitors activateFirstMonitor nil))
+  ([monitors activateFirstMonitor buffer]
+   (if (isProtocolValid? monitors)
+     (let [protocol (->protocolInstance (generateChannels (getDistinctParticipants monitors) buffer) (atom monitors) (atom nil) monitors)]
+       (activateFirstMonitor protocol)
+       (atom protocol))
+     (log-error :invalid-protocol "Supplied monitors are invalid! Make sure there are no duplicate monitor-recursion and that they are recurred and ended correctly!"))))
