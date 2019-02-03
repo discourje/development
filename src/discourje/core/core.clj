@@ -212,7 +212,7 @@
    (let [channel (getChannel from to (:channels @protocol))]
      (if (nil? channel)
        (incorrectCommunication :undefined-channel (format "Cannot find channel from %s to %s in the defined channels of the protocol! Please make sure you supply supported sender and receiver pair" from to))
-       (let [value (<!! channel)]
+       (let [value (<!! (:channel channel))]
          (validateReceive action from to protocol value callback dcj-recv!!)))))
   ([action from to protocol callback value]
    (dcj-recv!! action from to protocol callback value (:activeMonitor @protocol)))
