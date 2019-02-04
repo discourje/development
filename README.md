@@ -78,7 +78,7 @@ Macros:
 - <b>>r!> [action sender receiver callback]</b>: Creates an anonymous function with 1 parameter which calls receive to receive `action` from `sender` on `receiver` invoking `callback` with the value of the anonymous function as input.
 
 
-For an example on chaining macros see: [Chaining](src/discourje/examples/macroChaining.clj) and [blockingSends](src/discourje/examples/blockingSends.clj).
+For an example on chaining macros see: [Chaining](src/discourje/examples/macroChaining.clj) and [delayedSends](src/discourje/examples/delayedSends.clj).
 
 <i>*Reminder: Macros are not first class. This means when you want to treat send and receive as first class objects, you should use the functions instead of macros.</i>
 

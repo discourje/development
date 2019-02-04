@@ -1,4 +1,4 @@
-(ns discourje.examples.blockingSends
+(ns discourje.examples.delayedSends
   (require [discourje.api.api :refer :all]))
 
 (defn- defineSequenceProtocol

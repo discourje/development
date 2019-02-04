@@ -2,7 +2,7 @@
   (:require [clojure.core.async]
             [discourje.core.dataStructures :refer :all]
             [clj-uuid :as uuid])
-  (use [discourje.core.protocolCore :only [findRecurByName]]
+  (use [discourje.core.protocol :only [findRecurByName]]
        [discourje.core.validator :only [log-error log-message]])
   (:import (clojure.lang Seqable)
            (discourje.core.dataStructures choice sendM recur! receiveM recursion)))
@@ -114,7 +114,7 @@
              (resetMonitor! firstRecMonitor protocol recursionProtocol 1))
            (instance? recur! nextMonitor)
            (if (= :recur (:status nextMonitor))
-             (let [recursive (discourje.core.protocolCore/findRecurByName (:template @protocol) (:name nextMonitor))
+             (let [recursive (discourje.core.protocol/findRecurByName (:template @protocol) (:name nextMonitor))
                    firstRecMonitor (first (:protocol recursive))
                    recursionProtocol (:protocol recursive)]
                (resetMonitor! firstRecMonitor protocol recursionProtocol 1))

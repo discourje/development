@@ -1,5 +1,11 @@
 (ns discourje.core.dataStructures)
 
+
+;an instance of a protocol consists of a collection of channels, protocol definition and a monitor flagged active
+(defrecord protocolInstance [channels protocol activeMonitor template])
+;Defines a communication channel with a sender, receiver (strings), a channel Async.Chan and a queue for receivers.
+(defrecord communicationChannel [sender receiver channel])
+
 ;protocol to generate string of the current object (for exception/logging!)
 (defprotocol stringify
   (to-string [this])
@@ -38,6 +44,11 @@
   (to-id [this] id))
 ;protocol(interface) to implement in object
 (defprotocol role
-  (send-to [this action value to])
-  (send-to!! [this action value to callback])
-  (receive-by [this action from callback]))
+  (send-to!
+    [this action value to]
+    [this action value to callback])
+  (receive-by! [this action from callback])
+  (send-to!!
+    [this action value to]
+    [this action value to callback])
+  (receive-by!! [this action from callback]))

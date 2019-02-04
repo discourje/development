@@ -38,4 +38,4 @@
 (defn getProtocol
   "generate the protocol, channels and set the first monitor active"
   []
-  (generateProtocol (defineRecurringProtocol)))
+  (generateProtocolFromMonitors (defineRecurringProtocol)))

@@ -50,7 +50,8 @@
            (>s!> "greet3" helperFunction participant "bob"
                  (r! "greet4" "bob" participant
                      (>s!!> "greet5" helperFunction participant "bob"
-                            (>!!s!!> "greet6" helperFunction participant "bob" (log "DONE!"))))))))
+                            (>!!s!!> "greet6" helperFunction participant "bob"
+                                     (fn [x] (log "DONE!")))))))))
 
 
 (defn- greetForBob
@@ -73,7 +74,7 @@
                                         (>s!> "greet3" helperFunction alice "bob"
                                               (r! "greet4" "bob" alice
                                                   (>s!!> "greet5" helperFunction alice "bob"
-                                                         (>!!s!!> "greet6" helperFunction alice "bob" (log "DONE!"))))))))
+                                                         (>!!s!!> "greet6" helperFunction alice "bob" (fn [] (log "DONE!")))))))))
 
 (clojure.walk/macroexpand-all `(r! "greet" "alice" bob
                                    (>s!> "greet2" helperFunction bob "alice"
