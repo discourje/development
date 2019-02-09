@@ -3,28 +3,34 @@
             [discourje.core.async.async :refer :all]))
 
 (deftest interactableTest
-  (let [inter (-> "1" "A" "B")]
+  (let [inter (-->> "1" "A" "B")]
     (is (= "1" (get-action inter)))
     (is (= "A" (get-sender inter)))
     (is (= "B" (get-receiver inter)))))
 
 (def testDualProtocol
   (create-protocol [
-                    (-> "1" "A" "B")
-                    (-> "2" "B" "A")]))
+                    (-->> "1" "A" "B")
+                    (-->> "2" "B" "A")]))
 
 (def testTripleProtocol
   (create-protocol [
-                    (-> "1" "A" "B")
-                    (-> "2" "B" "A")
-                    (-> "3" "A" "C")]))
-
+                    (-->> "1" "A" "B")
+                    (-->> "2" "B" "A")
+                    (-->> "3" "A" "C")]))
 
 (def testParallelProtocol
   (create-protocol [
-                    (-> "1" "A" "B")
-                    (-> "2" "B" "A")
-                    (-> "3" "A" "C")
-                    (-> "4" "C" ["A" "B"])]))
+                    (-->> "1" "A" "B")
+                    (-->> "2" "B" "A")
+                    (-->> "3" "A" "C")
+                    (-->> "4" "C" ["A" "B"])]))
 
+(def testQuadProtocol
+  (create-protocol [
+                    (-->> "start" "main" ["A" "B" "C"])
+                    (-->> "1" "A" "B")
+                    (-->> "2" "B" "A")
+                    (-->> "3" "A" "C")
+                    (-->> "4" "C" ["A" "B"])]))
 
