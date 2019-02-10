@@ -49,7 +49,46 @@
   (get-output-enabled-transitions [this])
   (apply-action [this label]))
 
-(defrecord fsm [role start-node nodes transitions])
+(defprotocol finite-state-machine
+  (get-role [this])
+  (get-start-node [this])
+  (get-nodes [this])
+  (get-all-transitions[this])
+  (get-input-transitions-for-node [this node])
+  (get-output-transitions-for-node [this node])
+  (get-transitions-by-label [this label])
+  (get-nodes-by-label [this label])
+  (set-active-node [this node]))
+
+(defn- get-transitions-for-node
+  "Get transitions for node"
+  [node key transitions]
+  (filter (fn [trans]
+            (= (key trans) node))
+          transitions))
+
+(defn- get-transitions-with-label
+  "Get all transitions with label"
+  [label transitions]
+  (filter (fn [trans] (= (get-label trans) label)) transitions))
+
+(defn- get-nodes-with-label [label transitions]
+  (let [labelled-transitions (get-transitions-with-label label transitions)
+        nodes []]
+    (conj nodes (flatten (for [trans transitions] [(get-source-state trans) (get-sink-state trans)])))))
+
+(defrecord fsm [role start-node nodes transitions]
+  finite-state-machine
+  (get-role [this] role)
+  (get-start-node [this] start-node)
+  (get-nodes [this] nodes)
+  (get-all-transitions[this] transitions)
+  (get-input-transitions-for-node [this node] (get-transitions-for-node (get-id node) :sink transitions))
+  (get-output-transitions-for-node [this node](get-transitions-for-node (get-id node) :source transitions))
+  (get-transitions-by-label [this label] (get-transitions-with-label label transitions))
+  (get-nodes-by-label [this label] (get-nodes-with-label label transitions))
+  (set-active-node [this node] ()) ;todo continue here!
+  )
 
 (defrecord node [id transitions active]
   stateful

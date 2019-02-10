@@ -19,10 +19,10 @@
         n3 (->node 3 [trans5 trans6] false)]
     [n1 n2 n3]))
 
-(deftest n1-transitions []
-                        (let [nodes (generateNodes)]
-                          (is (= "1-2" (get-action-label(first (get-output-transitions (first nodes))))))))
+(deftest n1-transitions
+  (let [nodes (generateNodes)]
+    (is (= "1-2" (get-action-label (first (get-output-transitions (first nodes))))))))
 
-(deftest n2-transitions []
-                        (let [nodes (generateNodes)]
-                          (is (= 4 (count (get-output-transitions (nth nodes 1)))))))
+(deftest n2-transitions
+  (let [nodes (generateNodes)]
+    (is (= 4 (count (get-output-transitions (nth nodes 1)))))))
