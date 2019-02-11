@@ -9,8 +9,7 @@
     (is (= "B" (get-receiver inter)))))
 
 (def testDualProtocol
-  (create-protocol [
-                    (-->> "1" "A" "B")
+  (create-protocol [(-->> "1" "A" "B")
                     (-->> "2" "B" "A")]))
 
 (def testTripleProtocol

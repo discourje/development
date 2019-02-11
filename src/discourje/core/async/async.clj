@@ -1,5 +1,7 @@
 (ns discourje.core.async.async
-  (:require [clojure.core.async]))
+  (:require [clojure.core.async])
+  (:import (clojure.lang Seqable))
+  )
 
 ;load helper namespace files!
 (load "interactions")
@@ -32,4 +34,22 @@
 
 (defn generate-monitor [protocol]
   (let [roles (get-distinct-roles protocol)]))
+
+
+
+
+(defn protocol-to-monitor [protocol]
+  (let [roles (get-distinct-roles (get-interactions protocol))
+        transitions (interactions-to-transitions (get-interactions protocol))]
+    (println roles)
+    (println transitions)))
+
+
+(defn get-transitions-in-protocol [protocol]
+  (interactions-to-transitions (get-interactions protocol)))
+
+(defn- generate-io-fsms
+  "Convert a protocol of interactions to IO enabled finite-state-machines local to each role."
+  [protocol]
+  (let [roles (get-distinct-roles (get-interactions protocol))]))
 
