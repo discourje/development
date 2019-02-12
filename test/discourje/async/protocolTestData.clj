@@ -6,7 +6,7 @@
   (let [inter (-->> "1" "A" "B")]
     (is (= "1" (get-action inter)))
     (is (= "A" (get-sender inter)))
-    (is (= "B" (get-receiver inter)))))
+    (is (= "B" (get-receivers inter)))))
 
 (def testDualProtocol
   (create-protocol [(-->> "1" "A" "B")

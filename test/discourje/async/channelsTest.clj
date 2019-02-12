@@ -22,3 +22,5 @@
   (let [roles (get-distinct-roles (get-interactions testQuadProtocol))
         channels (generate-channels roles 1)]
     (is (= 12 (count channels)))))
+
+

@@ -6,7 +6,8 @@
 ;load helper namespace files!
 (load "interactions")
 (load "channels")
-(load "fsm")
+;(load "fsm")
+(load "monitoring")
 
 (defprotocol sendable
   (get-label [this])
@@ -32,24 +33,24 @@
   "Generate protocol based on interactions"
   (->protocol interactions))
 
+(defn- link-interactions [protocol]
+  (let [interactions (get-interactions protocol)
+        linked-interactons []]
+
+    )
+  )
+
 (defn generate-monitor [protocol]
-  (let [roles (get-distinct-roles protocol)]))
+  (let [roles (get-distinct-roles (get-interactions protocol))]
+    (->monitor (link-interactions protocol) (generate-channels roles 1) (atom (first (get-interactions protocol))))))
 
 
 
-
-(defn protocol-to-monitor [protocol]
-  (let [roles (get-distinct-roles (get-interactions protocol))
-        transitions (interactions-to-transitions (get-interactions protocol))]
-    (println roles)
-    (println transitions)))
-
-
-(defn get-transitions-in-protocol [protocol]
-  (interactions-to-transitions (get-interactions protocol)))
-
-(defn- generate-io-fsms
-  "Convert a protocol of interactions to IO enabled finite-state-machines local to each role."
-  [protocol]
-  (let [roles (get-distinct-roles (get-interactions protocol))]))
+;(defn get-transitions-in-protocol [protocol]
+;  (interactions-to-transitions (get-interactions protocol)))
+;
+;(defn- generate-io-fsms
+;  "Convert a protocol of interactions to IO enabled finite-state-machines local to each role."
+;  [protocol]
+;  (let [roles (get-distinct-roles (get-interactions protocol))]))
 

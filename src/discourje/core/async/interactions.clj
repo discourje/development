@@ -3,13 +3,13 @@
 (defprotocol interactable
   (get-action [this])
   (get-sender [this])
-  (get-receiver [this]))
+  (get-receivers [this]))
 
-(defrecord interaction [action sender receiver]
+(defrecord interaction [action sender receivers]
   interactable
   (get-action [this] action)
   (get-sender [this] sender)
-  (get-receiver [this] receiver))
+  (get-receivers [this] receivers))
 
 (defn- find-all-roles
   "List all sender and receivers in the protocol"
@@ -29,9 +29,9 @@
                 ;    (flatten (vec (conj result2 falseResult)))))
                 (satisfies? discourje.core.async.async/interactable element)
                 (do
-                  (if (instance? Seqable (get-receiver element))
-                    (conj result2 (flatten (get-receiver element)) (get-sender element))
-                    (conj result2 (get-receiver element) (get-sender element))))))))))
+                  (if (instance? Seqable (get-receivers element))
+                    (conj result2 (flatten (get-receivers element)) (get-sender element))
+                    (conj result2 (get-receivers element) (get-sender element))))))))))
 
 (defn get-distinct-roles
   "Get all distinct senders and receivers in the protocol"
@@ -44,6 +44,6 @@
                 (fn [interaction]
                   (when (or
                           (= (get-sender interaction) role)
-                          (= (get-receiver interaction) role))
+                          (= (get-receivers interaction) role))
                     interaction))
                 protocol))))

@@ -11,7 +11,6 @@
   (get-consumer [this] receiver)
   (get-chan [this] chan))
 
-
 (defn- generate-channel
   "Function to generate a channel between sender and receiver"
   ([sender receiver]
