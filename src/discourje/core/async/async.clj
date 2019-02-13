@@ -1,5 +1,6 @@
 (ns discourje.core.async.async
-  (:require [clojure.core.async])
+  (:require [clojure.core.async]
+            [clj-uuid :as uuid])
   (:import (clojure.lang Seqable))
   )
 
@@ -27,7 +28,7 @@
 
 (defn -->> [action sender receiver]
   "Creates an interaction object specifying sending action from sender to receiver."
-  (->interaction action sender receiver))
+  (->interaction action sender receiver nil))
 
 (defn create-protocol [interactions]
   "Generate protocol based on interactions"
@@ -35,8 +36,25 @@
 
 (defn- link-interactions [protocol]
   (let [interactions (get-interactions protocol)
-        linked-interactons []]
-
+        helper-vec (atom [])
+        linked-interactions (atom [])
+        ]
+    (if (= 1 (count interactions))
+      interactions
+      (let [intr (->interaction (get-action (first interactions)) (get-sender (first interactions)) (get-receivers (first interactions)) nil)]
+         (doseq [inter interactions]
+            (cond
+              (empty? @helper-vec) (swap! helper-vec conj inter)
+              (instance? interaction inter) (let [i (last @helper-vec)
+                                                  linked-i (assoc i :next inter)]
+                                              (swap! helper-vec conj inter)
+                                              (swap! linked-interactions conj linked-i))
+              )
+            (assoc intr :next inter)
+            )
+          (swap! linked-interactions conj (last @helper-vec))
+          (println @linked-interactions)
+          @linked-interactions))
     )
   )
 

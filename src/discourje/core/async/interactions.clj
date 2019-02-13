@@ -3,13 +3,15 @@
 (defprotocol interactable
   (get-action [this])
   (get-sender [this])
-  (get-receivers [this]))
+  (get-receivers [this])
+  (get-next [this]))
 
-(defrecord interaction [action sender receivers]
+(defrecord interaction [action sender receivers next]
   interactable
   (get-action [this] action)
   (get-sender [this] sender)
-  (get-receivers [this] receivers))
+  (get-receivers [this] receivers)
+  (get-next [this] next))
 
 (defn- find-all-roles
   "List all sender and receivers in the protocol"
