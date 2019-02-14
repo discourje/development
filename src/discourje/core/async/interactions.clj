@@ -1,13 +1,15 @@
 (in-ns 'discourje.core.async.async)
 
 (defprotocol interactable
+  (get-id [this])
   (get-action [this])
   (get-sender [this])
   (get-receivers [this])
   (get-next [this]))
 
-(defrecord interaction [action sender receivers next]
+(defrecord interaction [id action sender receivers next]
   interactable
+  (get-id [this] id)
   (get-action [this] action)
   (get-sender [this] sender)
   (get-receivers [this] receivers)
