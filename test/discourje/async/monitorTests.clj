@@ -4,15 +4,18 @@
             [discourje.core.async.async :refer :all]))
 
 (deftest get-active-interaction-test
-  (let [mon (generate-monitor testDualProtocol)]
+  (let [mon (generate-monitor testDualProtocol)
+        i0 (nth (:interactions mon) 0)
+        i1 (nth (:interactions mon) 1)]
     (is (= "1" (get-action (get-active-interaction mon))))
     (is (= "A" (get-sender (get-active-interaction mon))))
-    (is (= "B" (get-receivers (get-active-interaction mon))))))
+    (is (= "B" (get-receivers (get-active-interaction mon))))
+    (is (= (get-next i0) (get-id i1)))
+    (is (= (get-next i1) nil))))
 
 (deftest dual-protocol-monitor-test
   (let [mon (generate-monitor testDualProtocol)]
-    (is (= 2 (count (:interactions mon))))
-    (is (= 2 (count (:channels mon))))))
+    (is (= 2 (count (:interactions mon))))))
 
 (deftest dual-protocol-ids-test
   (let [mon (generate-monitor testDualProtocol)
@@ -23,8 +26,7 @@
 
 (deftest triple-protocol-monitor-test
   (let [mon (generate-monitor testTripleProtocol)]
-    (is (= 3 (count (:interactions mon))))
-    (is (= 6 (count (:channels mon))))))
+    (is (= 3 (count (:interactions mon))))))
 
 (deftest triple-protocol-ids-test
   (let [mon (generate-monitor testTripleProtocol)
@@ -37,8 +39,7 @@
 
 (deftest parallel-protocol-monitor-test
   (let [mon (generate-monitor testParallelProtocol)]
-    (is (= 4 (count (:interactions mon))))
-    (is (= 6 (count (:channels mon))))))
+    (is (= 4 (count (:interactions mon))))))
 
 (deftest parallel-protocol-ids-test
   (let [mon (generate-monitor testParallelProtocol)
@@ -53,8 +54,7 @@
 
 (deftest quad-protocol-monitor-test
   (let [mon (generate-monitor testQuadProtocol)]
-    (is (= 5 (count (:interactions mon))))
-    (is (= 12 (count (:channels mon))))))
+    (is (= 5 (count (:interactions mon))))))
 
 (deftest quad-protocol-ids-test
   (let [mon (generate-monitor testQuadProtocol)

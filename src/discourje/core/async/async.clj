@@ -1,6 +1,7 @@
 (ns discourje.core.async.async
   (:require [clojure.core.async]
             [clj-uuid :as uuid])
+  (use [clojure.core.async :rename {>!! core->!! <!! core-<!!}])
   (:import (clojure.lang Seqable))
   )
 
@@ -37,8 +38,7 @@
 (defn- link-interactions [protocol]
   (let [interactions (get-interactions protocol)
         helper-vec (atom [])
-        linked-interactions (atom [])
-        ]
+        linked-interactions (atom [])]
     (if (= 1 (count interactions))
       interactions
       (do (doseq [inter interactions]
@@ -52,11 +52,26 @@
     @linked-interactions))
 
 (defn generate-monitor [protocol]
-  (let [roles (get-distinct-roles (get-interactions protocol))]
-    (->monitor (link-interactions protocol) (generate-channels roles 1) (atom (first (get-interactions protocol))))))
+  (let [linked-interactions (link-interactions protocol)]
+    (->monitor linked-interactions (atom (first linked-interactions)))))
+
+(defn generate-infrastructure [protocol]
+  (let [monitor (generate-monitor protocol)
+        roles (get-distinct-roles (get-interactions protocol))
+        channels (generate-channels roles monitor 1)]
+    ;(println channels)
+    ;(println roles)
+    ;(println monitor)
+    channels))
+
+(defn >!!
+"Put on channel"
+  [message channel])
 
 
-
+(defn <!!
+  "Take from channel"
+  [message channel])
 ;(defn get-transitions-in-protocol [protocol]
 ;  (interactions-to-transitions (get-interactions protocol)))
 ;

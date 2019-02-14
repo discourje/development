@@ -28,7 +28,7 @@
   [active-interaction interactions]
   (swap! active-interaction (get-next-interaction active-interaction interactions)))
 
-(defn- apply-interaction
+(defn- apply-interaction-to-mon
   "Apply new interaction"
   [label active-interaction interactions]
   (cond
@@ -37,8 +37,8 @@
     :else (println "Unsupported type!")
     ))
 
-(defrecord monitor [interactions channels active-interaction]
+(defrecord monitor [interactions active-interaction]
   monitoring
   (get-active-interaction [this] @active-interaction)
-  (apply-interaction [this label] (apply-interaction label active-interaction interactions)))
+  (apply-interaction [this label] (apply-interaction-to-mon label active-interaction interactions)))
 
