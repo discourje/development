@@ -8,24 +8,24 @@
     (is (= "A" (get-sender inter)))
     (is (= "B" (get-receivers inter)))))
 
-(def testDualProtocol
+(defn testDualProtocol []
   (create-protocol [(-->> "1" "A" "B")
                     (-->> "2" "B" "A")]))
 
-(def testTripleProtocol
+(defn testTripleProtocol[]
   (create-protocol [
                     (-->> "1" "A" "B")
                     (-->> "2" "B" "A")
                     (-->> "3" "A" "C")]))
 
-(def testParallelProtocol
+(defn testParallelProtocol[]
   (create-protocol [
                     (-->> "1" "A" "B")
                     (-->> "2" "B" "A")
                     (-->> "3" "A" "C")
                     (-->> "4" "C" ["A" "B"])]))
 
-(def testQuadProtocol
+(defn testQuadProtocol[]
   (create-protocol [
                     (-->> "start" "main" ["A" "B" "C"])
                     (-->> "1" "A" "B")

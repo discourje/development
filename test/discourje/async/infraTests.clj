@@ -4,5 +4,5 @@
             [discourje.core.async.async :refer :all]))
 
 (deftest dual-interaction-infra-test
-  (let [channels (generate-infrastructure testDualProtocol)]
+  (let [channels (generate-infrastructure (testDualProtocol))]
   (is (= 2 (count channels)))))

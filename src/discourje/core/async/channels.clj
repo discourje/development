@@ -6,23 +6,19 @@
   (get-chan [this])
   (get-monitor [this]))
 
-(defrecord channel [sender receiver chan monitor]
+(defrecord channel [provider consumers chan buffer monitor]
   transportable
-  (get-provider [this] sender)
-  (get-consumer [this] receiver)
+  (get-provider [this] provider)
+  (get-consumer [this] consumers)
   (get-chan [this] chan)
   (get-monitor [this] monitor))
 
 (defn- generate-channel
   "Function to generate a channel between sender and receiver"
-  ([sender receiver]
-   (println "generating channelL" sender receiver)
-   (generate-channel sender receiver monitor nil))
   ([sender receiver monitor buffer]
-   (println "generating channel" sender receiver)
    (if (nil? buffer)
-     (->channel (str sender) (str receiver) (clojure.core.async/chan) monitor)
-     (->channel (str sender) (str receiver) (clojure.core.async/chan buffer) monitor))))
+     (->channel sender receiver (clojure.core.async/chan) nil monitor)
+     (->channel  sender receiver (clojure.core.async/chan buffer) buffer monitor))))
 
 (defn unique-cartesian-product
   "Generate channels between all participants and filters out duplicates e.g.: A<->A"
@@ -36,3 +32,11 @@
   "Generates communication channels between all participants, and adds the monitor"
   [participants monitor buffer]
   (map #(apply (fn [s r] (generate-channel s r monitor buffer)) %) (unique-cartesian-product participants participants)))
+
+(defn add-monitor-to-channels
+  "Add the monitor to existing channels"
+  [channels monitor]
+  (for [c channels] (generate-channel (get-sender c) (get-receivers c) monitor (:buffer c))))
+
+(defn equal-senders? [channels]
+  (= 1 (count (distinct (for [c channels] (get-provider c))))))

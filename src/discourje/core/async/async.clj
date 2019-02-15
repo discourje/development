@@ -1,7 +1,6 @@
 (ns discourje.core.async.async
-  (:require [clojure.core.async]
+  (:require [clojure.core.async :rename {>!! core->!! <!! core-<!!}]
             [clj-uuid :as uuid])
-  (use [clojure.core.async :rename {>!! core->!! <!! core-<!!}])
   (:import (clojure.lang Seqable))
   )
 
@@ -51,22 +50,41 @@
           (swap! linked-interactions conj (last @helper-vec))))
     @linked-interactions))
 
-(defn generate-monitor [protocol]
+(defn generate-monitor
+  "Generate the monitor based on the given protocol"
+  [protocol]
   (let [linked-interactions (link-interactions protocol)]
     (->monitor linked-interactions (atom (first linked-interactions)))))
 
-(defn generate-infrastructure [protocol]
+(defn generate-infrastructure
+  "Generate channels with monitor based on the protocol"
+  [protocol]
   (let [monitor (generate-monitor protocol)
         roles (get-distinct-roles (get-interactions protocol))
         channels (generate-channels roles monitor 1)]
-    ;(println channels)
-    ;(println roles)
-    ;(println monitor)
     channels))
 
+(defn- allow-send [message channel]
+  (cond
+    (instance? interaction (get-active-interaction (get-monitor channel)))
+    (println "busy") ;todo continue here!
+    :else (println "Allowing send on NOT-implemented type of interaction!")
+    ))
+
+
+
 (defn >!!
-"Put on channel"
-  [message channel])
+  "Put on channel"
+  [message channel]
+  (if (instance? Seqable channel)
+    (
+
+      )
+    (if (nil? (get-active-interaction (get-monitor channel)))
+      (println "Please activate a monitor, your protocol has not yet started, or it is already finished!")
+      (do (when (not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label message)))
+            (println "communication invalid!"))
+          (allow-send message channel)))))
 
 
 (defn <!!
