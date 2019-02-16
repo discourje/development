@@ -14,6 +14,16 @@
   (get-chan [this] chan)
   (get-monitor [this] monitor))
 
+(defn get-channel
+  "Finds a channel based on provider and consumer"
+  [provider consumer channels]
+  (first
+    (filter (fn [c]
+              (and
+                (= (get-provider c) provider)
+                (= (get-consumer c) consumer)))
+            channels)))
+
 (defn- generate-channel
   "Function to generate a channel between sender and receiver"
   ([sender receiver monitor buffer]
