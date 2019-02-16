@@ -54,7 +54,7 @@
   "Generate the monitor based on the given protocol"
   [protocol]
   (let [linked-interactions (link-interactions protocol)]
-    (->monitor linked-interactions (atom (first linked-interactions)))))
+    (->monitor (uuid/v1) linked-interactions (atom (first linked-interactions)))))
 
 (defn generate-infrastructure
   "Generate channels with monitor based on the protocol"
@@ -64,28 +64,45 @@
         channels (generate-channels roles monitor 1)]
     channels))
 
-(defn- allow-send [message channel]
+
+
+
+(defn- allow-send [channel message active-interaction]
   (cond
-    (instance? interaction (get-active-interaction (get-monitor channel)))
-    (println "busy") ;todo continue here!
+    (instance? interaction active-interaction)
+    (println "busy")                                        ;todo continue here!
     :else (println "Allowing send on NOT-implemented type of interaction!")
     ))
 
+(defn- allow-sends [channels message active-interaction]
+  (doseq [c channels] (allow-send c message active-interaction)))
 
+(defn all-valid-channels?
+  "Do all channels comply with the monitor"
+  [channels message]
+  (= 1 (count (distinct (for[c channels] (valid-interaction? (get-monitor c) (get-provider c) (get-consumer c) (get-label message)))))))
 
 (defn >!!
   "Put on channel"
-  [message channel]
-  (if (instance? Seqable channel)
-    (
-
-      )
-    (if (nil? (get-active-interaction (get-monitor channel)))
-      (println "Please activate a monitor, your protocol has not yet started, or it is already finished!")
-      (do (when (not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label message)))
-            (println "communication invalid!"))
-          (allow-send message channel)))))
-
+  [channel message]
+  (if (nil? (get-active-interaction (get-monitor channel)))
+    (println "Please activate a monitor, your protocol has not yet started, or it is already finished!")
+    (if (instance? Seqable channel)
+      (do (when-not (equal-senders? channel)
+            (println "Trying to send in parallel, but the sender of the channels is not the same!"))
+          (when-not (equal-monitors? channel)
+            (println "Trying to send in parallel, but the channels do not share the same monitor!"))
+          (when-not (all-valid-channels? channel message)
+            (println "Trying to send in parallel, but the monitor is not correct for all of them!"))
+          (let [monitor (get-monitor (first channel))
+                active-interaction (get-active-interaction monitor)]
+            (apply-interaction monitor (get-label message))
+            (allow-sends channel message active-interaction)))
+      (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label message))
+            (println "Communication invalid!"))
+          (let [active-interaction (get-active-interaction (get-monitor channel))]
+            (apply-interaction (get-monitor channel) (get-label message))
+            (allow-send channel message active-interaction))))))
 
 (defn <!!
   "Take from channel"

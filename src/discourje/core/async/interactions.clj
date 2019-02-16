@@ -1,3 +1,4 @@
+;interactions.clj
 (in-ns 'discourje.core.async.async)
 
 (defprotocol interactable

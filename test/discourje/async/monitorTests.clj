@@ -68,3 +68,11 @@
     (is (= (get-next i2) (get-id i3)))
     (is (= (get-next i3) (get-id i4)))
     (is (= (get-next i4) nil))))
+
+(deftest apply-atomic-test
+  (let [mon (generate-monitor (testDualProtocol))
+        message (->message "1" "hello world")]
+    (apply-interaction mon (get-label message))
+    (is (= "2" (get-action (get-active-interaction mon))))
+    (is (= "B" (get-sender (get-active-interaction mon))))
+    (is (= "A" (get-receivers (get-active-interaction mon))))))

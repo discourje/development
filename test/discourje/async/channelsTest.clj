@@ -7,7 +7,7 @@
   (let [chans[(->channel 1 2 nil nil nil)
          (->channel 1 3 nil nil nil)
          (->channel 1 4 nil nil nil)]]
-    (is (= true (equal-senders? chans)))))
+    (is true? (equal-senders? chans))))
 
 (deftest not-equal-senders-test
   (let [chans[(->channel 1 2 nil nil nil)
@@ -15,7 +15,9 @@
               (->channel 1 4 nil nil nil)]]
     (is false? (equal-senders? chans))))
 
-
+(deftest not-equal-senders-when-empty-test
+  (let [chans[]]
+    (is false? (equal-senders? chans))))
 
 (deftest dual-channels-test
   (let [roles (get-distinct-roles (get-interactions (testDualProtocol)))

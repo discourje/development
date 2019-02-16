@@ -1,3 +1,4 @@
+;channels.clj
 (in-ns 'discourje.core.async.async)
 
 (defprotocol transportable
@@ -38,5 +39,8 @@
   [channels monitor]
   (for [c channels] (generate-channel (get-sender c) (get-receivers c) monitor (:buffer c))))
 
-(defn equal-senders? [channels]
+(defn equal-senders?
+  "Check if all channels have the same sender"
+  [channels]
   (= 1 (count (distinct (for [c channels] (get-provider c))))))
+

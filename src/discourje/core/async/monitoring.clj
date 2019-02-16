@@ -1,6 +1,8 @@
+;monitoring.clj
 (in-ns 'discourje.core.async.async)
 
 (defprotocol monitoring
+  (get-monitor-id [this])
   (get-active-interaction [this])
   (apply-interaction [this label])
   (valid-interaction? [this sender receivers label]))
@@ -10,24 +12,20 @@
   [label active-interaction]
   (= (get-action @active-interaction) label))
 
-(defn- interaction-filter
-  "Filter interactions"
-  [active-interaction interactions]
-  (filter
-    (fn [interaction]
-      (cond (instance? interaction @active-interaction) (when (= (get-id interaction) (get-next active-interaction) interaction))
-            :else (println "Not supported type!"))
-      interactions)))
-
-(defn- get-next-interaction
+(defn- swap-next-interaction!
   "Get the next interaction"
-  [active-interaction interactions]
-  (first (vec (some? (interaction-filter active-interaction interactions)))))
+  [interactions]
+  (fn [active-interaction]
+    (first (filter
+            (fn [inter]
+             (cond (instance? interaction active-interaction) (= (get-id inter) (get-next active-interaction))
+                   :else (do (println "Not supported type!") false)))
+           interactions))))
 
 (defn- swap-active-interaction-by-atomic
   "Swap active interaction by atomic"
   [active-interaction interactions]
-  (swap! active-interaction (get-next-interaction active-interaction interactions)))
+  (swap! active-interaction (swap-next-interaction! interactions)))
 
 (defn- apply-interaction-to-mon
   "Apply new interaction"
@@ -37,7 +35,6 @@
     (swap-active-interaction-by-atomic active-interaction interactions)
     :else (println "Unsupported type of interaction!")
     ))
-
 
 (defn- contains-value?
   "Does the vector contain a value?"
@@ -66,10 +63,14 @@
     (do (println "Communication invalid!")
         false)))
 
+(defn equal-monitors?
+  "Check if all channels have the same monitor"
+  [channels]
+  (= 1 (count (distinct (for [c channels] (get-monitor-id (get-monitor c)))))))
 
-(defrecord monitor [interactions active-interaction]
+(defrecord monitor [id interactions active-interaction]
   monitoring
+  (get-monitor-id [this] id)
   (get-active-interaction [this] @active-interaction)
   (apply-interaction [this label] (apply-interaction-to-mon label active-interaction interactions))
   (valid-interaction? [this sender receivers label] (is-valid-communication? sender receivers label active-interaction)))
-
