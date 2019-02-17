@@ -8,6 +8,9 @@
     (is (= "A" (get-sender inter)))
     (is (= "B" (get-receivers inter)))))
 
+(defn testSingleParallelProtocol []
+  (create-protocol [(-->> "1" "A" ["B" "C"])]))
+
 (defn testDualProtocol []
   (create-protocol [(-->> "1" "A" "B")
                     (-->> "2" "B" "A")]))

@@ -4,6 +4,7 @@
 (defprotocol monitoring
   (get-monitor-id [this])
   (get-active-interaction [this])
+  (add-watch-to-active-interaction [this callback])
   (apply-interaction [this label])
   (valid-interaction? [this sender receivers label]))
 
@@ -22,9 +23,21 @@
                    :else (do (println "Not supported type!") false)))
            interactions))))
 
+(defn- multiple-receivers? [active-interaction]
+  (and (instance? Seqable (:receivers active-interaction)) (> (count (:receivers active-interaction)) 1)))
+
+(defn- remove-receiver [active-interaction receiver]
+  (let [currentMonitor @active-interaction
+        recv (:receivers currentMonitor)
+        newRecv (vec (remove #{receiver} recv))]
+    (cond ;todo conitnue here!
+      (instance? interaction currentMonitor)
+      (reset! (:activeMonitor @protocol) (->receiveM (:id currentMonitor) (:action currentMonitor) newRecv (:from currentMonitor))))))
+
 (defn- swap-active-interaction-by-atomic
   "Swap active interaction by atomic"
   [active-interaction interactions]
+  (if (multiple-receivers? active-interaction))
   (swap! active-interaction (swap-next-interaction! interactions)))
 
 (defn- apply-interaction-to-mon
@@ -44,8 +57,8 @@
 (defn- is-valid-interaction?
   "Is the given interaction valid compared to the active-interaction of the monitor"
   [sender receivers label active-interaction]
-  ;(println (format "input = %s %s %s" sender receivers label))
-  ;(println (format "active  = %s %s %s" (:sender active-interaction) (:receivers active-interaction) (:action active-interaction)))
+  (println (format "input = %s %s %s" sender receivers label))
+  (println (format "active  = %s %s %s" (:sender active-interaction) (:receivers active-interaction) (:action active-interaction)))
   (and
     (and (if (instance? Seqable label)
            (or (contains-value? (:action active-interaction) label) (= label (:action active-interaction)))
@@ -62,7 +75,7 @@
     (instance? interaction @active-interaction)
     (is-valid-interaction? sender receivers label @active-interaction)
     :else
-    (do (println "Communication invalid!")
+    (do (println "Unsupported communication type: Communication invalid, " @active-interaction)
         false)))
 
 (defn equal-monitors?
@@ -76,3 +89,4 @@
   (get-active-interaction [this] @active-interaction)
   (apply-interaction [this label] (apply-interaction-to-mon label active-interaction interactions))
   (valid-interaction? [this sender receivers label] (is-valid-communication? sender receivers label active-interaction)))
+

@@ -44,6 +44,7 @@
   [participants monitor buffer]
   (map #(apply (fn [s r] (generate-channel s r monitor buffer)) %) (unique-cartesian-product participants participants)))
 
+
 (defn add-monitor-to-channels
   "Add the monitor to existing channels"
   [channels monitor]
