@@ -30,6 +30,11 @@
   "Creates an interaction object specifying sending action from sender to receiver."
   (->interaction (uuid/v1) action sender receiver nil))
 
+(defn branch-on
+  "Create a choice interaction"
+  [branches]
+  (->choice (uuid/v1) branches))
+
 (defn create-protocol [interactions]
   "Generate protocol based on interactions"
   (->protocol interactions))

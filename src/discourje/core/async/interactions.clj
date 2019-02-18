@@ -1,20 +1,32 @@
 ;interactions.clj
 (in-ns 'discourje.core.async.async)
 
+(defprotocol idable
+  (get-id [this]))
+
 (defprotocol interactable
-  (get-id [this])
   (get-action [this])
   (get-sender [this])
   (get-receivers [this])
   (get-next [this]))
 
 (defrecord interaction [id action sender receivers next]
-  interactable
+  idable
   (get-id [this] id)
+  interactable
   (get-action [this] action)
   (get-sender [this] sender)
   (get-receivers [this] receivers)
   (get-next [this] next))
+
+(defprotocol branch
+  (get-branches [this]))
+
+(defrecord choice [id branches]
+  idable
+  (get-id [this] id)
+  branch
+  (get-branches [this] branches))
 
 (defn- find-all-roles
   "List all sender and receivers in the protocol"
@@ -26,12 +38,9 @@
               (cond
                 ;(instance? recursion element)
                 ;(flatten (vec (conj result2 (findAllParticipants (:protocol element) result2))))
-                ;(instance? choice element)
-                ;(let [trueResult (findAllParticipants (:trueBranch element) result2)
-                ;      falseResult (findAllParticipants (:falseBranch element) result2)]
-                ;  (if (not (nil? trueResult))
-                ;    (flatten (vec (conj result2 trueResult)))
-                ;    (flatten (vec (conj result2 falseResult)))))
+                (satisfies? discourje.core.async.async/branch element)
+                (let [branched-interactions (for [branch (get-branches element)] (find-all-roles branch result2))]
+                  (conj result2 (flatten branched-interactions)))
                 (satisfies? discourje.core.async.async/interactable element)
                 (do
                   (if (instance? Seqable (get-receivers element))

@@ -46,7 +46,6 @@
 (defn- swap-active-interaction-by-atomic
   "Swap active interaction by atomic"
   ([active-interaction receiver interactions]
-   (println (nil? receiver))
    (if (nil? receiver)
      (swap-active-interaction-by-atomic active-interaction interactions)
      (if (multiple-receivers? active-interaction)
