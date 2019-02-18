@@ -44,10 +44,8 @@
     (do
       (>!!! [ab ac] m1)
       (let [a->b (<!!! ab "1")
-            ;a->c (<!!! ac "1")
-            ]
+            a->c (<!!! ac "1")]
         (is (= "1" (get-label a->b)))
         (is (= "Hello B and C" (get-content a->b)))
-        ;(is (= (get-label a->c) (get-label a->b)))
-        ;(is (= (get-content a->c) (get-content a->b)))
-      ))))
+        (is (= (get-label a->c) (get-label a->b)))
+        (is (= (get-content a->c) (get-content a->b)))))))

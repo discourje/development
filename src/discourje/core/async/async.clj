@@ -38,14 +38,14 @@
   (let [interactions (get-interactions protocol)
         helper-vec (atom [])
         linked-interactions (atom [])]
-          (do (doseq [inter interactions]
-            (cond
-              (empty? @helper-vec) (swap! helper-vec conj inter)
-              (instance? interaction inter) (let [i (last @helper-vec)
-                                                  linked-i (assoc i :next (get-id inter))]
-                                              (swap! helper-vec conj inter)
-                                              (swap! linked-interactions conj linked-i))))
-          (swap! linked-interactions conj (last @helper-vec)))
+    (do (doseq [inter interactions]
+          (cond
+            (empty? @helper-vec) (swap! helper-vec conj inter)
+            (instance? interaction inter) (let [i (last @helper-vec)
+                                                linked-i (assoc i :next (get-id inter))]
+                                            (swap! helper-vec conj inter)
+                                            (swap! linked-interactions conj linked-i))))
+        (swap! linked-interactions conj (last @helper-vec)))
     @linked-interactions))
 
 (defn generate-monitor
@@ -85,24 +85,23 @@
 (defn >!!!
   "Put on channel"
   [channel message]
-;  (if (nil? (get-active-interaction (get-monitor channel)))
- ;   (println "Please activate a monitor, your protocol has not yet started, or it is already finished!")
-    (if (vector? channel)
-      (do (when-not (equal-senders? channel)
-            (println "Trying to send in parallel, but the sender of the channels is not the same!"))
-          (when-not (equal-monitors? channel)
-            (println "Trying to send in parallel, but the channels do not share the same monitor!"))
-          (when-not (all-valid-channels? channel message)
-            (println "Trying to send in parallel, but the monitor is not correct for all of them!"))
-          (let [monitor (get-monitor (first channel))]
-            ;(apply-interaction monitor (get-label message))
-            (allow-sends channel message)))
-      (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label message))
-            (println "Atomic-send communication invalid!"))
-         ; (apply-interaction (get-monitor channel) (get-label message))
-          (allow-send channel message))))
+  ;  (if (nil? (get-active-interaction (get-monitor channel)))
+  ;   (println "Please activate a monitor, your protocol has not yet started, or it is already finished!")
+  (if (vector? channel)
+    (do (when-not (equal-senders? channel)
+          (println "Trying to send in parallel, but the sender of the channels is not the same!"))
+        (when-not (equal-monitors? channel)
+          (println "Trying to send in parallel, but the channels do not share the same monitor!"))
+        (when-not (all-valid-channels? channel message)
+          (println "Trying to send in parallel, but the monitor is not correct for all of them!"))
+        (let [monitor (get-monitor (first channel))]
+          ;(apply-interaction monitor (get-label message))
+          (allow-sends channel message)))
+    (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label message))
+          (println "Atomic-send communication invalid!"))
+        ; (apply-interaction (get-monitor channel) (get-label message))
+        (allow-send channel message))))
 ;)
-(defn remove-receiver [receiver])
 
 (defn <!!!
   "Take from channel"
@@ -110,15 +109,10 @@
   (if (nil? (get-active-interaction (get-monitor channel)))
     (println "Please activate a monitor, your protocol has not yet started, or it is already finished!")
     (let [result (allow-receive channel)]
-       (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label)
-          (println "Atomic receive communication invalid!"))
-           (if (multiple-receivers? (get-active-interaction (get-monitor channel)))
-             (do
-               (remove-receiver "INPUT-HERE")
-
-               )
-               (apply-interaction (get-monitor channel) label))
-           result))))
+      (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label)
+            (println "Atomic receive communication invalid!"))
+          (receive-interaction (get-monitor channel) label (get-consumer channel))
+          result))))
 
 
 ;(defn get-transitions-in-protocol [protocol]

@@ -4,8 +4,8 @@
 (defprotocol monitoring
   (get-monitor-id [this])
   (get-active-interaction [this])
-  (add-watch-to-active-interaction [this callback])
-  (apply-interaction [this label])
+  (send-interaction [this label])
+  (receive-interaction [this label receiver])
   (valid-interaction? [this sender receivers label]))
 
 (defn- check-atomic-interaction
@@ -18,34 +18,50 @@
   [interactions]
   (fn [active-interaction]
     (first (filter
-            (fn [inter]
-             (cond (instance? interaction active-interaction) (= (get-id inter) (get-next active-interaction))
-                   :else (do (println "Not supported type!") false)))
-           interactions))))
+             (fn [inter]
+               (cond (instance? interaction active-interaction) (= (get-id inter) (get-next active-interaction))
+                     :else (do (println "Not supported type!") false)))
+             interactions))))
 
-(defn- multiple-receivers? [active-interaction]
-  (and (instance? Seqable (:receivers active-interaction)) (> (count (:receivers active-interaction)) 1)))
+(defn- multiple-receivers?
+  "Does the monitor have multiple receivers?"
+  [active-interaction]
+  (println (format "Checking multiple-receivers on active-interaction %s, seqable? %s, count > 1 %s"
+                   @active-interaction
+                   (instance? Seqable (:receivers @active-interaction))
+                   (> (count (:receivers @active-interaction)) 1)))
+  (and (instance? Seqable (:receivers @active-interaction)) (> (count (:receivers @active-interaction)) 1)))
 
-(defn- remove-receiver [active-interaction receiver]
+(defn- remove-receiver
+  "Remove a receiver from the active monitor"
+  [active-interaction receiver]
   (let [currentMonitor @active-interaction
         recv (:receivers currentMonitor)
         newRecv (vec (remove #{receiver} recv))]
-    (cond ;todo conitnue here!
+    (println (format "removing receiver %s, new receivers collection: %s" receiver newRecv))
+    (cond
       (instance? interaction currentMonitor)
-      (reset! (:activeMonitor @protocol) (->receiveM (:id currentMonitor) (:action currentMonitor) newRecv (:from currentMonitor))))))
+      (swap! active-interaction (fn [inter] (->interaction (:id inter) (:action inter) (:sender inter) newRecv (:next inter)))))))
 
 (defn- swap-active-interaction-by-atomic
   "Swap active interaction by atomic"
-  [active-interaction interactions]
-  (if (multiple-receivers? active-interaction))
-  (swap! active-interaction (swap-next-interaction! interactions)))
+  ([active-interaction receiver interactions]
+   (println (nil? receiver))
+   (if (nil? receiver)
+     (swap-active-interaction-by-atomic active-interaction interactions)
+     (if (multiple-receivers? active-interaction)
+       (remove-receiver active-interaction receiver)
+       (swap! active-interaction (swap-next-interaction! interactions)))))
+  ([active-interaction interactions]
+   ((swap! active-interaction (swap-next-interaction! interactions)))))
 
 (defn- apply-interaction-to-mon
   "Apply new interaction"
-  [label active-interaction interactions]
+  [label active-interaction receiver interactions]
+  (println (format "Applying: label %s, receiver %s." label receiver))
   (cond
     (and (instance? interaction @active-interaction) (check-atomic-interaction label active-interaction))
-    (swap-active-interaction-by-atomic active-interaction interactions)
+    (swap-active-interaction-by-atomic active-interaction receiver interactions)
     :else (println "Unsupported type of interaction!")
     ))
 
@@ -87,6 +103,7 @@
   monitoring
   (get-monitor-id [this] id)
   (get-active-interaction [this] @active-interaction)
-  (apply-interaction [this label] (apply-interaction-to-mon label active-interaction interactions))
+  (send-interaction [this label] (apply-interaction-to-mon label active-interaction nil interactions))
+  (receive-interaction [this label receiver] (apply-interaction-to-mon label active-interaction receiver interactions))
   (valid-interaction? [this sender receivers label] (is-valid-communication? sender receivers label active-interaction)))
 
