@@ -33,25 +33,49 @@
 (defn branch-on
   "Create a choice interaction"
   [branches]
-  (->choice (uuid/v1) branches))
+  (->choice (uuid/v1) branches nil))
 
 (defn create-protocol [interactions]
   "Generate protocol based on interactions"
   (->protocol interactions))
-
-(defn- link-interactions [protocol]
-  (let [interactions (get-interactions protocol)
-        helper-vec (atom [])
-        linked-interactions (atom [])]
-    (do (doseq [inter interactions]
-          (cond
-            (empty? @helper-vec) (swap! helper-vec conj inter)
-            (instance? interaction inter) (let [i (last @helper-vec)
-                                                linked-i (assoc i :next (get-id inter))]
-                                            (swap! helper-vec conj inter)
-                                            (swap! linked-interactions conj linked-i))))
-        (swap! linked-interactions conj (last @helper-vec)))
-    @linked-interactions))
+(defn set-top [coll x]
+  (conj (pop coll) x))
+(defn- link-interactions
+  ([protocol]
+   (let [interactions (get-interactions protocol)
+         helper-vec (atom [])
+         linked-interactions (atom [])]
+     (link-interactions interactions helper-vec linked-interactions)))
+  ([interactions helper-vec linked-interactions]
+   (do (doseq [inter interactions]
+         (cond
+           (empty? @helper-vec) (swap! helper-vec conj inter)
+           (satisfies? interactable inter) (let [i (last @helper-vec)
+                                                 linked-i (assoc i :next (get-id inter))]
+                                             (swap! helper-vec conj inter)
+                                             ;(swap! linked-interactions conj linked-i)
+                                             (if (satisfies? branch linked-i)
+                                               (swap! linked-interactions conj (assoc linked-i :branches (vec (for [b (get-branches linked-i)] (set-top b (assoc (last b) :next (get-id inter)))))))
+                                               (swap! linked-interactions conj linked-i))
+                                             )
+           (satisfies? branch inter)
+           (let [branched-interactions
+                 (for [branch (get-branches inter)]
+                   (let [branch-help-vec (atom [])
+                         linked-branch-interactions (atom [])]
+                     (link-interactions branch branch-help-vec linked-branch-interactions)))
+                 i (last @helper-vec)
+                 linked-i (assoc i :next (get-id inter))
+                 new-choice (->choice (get-id inter) branched-interactions nil)
+                 ]
+             (swap! helper-vec conj new-choice)
+             ;(swap! linked-interactions conj linked-i)
+             (if (satisfies? branch linked-i)
+               (swap! linked-interactions conj (assoc linked-i :branches (vec (for [b (get-branches linked-i)] (set-top b (assoc (last b) :next (get-id inter)))))))
+               (swap! linked-interactions conj linked-i))
+             )))
+       (swap! linked-interactions conj (last @helper-vec)))
+   @linked-interactions))
 
 (defn generate-monitor
   "Generate the monitor based on the given protocol"

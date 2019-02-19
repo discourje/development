@@ -42,6 +42,16 @@
                                 [(-->> "hi" "A" "C")]]
                                )]))
 
+(defn single-choice-in-middle-protocol []
+  (create-protocol [(-->> "99" "Start" "Finish")
+                    (branch-on [
+                                [(-->> "1" "A" "B")
+                                 (-->> "bla" "B" "A")]
+                                [(-->> "2" "A" "C")
+                                 (-->> "hello" "C" "A")]]
+                               )
+                    (-->> "88" "Finish" "Start")]))
+
 (defn single-choice-5branches-protocol []
   (create-protocol [(branch-on [
                                 [(-->> "1" "A" "B")]

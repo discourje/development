@@ -69,10 +69,24 @@
     (is (= (get-next i3) (get-id i4)))
     (is (= (get-next i4) nil))))
 
+(deftest quad-protocol-monitor-test
+  (let [mon (generate-monitor (testQuadProtocol))]
+    (is (= 5 (count (:interactions mon))))))
+
+(deftest single-choice-protocol-test
+  (let [mon (generate-monitor (single-choice-protocol))]
+    (is (= 1 (count (:interactions mon))))))
+
+(deftest single-choice-in-middle-protocol-test
+  (let [mon (generate-monitor (single-choice-in-middle-protocol))]
+    (println (:interactions mon))
+    (is (= 3 (count (:interactions mon))))))
+
 (deftest apply-atomic-test
   (let [mon (generate-monitor (testDualProtocol))
         message (->message "1" "hello world")]
-    (apply-interaction mon (get-label message))
+    (receive-interaction mon (get-label message)"B")
     (is (= "2" (get-action (get-active-interaction mon))))
     (is (= "B" (get-sender (get-active-interaction mon))))
     (is (= "A" (get-receivers (get-active-interaction mon))))))
+

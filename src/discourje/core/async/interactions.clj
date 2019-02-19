@@ -4,11 +4,13 @@
 (defprotocol idable
   (get-id [this]))
 
+(defprotocol linkable
+  (get-next [this]))
+
 (defprotocol interactable
   (get-action [this])
   (get-sender [this])
-  (get-receivers [this])
-  (get-next [this]))
+  (get-receivers [this]))
 
 (defrecord interaction [id action sender receivers next]
   idable
@@ -17,16 +19,19 @@
   (get-action [this] action)
   (get-sender [this] sender)
   (get-receivers [this] receivers)
+  linkable
   (get-next [this] next))
 
 (defprotocol branch
   (get-branches [this]))
 
-(defrecord choice [id branches]
+(defrecord choice [id branches next]
   idable
   (get-id [this] id)
   branch
-  (get-branches [this] branches))
+  (get-branches [this] branches)
+  linkable
+  (get-next [this] next))
 
 (defn- find-all-roles
   "List all sender and receivers in the protocol"
