@@ -58,8 +58,10 @@
                                 [(-->> "1" "A" "C")]
                                 [(-->> "1" "A" "D")]
                                 [(-->> "1" "A" "E")]
+                                [(-->> "1" "A" "F")]
                                 ]
-                               )]))
+                               )
+                    (-->> "Done" "A" "End")]))
 
 (defn dual-choice-protocol []
   (create-protocol [(branch-on [
@@ -69,7 +71,8 @@
                                              [(-->> "hiA" "C" "A")]
                                              [(-->> "hiD" "C" "D")]]
                                             )]]
-                               )]))
+                               )
+                    (-->> "Done" "A" "End")]))
 
 (defn single-nested-choice-branch-protocol []
   (create-protocol [(branch-on [
@@ -78,7 +81,8 @@
                                              [(-->> "1" "A" "C")]
                                              [(-->> "1" "A" "D")]]
                                             )]]
-                               )]))
+                               )
+                    (-->> "Done" "A" "End")]))
 
 (defn multiple-nested-branches-protocol []
   (create-protocol [(branch-on [
@@ -96,4 +100,5 @@
                                                          )]
                                              [(-->> "1" "A" "I")]]
                                             )]]
-                               )]))
+                               )
+                    (-->> "Done" "A" "End")]))

@@ -38,8 +38,22 @@
 (defn create-protocol [interactions]
   "Generate protocol based on interactions"
   (->protocol interactions))
-(defn set-top [coll x]
+
+(defn replace-last-in-vec
+  "Replace the last value in a vector and return the new vector."
+  [coll x]
   (conj (pop coll) x))
+
+(defn assoc-next-nested-choice
+  "Assoc nested choice next field recursively"
+  [linked-i inter]
+  (assoc linked-i :branches
+                  (vec
+                    (for [b (get-branches linked-i)]
+                      (if (satisfies? branch (last b))
+                        (replace-last-in-vec b (assoc-next-nested-choice (last b) inter))
+                        (replace-last-in-vec b (assoc (last b) :next (get-id inter))))))))
+
 (defn- link-interactions
   ([protocol]
    (let [interactions (get-interactions protocol)
@@ -48,18 +62,19 @@
      (link-interactions interactions helper-vec linked-interactions)))
   ([interactions helper-vec linked-interactions]
    (do (doseq [inter interactions]
+         (println inter)
+         (println "______");todo helper vec in empty, yet there is a branchable, it does nothing! there needs to be a check depending on what to do when empty but is choice->nested!!!
          (cond
            (empty? @helper-vec) (swap! helper-vec conj inter)
            (satisfies? interactable inter) (let [i (last @helper-vec)
                                                  linked-i (assoc i :next (get-id inter))]
                                              (swap! helper-vec conj inter)
-                                             ;(swap! linked-interactions conj linked-i)
                                              (if (satisfies? branch linked-i)
-                                               (swap! linked-interactions conj (assoc linked-i :branches (vec (for [b (get-branches linked-i)] (set-top b (assoc (last b) :next (get-id inter)))))))
+                                               (swap! linked-interactions conj (assoc-next-nested-choice linked-i inter));)(assoc linked-i :branches (vec (for [b (get-branches linked-i)] (replace-last-in-vec b (assoc (last b) :next (get-id inter)))))))
                                                (swap! linked-interactions conj linked-i))
                                              )
            (satisfies? branch inter)
-           (let [branched-interactions
+           (do (println "branch!")          (let [branched-interactions
                  (for [branch (get-branches inter)]
                    (let [branch-help-vec (atom [])
                          linked-branch-interactions (atom [])]
@@ -68,12 +83,12 @@
                  linked-i (assoc i :next (get-id inter))
                  new-choice (->choice (get-id inter) branched-interactions nil)
                  ]
+             (println "i = " i)
              (swap! helper-vec conj new-choice)
-             ;(swap! linked-interactions conj linked-i)
              (if (satisfies? branch linked-i)
-               (swap! linked-interactions conj (assoc linked-i :branches (vec (for [b (get-branches linked-i)] (set-top b (assoc (last b) :next (get-id inter)))))))
+               (swap! linked-interactions conj (assoc-next-nested-choice linked-i inter));(assoc linked-i :branches (vec (for [b (get-branches linked-i)] (replace-last-in-vec b (assoc (last b) :next (get-id inter)))))))
                (swap! linked-interactions conj linked-i))
-             )))
+             ))))
        (swap! linked-interactions conj (last @helper-vec)))
    @linked-interactions))
 
