@@ -160,12 +160,10 @@
         i0b1b0b0b10 (nth (nth (:branches (nth i0b1b0b0 0))1)0)
         i0b1b0b0b11 (nth (nth (:branches (nth i0b1b0b0 0))1)1)
         i0b1b0b0b12 (nth (nth (:branches (nth i0b1b0b0 0))1)2)
-
         i0b1b0b10 (nth (nth (:branches i0b1b0)1)0)
         i0b1b11 (nth (nth (:branches (nth i0b1 0))1)0)
         i1 (nth (:interactions mon) 1)
        ]
-    (println i0b1b0b0b10)
     (is (= (get-next i0) (get-id i1)))
     (is (= (get-next i0b0b00) (get-id i0b0b01)))
     (is (= (get-next i0b0b01) (get-id i1)))
