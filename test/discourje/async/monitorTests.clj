@@ -79,6 +79,7 @@
 
 (deftest single-choice-in-middle-protocol-test
   (let [mon (generate-monitor (single-choice-in-middle-protocol))]
+    (println (:interactions mon))
     (is (= 3 (count (:interactions mon))))))
 
 (deftest single-choice-in-middle-protocol-ids-test
@@ -123,7 +124,6 @@
 
 (deftest dual-choice-protocol-test
   (let [mon (generate-monitor (dual-choice-protocol))]
-   ; (println (:interactions mon))
     (is (= 2 (count (:interactions mon))))))
 
 (deftest dual-choice-protocol-ids-test
@@ -132,15 +132,51 @@
         i0b0 (nth (nth (:branches i0) 0) 0)
         i0b10 (nth (nth (:branches i0) 1) 0)
         i0b11 (nth (nth (:branches i0) 1) 1)
-        i0b1b10 (nth (:branches (nth (nth (:branches i0) 1) 1))0)
-        i0b1b11 (nth (:branches (nth (nth (:branches i0) 1) 1))1)
+        i0b1b10 (nth (nth (:branches i0b11)0)0)
+        i0b1b11 (nth (nth (:branches i0b11)1)0)
         i1 (nth (:interactions mon) 1)]
-    (println i0b10)
-    (println i0b11)
     (is (= (get-next i0) (get-id i1)))
     (is (= (get-next i0b0) (get-id i1)))
     (is (= (get-next i0b10) (get-id i0b11)))
+    (is (= (get-next i0b1b10) (get-id i1)))
+    (is (= (get-next i0b1b11) (get-id i1)))
     (is (= (get-next i1) nil))))
+
+(deftest multiple-nested-branches-protocol-test
+  (let [mon (generate-monitor (multiple-nested-branches-protocol))]
+    (is (= 2 (count (:interactions mon))))))
+
+(deftest multiple-nested-branches-protocol-ids-test
+  (let [mon (generate-monitor (multiple-nested-branches-protocol))
+        i0 (nth (:interactions mon) 0)
+        i0b0 (nth (:branches i0)0)
+        i0b0b00 (nth (nth (:branches (nth i0b0 0))0)0)
+        i0b0b01 (nth (nth (:branches (nth i0b0 0))0)1)
+        i0b0b10 (nth (nth (:branches (nth i0b0 0))1)0)
+        i0b1  (nth (:branches i0) 1)
+        i0b1b0 (nth (nth (:branches (nth i0b1 0))0)0)
+        i0b1b0b0 (nth (:branches i0b1b0)0)
+        i0b1b0b0b00 (nth (nth (:branches (nth i0b1b0b0 0))0)0)
+        i0b1b0b0b10 (nth (nth (:branches (nth i0b1b0b0 0))1)0)
+        i0b1b0b0b11 (nth (nth (:branches (nth i0b1b0b0 0))1)1)
+        i0b1b0b0b12 (nth (nth (:branches (nth i0b1b0b0 0))1)2)
+
+        i0b1b0b10 (nth (nth (:branches i0b1b0)1)0)
+        i0b1b11 (nth (nth (:branches (nth i0b1 0))1)0)
+        i1 (nth (:interactions mon) 1)
+       ]
+    (println i0b1b0b0b10)
+    (is (= (get-next i0) (get-id i1)))
+    (is (= (get-next i0b0b00) (get-id i0b0b01)))
+    (is (= (get-next i0b0b01) (get-id i1)))
+    (is (= (get-next i0b0b10) (get-id i1)))
+    (is (= (get-next i0b1b11) (get-id i1)))
+    (is (= (get-next i0b1b0b10) (get-id i1)))
+    (is (= (get-next i0b1b0b0b00) (get-id i1)))
+    (is (= (get-next i0b1b0b0b10) (get-id i0b1b0b0b11)))
+    (is (= (get-next i0b1b0b0b11) (get-id i0b1b0b0b12)))
+    (is (= (get-next i0b1b0b0b12) (get-id i1)))
+    ))
 
 (deftest apply-atomic-test
   (let [mon (generate-monitor (testDualProtocol))

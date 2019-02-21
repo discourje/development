@@ -85,20 +85,25 @@
                     (-->> "Done" "A" "End")]))
 
 (defn multiple-nested-branches-protocol []
-  (create-protocol [(branch-on [
-                                [(branch-on [
-                                             [(-->> "1" "A" "B")]
-                                             [(-->> "1" "A" "C")]]
+  (create-protocol [
+                    (branch-on [ ;i0
+                                [(branch-on [ ;i0b0
+                                             [(-->> "1" "A" "B") ;i0b0b00
+                                              (-->> "2" "B" "A")];i0b0b01
+                                             [(-->> "1" "A" "C")]];i0b0b10
                                             )]
-                                [(branch-on [
-                                             [(branch-on [
-                                                          [(branch-on [
-                                                                       [(-->> "1" "A" "D")]
-                                                                       [(-->> "1" "A" ["E" "F" "G"])]]
+                                [(branch-on [ ;i0b1
+                                             [(branch-on [ ;i0b1b0
+                                                          [(branch-on [ ;i0b1b0b0
+                                                                       [(-->> "1" "A" "D")] ;i0b1b0b0b00
+                                                                       [(-->> "1" "A" ["E" "F" "G"]) ;i0b1b0b0b10
+                                                                        (-->> "3" "F" "A")            ;i0b1b0b0b11
+                                                                        (-->> "4" "G" "A")]]          ;i0b1b0b0b12
                                                                       )]
-                                                          [(-->> "1" "A" "H")]]
+                                                          [(-->> "1" "A" "H")]];i0b1b0b10
                                                          )]
-                                             [(-->> "1" "A" "I")]]
+                                             [(-->> "1" "A" "I")]];i0b1b11
                                             )]]
                                )
-                    (-->> "Done" "A" "End")]))
+                    (-->> "Done" "A" "End")] ;i1
+                   ))
