@@ -49,3 +49,41 @@
         (is (= "Hello B and C" (get-content a->b)))
         (is (= (get-label a->c) (get-label a->b)))
         (is (= (get-content a->c) (get-content a->b)))))))
+
+(deftest send-receive-single-Always0-choice-protocol
+  (let [channels (generate-infrastructure (single-choice-protocol))
+        ab (get-channel "A" "B" channels)
+        ma (->message "1" "Hello B")]
+      (do
+        (>!!! ab ma)
+        (let [a->b (<!!! ab "1")]
+          (is (= "1" (get-label a->b)))
+          (is (= "Hello B" (get-content a->b)))))))
+
+(deftest send-receive-single-always1-choice-protocol
+  (let [channels (generate-infrastructure (single-choice-protocol))
+        ac (get-channel "A" "C" channels)
+        mc (->message "hi" "Hi C")]
+      (do
+        (>!!! ac mc)
+        (let [a->c (<!!! ac "hi")]
+          (is (= "1" (get-label a->c)))
+          (is (= "Hi C" (get-content a->c)))))))
+
+(deftest send-receive-single-Random-choice-protocol
+  (let [channels (generate-infrastructure (single-choice-protocol))
+        ab (get-channel "A" "B" channels)
+        ac (get-channel "A" "C" channels)
+        ma (->message "1" "Hello B")
+        mc (->message "hi" "Hi C")]
+    (if (== 0 (rand-int 2))
+      (do
+        (>!!! ab ma)
+        (let [a->b (<!!! ab "1")]
+          (is (= "1" (get-label a->b)))
+          (is (= "Hello B" (get-content a->b)))))
+      (do
+        (>!!! ac mc)
+        (let [a->c (<!!! ac "hi")]
+          (is (= "1" (get-label a->c)))
+          (is (= "Hi C" (get-content a->c))))))))

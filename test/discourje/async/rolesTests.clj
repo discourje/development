@@ -18,14 +18,14 @@
 (deftest unique3-roles-single-choice-test
   (is (= 3 (count (get-distinct-roles (get-interactions (single-choice-protocol)))))))
 
-(deftest unique5-roles-single-choice-5branches-test
+(deftest unique7-roles-single-choice-5branches-test
   (is (= 7 (count (get-distinct-roles (get-interactions (single-choice-5branches-protocol)))))))
 
-(deftest unique4-roles-dual-choice-test
+(deftest unique5-roles-dual-choice-test
   (is (= 5 (count (get-distinct-roles (get-interactions (dual-choice-protocol)))))))
 
 (deftest unique4-roles-single-nested-branch-choice-test
   (is (= 5 (count (get-distinct-roles (get-interactions (single-nested-choice-branch-protocol)))))))
 
-(deftest unique9-roles-multiple-nested-branch-choice-test
+(deftest unique10-roles-multiple-nested-branch-choice-test
   (is (= 10 (count (get-distinct-roles (get-interactions (multiple-nested-branches-protocol)))))))

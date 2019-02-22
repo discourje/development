@@ -151,7 +151,7 @@
     (let [result (allow-receive channel)]
       (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label)
             (println "Atomic receive communication invalid!"))
-          (receive-interaction (get-monitor channel) label (get-consumer channel))
+          (apply-interaction (get-monitor channel) (get-provider channel) (get-consumer channel) label)
           result))))
 
 
