@@ -67,7 +67,7 @@
       (do
         (>!!! ac mc)
         (let [a->c (<!!! ac "hi")]
-          (is (= "1" (get-label a->c)))
+          (is (= "hi" (get-label a->c)))
           (is (= "Hi C" (get-content a->c)))))))
 
 (deftest send-receive-single-Random-choice-protocol
@@ -85,5 +85,33 @@
       (do
         (>!!! ac mc)
         (let [a->c (<!!! ac "hi")]
-          (is (= "1" (get-label a->c)))
+          (is (= "hi" (get-label a->c)))
           (is (= "Hi C" (get-content a->c))))))))
+
+(deftest send-receive-single-choice-in-middle-always0-choice-protocol
+  (let [channels (generate-infrastructure (single-choice-in-middle-protocol))
+        sf (get-channel "Start" "Finish" channels)
+        fs (get-channel "Finish" "Start" channels)
+        ab (get-channel "A" "B" channels)
+        ba (get-channel "B" "A" channels)
+        msf (->message "99" "Starting!")
+        mab (->message "1" "1B")
+        mba (->message "bla" "blaA")
+        mfs (->message "88" "ending!")]
+    (do
+      (>!!! sf msf)
+      (let [s->f (<!!! sf "99")]
+        (is (= "99" (get-label s->f)))
+        (is (= "Starting!" (get-content s->f)))
+        (>!!! ab mab)
+        (let [a->b (<!!! ab "1")]
+          (is (= "1" (get-label a->b)))
+          (is (= "1B" (get-content a->b)))
+          (>!!! ba mba)
+          (let [b->a (<!!! ba "bla")]
+            (is (= "bla" (get-label b->a)))
+            (is (= "blaA" (get-content b->a)))
+            (>!!! fs mfs)
+            (let [f->s (<!!! fs "88")]
+              (is (= "88" (get-label f->s)))
+              (is (= "ending!" (get-content f->s))))))))))

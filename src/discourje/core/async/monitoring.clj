@@ -16,7 +16,7 @@
 (defn- check-branch-interaction
   "Check the atomic interaction"
   [label active-interaction]
-  (> (count (filter (fn [x] (= x label)) (flatten (for [b (:branches active-interaction)] (get-label (nth b 0)))))) 0))
+  (> (count (filter (fn [x] (= x label)) (flatten (for [b (:branches active-interaction)] (get-action (nth b 0)))))) 0))
 
 (defn- swap-next-interaction!
   "Get the next interaction"
@@ -56,7 +56,7 @@
     (println (format "removing receiver %s, new receivers collection: %s" receiver newRecv))
     (cond
       (satisfies? interactable target-interaction)
-      (swap! active-interaction (fn [inter] (->interaction (:id inter) (:action inter) (:sender inter) newRecv (:next inter)))))))
+      (swap! active-interaction (fn [inter] (->interaction (get-id inter) (get-action inter) (get-sender inter) newRecv (get-next inter)))))))
 
 (defn- remove-receiver
   "Remove a receiver from the active monitor"
