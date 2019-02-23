@@ -59,6 +59,11 @@
         channels (generate-channels roles nil 1)]
     (is (= 20 (count channels)))))
 
+(deftest single-choice-multiple-interactions-protocol-roles-test
+  (let [roles (get-distinct-roles (get-interactions (single-choice-multiple-interactions-protocol)))
+        channels (generate-channels roles nil 1)]
+    (is (= 12 (count channels)))))
+
 (deftest single-nested-choice-branch-protocol-roles-test
   (let [roles (get-distinct-roles (get-interactions (single-nested-choice-branch-protocol)))
         channels (generate-channels roles nil 1)]

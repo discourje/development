@@ -24,6 +24,9 @@
 (deftest unique5-roles-dual-choice-test
   (is (= 5 (count (get-distinct-roles (get-interactions (dual-choice-protocol)))))))
 
+(deftest unique4-roles-single-choice-multiple-interactions-protocol-test
+  (is (= 4 (count (get-distinct-roles (get-interactions (single-choice-multiple-interactions-protocol)))))))
+
 (deftest unique4-roles-single-nested-branch-choice-test
   (is (= 5 (count (get-distinct-roles (get-interactions (single-nested-choice-branch-protocol)))))))
 

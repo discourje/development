@@ -74,7 +74,7 @@
                                )
                     (-->> "Done" "A" "End")]))
 
-(defn single-choice-multiple-interactions-protocol
+(defn single-choice-multiple-interactions-protocol []
   (create-protocol [(-->> "1" "A" "B")
                     (-->> "1" "B" "A")
                     (branch-on [

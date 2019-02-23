@@ -143,6 +143,10 @@
     (is (= (get-next i0b1b11) (get-id i1)))
     (is (= (get-next i1) nil))))
 
+(deftest single-choice-multiple-interactions-protocol-test
+  (let [mon (generate-monitor (single-choice-multiple-interactions-protocol))]
+    (is (= 6 (count (:interactions mon))))))
+
 (deftest multiple-nested-branches-protocol-test
   (let [mon (generate-monitor (multiple-nested-branches-protocol))]
     (is (= 2 (count (:interactions mon))))))

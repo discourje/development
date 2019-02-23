@@ -54,21 +54,21 @@
   (let [channels (generate-infrastructure (single-choice-protocol))
         ab (get-channel "A" "B" channels)
         ma (->message "1" "Hello B")]
-      (do
-        (>!!! ab ma)
-        (let [a->b (<!!! ab "1")]
-          (is (= "1" (get-label a->b)))
-          (is (= "Hello B" (get-content a->b)))))))
+    (do
+      (>!!! ab ma)
+      (let [a->b (<!!! ab "1")]
+        (is (= "1" (get-label a->b)))
+        (is (= "Hello B" (get-content a->b)))))))
 
 (deftest send-receive-single-always1-choice-protocol
   (let [channels (generate-infrastructure (single-choice-protocol))
         ac (get-channel "A" "C" channels)
         mc (->message "hi" "Hi C")]
-      (do
-        (>!!! ac mc)
-        (let [a->c (<!!! ac "hi")]
-          (is (= "hi" (get-label a->c)))
-          (is (= "Hi C" (get-content a->c)))))))
+    (do
+      (>!!! ac mc)
+      (let [a->c (<!!! ac "hi")]
+        (is (= "hi" (get-label a->c)))
+        (is (= "Hi C" (get-content a->c)))))))
 
 (deftest send-receive-single-Random-choice-protocol
   (let [channels (generate-infrastructure (single-choice-protocol))
@@ -115,3 +115,35 @@
             (let [f->s (<!!! fs "88")]
               (is (= "88" (get-label f->s)))
               (is (= "ending!" (get-content f->s))))))))))
+
+(defn send-receive-single-choice-multiple-interactions-protocol-test
+  (let [channels (generate-infrastructure (single-choice-multiple-interactions-protocol))
+        ab (get-channel "A" "B" channels)
+        ba (get-channel "B" "A" channels)
+        ac (get-channel "A" "C" channels)
+        ca (get-channel "C" "A" channels)
+        ad (get-channel "A" "D" channels)
+        da (get-channel "D" "A" channels)
+        mab1 (->message "1" "1ab")
+        mab-c2 (->message "2" "B or C")
+        mab-c3 (->message "3" "B or C")
+        mad (->message "4" "4d")
+        m5 (->message "5" "bye all")]
+    (do (>!!! ab mab1)
+        (let [a->b (<!!! ab "1")]
+          (>!!! ba mab1)
+          (let [b->a (<!!! ba "1")]
+            (>!!! ac mab-c2)
+            (let [a->c (<!!! ac "2")]
+              (>!!! ca mab-c2)
+              (let [c->a (<!!! ca "2")]
+                (>!!! ac mab-c3)
+                (let [a->c3 (<!!! ca "3")]
+                  (>!!! ad mad)
+                  (let [a->d (<!!! ad "4")]
+                    (>!!! da mad)
+                    (let [d->a (<!!! da "4")]
+                      (>!!! [ab ac ad] m5)
+                      (let [a->b5 (<!!! ab "5")
+                            a->c5 (<!!! ac "5")
+                            a->d5 (<!!! ad "5")])))))))))))
