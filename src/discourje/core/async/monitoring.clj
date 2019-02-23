@@ -25,7 +25,7 @@
     (first (filter
              (fn [inter]
                (cond (satisfies? interactable active-interaction) (= (get-id inter) (get-next active-interaction))
-                     :else (do (println "Not supported type!") false)))
+                     :else (do (log-error :unsupported-operation "Not supported type!") false)))
              interactions))))
 
 (defn- swap-next-interaction-by-id!
@@ -36,7 +36,7 @@
              (fn [inter]
                (cond (satisfies? interactable active-interaction) (= (get-id inter) id)
                      (satisfies? branch active-interaction) (swap-next-interaction-by-id! id interactions)
-                     :else (do (println "Not supported type!") false)))
+                     :else (do (log-error :unsupported-operation "Not supported type!") false)))
              interactions))))
 
 (defn- multiple-receivers?
@@ -53,7 +53,7 @@
   [active-interaction target-interaction receiver]
   (let [recv (:receivers target-interaction)
         newRecv (vec (remove #{receiver} recv))]
-    (println (format "removing receiver %s, new receivers collection: %s" receiver newRecv))
+    (log-message (format "removing receiver %s, new receivers collection: %s" receiver newRecv))
     (cond
       (satisfies? interactable target-interaction)
       (swap! active-interaction (fn [inter] (->interaction (get-id inter) (get-action inter) (get-sender inter) newRecv (get-next inter)))))))
@@ -64,7 +64,7 @@
   (let [currentMonitor @active-interaction
         recv (:receivers currentMonitor)
         newRecv (vec (remove #{receiver} recv))]
-    (println (format "removing receiver %s, new receivers collection: %s" receiver newRecv))
+    (log-message (format "removing receiver %s, new receivers collection: %s" receiver newRecv))
     (cond
       (satisfies? interactable currentMonitor)
       (swap! active-interaction (fn [inter] (->interaction (:id inter) (:action inter) (:sender inter) newRecv (:next inter)))))))
@@ -88,7 +88,7 @@
                      (cond
                        (satisfies? interactable inter) (and (= (:action inter) label) (= (:receivers inter) receiver) (= (:sender inter) sender))
                        (satisfies? branch inter) (get-first-valid-target-branch-interaction active-interaction label sender receiver)
-                       :else (println "Not supported get nested branch!"))))
+                       :else (log-error :unsupported-operation "Not supported get nested branch!"))))
                  (:branches active-interaction))))
 
 (defn- swap-active-interaction-by-branch
@@ -102,13 +102,13 @@
 (defn- apply-interaction-to-mon
   "Apply new interaction"
   [sender receivers label active-interaction interactions]
-  (println (format "Applying: label %s, receiver %s." label receivers))
+  (log-message (format "Applying: label %s, receiver %s." label receivers))
   (cond
     (and (satisfies? interactable @active-interaction) (check-atomic-interaction label active-interaction))
     (swap-active-interaction-by-atomic active-interaction receivers interactions)
     (and (satisfies? branch @active-interaction) (check-branch-interaction label @active-interaction))
     (swap-active-interaction-by-branch sender receivers label active-interaction interactions)
-    :else (println "Unsupported type of interaction!")
+    :else (log-error :unsupported-operation "Unsupported type of interaction!")
     ))
 
 (defn- contains-value?
@@ -119,8 +119,8 @@
 (defn- is-valid-interaction?
   "Is the given interaction valid compared to the active-interaction of the monitor"
   [sender receivers label active-interaction]
-  (println (format "input = %s %s %s" sender receivers label))
-  (println (format "active  = %s %s %s" (:sender active-interaction) (:receivers active-interaction) (:action active-interaction)))
+  (log-message (format "input = %s %s %s" sender receivers label))
+  (log-message (format "active  = %s %s %s" (:sender active-interaction) (:receivers active-interaction) (:action active-interaction)))
   (and
     (and (if (instance? Seqable label)
            (or (contains-value? (:action active-interaction) label) (= label (:action active-interaction)))
@@ -139,7 +139,7 @@
     (satisfies? branch active-interaction)
     (> (count (filter true? (flatten (for [b (:branches active-interaction)] (is-valid-communication? sender receivers label (nth b 0)))))) 0)
     :else
-    (do (println "Unsupported communication type: Communication invalid, " active-interaction)
+    (do (log-error :unsupported-operation "Unsupported communication type: Communication invalid, " active-interaction)
         false)))
 
 (defn equal-monitors?

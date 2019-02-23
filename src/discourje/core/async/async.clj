@@ -1,6 +1,7 @@
 (ns discourje.core.async.async
   (:require [clojure.core.async :as async :exclude [>!! <!!]]
-            [clj-uuid :as uuid])
+            [clj-uuid :as uuid]
+            [discourje.core.async.logging :refer :all])
   ;(:refer [clojure.core.async :rename {>!! core>!!, <!! core<!!}])
   (:import (clojure.lang Seqable)))
 
@@ -105,11 +106,11 @@
 (defn- allow-send
   "Allow send message in channel"
   [channel message]
-  (println "allowing send on channel!")
+  (log-message "allowing send on channel!")
   (async/>!! (get-chan channel) message))
 
 (defn- allow-receive [channel]
-  (println "allowing receive on channel!")
+  (log-message "allowing receive on channel!")
   (async/<!! (get-chan channel)))
 
 (defn- allow-sends
@@ -129,16 +130,16 @@
   ;   (println "Please activate a monitor, your protocol has not yet started, or it is already finished!")
   (if (vector? channel)
     (do (when-not (equal-senders? channel)
-          (println "Trying to send in parallel, but the sender of the channels is not the same!"))
+          (log-error :invalid-parallel-channels "Trying to send in parallel, but the sender of the channels is not the same!"))
         (when-not (equal-monitors? channel)
-          (println "Trying to send in parallel, but the channels do not share the same monitor!"))
+          (log-error :monitor-mismatch "Trying to send in parallel, but the channels do not share the same monitor!"))
         (when-not (all-valid-channels? channel message)
-          (println "Trying to send in parallel, but the monitor is not correct for all of them!"))
+          (log-error :incorrect-communication "Trying to send in parallel, but the monitor is not correct for all of them!"))
         (let [monitor (get-monitor (first channel))]
           ;(apply-interaction monitor (get-label message))
           (allow-sends channel message)))
     (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label message))
-          (println "Atomic-send communication invalid!"))
+          (log-error :incorrect-communication  "Atomic-send communication invalid!"))
         ; (apply-interaction (get-monitor channel) (get-label message))
         (allow-send channel message))))
 ;)
@@ -147,10 +148,10 @@
   "Take from channel"
   [channel label]
   (if (nil? (get-active-interaction (get-monitor channel)))
-    (println "Please activate a monitor, your protocol has not yet started, or it is already finished!")
+    (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
     (let [result (allow-receive channel)]
       (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label)
-            (println "Atomic receive communication invalid!"))
+            (log-error :incorrect-communication "Atomic receive communication invalid!"))
           (apply-interaction (get-monitor channel) (get-provider channel) (get-consumer channel) label)
           result))))
 
