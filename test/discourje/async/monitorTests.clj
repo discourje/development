@@ -93,6 +93,7 @@
         i110 (nth branch1 0)
         i111 (nth branch1 1)
         i2 (nth (:interactions mon) 2)]
+    (println (:interactions mon))
     (is (= (get-next i0) (get-id i1)))
     (is (= (get-next i1) (get-id i2)))
     (is (= (get-next i100) (get-id i101)))
@@ -179,7 +180,7 @@
 (deftest apply-atomic-test
   (let [mon (generate-monitor (testDualProtocol))
         message (->message "1" "hello world")]
-    (receive-interaction mon (get-label message) "B")
+    (apply-interaction mon "A" "B" (get-label message))
     (is (= "2" (get-action (get-active-interaction mon))))
     (is (= "B" (get-sender (get-active-interaction mon))))
     (is (= "A" (get-receivers (get-active-interaction mon))))))

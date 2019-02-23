@@ -42,7 +42,7 @@
                                 [(-->> "hi" "A" "C")]]
                                )]))
 
-(defn single-choice-in-middle-protocol []
+(defn  single-choice-in-middle-protocol []
   (create-protocol [(-->> "99" "Start" "Finish")
                     (branch-on [
                                 [(-->> "1" "A" "B")

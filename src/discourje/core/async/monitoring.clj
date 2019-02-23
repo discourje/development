@@ -28,16 +28,25 @@
                      :else (do (log-error :unsupported-operation "Not supported type!") false)))
              interactions))))
 
+
+(defn- find-nested-next
+  "Finds the next interaction based on id, nested in choices"
+  [id interactions]
+  (first (filter some? (for [inter interactions]
+                         (cond (satisfies? interactable inter) (when (= (get-id inter) id) inter)
+                               (satisfies? branch inter) (let [branches (:branches inter)
+                                                               searches (for [b branches] (find-nested-next id b))]
+                                                           (first searches))
+                               :else (do (log-error :unsupported-operation "Not supported type!") nil)))
+                 )))
+
 (defn- swap-next-interaction-by-id!
   "Get the next interaction with next id already given"
   [id interactions]
   (fn [active-interaction]
-    (first (filter
-             (fn [inter]
-               (cond (satisfies? interactable active-interaction) (= (get-id inter) id)
-                     (satisfies? branch active-interaction) (swap-next-interaction-by-id! id interactions)
-                     :else (do (log-error :unsupported-operation "Not supported type!") false)))
-             interactions))))
+    (let [nested-id-search (find-nested-next id interactions)]
+      (println "nest-id" nested-id-search)
+      nested-id-search)))
 
 (defn- multiple-receivers?
   "Does the monitor have multiple receivers?"
@@ -83,18 +92,19 @@
 (defn get-first-valid-target-branch-interaction
   "Find the first interactable in (nested) branch constructs."
   [sender receiver label active-interaction]
-  (first (filter (fn [branch]
-                   (let [inter (nth branch 0)]
-                     (cond
-                       (satisfies? interactable inter) (and (= (:action inter) label) (= (:receivers inter) receiver) (= (:sender inter) sender))
-                       (satisfies? branch inter) (get-first-valid-target-branch-interaction active-interaction label sender receiver)
-                       :else (log-error :unsupported-operation "Not supported get nested branch!"))))
-                 (:branches active-interaction))))
+  (first (first (filter (fn [branch]
+                          (let [inter (nth branch 0)]
+                            (cond
+                              (satisfies? interactable inter) (and (= (:action inter) label) (= (:receivers inter) receiver) (= (:sender inter) sender))
+                              (satisfies? branch inter) (get-first-valid-target-branch-interaction active-interaction label sender receiver)
+                              :else (log-error :unsupported-operation "Not supported get nested branch!"))))
+                        (:branches active-interaction)))))
 
 (defn- swap-active-interaction-by-branch
   "Swap active interaction by branch"
   [sender receivers label active-interaction interactions]
   (let [target-interaction (get-first-valid-target-branch-interaction sender receivers label @active-interaction)]
+    (println (format "Target interaction sender %s receivers %s action %s next %s" (:sender target-interaction) (:receivers target-interaction) (:action target-interaction) (:next target-interaction)))
     (if (multiple-receivers? target-interaction)
       (remove-receiver-from-branch active-interaction target-interaction receivers)
       (swap! active-interaction (swap-next-interaction-by-id! (:next target-interaction) interactions)))))
@@ -119,8 +129,8 @@
 (defn- is-valid-interaction?
   "Is the given interaction valid compared to the active-interaction of the monitor"
   [sender receivers label active-interaction]
-  (log-message (format "input = %s %s %s" sender receivers label))
-  (log-message (format "active  = %s %s %s" (:sender active-interaction) (:receivers active-interaction) (:action active-interaction)))
+  ;(log-message (format "input = %s %s %s" sender receivers label))
+  ;(log-message (format "active  = %s %s %s" (:sender active-interaction) (:receivers active-interaction) (:action active-interaction)))
   (and
     (and (if (instance? Seqable label)
            (or (contains-value? (:action active-interaction) label) (= label (:action active-interaction)))
