@@ -74,6 +74,23 @@
                                )
                     (-->> "Done" "A" "End")]))
 
+(defn single-choice-multiple-interactions-protocol
+  (create-protocol [(-->> "1" "A" "B")
+                    (-->> "1" "B" "A")
+                    (branch-on [
+                                [(-->> "2" "A" "C")
+                                 (-->> "2" "C" "A")
+                                 (-->> "3" "A" "C")
+                                 (-->> "3" "C" "A")]
+                                [(-->> "2" "A" "B")
+                                 (-->> "2" "B" "A")
+                                 (-->> "3" "A" "B")
+                                 (-->> "3" "B" "A")]])
+                    (-->> "4" "A" "D")
+                    (-->> "4" "D" "A")
+                    (-->> "5" "A" ["B" "C" "D"])
+                    ]))
+
 (defn single-nested-choice-branch-protocol []
   (create-protocol [(branch-on [
                                 [(-->> "1" "A" "B")]
