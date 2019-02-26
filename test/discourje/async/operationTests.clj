@@ -116,7 +116,7 @@
               (is (= "88" (get-label f->s)))
               (is (= "ending!" (get-content f->s))))))))))
 
-(defn send-receive-single-choice-multiple-interactions-protocol-test
+(deftest send-receive-single-choice-multiple-interactions-protocol-test
   (let [channels (generate-infrastructure (single-choice-multiple-interactions-protocol))
         ab (get-channel "A" "B" channels)
         ba (get-channel "B" "A" channels)
@@ -131,19 +131,39 @@
         m5 (->message "5" "bye all")]
     (do (>!!! ab mab1)
         (let [a->b (<!!! ab "1")]
+          (is (= "1" (get-label a->b)))
+          (is (= "1ab" (get-content a->b)))
           (>!!! ba mab1)
           (let [b->a (<!!! ba "1")]
+            (is (= "1" (get-label b->a)))
+            (is (= "1ab" (get-content b->a)))
             (>!!! ac mab-c2)
             (let [a->c (<!!! ac "2")]
+              (is (= "2" (get-label a->c)))
+              (is (= "B or C" (get-content a->c)))
               (>!!! ca mab-c2)
               (let [c->a (<!!! ca "2")]
+                (is (= "2" (get-label c->a)))
+                (is (= "B or C" (get-content c->a)))
                 (>!!! ac mab-c3)
                 (let [a->c3 (<!!! ca "3")]
+                  (is (= "3" (get-label a->c3)))
+                  (is (= "B or C" (get-content a->c3)))
                   (>!!! ad mad)
                   (let [a->d (<!!! ad "4")]
+                    (is (= "4" (get-label a->d)))
+                    (is (= "4d" (get-content a->d)))
                     (>!!! da mad)
                     (let [d->a (<!!! da "4")]
+                      (is (= "4" (get-label d->a)))
+                      (is (= "4d" (get-content d->a)))
                       (>!!! [ab ac ad] m5)
                       (let [a->b5 (<!!! ab "5")
                             a->c5 (<!!! ac "5")
-                            a->d5 (<!!! ad "5")])))))))))))
+                            a->d5 (<!!! ad "5")]
+                        (is (= "5" (get-label a->b5)))
+                        (is (= "bye all" (get-content a->b5)))
+                        (is (= "5" (get-label a->c5)))
+                        (is (= "bye all" (get-content a->c5)))
+                        (is (= "5" (get-label a->d5)))
+                        (is (= "bye all" (get-content a->d5))))))))))))))
