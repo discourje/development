@@ -79,6 +79,8 @@
   ([interactions helper-vec linked-interactions]
    (do (doseq [inter interactions]
          (cond
+           (satisfies? recursable inter)
+           (println "found recursable")
            (satisfies? branch inter)
                (let [branched-interactions
                      (for [branch (get-branches inter)]
