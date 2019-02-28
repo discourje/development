@@ -181,6 +181,20 @@
     (is (= (get-next i0b1b0b0b12) (get-id i1)))
     ))
 
+(deftest single-recur-protocol-monitor-test
+  (let [mon (generate-monitor (single-recur-protocol))]
+    (is (= 3 (count (:interactions mon))))))
+
+(deftest single-recur-protocol-ids-test
+  (let [mon (generate-monitor (single-recur-protocol))
+        i0 (nth (:interactions mon) 0)
+        i1 (nth (:interactions mon) 1)
+        i2 (nth (:interactions mon) 2)]
+    (is (= (get-next i0) (get-id i1)))
+    (is (= (get-next i1) nil))
+    (is (= (get-next i2) nil))))
+
+
 (deftest apply-atomic-test
   (let [mon (generate-monitor (testDualProtocol))
         message (->message "1" "hello world")]
