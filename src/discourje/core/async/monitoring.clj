@@ -34,9 +34,11 @@
   [id interactions]
   (first (filter some? (for [inter interactions]
                          (cond (satisfies? interactable inter) (when (= (get-id inter) id) inter)
-                               (satisfies? branch inter) (let [branches (:branches inter)
-                                                               searches (for [b branches] (find-nested-next id b))]
-                                                           (first searches))
+                               (satisfies? branch inter) (if (= id (get-id inter))
+                                                           inter
+                                                           (let [branches (:branches inter)
+                                                                 searches (for [b branches] (find-nested-next id b))]
+                                                             (first searches)))
                                :else (do (log-error :unsupported-operation "Not supported type!") nil)))
                  )))
 
@@ -85,9 +87,9 @@
      (swap-active-interaction-by-atomic active-interaction interactions)
      (if (multiple-receivers? @active-interaction)
        (remove-receiver active-interaction receiver)
-       (swap! active-interaction (swap-next-interaction! interactions)))))
+       (swap! active-interaction (swap-next-interaction-by-id! (get-next @active-interaction) interactions)))))
   ([active-interaction interactions]
-   ((swap! active-interaction (swap-next-interaction! interactions)))))
+   ((swap! active-interaction (swap-next-interaction-by-id! (get-next @active-interaction) interactions)))))
 
 (defn get-first-valid-target-branch-interaction
   "Find the first interactable in (nested) branch constructs."
@@ -96,7 +98,7 @@
                           (let [inter (nth branch 0)]
                             (cond
                               (satisfies? interactable inter) (and (= (:action inter) label) (= (:receivers inter) receiver) (= (:sender inter) sender))
-                              (satisfies? branch inter) (get-first-valid-target-branch-interaction active-interaction label sender receiver)
+                              (satisfies? branch inter) (get-first-valid-target-branch-interaction sender receiver label inter)
                               :else (log-error :unsupported-operation "Not supported get nested branch!"))))
                         (:branches active-interaction)))))
 

@@ -53,28 +53,28 @@
           (is (= "2" (get-label b->a)))
           (is (= "B->A" (get-content b->a)))
           (>!!! ac (->message "3" "A->C"))
-          (let [a->c (<!!! ca "3")]
+          (let [a->c (<!!! ac "3")]
             (is (= "3" (get-label a->c)))
-            (is (= "B->C" (get-content a->c)))
-          (>!!! [ca cb] (->message "4" "C->A-B"))
-          (let [c->a (<!!! ca "4")
-                c->b (<!!! cb "4")]
-            (is (= "4" (get-label c->a)))
-            (is (= "C->A-B" (get-content c->a)))
-          (is (= "4" (get-label c->b)))
-          (is (= "C->A-B" (get-content c->b))))))))))
+            (is (= "A->C" (get-content a->c)))
+            (>!!! [ca cb] (->message "4" "C->A-B"))
+            (let [c->a (<!!! ca "4")
+                  c->b (<!!! cb "4")]
+              (is (= "4" (get-label c->a)))
+              (is (= "C->A-B" (get-content c->a)))
+              (is (= "4" (get-label c->b)))
+              (is (= "C->A-B" (get-content c->b))))))))))
 
-(deftest send-receive-quad-protocol-test
-  (let [channels (generate-infrastructure (testQuadProtocol))
-        mainA (get-channel "main" "A" channels)
-        mainB (get-channel "main" "B" channels)
-        mainC (get-channel "main" "C" channels)
-        ab (get-channel "A" "B" channels)
-        ba (get-channel "B" "A" channels)
-        ac (get-channel "A" "C" channels)
-        ca (get-channel "C" "A" channels)
-        cb (get-channel "C" "B" channels)
-        ]))
+;(deftest send-receive-quad-protocol-test
+;  (let [channels (generate-infrastructure (testQuadProtocol))
+;        mainA (get-channel "main" "A" channels)
+;        mainB (get-channel "main" "B" channels)
+;        mainC (get-channel "main" "C" channels)
+;        ab (get-channel "A" "B" channels)
+;        ba (get-channel "B" "A" channels)
+;        ac (get-channel "A" "C" channels)
+;        ca (get-channel "C" "A" channels)
+;        cb (get-channel "C" "B" channels)
+;        ]))
 
 (deftest send-receive-single-parallel-test
   (let [channels (generate-infrastructure (testSingleParallelProtocol))
@@ -186,24 +186,28 @@
                 (is (= "2" (get-label c->a)))
                 (is (= "B or C" (get-content c->a)))
                 (>!!! ac mab-c3)
-                (let [a->c3 (<!!! ca "3")]
+                (let [a->c3 (<!!! ac "3")]
                   (is (= "3" (get-label a->c3)))
                   (is (= "B or C" (get-content a->c3)))
-                  (>!!! ad mad)
-                  (let [a->d (<!!! ad "4")]
-                    (is (= "4" (get-label a->d)))
-                    (is (= "4d" (get-content a->d)))
-                    (>!!! da mad)
-                    (let [d->a (<!!! da "4")]
-                      (is (= "4" (get-label d->a)))
-                      (is (= "4d" (get-content d->a)))
-                      (>!!! [ab ac ad] m5)
-                      (let [a->b5 (<!!! ab "5")
-                            a->c5 (<!!! ac "5")
-                            a->d5 (<!!! ad "5")]
-                        (is (= "5" (get-label a->b5)))
-                        (is (= "bye all" (get-content a->b5)))
-                        (is (= "5" (get-label a->c5)))
-                        (is (= "bye all" (get-content a->c5)))
-                        (is (= "5" (get-label a->d5)))
-                        (is (= "bye all" (get-content a->d5))))))))))))))
+                  (>!!! ca mab-c3)
+                  (let [c->a3 (<!!! ca "3")]
+                    (is (= "3" (get-label c->a3)))
+                    (is (= "B or C" (get-content c->a3)))
+                    (>!!! ad mad)
+                    (let [a->d (<!!! ad "4")]
+                      (is (= "4" (get-label a->d)))
+                      (is (= "4d" (get-content a->d)))
+                      (>!!! da mad)
+                      (let [d->a (<!!! da "4")]
+                        (is (= "4" (get-label d->a)))
+                        (is (= "4d" (get-content d->a)))
+                        (>!!! [ab ac ad] m5)
+                        (let [a->b5 (<!!! ab "5")
+                              a->c5 (<!!! ac "5")
+                              a->d5 (<!!! ad "5")]
+                          (is (= "5" (get-label a->b5)))
+                          (is (= "bye all" (get-content a->b5)))
+                          (is (= "5" (get-label a->c5)))
+                          (is (= "bye all" (get-content a->c5)))
+                          (is (= "5" (get-label a->d5)))
+                          (is (= "bye all" (get-content a->d5)))))))))))))))
