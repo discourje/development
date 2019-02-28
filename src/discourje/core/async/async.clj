@@ -31,7 +31,7 @@
   "Creates an interaction object specifying sending action from sender to receiver."
   (->interaction (uuid/v1) action sender receiver nil))
 
-(defn branch-on
+(defn make-choice
   "Create a choice interaction"
   [branches]
   (->choice (uuid/v1) branches nil))
