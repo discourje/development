@@ -36,6 +36,21 @@
   [branches]
   (->choice (uuid/v1) branches nil))
 
+(defn recur
+  "Generate recursion"
+  [name recursion]
+  (->recursion (uuid/v1) name recursion nil))
+
+(defn end-recur
+  "end a recursion"
+  [name]
+  (->recur-identifier (uuid/v1) name :end nil))
+
+(defn do-recur
+  "do recur to start of recursion"
+  [name]
+  (->recur-identifier (uuid/v1) name :recur nil))
+
 (defn create-protocol [interactions]
   "Generate protocol based on interactions"
   (->protocol interactions))

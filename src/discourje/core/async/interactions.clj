@@ -33,6 +33,35 @@
   linkable
   (get-next [this] next))
 
+(defprotocol namable
+  (get-name [this]))
+
+(defprotocol recursable
+  (get-recursion [this]))
+
+(defrecord recursion [id name recursion next]
+  idable
+  (get-id [this] id)
+  namable
+  (get-name [this] name)
+  recursable
+  (get-recursion [this] recursion)
+  linkable
+  (get-next [this] next))
+
+(defprotocol identifiable-recur
+  (get-option [this]))
+
+(defrecord recur-identifier [id name option next]
+  idable
+  (get-id [this] id)
+  namable
+  (get-name [this] name)
+  identifiable-recur
+  (get-option [this] option)
+  linkable
+  (get-next [this] next))
+
 (defn- find-all-roles
   "List all sender and receivers in the protocol"
   [protocol result]
