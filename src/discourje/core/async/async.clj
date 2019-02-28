@@ -36,7 +36,7 @@
   [branches]
   (->choice (uuid/v1) branches nil))
 
-(defn recur
+(defn make-recursion
   "Generate recursion"
   [name recursion]
   (->recursion (uuid/v1) name recursion nil))

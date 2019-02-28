@@ -32,3 +32,6 @@
 
 (deftest unique10-roles-multiple-nested-branch-choice-test
   (is (= 10 (count (get-distinct-roles (get-interactions (multiple-nested-branches-protocol)))))))
+
+(deftest unique3-roles-single-recur-test
+  (is (= 3 (count (get-distinct-roles (get-interactions (single-recur-protocol)))))))

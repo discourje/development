@@ -124,3 +124,18 @@
                                )
                     (-->> "Done" "A" "End")] ;i1
                    ))
+
+(defn single-recur-protocol []
+  (create-protocol [(-->> "1" "A" "B")
+                    (make-recursion :test [
+                                  (-->> "1" "B" "A")
+                                  (branch-on [
+                                              [(-->> "2" "A" "C")
+                                               (-->> "2" "C" "A")
+                                               (do-recur :test)]
+                                              [(-->> "3" "A" "B")
+                                               (end-recur :test)]
+                                              ])
+                                  ])
+                    (-->> "end" "A" ["B" "C"])
+                    ]))

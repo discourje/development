@@ -70,6 +70,8 @@
           (flatten
             (for [element protocol]
               (cond
+                (satisfies? discourje.core.async.async/recursable element)
+                (conj result2 (flatten (find-all-roles (:recursion element) result2)))
                 ;(instance? recursion element)
                 ;(flatten (vec (conj result2 (findAllParticipants (:protocol element) result2))))
                 (satisfies? discourje.core.async.async/branch element)
