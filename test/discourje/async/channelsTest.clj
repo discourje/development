@@ -78,3 +78,9 @@
   (let [roles (get-distinct-roles (get-interactions (multiple-nested-branches-protocol)))
         channels (generate-channels roles nil 1)]
     (is (= 90 (count channels)))))
+
+(deftest single-recur-protocol-roles-test
+  (let [roles (get-distinct-roles (get-interactions (single-recur-protocol)))
+        channels (generate-channels roles nil 1)]
+    (is (= 6 (count channels)))))
+
