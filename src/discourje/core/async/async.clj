@@ -70,6 +70,9 @@
                         (replace-last-in-vec b (assoc-next-nested-choice (last b) inter))
                         (replace-last-in-vec b (assoc (last b) :next (get-id inter))))))))
 
+(defn assoc-next-nested-do-recur[])
+(defn assoc-next-nested-end-recur[])
+
 (defn- link-interactions
   ([protocol]
    (let [interactions (get-interactions protocol)
@@ -80,7 +83,20 @@
    (do (doseq [inter interactions]
          (cond
            (satisfies? recursable inter)
-           (println "found recursable")
+           (let [recured-interactions
+                 (for [recursion (get-recursion inter)]
+                   (let [recursion-help-vec (atom [])
+                         linked-recursion-interactions (atom [])]
+                     (link-interactions recursion recursion-help-vec linked-recursion-interactions)))
+                 last-helper-mon (last @helper-vec)
+                 linked-i (if (nil? last-helper-mon) nil (assoc last-helper-mon :next (get-id inter)))
+                 new-recursion (->recursion (get-id inter) (get-name inter) recured-interactions nil)]
+             (swap! helper-vec conj new-recursion)
+             (when-not (nil? last-helper-mon)
+               (if  (satisfies? branch linked-i)
+                 (swap! linked-interactions conj (assoc-next-nested-choice linked-i inter));(assoc linked-i :branches (vec (for [b (get-branches linked-i)] (replace-last-in-vec b (assoc (last b) :next (get-id inter)))))))
+                 (swap! linked-interactions conj linked-i)))
+             )
            (satisfies? branch inter)
                (let [branched-interactions
                      (for [branch (get-branches inter)]
@@ -97,7 +113,7 @@
                    (swap! linked-interactions conj linked-i)))
                  )
            (empty? @helper-vec) (swap! helper-vec conj inter)
-           (satisfies? interactable inter) (let [i (last @helper-vec)
+           (or (satisfies? interactable inter)(satisfies? identifiable-recur inter)) (let [i (last @helper-vec)
                                                  linked-i (assoc i :next (get-id inter))]
                                              (swap! helper-vec conj inter)
                                              (if (satisfies? branch linked-i)
