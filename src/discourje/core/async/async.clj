@@ -84,25 +84,23 @@
 
 (defn- replace-nested-recur
   [name id option interactions]
-  (let [prot (for [inter interactions]
-               (cond (satisfies? identifiable-recur inter) (when (and (= (get-name inter) name) (= (get-option option))) (assoc inter :next id))
+  (let [prot (vec (for [inter interactions]
+               (cond (satisfies? identifiable-recur inter) (when (and (= (get-name inter) name) (= (get-option inter) option)) (assoc inter :next id))
                      (satisfies? branch inter) (let [branches (get-branches inter)
-                                                     searches (for [b branches] (find-nested-recur name option b))]
-                                                 (assoc inter :branches searches))
-                     (satisfies? recursable inter) (assoc inter :recursion (find-nested-recur name option (get-recursion inter)))
-                     :else inter
-                     ))]
-    prot))
+                                                     searches (for [b branches] (replace-nested-recur name id  option b))]
+                                                 (assoc inter :branches (vec searches) ))
+                     (satisfies? recursable inter) (assoc inter :recursion (replace-nested-recur name id option (get-recursion inter)))
+                     :else inter)))]
+    (vec prot)))
 
 
 (defn assoc-next-nested-do-recur
   "Link do-recur"
-  [linked-i current-inter linked-interactions]
+  [linked-i]
   (let [name (get-name linked-i)
-        target-recursion (find-nested-recur name :recur @linked-interactions)
-        linked-target-recursion (assoc target-recursion :next (get-id linked-i))
-        prot (replace-nested-recur name (get-id linked-i) :recur @linked-interactions)]
-      (println "assoc DO-RECUR_ " prot)
+        prot (vec (replace-nested-recur name (get-id linked-i) :recur (get-recursion linked-i))) ]
+      (println "assoc DO-RECUR_ "  prot)
+      prot
   )
   )
 
@@ -134,7 +132,7 @@
              (when-not (nil? last-helper-mon)
                (cond
                  (satisfies? branch linked-i) (swap! linked-interactions conj (assoc-next-nested-choice linked-i inter))
-                 (satisfies? recursable linked-i) (let [recured-linked-i (assoc-next-nested-do-recur linked-i inter linked-interactions)
+                 (satisfies? recursable linked-i) (let [recured-linked-i (assoc-next-nested-do-recur linked-i)
                                                         ended-linked-i (assoc-next-nested-end-recur recured-linked-i inter linked-interactions)]
                                                     (swap! linked-interactions conj ended-linked-i))
                  :else (swap! linked-interactions conj linked-i)))
@@ -152,7 +150,7 @@
              (when-not (nil? last-helper-mon)
                (cond
                  (satisfies? branch linked-i) (swap! linked-interactions conj (assoc-next-nested-choice linked-i inter))
-                 (satisfies? recursable linked-i) (let [recured-linked-i (assoc-next-nested-do-recur linked-i inter linked-interactions)
+                 (satisfies? recursable linked-i) (let [recured-linked-i (assoc-next-nested-do-recur linked-i)
                                                         ended-linked-i (assoc-next-nested-end-recur recured-linked-i inter linked-interactions)]
                                                     (swap! linked-interactions conj ended-linked-i))
                  :else (swap! linked-interactions conj linked-i)))
@@ -164,7 +162,7 @@
              (swap! helper-vec conj inter)
              (cond
                (satisfies? branch linked-i) (swap! linked-interactions conj (assoc-next-nested-choice linked-i inter))
-               (satisfies? recursable linked-i) (let [recured-linked-i (assoc-next-nested-do-recur linked-i inter linked-interactions)
+               (satisfies? recursable linked-i) (let [recured-linked-i (assoc-next-nested-do-recur linked-i)
                                                       ended-linked-i (assoc-next-nested-end-recur recured-linked-i inter linked-interactions)]
                                                   (swap! linked-interactions conj ended-linked-i))
                :else (swap! linked-interactions conj linked-i)))))

@@ -183,7 +183,7 @@
 
 (deftest single-recur-protocol-monitor-test
   (let [mon (generate-monitor (single-recur-protocol))]
-    (println (:interactions mon))
+    ;   (println (:interactions mon))
     (is (= 3 (count (:interactions mon))))))
 
 (deftest single-recur-protocol-ids-test
