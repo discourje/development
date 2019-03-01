@@ -126,16 +126,16 @@
                    ))
 
 (defn single-recur-protocol []
-  (create-protocol [(-->> "1" "A" "B")
-                    (make-recursion :test [
-                                  (-->> "1" "B" "A")
-                                  (make-choice [
-                                              [(-->> "2" "A" "C")
-                                               (-->> "2" "C" "A")
-                                               (do-recur :test)]
-                                              [(-->> "3" "A" "B")
-                                               (end-recur :test)]
+  (create-protocol [(-->> "1" "A" "B") ;i0
+                    (make-recursion :test [  ;i1
+                                  (-->> "1" "B" "A") ; i1r0
+                                  (make-choice [      ;i1r1
+                                              [(-->> "2" "A" "C")   ;i1r1b00
+                                               (-->> "2" "C" "A")   ;i1r1b01
+                                               (do-recur :test)]    ;i1r1b02
+                                              [(-->> "3" "A" "B")   ;i1r1b10
+                                               (end-recur :test)]   ;i1r1b11
                                               ])
                                   ])
-                    (-->> "end" "A" ["B" "C"])
+                    (-->> "end" "A" ["B" "C"]) ; i2
                     ]))

@@ -70,8 +70,49 @@
                         (replace-last-in-vec b (assoc-next-nested-choice (last b) inter))
                         (replace-last-in-vec b (assoc (last b) :next (get-id inter))))))))
 
-(defn assoc-next-nested-do-recur[])
-(defn assoc-next-nested-end-recur[])
+(defn- find-nested-recur
+  "Finds the next interaction based on id, nested in choices"
+  [name option interactions]
+  (first (filter some? (for [inter interactions]
+                         (cond (satisfies? identifiable-recur inter) (when (and (= (get-name inter) name) (= (get-option option))) inter)
+                               (satisfies? branch inter) (let [branches (get-branches inter)
+                                                               searches (for [b branches] (find-nested-recur name option b))]
+                                                           (first searches))
+                               (satisfies? recursable inter) (first (find-nested-recur name option (get-recursion inter)))
+                               ))
+                 )))
+
+(defn- replace-nested-recur
+  [name id option interactions]
+  (let [prot (for [inter interactions]
+               (cond (satisfies? identifiable-recur inter) (when (and (= (get-name inter) name) (= (get-option option))) (assoc inter :next id))
+                     (satisfies? branch inter) (let [branches (get-branches inter)
+                                                     searches (for [b branches] (find-nested-recur name option b))]
+                                                 (assoc inter :branches searches))
+                     (satisfies? recursable inter) (assoc inter :recursion (find-nested-recur name option (get-recursion inter)))
+                     :else inter
+                     ))]
+    prot))
+
+
+(defn assoc-next-nested-do-recur
+  "Link do-recur"
+  [linked-i current-inter linked-interactions]
+  (let [name (get-name linked-i)
+        target-recursion (find-nested-recur name :recur @linked-interactions)
+        linked-target-recursion (assoc target-recursion :next (get-id linked-i))
+        prot (replace-nested-recur name (get-id linked-i) :recur @linked-interactions)]
+      (println "assoc DO-RECUR_ " prot)
+  )
+  )
+
+(defn assoc-next-nested-end-recur
+  "Link end recur"
+  [linked-i current-inter linked-interactions]
+  (let [name (get-name linked-i)
+        prot (replace-nested-recur name (get-id current-inter) :end @linked-interactions)]
+    (println "assoc END-RECUR_ "prot)
+    ))
 
 (defn- link-interactions
   ([protocol]
@@ -83,42 +124,50 @@
    (do (doseq [inter interactions]
          (cond
            (satisfies? recursable inter)
-           (let [recured-interactions
-                 (for [recursion (get-recursion inter)]
-                   (let [recursion-help-vec (atom [])
-                         linked-recursion-interactions (atom [])]
-                     (link-interactions recursion recursion-help-vec linked-recursion-interactions)))
+           (let [recursion-help-vec (atom [])
+                 linked-recursion-interactions (atom [])
+                 recured-interactions (link-interactions (get-recursion inter) recursion-help-vec linked-recursion-interactions)
                  last-helper-mon (last @helper-vec)
                  linked-i (if (nil? last-helper-mon) nil (assoc last-helper-mon :next (get-id inter)))
                  new-recursion (->recursion (get-id inter) (get-name inter) recured-interactions nil)]
              (swap! helper-vec conj new-recursion)
              (when-not (nil? last-helper-mon)
-               (if  (satisfies? branch linked-i)
-                 (swap! linked-interactions conj (assoc-next-nested-choice linked-i inter));(assoc linked-i :branches (vec (for [b (get-branches linked-i)] (replace-last-in-vec b (assoc (last b) :next (get-id inter)))))))
-                 (swap! linked-interactions conj linked-i)))
+               (cond
+                 (satisfies? branch linked-i) (swap! linked-interactions conj (assoc-next-nested-choice linked-i inter))
+                 (satisfies? recursable linked-i) (let [recured-linked-i (assoc-next-nested-do-recur linked-i inter linked-interactions)
+                                                        ended-linked-i (assoc-next-nested-end-recur recured-linked-i inter linked-interactions)]
+                                                    (swap! linked-interactions conj ended-linked-i))
+                 :else (swap! linked-interactions conj linked-i)))
              )
            (satisfies? branch inter)
-               (let [branched-interactions
-                     (for [branch (get-branches inter)]
-                       (let [branch-help-vec (atom [])
-                             linked-branch-interactions (atom [])]
-                         (link-interactions branch branch-help-vec linked-branch-interactions)))
-                     last-helper-mon (last @helper-vec)
-                     linked-i (if (nil? last-helper-mon) nil (assoc last-helper-mon :next (get-id inter)))
-                     new-choice (->choice (get-id inter) branched-interactions nil)]
-                 (swap! helper-vec conj new-choice)
-                 (when-not (nil? last-helper-mon)
-                 (if  (satisfies? branch linked-i)
-                   (swap! linked-interactions conj (assoc-next-nested-choice linked-i inter));(assoc linked-i :branches (vec (for [b (get-branches linked-i)] (replace-last-in-vec b (assoc (last b) :next (get-id inter)))))))
-                   (swap! linked-interactions conj linked-i)))
-                 )
+           (let [branched-interactions
+                 (for [branch (get-branches inter)]
+                   (let [branch-help-vec (atom [])
+                         linked-branch-interactions (atom [])]
+                     (link-interactions branch branch-help-vec linked-branch-interactions)))
+                 last-helper-mon (last @helper-vec)
+                 linked-i (if (nil? last-helper-mon) nil (assoc last-helper-mon :next (get-id inter)))
+                 new-choice (->choice (get-id inter) branched-interactions nil)]
+             (swap! helper-vec conj new-choice)
+             (when-not (nil? last-helper-mon)
+               (cond
+                 (satisfies? branch linked-i) (swap! linked-interactions conj (assoc-next-nested-choice linked-i inter))
+                 (satisfies? recursable linked-i) (let [recured-linked-i (assoc-next-nested-do-recur linked-i inter linked-interactions)
+                                                        ended-linked-i (assoc-next-nested-end-recur recured-linked-i inter linked-interactions)]
+                                                    (swap! linked-interactions conj ended-linked-i))
+                 :else (swap! linked-interactions conj linked-i)))
+             )
            (empty? @helper-vec) (swap! helper-vec conj inter)
-           (or (satisfies? interactable inter)(satisfies? identifiable-recur inter)) (let [i (last @helper-vec)
-                                                 linked-i (assoc i :next (get-id inter))]
-                                             (swap! helper-vec conj inter)
-                                             (if (satisfies? branch linked-i)
-                                               (swap! linked-interactions conj (assoc-next-nested-choice linked-i inter));)(assoc linked-i :branches (vec (for [b (get-branches linked-i)] (replace-last-in-vec b (assoc (last b) :next (get-id inter)))))))
-                                               (swap! linked-interactions conj linked-i)))))
+           (or (satisfies? interactable inter) (satisfies? identifiable-recur inter))
+           (let [i (last @helper-vec)
+                 linked-i (assoc i :next (get-id inter))]
+             (swap! helper-vec conj inter)
+             (cond
+               (satisfies? branch linked-i) (swap! linked-interactions conj (assoc-next-nested-choice linked-i inter))
+               (satisfies? recursable linked-i) (let [recured-linked-i (assoc-next-nested-do-recur linked-i inter linked-interactions)
+                                                      ended-linked-i (assoc-next-nested-end-recur recured-linked-i inter linked-interactions)]
+                                                  (swap! linked-interactions conj ended-linked-i))
+               :else (swap! linked-interactions conj linked-i)))))
        (swap! linked-interactions conj (last @helper-vec)))
    @linked-interactions))
 
@@ -172,7 +221,7 @@
           ;(apply-interaction monitor (get-label message))
           (allow-sends channel message)))
     (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label message))
-          (log-error :incorrect-communication  "Atomic-send communication invalid!"))
+          (log-error :incorrect-communication "Atomic-send communication invalid!"))
         ; (apply-interaction (get-monitor channel) (get-label message))
         (allow-send channel message))))
 ;)
