@@ -68,7 +68,9 @@
                     (for [b (get-branches linked-i)]
                       (if (satisfies? branch (last b))
                         (replace-last-in-vec b (assoc-next-nested-choice (last b) inter))
-                        (replace-last-in-vec b (assoc (last b) :next (get-id inter))))))))
+                        (if-not (satisfies? identifiable-recur (last b))
+                          (replace-last-in-vec b (assoc (last b) :next (get-id inter)))
+                          b))))))
 
 (defn- find-nested-recur
   "Finds the next interaction based on id, nested in choices"

@@ -207,6 +207,45 @@
     (is (= (get-next i1) (get-id i2)))
     (is (= (get-next i2) nil))))
 
+(deftest nested-recur-protocol-monitor-test
+  (let [mon (generate-monitor (nested-recur-protocol))]
+    (is (= 2 (count (:interactions mon))))))
+
+(deftest nested-recur-protocol-ids-test
+  (let [mon (generate-monitor (nested-recur-protocol))
+        i0 (nth (:interactions mon) 0)
+        i0r0 (nth (:recursion i0) 0)
+        i0r0i0 (nth (:recursion i0r0) 0)
+        i0r0i1 (nth (:recursion i0r0) 1)
+        i0r0i1b00 (nth (nth (:branches i0r0i1)0)0)
+        i0r0i1b01 (nth (nth (:branches i0r0i1)0)1)
+        i0r0i1b02 (nth (nth (:branches i0r0i1)0)2)
+        i0r0i1b10 (nth (nth (:branches i0r0i1)1)0)
+        i0r0i1b11 (nth (nth (:branches i0r0i1)1)1)
+        i0r0i2  (nth (:recursion i0r0) 2)
+        i0r0i2b00 (nth (nth (:branches i0r0i2)0)0)
+        i0r0i2b01 (nth (nth (:branches i0r0i2)0)1)
+        i0r0i2b02 (nth (nth (:branches i0r0i2)0)2)
+        i0r0i2b10 (nth (nth (:branches i0r0i2)1)0)
+        i0r0i2b11 (nth (nth (:branches i0r0i2)1)1)
+        i1 (nth (:interactions mon) 1)]
+    (println (:interactions mon))
+    (println i0r0i1b02)
+    (println i1)
+    (is (= (get-next i0) (get-id i1)))
+    (is (= (get-next i0r0i0) (get-id i0r0i1)))
+    (is (= (get-next i0r0i1b00) (get-id i0r0i1b01)))
+    (is (= (get-next i0r0i1b01) (get-id i0r0i1b02)))
+    (is (= (get-next i0r0i1b02) (get-id i0r0)))
+    (is (= (get-next i0r0i1b10) (get-id i0r0i1b11)))
+    (is (= (get-next i0r0i1b11) (get-id i0r0i2)))
+
+    (is (= (get-next i0r0i2b00) (get-id i0r0i2b01)))
+    (is (= (get-next i0r0i2b01) (get-id i0r0i2b02)))
+    (is (= (get-next i0r0i2b02) (get-id i0)))
+    (is (= (get-next i0r0i2b10) (get-id i0r0i2b11)))
+    (is (= (get-next i0r0i2b11) (get-id i1)))
+    (is (= (get-next i1) nil))))
 
 (deftest apply-atomic-test
   (let [mon (generate-monitor (testDualProtocol))

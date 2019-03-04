@@ -38,39 +38,39 @@
 
 (defn single-choice-protocol []
   (create-protocol [(make-choice [
-                                [(-->> "1" "A" "B")]
-                                [(-->> "hi" "A" "C")]]
+                                  [(-->> "1" "A" "B")]
+                                  [(-->> "hi" "A" "C")]]
                                  )]))
 
-(defn  single-choice-in-middle-protocol []
+(defn single-choice-in-middle-protocol []
   (create-protocol [(-->> "99" "Start" "Finish")
                     (make-choice [
-                                [(-->> "1" "A" "B")
-                                 (-->> "bla" "B" "A")]
-                                [(-->> "2" "A" "C")
-                                 (-->> "hello" "C" "A")]]
+                                  [(-->> "1" "A" "B")
+                                   (-->> "bla" "B" "A")]
+                                  [(-->> "2" "A" "C")
+                                   (-->> "hello" "C" "A")]]
                                  )
                     (-->> "88" "Finish" "Start")]))
 
 (defn single-choice-5branches-protocol []
   (create-protocol [(make-choice [
-                                [(-->> "1" "A" "B")]
-                                [(-->> "1" "A" "C")]
-                                [(-->> "1" "A" "D")]
-                                [(-->> "1" "A" "E")]
-                                [(-->> "1" "A" "F")]
-                                ]
+                                  [(-->> "1" "A" "B")]
+                                  [(-->> "1" "A" "C")]
+                                  [(-->> "1" "A" "D")]
+                                  [(-->> "1" "A" "E")]
+                                  [(-->> "1" "A" "F")]
+                                  ]
                                  )
                     (-->> "Done" "A" "End")]))
 
 (defn dual-choice-protocol []
   (create-protocol [(make-choice [
-                                [(-->> "1" "A" "B")]
-                                [(-->> "hi" "A" "C")
-                                 (make-choice [
-                                             [(-->> "hiA" "C" "A")]
-                                             [(-->> "hiD" "C" "D")]]
-                                              )]]
+                                  [(-->> "1" "A" "B")]
+                                  [(-->> "hi" "A" "C")
+                                   (make-choice [
+                                                 [(-->> "hiA" "C" "A")]
+                                                 [(-->> "hiD" "C" "D")]]
+                                                )]]
                                  )
                     (-->> "Done" "A" "End")]))
 
@@ -78,14 +78,14 @@
   (create-protocol [(-->> "1" "A" "B")
                     (-->> "1" "B" "A")
                     (make-choice [
-                                [(-->> "2" "A" "C")
-                                 (-->> "2" "C" "A")
-                                 (-->> "3" "A" "C")
-                                 (-->> "3" "C" "A")]
-                                [(-->> "2" "A" "B")
-                                 (-->> "2" "B" "A")
-                                 (-->> "3" "A" "B")
-                                 (-->> "3" "B" "A")]])
+                                  [(-->> "2" "A" "C")
+                                   (-->> "2" "C" "A")
+                                   (-->> "3" "A" "C")
+                                   (-->> "3" "C" "A")]
+                                  [(-->> "2" "A" "B")
+                                   (-->> "2" "B" "A")
+                                   (-->> "3" "A" "B")
+                                   (-->> "3" "B" "A")]])
                     (-->> "4" "A" "D")
                     (-->> "4" "D" "A")
                     (-->> "5" "A" ["B" "C" "D"])
@@ -93,49 +93,73 @@
 
 (defn single-nested-choice-branch-protocol []
   (create-protocol [(make-choice [
-                                [(-->> "1" "A" "B")]
-                                [(make-choice [
-                                             [(-->> "1" "A" "C")]
-                                             [(-->> "1" "A" "D")]]
-                                              )]]
+                                  [(-->> "1" "A" "B")]
+                                  [(make-choice [
+                                                 [(-->> "1" "A" "C")]
+                                                 [(-->> "1" "A" "D")]]
+                                                )]]
                                  )
                     (-->> "Done" "A" "End")]))
 
 (defn multiple-nested-branches-protocol []
   (create-protocol [
-                    (make-choice [ ;i0
-                                [(make-choice [ ;i0b0
-                                             [(-->> "1" "A" "B") ;i0b0b00
-                                              (-->> "2" "B" "A")];i0b0b01
-                                             [(-->> "1" "A" "C")]];i0b0b10
-                                              )]
-                                [(make-choice [ ;i0b1
-                                             [(make-choice [ ;i0b1b0
-                                                          [(make-choice [ ;i0b1b0b0
-                                                                       [(-->> "1" "A" "D")] ;i0b1b0b0b00
-                                                                       [(-->> "1" "A" ["E" "F" "G"]) ;i0b1b0b0b10
-                                                                        (-->> "3" "F" "A")            ;i0b1b0b0b11
-                                                                        (-->> "4" "G" "A")]]          ;i0b1b0b0b12
-                                                                        )]
-                                                          [(-->> "1" "A" "H")]];i0b1b0b10
-                                                           )]
-                                             [(-->> "1" "A" "I")]];i0b1b11
-                                              )]]
+                    (make-choice [;i0
+                                  [(make-choice [;i0b0
+                                                 [(-->> "1" "A" "B") ;i0b0b00
+                                                  (-->> "2" "B" "A")] ;i0b0b01
+                                                 [(-->> "1" "A" "C")]] ;i0b0b10
+                                                )]
+                                  [(make-choice [;i0b1
+                                                 [(make-choice [;i0b1b0
+                                                                [(make-choice [;i0b1b0b0
+                                                                               [(-->> "1" "A" "D")] ;i0b1b0b0b00
+                                                                               [(-->> "1" "A" ["E" "F" "G"]) ;i0b1b0b0b10
+                                                                                (-->> "3" "F" "A") ;i0b1b0b0b11
+                                                                                (-->> "4" "G" "A")]] ;i0b1b0b0b12
+                                                                              )]
+                                                                [(-->> "1" "A" "H")]] ;i0b1b0b10
+                                                               )]
+                                                 [(-->> "1" "A" "I")]] ;i0b1b11
+                                                )]]
                                  )
-                    (-->> "Done" "A" "End")] ;i1
+                    (-->> "Done" "A" "End")]                ;i1
                    ))
 
 (defn single-recur-protocol []
-  (create-protocol [(-->> "1" "A" "B") ;i0
-                    (make-recursion :test [  ;i1
-                                  (-->> "1" "B" "A") ; i1r0
-                                  (make-choice [      ;i1r1
-                                              [(-->> "2" "A" "C")   ;i1r1b00
-                                               (-->> "2" "C" "A")   ;i1r1b01
-                                               (do-recur :test)]    ;i1r1b02
-                                              [(-->> "3" "A" "B")   ;i1r1b10
-                                               (end-recur :test)]   ;i1r1b11
-                                              ])
-                                  ])
-                    (-->> "end" "A" ["B" "C"]) ; i2
+  (create-protocol [(-->> "1" "A" "B")                      ;i0
+                    (make-recursion :test [;i1
+                                           (-->> "1" "B" "A") ; i1r0
+                                           (make-choice [;i1r1
+                                                         [(-->> "2" "A" "C") ;i1r1b00
+                                                          (-->> "2" "C" "A") ;i1r1b01
+                                                          (do-recur :test)] ;i1r1b02
+                                                         [(-->> "3" "A" "B") ;i1r1b10
+                                                          (end-recur :test)] ;i1r1b11
+                                                         ])
+                                           ])
+                    (-->> "end" "A" ["B" "C"])              ; i2
+                    ]))
+
+(defn nested-recur-protocol []
+  (create-protocol [(make-recursion :test [;i0
+                                           (make-recursion :nested [; i0r0
+                                                                    (-->> "1" "B" "A")  ;i0r0i0
+                                                                    (make-choice [;i0r0i1
+                                                                                  [(-->> "2" "A" "C") ;i0r0i1b00
+                                                                                   (-->> "2" "C" "A") ;i0r0i1b01
+                                                                                   (do-recur :nested)] ;i0r0i1b02
+                                                                                  [(-->> "3" "A" "B") ;i0r0i1b10
+                                                                                   (end-recur :nested)] ;i0r0i1b11
+                                                                                  ])
+                                                                    (make-choice [;i0r0i2
+                                                                                  [(-->> "2" "A" "C") ;i0r0i2b00
+                                                                                   (-->> "2" "C" "A") ;i0r0i2b01
+                                                                                   (do-recur :test)] ;i0r0i2b02
+                                                                                  [(-->> "3" "A" "B"); i0r0i2b10
+                                                                                   (end-recur :test)]  ;i0r0i2b11
+                                                                                  ])
+                                                                    ])]
+
+                                    )
+                    (-->> "end" "A" ["B" "C"])  ;i1
                     ]))
