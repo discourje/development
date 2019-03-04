@@ -85,7 +85,7 @@
 (defn- replace-nested-recur
   [name id option interactions]
   (let [prot (vec (for [inter interactions]
-               (cond (satisfies? identifiable-recur inter) (when (and (= (get-name inter) name) (= (get-option inter) option)) (assoc inter :next id))
+               (cond (satisfies? identifiable-recur inter) (if (and (= (get-name inter) name) (= (get-option inter) option)) (assoc inter :next id) inter)
                      (satisfies? branch inter) (let [branches (get-branches inter)
                                                      searches (for [b branches] (replace-nested-recur name id  option b))]
                                                  (assoc inter :branches (vec searches) ))
@@ -98,19 +98,15 @@
   "Link do-recur"
   [linked-i]
   (let [name (get-name linked-i)
-        prot (vec (replace-nested-recur name (get-id linked-i) :recur (get-recursion linked-i))) ]
-      (println "assoc DO-RECUR_ "  prot)
-      prot
-  )
-  )
+        prot (vec (replace-nested-recur name (get-id linked-i) :recur (get-recursion linked-i)))]
+    (assoc linked-i :recursion prot)))
 
 (defn assoc-next-nested-end-recur
   "Link end recur"
   [linked-i current-inter linked-interactions]
   (let [name (get-name linked-i)
-        prot (replace-nested-recur name (get-id current-inter) :end @linked-interactions)]
-    (println "assoc END-RECUR_ "prot)
-    ))
+        prot (vec (replace-nested-recur name (get-id current-inter) :end (get-recursion linked-i)))]
+    (assoc linked-i :recursion prot)))
 
 (defn- link-interactions
   ([protocol]
@@ -165,7 +161,8 @@
                (satisfies? recursable linked-i) (let [recured-linked-i (assoc-next-nested-do-recur linked-i)
                                                       ended-linked-i (assoc-next-nested-end-recur recured-linked-i inter linked-interactions)]
                                                   (swap! linked-interactions conj ended-linked-i))
-               :else (swap! linked-interactions conj linked-i)))))
+               :else (swap! linked-interactions conj linked-i)))
+           ))
        (swap! linked-interactions conj (last @helper-vec)))
    @linked-interactions))
 
