@@ -11,12 +11,23 @@
 (defn- check-atomic-interaction
   "Check the atomic interaction"
   [label active-interaction]
-  (= (get-action @active-interaction) label))
+  (= (get-action active-interaction) label))
 
 (defn- check-branch-interaction
   "Check the atomic interaction"
   [label active-interaction]
   (> (count (filter (fn [x] (= x label)) (flatten (for [b (:branches active-interaction)] (get-action (nth b 0)))))) 0))
+
+(defn- check-recursion-interaction
+  "Check the first element in a recursion interaction"
+  [label active-interaction]
+  (let [rec (get-recursion active-interaction)
+        first-interaction (first rec)]
+    (cond
+      (satisfies? interactable first-interaction) (check-atomic-interaction label first-interaction)
+      (satisfies? branch first-interaction) (check-branch-interaction label first-interaction)
+      (satisfies? recursable first-interaction) (check-recursion-interaction label first-interaction)
+      :else (log-error :unsupported-operation "No correct next recursion monitor found"))))
 
 (defn- swap-next-interaction!
   "Get the next interaction"
@@ -39,8 +50,13 @@
                                                            (let [branches (:branches inter)
                                                                  searches (for [b branches] (find-nested-next id b))]
                                                              (first searches)))
-                               ;(satisfies? recursable inter)
-                               :else (do (log-error :unsupported-operation "Not supported type!") nil)))
+                               (satisfies? recursable inter) (if (= id (get-id inter))
+                                                               inter
+                                                               (let [a (find-nested-next id (get-recursion inter))]
+                                                                 (println "RECCCC" (get-recursion inter))
+                                                                 (println "A = !! " a)a))
+                               (satisfies? identifiable-recur inter) (when (= (get-id inter) id) inter)
+                               :else (do (log-error :unsupported-operation "Not supported type!" inter) nil)))
                  )))
 
 (defn- swap-next-interaction-by-id!
@@ -90,7 +106,13 @@
        (remove-receiver active-interaction receiver)
        (swap! active-interaction (swap-next-interaction-by-id! (get-next @active-interaction) interactions)))))
   ([active-interaction interactions]
-   ((swap! active-interaction (swap-next-interaction-by-id! (get-next @active-interaction) interactions)))))
+   ((swap! active-interaction (swap-next-interaction-by-id! (get-next @active-interaction) interactions))))
+  ([target-interaction active-interaction receiver interactiond]
+   (if (nil? receiver)
+     (swap-active-interaction-by-atomic active-interaction interactions)
+     (if (multiple-receivers? target-interaction)
+       (remove-receiver active-interaction receiver)
+       (swap! active-interaction (swap-next-interaction-by-id! (get-next @active-interaction) interactions))))))
 
 (defn get-first-valid-target-branch-interaction
   "Find the first interactable in (nested) branch constructs."
@@ -105,22 +127,38 @@
 
 (defn- swap-active-interaction-by-branch
   "Swap active interaction by branch"
-  [sender receivers label active-interaction interactions]
+  ([sender receivers label active-interaction interactions]
   (let [target-interaction (get-first-valid-target-branch-interaction sender receivers label @active-interaction)]
-    (println (format "Target interaction sender %s receivers %s action %s next %s" (:sender target-interaction) (:receivers target-interaction) (:action target-interaction) (:next target-interaction)))
+    (log-message (format "Target interaction sender %s receivers %s action %s next %s" (:sender target-interaction) (:receivers target-interaction) (:action target-interaction) (:next target-interaction)))
     (if (multiple-receivers? target-interaction)
       (remove-receiver-from-branch active-interaction target-interaction receivers)
       (swap! active-interaction (swap-next-interaction-by-id! (:next target-interaction) interactions)))))
+  ([sender receivers label target-interaction atomized-active-interaction interactions]
+   (let [target (get-first-valid-target-branch-interaction sender receivers label target-interaction)]
+     (log-message (format "Target interaction sender %s receivers %s action %s next %s" (:sender target) (:receivers target) (:action target) (:next target)))
+     (if (multiple-receivers? target)
+       (remove-receiver-from-branch atomized-active-interaction target receivers) ;todo this wont work...wrong reference
+       (swap! atomized-active-interaction (swap-next-interaction-by-id! (:next target) interactions))))))
+
+(defn- swap-active-interaction-by-recursion
+  "Swap active interaction bu recursion"
+  [sender receivers label active-interaction interactions]
+  (let [target-interaction (first (get-recursion @active-interaction))]
+    (cond (satisfies? interactable target-interaction) (swap-active-interaction-by-atomic active-interaction receivers interactions)
+          (satisfies? branch target-interaction) (swap-active-interaction-by-branch sender receivers label target-interaction active-interaction interactions)
+          :else (log-error :unsupported-operation "Cannot swap the interaction, unknown type!"))))
 
 (defn- apply-interaction-to-mon
   "Apply new interaction"
   [sender receivers label active-interaction interactions]
   (log-message (format "Applying: label %s, receiver %s." label receivers))
   (cond
-    (and (satisfies? interactable @active-interaction) (check-atomic-interaction label active-interaction))
+    (and (satisfies? interactable @active-interaction) (check-atomic-interaction label @active-interaction))
     (swap-active-interaction-by-atomic active-interaction receivers interactions)
     (and (satisfies? branch @active-interaction) (check-branch-interaction label @active-interaction))
     (swap-active-interaction-by-branch sender receivers label active-interaction interactions)
+    (and (satisfies? recursable @active-interaction) (check-recursion-interaction label @active-interaction))
+    (swap-active-interaction-by-recursion sender receivers label active-interaction interactions)
     :else (log-error :unsupported-operation "Unsupported type of interaction!")
     ))
 
@@ -151,6 +189,8 @@
     (is-valid-interaction? sender receivers label active-interaction)
     (satisfies? branch active-interaction)
     (> (count (filter true? (flatten (for [b (:branches active-interaction)] (is-valid-communication? sender receivers label (nth b 0)))))) 0)
+    (satisfies? recursable active-interaction)
+    (is-valid-communication? sender receivers label (first (get-recursion active-interaction)))
     :else
     (do (log-error :unsupported-operation "Unsupported communication type: Communication invalid, " active-interaction)
         false)))

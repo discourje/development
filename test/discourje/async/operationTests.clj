@@ -227,7 +227,7 @@
           (let [b->a (<!!! ba "1")]
             (is (= "1" (get-label b->a)))
             (is (= "AB" (get-content b->a)))
-            (while (false? flag)
+            (while (false? @flag)
               (if (== 1 (+ 1 (rand-int 2)))
                 (do
                   (>!!! ac (->message "2" "AC"))
@@ -237,8 +237,7 @@
                     (>!!! ca (->message "2" "AC"))
                     (let [c->a (>!!! ca "2")]
                       (is (= "2" (get-label c->a)))
-                      (is (= "AC" (get-content c->a)))
-                      )))
+                      (is (= "AC" (get-content c->a))))))
                 (do
                   (>!!! ab (->message "3" "AB3"))
                   (let [a->b3 (>!!! ab "3")]
