@@ -237,7 +237,7 @@
     (is (= (get-next i0r0i1b01) (get-id i0r0i1b02)))
     (is (= (get-next i0r0i1b02) (get-id i0r0)))
     (is (= (get-next i0r0i1b10) (get-id i0r0i1b11)))
-    (is (= (get-next i0r0i1b11) (get-id i0r0i2)))
+    ; (is (= (get-next i0r0i1b11) (get-id i1))) ;Todo do we really need an end-recur identifier?
 
     (is (= (get-next i0r0i2b00) (get-id i0r0i2b01)))
     (is (= (get-next i0r0i2b01) (get-id i0r0i2b02)))

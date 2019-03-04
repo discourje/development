@@ -125,13 +125,13 @@
                  recured-interactions (link-interactions (get-recursion inter) recursion-help-vec linked-recursion-interactions)
                  last-helper-mon (last @helper-vec)
                  linked-i (if (nil? last-helper-mon) nil (assoc last-helper-mon :next (get-id inter)))
-                 new-recursion (->recursion (get-id inter) (get-name inter) recured-interactions nil)]
-             (swap! helper-vec conj new-recursion)
+                 new-recursion (->recursion (get-id inter) (get-name inter) recured-interactions nil)
+                 recured-new-recursion (assoc-next-nested-do-recur new-recursion)]
+             (swap! helper-vec conj recured-new-recursion)
              (when-not (nil? last-helper-mon)
                (cond
                  (satisfies? branch linked-i) (swap! linked-interactions conj (assoc-next-nested-choice linked-i inter))
-                 (satisfies? recursable linked-i) (let [recured-linked-i (assoc-next-nested-do-recur linked-i)
-                                                        ended-linked-i (assoc-next-nested-end-recur recured-linked-i inter linked-interactions)]
+                 (satisfies? recursable linked-i) (let [ended-linked-i (assoc-next-nested-end-recur linked-i inter linked-interactions)]
                                                     (swap! linked-interactions conj ended-linked-i))
                  :else (swap! linked-interactions conj linked-i)))
              )
@@ -148,8 +148,7 @@
              (when-not (nil? last-helper-mon)
                (cond
                  (satisfies? branch linked-i) (swap! linked-interactions conj (assoc-next-nested-choice linked-i inter))
-                 (satisfies? recursable linked-i) (let [recured-linked-i (assoc-next-nested-do-recur linked-i)
-                                                        ended-linked-i (assoc-next-nested-end-recur recured-linked-i inter linked-interactions)]
+                 (satisfies? recursable linked-i) (let [ended-linked-i (assoc-next-nested-end-recur linked-i inter linked-interactions)]
                                                     (swap! linked-interactions conj ended-linked-i))
                  :else (swap! linked-interactions conj linked-i)))
              )
@@ -160,13 +159,12 @@
              (swap! helper-vec conj inter)
              (cond
                (satisfies? branch linked-i) (swap! linked-interactions conj (assoc-next-nested-choice linked-i inter))
-               (satisfies? recursable linked-i) (let [recured-linked-i (assoc-next-nested-do-recur linked-i)
-                                                      ended-linked-i (assoc-next-nested-end-recur recured-linked-i inter linked-interactions)]
+               (satisfies? recursable linked-i) (let [ended-linked-i (assoc-next-nested-end-recur linked-i inter linked-interactions)]
                                                   (swap! linked-interactions conj ended-linked-i))
                :else (swap! linked-interactions conj linked-i)))
            ))
-       (swap! linked-interactions conj (last @helper-vec)))
-   @linked-interactions))
+       (swap! linked-interactions conj (last @helper-vec))
+   @linked-interactions)))
 
 (defn generate-monitor
   "Generate the monitor based on the given protocol"
