@@ -231,7 +231,6 @@
         i1 (nth (:interactions mon) 1)]
     (println (:interactions mon))
     (println i0r0i1b02)
-    (println i1)
     (is (= (get-next i0) (get-id i1)))
     (is (= (get-next i0r0i0) (get-id i0r0i1)))
     (is (= (get-next i0r0i1b00) (get-id i0r0i1b01)))

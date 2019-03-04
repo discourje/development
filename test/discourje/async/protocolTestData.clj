@@ -143,7 +143,7 @@
 (defn nested-recur-protocol []
   (create-protocol [(make-recursion :test [;i0
                                            (make-recursion :nested [; i0r0
-                                                                    (-->> "1" "B" "A")  ;i0r0i0
+                                                                    (-->> "1" "B" "A") ;i0r0i0
                                                                     (make-choice [;i0r0i1
                                                                                   [(-->> "2" "A" "C") ;i0r0i1b00
                                                                                    (-->> "2" "C" "A") ;i0r0i1b01
@@ -155,11 +155,36 @@
                                                                                   [(-->> "2" "A" "C") ;i0r0i2b00
                                                                                    (-->> "2" "C" "A") ;i0r0i2b01
                                                                                    (do-recur :test)] ;i0r0i2b02
-                                                                                  [(-->> "3" "A" "B"); i0r0i2b10
-                                                                                   (end-recur :test)]  ;i0r0i2b11
+                                                                                  [(-->> "3" "A" "B") ; i0r0i2b10
+                                                                                   (end-recur :test)] ;i0r0i2b11
                                                                                   ])
                                                                     ])]
 
                                     )
-                    (-->> "end" "A" ["B" "C"])  ;i1
+                    (-->> "end" "A" ["B" "C"])              ;i1
+                    ]))
+
+(defn multiple-nested-recur-protocol []
+  (create-protocol [(make-recursion :test [;i0
+                                           (make-recursion :nested [; i0r0
+                                                                    (make-choice [;i0r0i1
+                                                                                  [(make-recursion :nested-again [
+                                                                                                                  (-->> "2" "A" "C") ;i0r0i1b00
+                                                                                                                  (-->> "2" "C" "A") ;i0r0i1b01
+                                                                                                                  (do-recur :nested-again)])] ;i0r0i1b02
+                                                                                  [(-->> "4" "A" "B")
+                                                                                   (do-recur :nested)]
+                                                                                  [(-->> "3" "A" "B") ;i0r0i1b10
+                                                                                   (end-recur :nested)] ;i0r0i1b11
+                                                                                  ])
+                                                                    (make-choice [;i0r0i2
+                                                                                  [(-->> "2" "A" "C") ;i0r0i2b00
+                                                                                   (-->> "2" "C" "A") ;i0r0i2b01
+                                                                                   (do-recur :test)] ;i0r0i2b02
+                                                                                  [(-->> "3" "A" "B") ; i0r0i2b10
+                                                                                   (end-recur :test)] ;i0r0i2b11
+                                                                                  ])
+                                                                    ])]
+
+                                    )                       ;i1
                     ]))
