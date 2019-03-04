@@ -35,3 +35,9 @@
 
 (deftest unique3-roles-single-recur-test
   (is (= 3 (count (get-distinct-roles (get-interactions (single-recur-protocol)))))))
+
+(deftest unique5-roles-nested-recur-protocol-test
+  (is (= 5 (count (get-distinct-roles (get-interactions (nested-recur-protocol)))))))
+
+(deftest unique6-roles-multiple-nested-recur-protocol-test
+  (is (= 6 (count (get-distinct-roles (get-interactions (multiple-nested-recur-protocol)))))))

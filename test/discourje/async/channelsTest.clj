@@ -84,3 +84,12 @@
         channels (generate-channels roles nil 1)]
     (is (= 6 (count channels)))))
 
+(deftest nested-recur-protocol-roles-test
+  (let [roles (get-distinct-roles (get-interactions (nested-recur-protocol)))
+        channels (generate-channels roles nil 1)]
+    (is (= 20 (count channels)))))
+
+(deftest multiple-nested-recur-protocol-roles-test
+  (let [roles (get-distinct-roles (get-interactions (multiple-nested-recur-protocol)))
+        channels (generate-channels roles nil 1)]
+    (is (= 30 (count channels)))))

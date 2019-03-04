@@ -153,9 +153,9 @@
                                                                                   ])
                                                                     (make-choice [;i0r0i2
                                                                                   [(-->> "2" "A" "C") ;i0r0i2b00
-                                                                                   (-->> "2" "C" "A") ;i0r0i2b01
+                                                                                   (-->> "2" "C" "D") ;i0r0i2b01
                                                                                    (do-recur :test)] ;i0r0i2b02
-                                                                                  [(-->> "3" "A" "B") ; i0r0i2b10
+                                                                                  [(-->> "3" "A" "E") ; i0r0i2b10
                                                                                    (end-recur :test)] ;i0r0i2b11
                                                                                   ])
                                                                     ])]
@@ -174,14 +174,14 @@
                                                                                                                   (do-recur :nested-again)])] ;i0r0i1b02
                                                                                   [(-->> "4" "A" "B")
                                                                                    (do-recur :nested)]
-                                                                                  [(-->> "3" "A" "B") ;i0r0i1b10
+                                                                                  [(-->> "3" "A" "D") ;i0r0i1b10
                                                                                    (end-recur :nested)] ;i0r0i1b11
                                                                                   ])
                                                                     (make-choice [;i0r0i2
                                                                                   [(-->> "2" "A" "C") ;i0r0i2b00
-                                                                                   (-->> "2" "C" "A") ;i0r0i2b01
+                                                                                   (-->> "2" "C" "E") ;i0r0i2b01
                                                                                    (do-recur :test)] ;i0r0i2b02
-                                                                                  [(-->> "3" "A" "B") ; i0r0i2b10
+                                                                                  [(-->> "3" "A" "F") ; i0r0i2b10
                                                                                    (end-recur :test)] ;i0r0i2b11
                                                                                   ])
                                                                     ])]
