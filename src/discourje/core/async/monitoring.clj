@@ -39,6 +39,7 @@
                                                            (let [branches (:branches inter)
                                                                  searches (for [b branches] (find-nested-next id b))]
                                                              (first searches)))
+                               ;(satisfies? recursable inter)
                                :else (do (log-error :unsupported-operation "Not supported type!") nil)))
                  )))
 
