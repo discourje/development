@@ -100,13 +100,13 @@
 (defn- swap-active-interaction-by-atomic
   "Swap active interaction by atomic"
   ([active-interaction receiver interactions]
+   (swap-active-interaction-by-atomic active-interaction @active-interaction receiver interactions))
+  ([active-interaction target-interaction receiver interactions]
    (if (nil? receiver)
-     (swap-active-interaction-by-atomic active-interaction interactions)
-     (if (multiple-receivers? @active-interaction)
-       (remove-receiver active-interaction receiver)
-       (swap! active-interaction (swap-next-interaction-by-id! (get-next @active-interaction) interactions)))))
-  ([active-interaction interactions]
-   ((swap! active-interaction (swap-next-interaction-by-id! (get-next @active-interaction) interactions)))))
+     (swap! active-interaction (swap-next-interaction-by-id! (get-next target-interaction) interactions))
+     (if (multiple-receivers? target-interaction)
+       (remove-receiver active-interaction target-interaction receiver)
+       (swap! active-interaction (swap-next-interaction-by-id! (get-next target-interaction) interactions))))))
 
 (defn get-first-valid-target-branch-interaction
   "Find the first interactable in (nested) branch constructs."
@@ -164,7 +164,7 @@
    (log-message (format "Applying: label %s, receiver %s." label receivers))
    (cond
      (and (satisfies? interactable target-interaction) (check-atomic-interaction label target-interaction))
-     (swap-active-interaction-by-atomic active-interaction receivers interactions)
+     (swap-active-interaction-by-atomic active-interaction target-interaction receivers interactions)
      (and (satisfies? branch target-interaction) (check-branch-interaction label target-interaction))
      (swap-active-interaction-by-branch sender receivers label active-interaction target-interaction interactions)
      (and (satisfies? recursable target-interaction) (check-recursion-interaction label target-interaction))
