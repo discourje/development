@@ -223,31 +223,31 @@
         (let [a->b (<!!! ab "1")]
           (is (= "1" (get-label a->b)))
           (is (= "AB" (get-content a->b)))
-          (>!!! ba (->message "1" "AB"))
-          (let [b->a (<!!! ba "1")]
-            (is (= "1" (get-label b->a)))
-            (is (= "AB" (get-content b->a)))
-            (while (false? @flag)
-              (if (== 1 (+ 1 (rand-int 2)))
-                (do
+          (while (false? @flag)
+            (>!!! ba (->message "1" "AB"))
+            (let [b->a (<!!! ba "1")]
+              (is (= "1" (get-label b->a)))
+              (is (= "AB" (get-content b->a)))
+            (if (== 1 (+ 1 (rand-int 2)))
+              (do
                   (>!!! ac (->message "2" "AC"))
                   (let [a->c (<!!! ac "2")]
                     (is (= "2" (get-label a->c)))
                     (is (= "AC" (get-content a->c)))
                     (>!!! ca (->message "2" "AC"))
-                    (let [c->a (>!!! ca "2")]
+                    (let [c->a (<!!! ca "2")]
                       (is (= "2" (get-label c->a)))
                       (is (= "AC" (get-content c->a))))))
                 (do
                   (>!!! ab (->message "3" "AB3"))
-                  (let [a->b3 (>!!! ab "3")]
+                  (let [a->b3 (<!!! ab "3")]
                     (is (= "3" (get-label a->b3)))
                     (is (= "AB3" (get-content a->b3)))
-                    (reset! flag true)))))
+                    (reset! flag true))))))
             (>!!! [ab ac] (->message "end" "ending"))
             (let [a->b-end (<!!! ab "end")
                   a->c-end (<!!! ac "end")]
               (is (= "end" (get-label a->b-end)))
               (is (= "ending" (get-content a->b-end)))
               (is (= "end" (get-label a->c-end)))
-              (is (= "ending" (get-content a->c-end)))))))))
+              (is (= "ending" (get-content a->c-end))))))))
