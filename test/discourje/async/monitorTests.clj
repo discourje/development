@@ -143,6 +143,28 @@
     (is (= (get-next i0b1b11) (get-id i1)))
     (is (= (get-next i1) nil))))
 
+
+(deftest multiple-nested-choice-branch-protocol-test
+  (let [mon (generate-monitor (multiple-nested-choice-branch-protocol))]
+    (is (= 1 (count (:interactions mon))))))
+
+(deftest multiple-nested-choice-branch-protocol-ids-test
+  (let [mon (generate-monitor (multiple-nested-choice-branch-protocol))
+        i0 (nth (:interactions mon) 0)
+        i0b00 (nth (nth (:branches i0) 0) 0)
+        i0b00b00 (nth (nth (:branches i0b00) 0) 0)
+        i0b00b10 (nth (nth (:branches i0b00) 1) 0)
+        i0b10 (nth (nth (:branches i0) 1) 0)
+        i0b10b00 (nth (nth (:branches i0b10) 0) 0)
+        i0b10b10 (nth (nth (:branches i0b10) 1) 0)]
+    (is (= (get-next i0) nil))
+    (is (= (get-next i0b00) nil))
+    (is (= (get-next i0b10) nil))
+    (is (= (get-next i0b00b00) nil))
+    (is (= (get-next i0b00b10) nil))
+    (is (= (get-next i0b10b00) nil))
+    (is (= (get-next i0b10b10) nil))))
+
 (deftest single-choice-multiple-interactions-protocol-test
   (let [mon (generate-monitor (single-choice-multiple-interactions-protocol))]
     (is (= 6 (count (:interactions mon))))))

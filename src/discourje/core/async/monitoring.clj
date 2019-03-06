@@ -16,7 +16,12 @@
 (defn- check-branch-interaction
   "Check the atomic interaction"
   [label active-interaction]
-  (> (count (filter (fn [x] (= x label)) (flatten (for [b (:branches active-interaction)] (get-action (nth b 0)))))) 0))
+  (> (count (filter (fn [x] (= x label)) (flatten
+                                           (for [b (:branches active-interaction)]
+                                             (cond (satisfies? recursable (nth b 0)) (get-label (first (:recursion (nth b 0))))
+                                                   :else (get-action (nth b 0)))
+
+                                             )))) 0))
 
 (defn- check-recursion-interaction
   "Check the first element in a recursion interaction"

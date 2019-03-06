@@ -101,6 +101,18 @@
                                  )
                     (-->> "Done" "A" "End")]))
 
+(defn multiple-nested-choice-branch-protocol []
+  (create-protocol [(make-choice [                          ;i0
+                                  [(make-choice [           ;i0b00
+                                                 [(-->> "1" "A" "B")]  ;i0b00b00
+                                                 [(-->> "2" "A" "B")]];i0b00b10
+                                                )]
+                                  [(make-choice [           ;i0b10
+                                                 [(-->> "3" "A" "B")];i0b10b00
+                                                 [(-->> "4" "A" "B")]];i0b10b10
+                                                )]]
+                                 )]))
+
 (defn multiple-nested-branches-protocol []
   (create-protocol [
                     (make-choice [;i0
