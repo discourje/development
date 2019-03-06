@@ -264,8 +264,31 @@
     (is (= (get-next i0r0b00) (get-id i0r0b01)))
     (is (= (get-next i0r0b01) (get-id i0)))
     (is (= (get-next i0r0b10) (get-id i0r0b11)))
-    (is (= (get-next i0r0b11) nil))
-    ))
+    (is (= (get-next i0r0b11) nil))))
+
+(deftest one-recur-with-startchoice-and-endchoice-protocol-monitor-test
+  (let [mon (generate-monitor (one-recur-with-startchoice-and-endchoice-protocol))]
+    (is (= 1 (count (:interactions mon))))))
+
+(deftest one-recur-with-startchoice-and-endchoice-protocol-ids-test
+  (let [mon (generate-monitor (one-recur-with-startchoice-and-endchoice-protocol))
+        i0 (nth (:interactions mon) 0)
+        i0b0r0 (nth (nth (:branches i0) 0) 0)
+        i0b0r00 (nth (:recursion i0b0r0) 0)
+        i0b0r00b00 (nth (nth (:branches i0b0r00) 0) 0)
+        i0b0r00b01 (nth (nth (:branches i0b0r00) 0) 1)
+        i0b0r00b10 (nth (nth (:branches i0b0r00) 1) 0)
+        i0b0r00b11 (nth (nth (:branches i0b0r00) 1) 1)
+        i0b10 (nth (nth (:branches i0) 1) 0)
+        ]
+    (is (= (get-next i0) nil))
+    (is (= (get-next i0b0r0) nil))
+    (is (= (get-next i0b10) nil))
+    (is (= (get-next i0b0r00) nil))
+    (is (= (get-next i0b0r00b00) (get-id i0b0r00b01)))
+    (is (= (get-next i0b0r00b01) (get-id i0b0r0)))
+    (is (= (get-next i0b0r00b10) (get-id i0b0r00b11)))
+    (is (= (get-next i0b0r00b11) nil))))
 
 (deftest apply-atomic-test
   (let [mon (generate-monitor (testDualProtocol))
