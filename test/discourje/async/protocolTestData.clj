@@ -145,14 +145,30 @@
   (create-protocol [(make-recursion :test [;i0
                                            (make-choice [;i0r0
                                                          [(-->> "2" "A" "C") ;i0r0b00
-                                                          (do-recur :test)];i0r0b01
-                                                         [(-->> "3" "A" "B");i0r0b10
-                                                          (end-recur :test);i0r0b11
+                                                          (do-recur :test)] ;i0r0b01
+                                                         [(-->> "3" "A" "B") ;i0r0b10
+                                                          (end-recur :test) ;i0r0b11
                                                           ]
                                                          ])
                                            ])
                     ])
   )
+(defn one-recur-with-startchoice-and-endchoice-protocol []
+  (create-protocol [(make-choice [
+                                  [(make-recursion :test [
+                                                          (make-choice [
+                                                                        [(-->> "2" "A" "C")
+                                                                         (do-recur :test)]
+                                                                        [(-->> "3" "A" "B")
+                                                                         (end-recur :test)
+                                                                         ]
+                                                                        ])
+                                                          ])
+                                   ]
+                                  [(-->> "2" "A" "C")]
+                                  ])
+                    ]))
+
 
 (defn nested-recur-protocol []
   (create-protocol [(make-recursion :test [;i0
