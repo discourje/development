@@ -134,7 +134,8 @@
                                                           (-->> "2" "C" "A") ;i1r1b01
                                                           (do-recur :test)] ;i1r1b02
                                                          [(-->> "3" "A" "B") ;i1r1b10
-                                                          (end-recur :test)] ;i1r1b11
+                                                          (end-recur :test) ;i1r1b11
+                                                          ]
                                                          ])
                                            ])
                     (-->> "end" "A" ["B" "C"])              ; i2

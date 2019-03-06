@@ -183,7 +183,6 @@
 (defn- allow-send
   "Allow send message in channel"
   [channel message]
-  (log-message "allowing send on channel!")
   (async/>!! (get-chan channel) message))
 
 (defn- allow-receive [channel]

@@ -250,4 +250,5 @@
               (is (= "end" (get-label a->b-end)))
               (is (= "ending" (get-content a->b-end)))
               (is (= "end" (get-label a->c-end)))
-              (is (= "ending" (get-content a->c-end))))))))
+              (is (= "ending" (get-content a->c-end)))
+              )))))
