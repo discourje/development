@@ -246,6 +246,27 @@
     (is (= (get-next i0r0i2b11) (get-id i1)))
     (is (= (get-next i1) nil))))
 
+(deftest one-recur-with-choice-protocol-monitor-test
+  (let [mon (generate-monitor (one-recur-with-choice-protocol))]
+    (is (= 1 (count (:interactions mon))))))
+
+(deftest one-recur-with-choice-protocol-ids-test
+  (let [mon (generate-monitor (one-recur-with-choice-protocol))
+        i0 (nth (:interactions mon) 0)
+        i0r0 (nth (:recursion i0) 0)
+        i0r0b00 (nth (nth (:branches i0r0) 0) 0)
+        i0r0b01 (nth (nth (:branches i0r0) 0) 1)
+        i0r0b10 (nth (nth (:branches i0r0) 1) 0)
+        i0r0b11 (nth (nth (:branches i0r0) 1) 1)
+        ]
+    (is (= (get-next i0) nil))
+    (is (= (get-next i0r0) nil))
+    (is (= (get-next i0r0b00) (get-id i0r0b01)))
+    (is (= (get-next i0r0b01) (get-id i0)))
+    (is (= (get-next i0r0b10) (get-id i0r0b11)))
+    (is (= (get-next i0r0b11) nil))
+    ))
+
 (deftest apply-atomic-test
   (let [mon (generate-monitor (testDualProtocol))
         message (->message "1" "hello world")]

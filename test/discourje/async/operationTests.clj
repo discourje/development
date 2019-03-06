@@ -250,5 +250,23 @@
               (is (= "end" (get-label a->b-end)))
               (is (= "ending" (get-content a->b-end)))
               (is (= "end" (get-label a->c-end)))
-              (is (= "ending" (get-content a->c-end)))
-              )))))
+              (is (= "ending" (get-content a->c-end))))))))
+
+(deftest send-receive-one-recur-with-choice-protocol
+  (let [channels (generate-infrastructure (one-recur-with-choice-protocol))
+        ab (get-channel "A" "B" channels)
+        ac (get-channel "A" "C" channels)
+        flag (atom false)]
+    (while (false? @flag)
+        (if (== 1 (+ 1 (rand-int 2)))
+          (do
+            (>!!! ac (->message "2" "AC"))
+            (let [a->c (<!!! ac "2")]
+              (is (= "2" (get-label a->c)))
+              (is (= "AC" (get-content a->c)))))
+          (do
+            (>!!! ab (->message "3" "AB3"))
+            (let [a->b3 (<!!! ab "3")]
+              (is (= "3" (get-label a->b3)))
+              (is (= "AB3" (get-content a->b3)))
+              (reset! flag true)))))))
