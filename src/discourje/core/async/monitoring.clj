@@ -217,8 +217,6 @@
 (defn- is-valid-interaction?
   "Is the given interaction valid compared to the active-interaction of the monitor"
   [sender receivers label active-interaction]
-  ;(log-message (format "input = %s %s %s" sender receivers label))
-  ;(log-message (format "active  = %s %s %s" (:sender active-interaction) (:receivers active-interaction) (:action active-interaction)))
   (and
     (and (if (instance? Seqable label)
            (or (contains-value? (:action active-interaction) label) (= label (:action active-interaction)))

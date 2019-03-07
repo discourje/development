@@ -87,12 +87,12 @@
 (defn- replace-nested-recur
   [name id option interactions]
   (let [prot (vec (for [inter interactions]
-               (cond (satisfies? identifiable-recur inter) (if (and (= (get-name inter) name) (= (get-option inter) option)) (assoc inter :next id) inter)
-                     (satisfies? branch inter) (let [branches (get-branches inter)
-                                                     searches (for [b branches] (replace-nested-recur name id  option b))]
-                                                 (assoc inter :branches (vec searches) ))
-                     (satisfies? recursable inter) (assoc inter :recursion (replace-nested-recur name id option (get-recursion inter)))
-                     :else inter)))]
+                    (cond (satisfies? identifiable-recur inter) (if (and (= (get-name inter) name) (= (get-option inter) option)) (assoc inter :next id) inter)
+                          (satisfies? branch inter) (let [branches (get-branches inter)
+                                                          searches (for [b branches] (replace-nested-recur name id option b))]
+                                                      (assoc inter :branches (vec searches)))
+                          (satisfies? recursable inter) (assoc inter :recursion (replace-nested-recur name id option (get-recursion inter)))
+                          :else inter)))]
     (vec prot)))
 
 
@@ -164,7 +164,7 @@
                :else (swap! linked-interactions conj linked-i)))
            ))
        (swap! linked-interactions conj (last @helper-vec))
-   @linked-interactions)))
+       @linked-interactions)))
 
 (defn generate-monitor
   "Generate the monitor based on the given protocol"
@@ -172,71 +172,82 @@
   (let [linked-interactions (link-interactions protocol)]
     (->monitor (uuid/v1) linked-interactions (atom (first linked-interactions)))))
 
+(defn- all-channels-implement-transportable?
+  "Do all custom supplied channels implement the transportable interface?"
+  [channels]
+  (= 1 (count (distinct (for [c channels] (satisfies? transportable c))))))
+
 (defn generate-infrastructure
-  "Generate channels with monitor based on the protocol"
-  [protocol]
-  (let [monitor (generate-monitor protocol)
-        roles (get-distinct-roles (get-interactions protocol))
-        channels (generate-channels roles monitor 1)]
-    channels))
-
-(defn- allow-send
-  "Allow send message in channel"
-  [channel message]
-  (async/>!! (get-chan channel) message))
-
-(defn- allow-receive [channel]
-  (log-message "allowing receive on channel!")
-  (async/<!! (get-chan channel)))
-
-(defn- allow-sends
-  "Allow sending message on multiple channels"
-  [channels message]
-  (doseq [c channels] (allow-send c message)))
-
-(defn all-valid-channels?
-  "Do all channels comply with the monitor"
-  [channels message]
-  (= 1 (count (distinct (for [c channels] (valid-interaction? (get-monitor c) (get-provider c) (get-consumer c) (get-label message)))))))
-
-(defn >!!!
-  "Put on channel"
-  [channel message]
-  ;  (if (nil? (get-active-interaction (get-monitor channel)))
-  ;   (println "Please activate a monitor, your protocol has not yet started, or it is already finished!")
-  (if (vector? channel)
-    (do (when-not (equal-senders? channel)
-          (log-error :invalid-parallel-channels "Trying to send in parallel, but the sender of the channels is not the same!"))
-        (when-not (equal-monitors? channel)
-          (log-error :monitor-mismatch "Trying to send in parallel, but the channels do not share the same monitor!"))
-        (when-not (all-valid-channels? channel message)
-          (log-error :incorrect-communication "Trying to send in parallel, but the monitor is not correct for all of them!"))
-        (let [monitor (get-monitor (first channel))]
-          ;(apply-interaction monitor (get-label message))
-          (allow-sends channel message)))
-    (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label message))
-          (log-error :incorrect-communication "Atomic-send communication invalid!"))
-        ; (apply-interaction (get-monitor channel) (get-label message))
-        (allow-send channel message))))
-;)
-
-(defn <!!!
-  "Take from channel"
-  [channel label]
-  (if (nil? (get-active-interaction (get-monitor channel)))
-    (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
-    (let [result (allow-receive channel)]
-      (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label)
-            (log-error :incorrect-communication "Atomic receive communication invalid!"))
-          (apply-interaction (get-monitor channel) (get-provider channel) (get-consumer channel) label)
-          result))))
+  "Generate channels with monitor based on the protocol, also supports arity to give manually created custom channels. With for example specific buffer requirements."
+  ([protocol]
+   (let [monitor (generate-monitor protocol)
+         roles (get-distinct-roles (get-interactions protocol))
+         channels (generate-channels roles monitor 1)]
+     channels))
+  ([protocol channels]
+   (if (all-channels-implement-transportable? channels)
+     (let [monitor (generate-monitor protocol)]
+       (vec (for [c channels] (assoc c :monitor monitor)))))
+     (log-error :invalid-channels "Cannot generate infrastructure, make sure all supplied channels implement the `transporable' protocol!")))
 
 
-;(defn get-transitions-in-protocol [protocol]
-;  (interactions-to-transitions (get-interactions protocol)))
-;
-;(defn- generate-io-fsms
-;  "Convert a protocol of interactions to IO enabled finite-state-machines local to each role."
-;  [protocol]
-;  (let [roles (get-distinct-roles (get-interactions protocol))]))
+  (defn- allow-send
+    "Allow send message in channel"
+    [channel message]
+    (async/>!! (get-chan channel) message))
+
+  (defn- allow-receive [channel]
+    (log-message "allowing receive on channel!")
+    (async/<!! (get-chan channel)))
+
+  (defn- allow-sends
+    "Allow sending message on multiple channels"
+    [channels message]
+    (doseq [c channels] (allow-send c message)))
+
+  (defn all-valid-channels?
+    "Do all channels comply with the monitor"
+    [channels message]
+    (= 1 (count (distinct (for [c channels] (valid-interaction? (get-monitor c) (get-provider c) (get-consumer c) (get-label message)))))))
+
+  (defn >!!!
+    "Put on channel"
+    [channel message]
+    ;  (if (nil? (get-active-interaction (get-monitor channel)))
+    ;   (println "Please activate a monitor, your protocol has not yet started, or it is already finished!")
+    (if (vector? channel)
+      (do (when-not (equal-senders? channel)
+            (log-error :invalid-parallel-channels "Trying to send in parallel, but the sender of the channels is not the same!"))
+          (when-not (equal-monitors? channel)
+            (log-error :monitor-mismatch "Trying to send in parallel, but the channels do not share the same monitor!"))
+          (when-not (all-valid-channels? channel message)
+            (log-error :incorrect-communication "Trying to send in parallel, but the monitor is not correct for all of them!"))
+          (let [monitor (get-monitor (first channel))]
+            ;(apply-interaction monitor (get-label message))
+            (allow-sends channel message)))
+      (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label message))
+            (log-error :incorrect-communication "Atomic-send communication invalid!"))
+          ; (apply-interaction (get-monitor channel) (get-label message))
+          (allow-send channel message))))
+  ;)
+
+  (defn <!!!
+    "Take from channel"
+    [channel label]
+    (if (nil? (get-active-interaction (get-monitor channel)))
+      (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
+      (let [result (allow-receive channel)]
+        (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label)
+              (log-error :incorrect-communication "Atomic receive communication invalid!"))
+            (apply-interaction (get-monitor channel) (get-provider channel) (get-consumer channel) label)
+            result))))
+
+
+  ;(defn get-transitions-in-protocol [protocol]
+  ;  (interactions-to-transitions (get-interactions protocol)))
+  ;
+  ;(defn- generate-io-fsms
+  ;  "Convert a protocol of interactions to IO enabled finite-state-machines local to each role."
+  ;  [protocol]
+  ;  (let [roles (get-distinct-roles (get-interactions protocol))]))
 

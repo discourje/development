@@ -24,7 +24,7 @@
                 (= (get-consumer c) consumer)))
             channels)))
 
-(defn- generate-channel
+(defn generate-channel
   "Function to generate a channel between sender and receiver"
   ([sender receiver monitor buffer]
    (if (nil? buffer)
