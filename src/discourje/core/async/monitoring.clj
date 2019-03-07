@@ -1,6 +1,9 @@
 ;monitoring.clj
 (in-ns 'discourje.core.async.async)
 
+;forward declare check-branch-interaction to resolve undefined issue in check-recursion-interaction
+(declare check-branch-interaction get-branch-interaction)
+
 (defprotocol monitoring
   (get-monitor-id [this])
   (get-active-interaction [this])
@@ -13,16 +16,6 @@
   [label active-interaction]
   (= (get-action active-interaction) label))
 
-(defn- check-branch-interaction
-  "Check the atomic interaction"
-  [label active-interaction]
-  (> (count (filter (fn [x] (= x label)) (flatten
-                                           (for [b (:branches active-interaction)]
-                                             (cond (satisfies? recursable (nth b 0)) (get-label (first (:recursion (nth b 0))))
-                                                   :else (get-action (nth b 0)))
-
-                                             )))) 0))
-
 (defn- check-recursion-interaction
   "Check the first element in a recursion interaction"
   [label active-interaction]
@@ -33,6 +26,20 @@
       (satisfies? branch first-interaction) (check-branch-interaction label first-interaction)
       (satisfies? recursable first-interaction) (check-recursion-interaction label first-interaction)
       :else (log-error :unsupported-operation "No correct next recursion monitor found"))))
+
+(defn- check-branch-interaction
+  "Check the atomic interaction"
+  [label active-interaction]
+  (> (count (filter (fn [x] (true? x))
+                    (flatten
+                      (for [b (:branches active-interaction)]
+                        (let [first-in-branch (nth b 0)]
+                          (cond
+                            (satisfies? interactable first-in-branch) (check-atomic-interaction label first-in-branch)
+                            (satisfies? branch first-in-branch) (check-branch-interaction label first-in-branch)
+                            (satisfies? recursable first-in-branch) (check-recursion-interaction label first-in-branch)
+                            :else (log-error :unsupported-operation "Cannot check operation on child branch construct!")))))))
+     0))
 
 (defn- swap-next-interaction!
   "Get the next interaction"
@@ -113,18 +120,39 @@
        (remove-receiver active-interaction target-interaction receiver)
        (swap! active-interaction (swap-next-interaction-by-id! (get-next target-interaction) interactions))))))
 
-(defn get-first-valid-target-branch-interaction
+(defn- get-atomic-interaction
+  "Check the atomic interaction"
+  [sender receiver label active-interaction]
+  (when (and (= (:action active-interaction) label) (= (:receivers active-interaction) receiver) (= (:sender active-interaction) sender)) active-interaction))
+
+(defn- get-recursion-interaction
+  "Check the first element in a recursion interaction"
+  [sender receiver label active-interaction]
+  (let [rec (get-recursion active-interaction)
+        first-interaction (first rec)]
+    (cond
+      (satisfies? interactable first-interaction) (get-atomic-interaction sender receiver label first-interaction)
+      (satisfies? branch first-interaction) (get-branch-interaction sender receiver label first-interaction)
+      (satisfies? recursable first-interaction) (get-recursion-interaction sender receiver label first-interaction)
+      :else (log-error :unsupported-operation "No correct next recursion monitor found"))))
+
+(defn- get-branch-interaction
+  "Check the atomic interaction"
+  [sender receiver label active-interaction]
+   (flatten
+    (for [b (:branches active-interaction)]
+      (let [first-in-branch (nth b 0)]
+        (cond
+          (satisfies? interactable first-in-branch) (get-atomic-interaction sender receiver label first-in-branch)
+          (satisfies? branch first-in-branch) (get-branch-interaction sender receiver label first-in-branch)
+          (satisfies? recursable first-in-branch) (get-recursion-interaction sender receiver label first-in-branch)
+          :else (log-error :unsupported-operation "Cannot check operation on child branch construct!"))))))
+
+
+(defn- get-first-valid-target-branch-interaction
   "Find the first interactable in (nested) branch constructs."
   [sender receiver label active-interaction]
-  (first (first (filter (fn [branch]
-                          (let [inter (nth branch 0)]
-                            (cond
-                              (satisfies? interactable inter) (and (= (:action inter) label) (= (:receivers inter) receiver) (= (:sender inter) sender))
-                              (satisfies? branch inter) (get-first-valid-target-branch-interaction sender receiver label inter)
-                              (satisfies? recursion inter) (let [first-in-recursion (first (:recursion inter))]
-                                                             (and (= (:action first-in-recursion) label) (= (:receivers first-in-recursion) receiver) (= (:sender first-in-recursion) sender)))
-                              :else (log-error :unsupported-operation "Not supported get nested branch!"))))
-                        (:branches active-interaction)))))
+  (first (filter some? (get-branch-interaction sender receiver label active-interaction))))
 
 (defn- swap-active-interaction-by-branch
   "Swap active interaction by branch"
