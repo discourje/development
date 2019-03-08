@@ -69,11 +69,6 @@
         channels (generate-channels roles nil 1)]
     (is (= 20 (count channels)))))
 
-(deftest single-nested-choice-branch-protocol-roles-test
-  (let [roles (get-distinct-roles (get-interactions (single-nested-choice-branch-protocol)))
-        channels (generate-channels roles nil 1)]
-    (is (= 20 (count channels)))))
-
 (deftest multiple-nested-branches-protocol-roles-test
   (let [roles (get-distinct-roles (get-interactions (multiple-nested-branches-protocol)))
         channels (generate-channels roles nil 1)]
@@ -93,3 +88,19 @@
   (let [roles (get-distinct-roles (get-interactions (multiple-nested-recur-protocol)))
         channels (generate-channels roles nil 1)]
     (is (= 30 (count channels)))))
+
+(deftest minimum-amount-quad-channels-roles-test
+  (let [roles (get-distinct-role-pairs (get-interactions (testQuadProtocol)))
+        channels (generate-minimum-channels roles nil 1)]
+    (is (= 8 (count channels)))))
+
+(deftest minimum-amount-multiple-nested-branches-protocol-roles-test
+  (let [roles (get-distinct-role-pairs (get-interactions (multiple-nested-branches-protocol)))
+        channels (generate-minimum-channels roles nil 1)]
+    (is (= 12 (count channels)))))
+
+(deftest minimum-amount-single-recur-protocol-roles-test
+  (let [roles (get-distinct-role-pairs (get-interactions (single-recur-protocol)))
+        channels (generate-minimum-channels roles nil 1)]
+    (println (distinct channels))
+    (is (= 4 (count channels)))))

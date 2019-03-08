@@ -323,3 +323,21 @@
         (let [a->c (<!!! ac "2")]
           (is (= "2" (get-label a->c)))
           (is (= "AC" (get-content a->c))))))))
+
+(deftest send-receive-dual-custom-channels-test
+  (let [channels (generate-infrastructure (testDualProtocol)[(generate-channel "A" "B" nil 3) (generate-channel "B" "A" nil 2)])
+        ab (get-channel "A" "B" channels)
+        ba (get-channel "B" "A" channels)
+        m1 (->message "1" "Hello B")
+        m2 (->message "2" "Hello A")]
+    (is (== 3 (get-buffer ab)))
+    (is (== 2 (get-buffer ba)))
+    (do
+      (>!!! ab m1)
+      (let [a->b (<!!! ab "1")]
+        (is (= "1" (get-label a->b)))
+        (is (= "Hello B" (get-content a->b))))
+      (>!!! ba m2)
+      (let [b->a (<!!! ba "2")]
+        (is (= "2" (get-label b->a)))
+        (is (= "Hello A" (get-content b->a)))))))

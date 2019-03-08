@@ -105,7 +105,7 @@
 
 (defn assoc-next-nested-end-recur
   "Link end recur"
-  [linked-i current-inter linked-interactions]
+  [linked-i current-inter]
   (let [name (get-name linked-i)
         prot (vec (replace-nested-recur name (get-id current-inter) :end (get-recursion linked-i)))]
     (assoc linked-i :recursion prot)))
@@ -131,7 +131,7 @@
              (when-not (nil? last-helper-mon)
                (cond
                  (satisfies? branch linked-i) (swap! linked-interactions conj (assoc-next-nested-choice linked-i inter))
-                 (satisfies? recursable linked-i) (let [ended-linked-i (assoc-next-nested-end-recur linked-i inter linked-interactions)]
+                 (satisfies? recursable linked-i) (let [ended-linked-i (assoc-next-nested-end-recur linked-i inter)]
                                                     (swap! linked-interactions conj ended-linked-i))
                  :else (swap! linked-interactions conj linked-i)))
              )
@@ -148,7 +148,7 @@
              (when-not (nil? last-helper-mon)
                (cond
                  (satisfies? branch linked-i) (swap! linked-interactions conj (assoc-next-nested-choice linked-i inter))
-                 (satisfies? recursable linked-i) (let [ended-linked-i (assoc-next-nested-end-recur linked-i inter linked-interactions)]
+                 (satisfies? recursable linked-i) (let [ended-linked-i (assoc-next-nested-end-recur linked-i inter)]
                                                     (swap! linked-interactions conj ended-linked-i))
                  :else (swap! linked-interactions conj linked-i)))
              )
@@ -159,7 +159,7 @@
              (swap! helper-vec conj inter)
              (cond
                (satisfies? branch linked-i) (swap! linked-interactions conj (assoc-next-nested-choice linked-i inter))
-               (satisfies? recursable linked-i) (let [ended-linked-i (assoc-next-nested-end-recur linked-i inter linked-interactions)]
+               (satisfies? recursable linked-i) (let [ended-linked-i (assoc-next-nested-end-recur linked-i inter)]
                                                   (swap! linked-interactions conj ended-linked-i))
                :else (swap! linked-interactions conj linked-i)))
            ))
@@ -175,6 +175,7 @@
 (defn- all-channels-implement-transportable?
   "Do all custom supplied channels implement the transportable interface?"
   [channels]
+  (println (= 1 (count (distinct (for [c channels] (satisfies? transportable c))))))
   (= 1 (count (distinct (for [c channels] (satisfies? transportable c))))))
 
 (defn generate-infrastructure
@@ -187,67 +188,67 @@
   ([protocol channels]
    (if (all-channels-implement-transportable? channels)
      (let [monitor (generate-monitor protocol)]
-       (vec (for [c channels] (assoc c :monitor monitor)))))
-     (log-error :invalid-channels "Cannot generate infrastructure, make sure all supplied channels implement the `transporable' protocol!")))
+       (vec (for [c channels] (assoc c :monitor monitor))))
+     (log-error :invalid-channels "Cannot generate infrastructure, make sure all supplied channels implement the `transporable' protocol!"))))
 
 
-  (defn- allow-send
-    "Allow send message in channel"
-    [channel message]
-    (async/>!! (get-chan channel) message))
+(defn- allow-send
+  "Allow send message in channel"
+  [channel message]
+  (async/>!! (get-chan channel) message))
 
-  (defn- allow-receive [channel]
-    (log-message "allowing receive on channel!")
-    (async/<!! (get-chan channel)))
+(defn- allow-receive [channel]
+  (log-message "allowing receive on channel!")
+  (async/<!! (get-chan channel)))
 
-  (defn- allow-sends
-    "Allow sending message on multiple channels"
-    [channels message]
-    (doseq [c channels] (allow-send c message)))
+(defn- allow-sends
+  "Allow sending message on multiple channels"
+  [channels message]
+  (doseq [c channels] (allow-send c message)))
 
-  (defn all-valid-channels?
-    "Do all channels comply with the monitor"
-    [channels message]
-    (= 1 (count (distinct (for [c channels] (valid-interaction? (get-monitor c) (get-provider c) (get-consumer c) (get-label message)))))))
+(defn all-valid-channels?
+  "Do all channels comply with the monitor"
+  [channels message]
+  (= 1 (count (distinct (for [c channels] (valid-interaction? (get-monitor c) (get-provider c) (get-consumer c) (get-label message)))))))
 
-  (defn >!!!
-    "Put on channel"
-    [channel message]
-    ;  (if (nil? (get-active-interaction (get-monitor channel)))
-    ;   (println "Please activate a monitor, your protocol has not yet started, or it is already finished!")
-    (if (vector? channel)
-      (do (when-not (equal-senders? channel)
-            (log-error :invalid-parallel-channels "Trying to send in parallel, but the sender of the channels is not the same!"))
-          (when-not (equal-monitors? channel)
-            (log-error :monitor-mismatch "Trying to send in parallel, but the channels do not share the same monitor!"))
-          (when-not (all-valid-channels? channel message)
-            (log-error :incorrect-communication "Trying to send in parallel, but the monitor is not correct for all of them!"))
-          (let [monitor (get-monitor (first channel))]
-            ;(apply-interaction monitor (get-label message))
-            (allow-sends channel message)))
-      (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label message))
-            (log-error :incorrect-communication "Atomic-send communication invalid!"))
-          ; (apply-interaction (get-monitor channel) (get-label message))
-          (allow-send channel message))))
-  ;)
+(defn >!!!
+  "Put on channel"
+  [channel message]
+  ;  (if (nil? (get-active-interaction (get-monitor channel)))
+  ;   (println "Please activate a monitor, your protocol has not yet started, or it is already finished!")
+  (if (vector? channel)
+    (do (when-not (equal-senders? channel)
+          (log-error :invalid-parallel-channels "Trying to send in parallel, but the sender of the channels is not the same!"))
+        (when-not (equal-monitors? channel)
+          (log-error :monitor-mismatch "Trying to send in parallel, but the channels do not share the same monitor!"))
+        (when-not (all-valid-channels? channel message)
+          (log-error :incorrect-communication "Trying to send in parallel, but the monitor is not correct for all of them!"))
+        (let [monitor (get-monitor (first channel))]
+          ;(apply-interaction monitor (get-label message))
+          (allow-sends channel message)))
+    (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label message))
+          (log-error :incorrect-communication "Atomic-send communication invalid!"))
+        ; (apply-interaction (get-monitor channel) (get-label message))
+        (allow-send channel message))))
+;)
 
-  (defn <!!!
-    "Take from channel"
-    [channel label]
-    (if (nil? (get-active-interaction (get-monitor channel)))
-      (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
-      (let [result (allow-receive channel)]
-        (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label)
-              (log-error :incorrect-communication "Atomic receive communication invalid!"))
-            (apply-interaction (get-monitor channel) (get-provider channel) (get-consumer channel) label)
-            result))))
+(defn <!!!
+  "Take from channel"
+  [channel label]
+  (if (nil? (get-active-interaction (get-monitor channel)))
+    (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
+    (let [result (allow-receive channel)]
+      (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label)
+            (log-error :incorrect-communication "Atomic receive communication invalid!"))
+          (apply-interaction (get-monitor channel) (get-provider channel) (get-consumer channel) label)
+          result))))
 
 
-  ;(defn get-transitions-in-protocol [protocol]
-  ;  (interactions-to-transitions (get-interactions protocol)))
-  ;
-  ;(defn- generate-io-fsms
-  ;  "Convert a protocol of interactions to IO enabled finite-state-machines local to each role."
-  ;  [protocol]
-  ;  (let [roles (get-distinct-roles (get-interactions protocol))]))
+;(defn get-transitions-in-protocol [protocol]
+;  (interactions-to-transitions (get-interactions protocol)))
+;
+;(defn- generate-io-fsms
+;  "Convert a protocol of interactions to IO enabled finite-state-machines local to each role."
+;  [protocol]
+;  (let [roles (get-distinct-roles (get-interactions protocol))]))
 

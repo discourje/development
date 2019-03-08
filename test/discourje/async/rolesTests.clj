@@ -41,3 +41,28 @@
 
 (deftest unique6-roles-multiple-nested-recur-protocol-test
   (is (= 6 (count (get-distinct-roles (get-interactions (multiple-nested-recur-protocol)))))))
+
+(deftest unique-minimum-role-pairs-test
+  (let [roles (get-distinct-role-pairs (get-interactions (testQuadProtocol)))
+        main (nth roles 0)
+        ab (nth roles 1)
+        ba (nth roles 2)
+        ac (nth roles 3)
+        cab (nth roles 4)]
+    (println roles)
+    (is (== 5 (count roles)))
+    (is (and (= (:sender main) "main") (= (:receivers main) ["A" "B" "C"])))
+    (is (and (= (:sender ab) "A") (= (:receivers ab) "B")))
+    (is (and (= (:sender ba) "B") (= (:receivers ba) "A")))
+    (is (and (= (:sender ac) "A") (= (:receivers ac) "C")))
+    (is (and (= (:sender cab) "C") (= (:receivers cab) ["A" "B"])))
+    ))
+
+(deftest unique-minimum-multiple-nested-branches-protocol-role-pairs-test
+  (let [roles (get-distinct-role-pairs (get-interactions (multiple-nested-branches-protocol)))]
+    (is (== 10 (count roles)))))
+
+(deftest unique-minimum-single-recur-protocol-role-pairs-test
+  (let [roles (get-distinct-role-pairs (get-interactions (single-recur-protocol)))]
+    (println roles)
+    (is (== 5 (count roles)))))

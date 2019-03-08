@@ -83,11 +83,33 @@
                     (conj result2 (flatten (get-receivers element)) (get-sender element))
                     (conj result2 (get-receivers element) (get-sender element))))))))))
 
+(defn- find-all-role-pairs
+  "List all sender and receivers in the protocol"
+  [protocol result]
+  (let [result2 (conj result [])]
+    (conj result2
+          (flatten
+            (for [element protocol]
+              (cond
+                (satisfies? discourje.core.async.async/recursable element)
+                (conj result2 (flatten (find-all-role-pairs (:recursion element) result2)))
+                (satisfies? discourje.core.async.async/branch element)
+                (let [branched-interactions (for [branch (get-branches element)] (find-all-role-pairs branch result2))]
+                  (conj result2 (flatten branched-interactions)))
+                (satisfies? discourje.core.async.async/interactable element)
+                (conj result2 {:sender (get-sender element) :receivers (get-receivers element)})
+                ))))))
+
 (defn get-distinct-roles
   "Get all distinct senders and receivers in the protocol"
   [interactions]
   (let [x (find-all-roles interactions [])]
     (vec (filter some? (distinct (flatten (first x)))))))
+
+(defn get-distinct-role-pairs
+  "Get minimum amount of distinct sender and receivers pairs needed to implement the given protocol"
+  [interactions]
+  (vec (distinct (filter some? (flatten (find-all-role-pairs interactions []))))))
 
 (defn get-interactions-by-role [role protocol]
   (vec (some? (filter
