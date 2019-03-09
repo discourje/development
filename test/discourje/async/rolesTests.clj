@@ -64,5 +64,12 @@
 
 (deftest unique-minimum-single-recur-protocol-role-pairs-test
   (let [roles (get-distinct-role-pairs (get-interactions (single-recur-protocol)))]
-    (println roles)
+    (is (== 5 (count roles)))))
+
+(deftest two-buyer-protocol-role-test
+  (let [roles (get-distinct-roles (get-interactions (two-buyer-protocol)))]
+    (is (== 3 (count roles)))))
+
+(deftest two-buyer-protocol-role-pairs-test
+  (let [roles (get-distinct-role-pairs (get-interactions (two-buyer-protocol)))]
     (is (== 5 (count roles)))))

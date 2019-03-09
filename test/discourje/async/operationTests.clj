@@ -339,7 +339,7 @@
           (is (= "AC" (get-content a->c))))))))
 
 (deftest send-receive-dual-custom-channels-test
-  (let [channels (generate-infrastructure (testDualProtocol)[(generate-channel "A" "B" nil 3) (generate-channel "B" "A" nil 2)])
+  (let [channels (generate-infrastructure (testDualProtocol) [(generate-channel "A" "B" nil 3) (generate-channel "B" "A" nil 2)])
         ab (get-channel "A" "B" channels)
         ba (get-channel "B" "A" channels)
         m1 (->message "1" "Hello B")
@@ -355,3 +355,42 @@
       (let [b->a (<!!! ba "2")]
         (is (= "2" (get-label b->a)))
         (is (= "Hello A" (get-content b->a)))))))
+
+(deftest send-receive-two-buyer-protocol-test
+  (let [channels (generate-infrastructure (two-buyer-protocol))
+        b1s (get-channel "Buyer1" "Seller" channels)
+        sb1 (get-channel "Seller" "Buyer1" channels)
+        sb2 (get-channel "Seller" "Buyer2" channels)
+        b1b2 (get-channel "Buyer1" "Buyer2" channels)
+        b2s (get-channel "Buyer2" "Seller" channels)
+        order-book (atom true)]
+    (while (true? @order-book)
+      (do
+        (>!!! b1s (->message "title" "The Joy of Clojure"))
+        (let [b1-title-s (<!!! b1s "title")]
+          (is (= "title" (get-label b1-title-s)))
+          (is (= "The Joy of Clojure" (get-content b1-title-s)))
+          (>!!! [sb1 sb2] (->message "quote" (+ 1 (rand-int 20))))
+          (let [s-quote-b1 (<!!! sb1 "quote")
+                s-quote-b2 (<!!! sb2 "quote")]
+            (is (= "quote" (get-label s-quote-b1)))
+            (is (= "quote" (get-label s-quote-b2)))
+            (>!!! b1b2 (->message "quoteDiv" (rand-int (get-content s-quote-b1))))
+            (let [b1-quoteDiv-b2 (<!!! b1b2 "quoteDiv")]
+              (is (= "quoteDiv" (get-label b1-quoteDiv-b2)))
+              (if (>= (* 100 (float (/ (get-content b1-quoteDiv-b2) (get-content s-quote-b2)))) 50)
+                (do
+                  (>!!! b2s (->message "ok" "Open University, Valkenburgerweg 177, 6419 AT, Heerlen"))
+                  (let [b2-ok-s (<!!! b2s "ok")]
+                    (is (= "ok" (get-label b2-ok-s)))
+                    (is (= "Open University, Valkenburgerweg 177, 6419 AT, Heerlen" (get-content b2-ok-s)))
+                    (>!!! sb2 (->message "date" "09-04-2019"))
+                    (let [s-date-b2 (<!!! sb2 "date")]
+                      (is (= "date" (get-label s-date-b2)))
+                      (is (= "09-04-2019" (get-content s-date-b2))))))
+                (do
+                  (>!!! b2s (->message "quit" "Price to high"))
+                  (let [b2-quit-s (<!!! b2s "quit")]
+                    (is (= "quit" (get-label b2-quit-s)))
+                    (is (= "Price to high" (get-content b2-quit-s)))
+                    (reset! order-book false)))))))))))

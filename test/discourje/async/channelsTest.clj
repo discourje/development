@@ -103,3 +103,8 @@
   (let [roles (get-distinct-role-pairs (get-interactions (single-recur-protocol)))
         channels (generate-minimum-channels roles nil 1)]
     (is (= 4 (count channels)))))
+
+(deftest minimum-amount-two-buyer-protocol-roles-test
+  (let [roles (get-distinct-role-pairs (get-interactions (two-buyer-protocol)))
+        channels (generate-minimum-channels roles nil 1)]
+    (is (= 5 (count channels)))))
