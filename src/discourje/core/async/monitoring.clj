@@ -212,7 +212,8 @@
 (defn- contains-value?
   "Does the vector contain a value?"
   [element coll]
-  (boolean (some #(= element %) coll)))
+  (when (instance? Seqable coll)
+  (boolean (some #(= element %) coll))))
 
 (defn- is-valid-interaction?
   "Is the given interaction valid compared to the active-interaction of the monitor"

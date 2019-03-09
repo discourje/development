@@ -15,6 +15,10 @@
   (create-protocol [(-->> "1" "A" "B")
                     (-->> "2" "B" "A")]))
 
+(defn test-typed-DualProtocol []
+  (create-protocol [(-->> java.lang.String "A" "B")
+                    (-->> java.lang.String "B" "A")]))
+
 (defn testTripleProtocol []
   (create-protocol [
                     (-->> "1" "A" "B")
