@@ -51,11 +51,25 @@
   Note: this requires a (participants) vector of maps {:sender x :receivers y}, where receivers can also be a vector, [y z]."
   [participants monitor buffer]
   (distinct (flatten (map #(apply (fn [s r] (let [sender (nth s 1)
-                               receivers (nth r 1)]
-                           (if (instance? Seqable receivers)
-                             (for [receiver receivers] (generate-channel sender receiver monitor buffer))
-                             (generate-channel sender receivers monitor buffer))))
-               %) participants))))
+                                                  receivers (nth r 1)]
+                                              (if (instance? Seqable receivers)
+                                                (for [receiver receivers] (generate-channel sender receiver monitor buffer))
+                                                (generate-channel sender receivers monitor buffer))))
+                                  %) participants))))
+
+(defn generate-minimum-channelsS
+  "Generates communication channels between minimum amount of participants required for a protocol, and adds the monitor
+  Note: this requires a (participants) vector of maps {:sender x :receivers y}, where receivers can also be a vector, [y z]."
+  [participants monitor buffer]
+  (let [channels (atom [])]
+    (doseq [participant participants]
+      (if (instance? Seqable (:receivers participant))
+        (doseq [receiver (:receivers participant)]
+          (when (empty? (distinct (filter (fn [c] (and (= (:provider c) (:sender participant)) (= (:consumers c) receiver))) @channels )))
+            (swap! channels conj (generate-channel (:sender participant) receiver monitor buffer))))
+        (when (empty? (distinct (filter (fn [c] (and (= (:provider c) (:sender participant)) (= (:consumers c) (:receivers participant)))) @channels)))
+          (swap! channels conj (generate-channel (:sender participant) (:receivers participant) monitor buffer)))))
+    @channels))
 
 (defn add-monitor-to-channels
   "Add the monitor to existing channels"
