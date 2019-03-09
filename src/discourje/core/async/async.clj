@@ -190,9 +190,9 @@
            control-channels (generate-minimum-channels roles monitor 1)
            all-channels-given? (nil? (some #(false? %) (for [channel control-channels] (not (empty? (filter (fn [c] (and (= (:provider c) (:provider channel)) (= (:consumers c) (:consumers channel)))) channels))))))]
        (if all-channels-given?
-       (let [monitor (generate-monitor protocol)]
-         (vec (for [c channels] (assoc c :monitor monitor))))
-       (log-error :invalid-channels "Cannot generate infrastructure, make sure all channels required for the protocol are given!")))
+         (let [monitor (generate-monitor protocol)]
+           (vec (for [c channels] (assoc c :monitor monitor))))
+         (log-error :invalid-channels "Cannot generate infrastructure, make sure all channels required for the protocol are given!")))
      (log-error :invalid-channels "Cannot generate infrastructure, make sure all supplied channels implement the `transporable' protocol!"))))
 
 
@@ -218,22 +218,23 @@
 (defn >!!!
   "Put on channel"
   [channel message]
-  ;  (if (nil? (get-active-interaction (get-monitor channel)))
-  ;   (println "Please activate a monitor, your protocol has not yet started, or it is already finished!")
-  (if (vector? channel)
-    (do (when-not (equal-senders? channel)
-          (log-error :invalid-parallel-channels "Trying to send in parallel, but the sender of the channels is not the same!"))
-        (when-not (equal-monitors? channel)
-          (log-error :monitor-mismatch "Trying to send in parallel, but the channels do not share the same monitor!"))
-        (when-not (all-valid-channels? channel message)
-          (log-error :incorrect-communication "Trying to send in parallel, but the monitor is not correct for all of them!"))
-        (let [monitor (get-monitor (first channel))]
-          ;(apply-interaction monitor (get-label message))
-          (allow-sends channel message)))
-    (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label message))
-          (log-error :incorrect-communication "Atomic-send communication invalid!"))
-        ; (apply-interaction (get-monitor channel) (get-label message))
-        (allow-send channel message))))
+  (let [m (if (not (satisfies? sendable message))
+            (->message (type message) message)
+            message)]
+    (if (vector? channel)
+      (do (when-not (equal-senders? channel)
+            (log-error :invalid-parallel-channels "Trying to send in parallel, but the sender of the channels is not the same!"))
+          (when-not (equal-monitors? channel)
+            (log-error :monitor-mismatch "Trying to send in parallel, but the channels do not share the same monitor!"))
+          (when-not (all-valid-channels? channel m)
+            (log-error :incorrect-communication "Trying to send in parallel, but the monitor is not correct for all of them!"))
+          (let [monitor (get-monitor (first channel))]
+            ;(apply-interaction monitor (get-label message))
+            (allow-sends channel m)))
+      (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m))
+            (log-error :incorrect-communication "Atomic-send communication invalid!"))
+          ; (apply-interaction (get-monitor channel) (get-label message))
+          (allow-send channel m)))))
 ;)
 
 (defn <!!!
