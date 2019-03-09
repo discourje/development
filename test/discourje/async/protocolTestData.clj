@@ -106,14 +106,14 @@
                     (-->> "Done" "A" "End")]))
 
 (defn multiple-nested-choice-branch-protocol []
-  (create-protocol [(make-choice [                          ;i0
-                                  [(make-choice [           ;i0b00
-                                                 [(-->> "1" "A" "B")]  ;i0b00b00
-                                                 [(-->> "2" "A" "B")]];i0b00b10
+  (create-protocol [(make-choice [;i0
+                                  [(make-choice [;i0b00
+                                                 [(-->> "1" "A" "B")] ;i0b00b00
+                                                 [(-->> "2" "A" "B")]] ;i0b00b10
                                                 )]
-                                  [(make-choice [           ;i0b10
-                                                 [(-->> "3" "A" "B")];i0b10b00
-                                                 [(-->> "4" "A" "B")]];i0b10b10
+                                  [(make-choice [;i0b10
+                                                 [(-->> "3" "A" "B")] ;i0b10b00
+                                                 [(-->> "4" "A" "B")]] ;i0b10b10
                                                 )]]
                                  )]))
 
@@ -170,18 +170,18 @@
                     ])
   )
 (defn one-recur-with-startchoice-and-endchoice-protocol []
-  (create-protocol [(make-choice [                          ;i0
-                                  [(make-recursion :test [  ;i0b0r0
-                                                          (make-choice [ ;i0b0r00
-                                                                        [(-->> "2" "A" "C");i0b0r00b00
-                                                                         (do-recur :test)];i0b0r00b01
-                                                                        [(-->> "3" "A" "B");i0b0r00b10
-                                                                         (end-recur :test);i0b0r00b11
+  (create-protocol [(make-choice [;i0
+                                  [(make-recursion :test [;i0b0r0
+                                                          (make-choice [;i0b0r00
+                                                                        [(-->> "2" "A" "C") ;i0b0r00b00
+                                                                         (do-recur :test)] ;i0b0r00b01
+                                                                        [(-->> "3" "A" "B") ;i0b0r00b10
+                                                                         (end-recur :test) ;i0b0r00b11
                                                                          ]
                                                                         ])
                                                           ])
                                    ]
-                                  [(-->> "2" "A" "C")];i0b10
+                                  [(-->> "2" "A" "C")]      ;i0b10
                                   ])
                     ]))
 
@@ -233,4 +233,17 @@
                                                                     ])]
 
                                     )                       ;i1
+                    ]))
+
+(defn two-buyer-protocol []
+  (create-protocol [(make-recursion :order-book [
+                                           (-->> "title" "Buyer1" "Seller")
+                                           (-->> "quote" "Seller" ["Buyer1" "Buyer2"])
+                                           (-->> "quoteDiv" "Buyer1" "Buyer2")
+                                           (make-choice [
+                                                         [(-->> "ok" "Buyer2" "Seller")
+                                                          (-->> "date" "Seller" "Buyer2")
+                                                          (do-recur :order-book)]
+                                                         [(-->> "quit" "Buyer2" "Seller")
+                                                          (end-recur :order-book)]])])
                     ]))
