@@ -175,20 +175,24 @@
 (defn- all-channels-implement-transportable?
   "Do all custom supplied channels implement the transportable interface?"
   [channels]
-  (println (= 1 (count (distinct (for [c channels] (satisfies? transportable c))))))
   (= 1 (count (distinct (for [c channels] (satisfies? transportable c))))))
 
 (defn generate-infrastructure
   "Generate channels with monitor based on the protocol, also supports arity to give manually created custom channels. With for example specific buffer requirements."
   ([protocol]
    (let [monitor (generate-monitor protocol)
-         roles (get-distinct-roles (get-interactions protocol))
-         channels (generate-channels roles monitor 1)]
+         roles (get-distinct-role-pairs (get-interactions protocol))
+         channels (generate-minimum-channels roles monitor 1)]
      channels))
   ([protocol channels]
    (if (all-channels-implement-transportable? channels)
-     (let [monitor (generate-monitor protocol)]
-       (vec (for [c channels] (assoc c :monitor monitor))))
+     (let [roles (get-distinct-role-pairs (get-interactions protocol))
+           control-channels (generate-minimum-channels roles monitor 1)
+           all-channels-given? (nil? (some #(false? %) (for [channel control-channels] (not (empty? (filter (fn [c] (and (= (:provider c) (:provider channel)) (= (:consumers c) (:consumers channel)))) channels))))))]
+       (if all-channels-given?
+       (let [monitor (generate-monitor protocol)]
+         (vec (for [c channels] (assoc c :monitor monitor))))
+       (log-error :invalid-channels "Cannot generate infrastructure, make sure all channels required for the protocol are given!")))
      (log-error :invalid-channels "Cannot generate infrastructure, make sure all supplied channels implement the `transporable' protocol!"))))
 
 
