@@ -228,14 +228,10 @@
             (log-error :monitor-mismatch "Trying to send in parallel, but the channels do not share the same monitor!"))
           (when-not (all-valid-channels? channel m)
             (log-error :incorrect-communication "Trying to send in parallel, but the monitor is not correct for all of them!"))
-          (let [monitor (get-monitor (first channel))]
-            ;(apply-interaction monitor (get-label message))
-            (allow-sends channel m)))
+            (allow-sends channel m))
       (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m))
             (log-error :incorrect-communication "Atomic-send communication invalid!"))
-          ; (apply-interaction (get-monitor channel) (get-label message))
           (allow-send channel m)))))
-;)
 
 (defn <!!!
   "Take from channel"
