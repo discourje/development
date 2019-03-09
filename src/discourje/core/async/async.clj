@@ -81,8 +81,7 @@
                                                                searches (for [b branches] (find-nested-recur name option b))]
                                                            (first searches))
                                (satisfies? recursable inter) (first (find-nested-recur name option (get-recursion inter)))
-                               ))
-                 )))
+                               )))))
 
 (defn- replace-nested-recur
   [name id option interactions]
@@ -243,13 +242,4 @@
             (log-error :incorrect-communication "Atomic receive communication invalid!"))
           (apply-interaction (get-monitor channel) (get-provider channel) (get-consumer channel) label)
           result))))
-
-
-;(defn get-transitions-in-protocol [protocol]
-;  (interactions-to-transitions (get-interactions protocol)))
-;
-;(defn- generate-io-fsms
-;  "Convert a protocol of interactions to IO enabled finite-state-machines local to each role."
-;  [protocol]
-;  (let [roles (get-distinct-roles (get-interactions protocol))]))
 
