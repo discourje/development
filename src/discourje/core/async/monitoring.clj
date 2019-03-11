@@ -11,10 +11,14 @@
   (apply-interaction [this sender receivers label])
   (valid-interaction? [this sender receivers label]))
 
+(declare contains-value?)
+
 (defn- check-atomic-interaction
   "Check the atomic interaction"
   [label active-interaction]
-  (= (get-action active-interaction) label))
+  (if (instance? Seqable label)
+    (contains-value? (get-action active-interaction) label)
+    (= (get-action active-interaction) label)))
 
 (defn- check-recursion-interaction
   "Check the first element in a recursion interaction"
@@ -114,6 +118,7 @@
   ([active-interaction receiver interactions]
    (swap-active-interaction-by-atomic active-interaction @active-interaction receiver interactions))
   ([active-interaction target-interaction receiver interactions]
+   (println "swaping atomic! " target-interaction)
    (if (nil? receiver)
      (swap! active-interaction (swap-next-interaction-by-id! (get-next target-interaction) interactions))
      (if (multiple-receivers? target-interaction)
@@ -139,7 +144,7 @@
 (defn- get-branch-interaction
   "Check the atomic interaction"
   [sender receiver label active-interaction]
-   (flatten
+  (flatten
     (for [b (:branches active-interaction)]
       (let [first-in-branch (nth b 0)]
         (cond
@@ -213,7 +218,7 @@
   "Does the vector contain a value?"
   [element coll]
   (when (instance? Seqable coll)
-  (boolean (some #(= element %) coll))))
+    (boolean (some #(= element %) coll))))
 
 (defn- is-valid-interaction?
   "Is the given interaction valid compared to the active-interaction of the monitor"
