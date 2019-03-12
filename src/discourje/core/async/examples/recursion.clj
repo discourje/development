@@ -32,10 +32,11 @@
   (>!!! alice-to-bob (->message "number" {:threshold threshold :generatedNumber (rand-int (+ threshold 10))}))
   (let [response (<!!! bob-to-alice ["greaterThan" "lessThan"])]
     (cond
-      (= (get-label response) "greaterThan") (do
-                                               (log-message (format "greaterThan received with message: %s" (get-content response)))
-                                               (sendNumberAndAwaitResult threshold))
-      (= (get-label response) "lessThan") (log-message (format "lessThan received with message: %s" (get-content response))))))
+      (= (get-label response) "greaterThan")
+      (do (log-message (format "greaterThan received with message: %s" (get-content response)))
+          (sendNumberAndAwaitResult threshold))
+      (= (get-label response) "lessThan")
+      (log-message (format "lessThan received with message: %s" (get-content response))))))
 
 (defn- receiveNumber
   "This function will use the protocol to listen for the number message. Check the number and threshold and send result"
@@ -48,7 +49,7 @@
           (receiveNumber))
       (>!!! bob-to-alice (->message "lessThan" "Number send is smaller!")))))
 
-;start the `GreetBobAndCarol' function on thread and supply some threshold
+;start the `sendNumberAndAwaitResult' function on thread and supply some threshold
 (clojure.core.async/thread (sendNumberAndAwaitResult 5))
 ;start the `receiveGreet' function on thread
 (clojure.core.async/thread (receiveNumber))
