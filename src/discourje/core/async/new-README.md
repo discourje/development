@@ -1,9 +1,6 @@
 <b>Discourje</b>
 -
-- [Getting Started](GettingStarted.md)
 - [Library Name](LibraryName.md)
-- [Project information](ProjectInformation.md)
-- [ToDo](ToDo.md)
 - [Dependencies](Dependencies.md)
 
 <b>Introduction:</b>
@@ -23,6 +20,9 @@ Communication is blocking when desired (configure logging levels) and order amon
 - [Parallelisation](src/discourje/examples/parallelisation.clj)
 - [Branching](src/discourje/examples/branching.clj)
 - [Recursion](src/discourje/examples/recursion.clj)
+- [Custom Channels](src/discourje/examples/recursion.clj)
+- [Typed Messages](src/discourje/examples/recursion.clj)
+- [Logging Levels](src/discourje/examples/recursion.clj)
 - Nesting: Recursion and Branching constructs support nesting!
 
 <i>See examples for each function for more info.</i>
