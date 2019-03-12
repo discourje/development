@@ -31,7 +31,11 @@
   ([sender receiver monitor buffer]
    (if (nil? buffer)
      (->channel sender receiver (clojure.core.async/chan) nil monitor)
-     (->channel sender receiver (clojure.core.async/chan buffer) buffer monitor))))
+     (->channel sender receiver (clojure.core.async/chan buffer) buffer monitor)))
+  ([sender receiver buffer]
+   (if (nil? buffer)
+     (->channel sender receiver (clojure.core.async/chan) nil nil)
+     (->channel sender receiver (clojure.core.async/chan buffer) buffer nil))))
 
 (defn unique-cartesian-product
   "Generate channels between all participants and filters out duplicates e.g.: A<->A"
