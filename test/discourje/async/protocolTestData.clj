@@ -157,6 +157,18 @@
                     (-->> "end" "A" ["B" "C"])              ; i2
                     ]))
 
+(defn single-recur-one-choice-protocol []
+  (create-protocol [(make-recursion :generate [
+                                               (-->> "1" "A" "B")
+                                               (make-choice [
+                                                             [(-->> "2" "B" "A")
+                                                              (do-recur :generate)]
+                                                             [(-->> "3" "B" "A")
+                                                              (end-recur :generate)]
+                                                             ])
+                                               ])
+                    ]))
+
 (defn one-recur-with-choice-protocol []
   (create-protocol [(make-recursion :test [;i0
                                            (make-choice [;i0r0

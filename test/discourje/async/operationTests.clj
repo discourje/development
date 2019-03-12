@@ -313,6 +313,33 @@
             (is (= "AB3" (get-content a->b3)))
             (reset! flag true)))))))
 
+(deftest send-receive-single-recur-one-choice-protocol
+  (let [channels (generate-infrastructure (single-recur-one-choice-protocol))
+        ab (get-channel "A" "B" channels)
+        ba (get-channel "B" "A" channels)
+        fnA (fn [fnA]
+              (>!!! ab (->message "1" {:threshold 5 :generatedNumber (rand-int (+ 10 10))}))
+              (let [response (<!!! ba ["2" "3"])]
+                (cond
+                  (= (get-label response) "2") (do
+                                                 (println (format "greaterThan received with message: %s" (get-content response)))
+                                                 (fnA fnA))
+                  (= (get-label response) "3") (println (format "lessThan received with message: %s" (get-content response))))))
+        fnB (fn [fnB]
+              (let [numberMap (<!!! ab "1")
+                    threshold (:threshold (get-content numberMap))
+                    generated (:generatedNumber (get-content numberMap))]
+                (println numberMap)
+                (if (> generated threshold)
+                  (do (>!!! ba (->message "2" "Number send is greater!"))
+                      (fnB fnB))
+                  (>!!! ba (->message "3" "Number send is smaller!")))))
+
+        ]
+    (clojure.core.async/thread (fnA fnA))
+    (clojure.core.async/thread (fnB fnB))
+      ))
+
 (deftest send-receive-one-recur-with-startchoice-and-endchoice-protocol
   (let [channels (generate-infrastructure (one-recur-with-startchoice-and-endchoice-protocol))
         ab (get-channel "A" "B" channels)

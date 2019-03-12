@@ -118,7 +118,6 @@
   ([active-interaction receiver interactions]
    (swap-active-interaction-by-atomic active-interaction @active-interaction receiver interactions))
   ([active-interaction target-interaction receiver interactions]
-   (println "swaping atomic! " target-interaction)
    (if (nil? receiver)
      (swap! active-interaction (swap-next-interaction-by-id! (get-next target-interaction) interactions))
      (if (multiple-receivers? target-interaction)
@@ -128,7 +127,7 @@
 (defn- get-atomic-interaction
   "Check the atomic interaction"
   [sender receiver label active-interaction]
-  (when (and (= (:action active-interaction) label) (= (:receivers active-interaction) receiver) (= (:sender active-interaction) sender)) active-interaction))
+  (when (and (check-atomic-interaction label active-interaction) (= (:receivers active-interaction) receiver) (= (:sender active-interaction) sender)) active-interaction))
 
 (defn- get-recursion-interaction
   "Check the first element in a recursion interaction"
@@ -163,13 +162,13 @@
   "Swap active interaction by branch"
   ([sender receivers label active-interaction interactions]
    (let [target-interaction (get-first-valid-target-branch-interaction sender receivers label @active-interaction)]
-     (log-message (format "Target interaction sender %s receivers %s action %s next %s" (:sender target-interaction) (:receivers target-interaction) (:action target-interaction) (:next target-interaction)))
+     (log-message (format "target-interaction sender %s receivers %s action %s next %s, or is identifiable-recur %s" (:sender target-interaction) (:receivers target-interaction) (:action target-interaction) (:next target-interaction)(satisfies? identifiable-recur target-interaction)))
      (if (multiple-receivers? target-interaction)
        (remove-receiver-from-branch active-interaction target-interaction receivers)
        (swap! active-interaction (swap-next-interaction-by-id! (:next target-interaction) interactions)))))
   ([sender receivers label active-interaction target-interaction interactions]
    (let [target (get-first-valid-target-branch-interaction sender receivers label target-interaction)]
-     (log-message (format "Target interaction sender %s receivers %s action %s next %s" (:sender target) (:receivers target) (:action target) (:next target)))
+     (log-message (format "target sender %s receivers %s action %s next %s or is identifiable-recur %s" (:sender target) (:receivers target) (:action target) (:next target) (satisfies? identifiable-recur target)))
      (if (multiple-receivers? target)
        (remove-receiver-from-branch active-interaction target receivers)
        (swap! active-interaction (swap-next-interaction-by-id! (:next target) interactions))))))
@@ -188,7 +187,7 @@
              (swap! active-interaction (swap-next-interaction-by-id! (get-next target-interaction) interactions))))
          (satisfies? branch target-interaction)
          (let [first-in-branch (get-first-valid-target-branch-interaction sender receivers label target-interaction)]
-           (log-message (format "Target interaction sender %s receivers %s action %s next %s" (:sender first-in-branch) (:receivers first-in-branch) (:action first-in-branch) (:next first-in-branch)))
+           (log-message (format "first-in-branch sender %s receivers %s action %s next %s, or is identifiable-recur %s" (:sender first-in-branch) (:receivers first-in-branch) (:action first-in-branch) (:next first-in-branch) (satisfies? identifiable-recur first-in-branch)))
            (if (multiple-receivers? first-in-branch)
              (remove-receiver-from-branch active-interaction first-in-branch receivers)
              (swap! active-interaction (swap-next-interaction-by-id! (:next first-in-branch) interactions))))

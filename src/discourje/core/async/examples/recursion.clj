@@ -49,6 +49,6 @@
       (>!!! bob-to-alice (->message "lessThan" "Number send is smaller!")))))
 
 ;start the `GreetBobAndCarol' function on thread and supply some threshold
-(clojure.core.async/thread (sendNumberAndAwaitResult 10))
+(clojure.core.async/thread (sendNumberAndAwaitResult 5))
 ;start the `receiveGreet' function on thread
 (clojure.core.async/thread (receiveNumber))
