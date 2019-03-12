@@ -1,4 +1,4 @@
-(ns discourje.core.async.examples.sequencing
+(ns discourje.core.async.examples.customChannels
   (require [discourje.core.async.async :refer :all]
            [discourje.core.async.logging :refer :all]))
 
@@ -9,8 +9,13 @@
   (create-protocol [(-->> "greet" "alice" "bob")
                     (-->> "greet" "alice" "carol")]))
 
-;setup infrastructure, generate channels and add monitor
-(def infrastructure (generate-infrastructure (define-sequence-protocol)))
+;Define custom channels, which differ in buffer size (1 and 2)
+(def a->b (generate-channel "alice" "bob" 1))
+(def a->c (generate-channel "alice" "carol" 2))
+
+;setup infrastructure, generate channels and add monitor, notice that we supply the generate-infrastructure function with custom channels vector
+;generate-infrastructure will detect if all channels in the vector implement the transportable defprotocol and that all channels required for the protocol are present in the custom channel vector
+(def infrastructure (generate-infrastructure (define-sequence-protocol) [a->b a->c]))
 ;Get the channels
 (def alice-to-bob (get-channel "alice" "bob" infrastructure))
 (def alice-to-carol (get-channel "alice" "carol" infrastructure))
