@@ -1,5 +1,5 @@
 (ns discourje.core.async.logging
-  (require [clojure.core.async :as async :refer :all]
+  (require [clojure.core.async :as async]
            [slingshot.slingshot :refer :all])
   (:use [slingshot.slingshot :only [throw+]]))
 
@@ -26,14 +26,14 @@
   (reset! logging-level level-exceptions))
 
 ; define a channel to log data to, we use a channel to preserve order among println
-(def logging-channel (chan))
+(def logging-channel (async/chan))
 
 (defn log-message
   "Put a message on the logging channel.
   We use a channel to preserve order among messages!"
   [message & more]
   (when (not (nil? logging-channel))
-    (>!! logging-channel (format "%s %s" message (apply str (flatten more))))))
+    (async/>!! logging-channel (format "%s %s" message (apply str (flatten more))))))
 
 (defn log-error
   "Always log message but throw exception (error) if exceptions level is set!"
@@ -44,9 +44,9 @@
       (log-message (format "ERROR-[%s] - %s" type msg)))))
 
 ;loop take on channel as long as the channel is open.
-(thread
+(async/thread
   (loop []
-    (when-let [v (<!! logging-channel)]
+    (when-let [v (async/<!! logging-channel)]
       (println v)
       (recur)))
   (println "Logging Closed"))
@@ -54,4 +54,4 @@
 (defn stop-logging
   "Stop logging and close the channel"
   []
-  (close! logging-channel))
+  (async/close! logging-channel))

@@ -1,7 +1,7 @@
 (ns discourje.core.async.async
   (:require [clj-uuid :as uuid]
-            [discourje.core.async.logging :refer :all])
-  (use [clojure.core.async :rename {>!! core->!!, <!! core-<!!}])
+            [discourje.core.async.logging :refer :all]
+            [clojure.core.async :as async])
   (:import (clojure.lang Seqable)))
 
 (defprotocol sendable
@@ -87,11 +87,11 @@
 (defn- allow-send
   "Allow send message in channel"
   [channel message]
-  (core->!! (get-chan channel) message))
+  (async/>!! (get-chan channel) message))
 
 (defn- allow-receive [channel]
   (log-message "allowing receive on channel!")
-  (core-<!! (get-chan channel)))
+  (async/<!! (get-chan channel)))
 
 (defn- allow-sends
   "Allow sending message on multiple channels"
