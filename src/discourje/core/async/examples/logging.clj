@@ -19,13 +19,13 @@
   "This function will use the protocol to send the greet message to bob and carol.
   NOTICE: How we first send to carol instead of bob, which is incorrect since our protocol specifies bob should be greeted first!"
   []
-  (>!!! alice-to-carol (->message "greet" "Greetings, from alice!"))
-  (>!!! alice-to-bob (->message "greet" "Greetings, from alice!")))
+  (>!! alice-to-carol (->message "greet" "Greetings, from alice!"))
+  (>!! alice-to-bob (->message "greet" "Greetings, from alice!")))
 
 (defn- receive-greet
   "This function will use the protocol to listen for the greet message."
   [channel]
-  (let [message (<!!! channel "greet")]
+  (let [message (<!! channel "greet")]
         (log-message (format "Received message: %s" (get-content message)))))
 
 "***BY DEFAULT EXCEPTION LOGGING IS ENABLED!***"

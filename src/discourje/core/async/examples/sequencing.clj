@@ -18,13 +18,13 @@
 (defn- greet-bob-and-carol
   "This function will use the protocol to send the greet message to bob and carol."
   []
-  (>!!! alice-to-bob (->message "greet" "Greetings, from alice!"))
-  (>!!! alice-to-carol (->message "greet" "Greetings, from alice!")))
+  (>!! alice-to-bob (->message "greet" "Greetings, from alice!"))
+  (>!! alice-to-carol (->message "greet" "Greetings, from alice!")))
 
 (defn- receive-greet
   "This function will use the protocol to listen for the greet message."
   [channel]
-  (let [message (<!!! channel "greet" )]
+  (let [message (<!! channel "greet")]
         (log-message (format "Received message: %s to %s" (get-content message) (get-consumer channel)))))
 
 ;start the `greet-bob-and-carol' function on thread

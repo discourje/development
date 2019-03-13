@@ -1,8 +1,7 @@
 (ns discourje.core.async.async
-  (:require [clojure.core.async :as async :exclude [>!! <!!]]
-            [clj-uuid :as uuid]
+  (:require [clj-uuid :as uuid]
             [discourje.core.async.logging :refer :all])
-  ;(:refer [clojure.core.async :rename {>!! core>!!, <!! core<!!}])
+  (use [clojure.core.async :rename {>!! core->!!, <!! core-<!!}])
   (:import (clojure.lang Seqable)))
 
 (defprotocol sendable
@@ -54,116 +53,6 @@
 (defn create-protocol [interactions]
   "Generate protocol based on interactions"
   (->protocol interactions))
-;
-;(defn replace-last-in-vec
-;  "Replace the last value in a vector and return the new vector."
-;  [coll x]
-;  (conj (pop coll) x))
-;
-;(defn assoc-next-nested-choice
-;  "Assoc nested choice next field recursively"
-;  [linked-i inter]
-;  (assoc linked-i :branches
-;                  (vec
-;                    (for [b (get-branches linked-i)]
-;                      (if (satisfies? branch (last b))
-;                        (replace-last-in-vec b (assoc-next-nested-choice (last b) inter))
-;                        (if-not (satisfies? identifiable-recur (last b))
-;                          (replace-last-in-vec b (assoc (last b) :next (get-id inter)))
-;                          b))))))
-;
-;(defn- find-nested-recur
-;  "Finds the next interaction based on id, nested in choices"
-;  [name option interactions]
-;  (first (filter some? (for [inter interactions]
-;                         (cond (satisfies? identifiable-recur inter) (when (and (= (get-name inter) name) (= (get-option option))) inter)
-;                               (satisfies? branch inter) (let [branches (get-branches inter)
-;                                                               searches (for [b branches] (find-nested-recur name option b))]
-;                                                           (first searches))
-;                               (satisfies? recursable inter) (first (find-nested-recur name option (get-recursion inter)))
-;                               )))))
-;
-;(defn- replace-nested-recur
-;  [name id option interactions]
-;  (let [prot (vec (for [inter interactions]
-;                    (cond (satisfies? identifiable-recur inter) (if (and (= (get-name inter) name) (= (get-option inter) option)) (assoc inter :next id) inter)
-;                          (satisfies? branch inter) (let [branches (get-branches inter)
-;                                                          searches (for [b branches] (replace-nested-recur name id option b))]
-;                                                      (assoc inter :branches (vec searches)))
-;                          (satisfies? recursable inter) (assoc inter :recursion (replace-nested-recur name id option (get-recursion inter)))
-;                          :else inter)))]
-;    (vec prot)))
-;
-;
-;(defn assoc-next-nested-do-recur
-;  "Link do-recur"
-;  [linked-i]
-;  (let [name (get-name linked-i)
-;        prot (vec (replace-nested-recur name (get-id linked-i) :recur (get-recursion linked-i)))]
-;    (assoc linked-i :recursion prot)))
-;
-;(defn assoc-next-nested-end-recur
-;  "Link end recur"
-;  [linked-i current-inter]
-;  (let [name (get-name linked-i)
-;        prot (vec (replace-nested-recur name (get-id current-inter) :end (get-recursion linked-i)))]
-;    (assoc linked-i :recursion prot)))
-;
-;(defn- link-interactions
-;  ([protocol]
-;   (let [interactions (get-interactions protocol)
-;         helper-vec (atom [])
-;         linked-interactions (atom [])]
-;     (link-interactions interactions helper-vec linked-interactions)))
-;  ([interactions helper-vec linked-interactions]
-;   (do (doseq [inter interactions]
-;         (cond
-;           (satisfies? recursable inter)
-;           (let [recursion-help-vec (atom [])
-;                 linked-recursion-interactions (atom [])
-;                 recured-interactions (link-interactions (get-recursion inter) recursion-help-vec linked-recursion-interactions)
-;                 last-helper-mon (last @helper-vec)
-;                 linked-i (if (nil? last-helper-mon) nil (assoc last-helper-mon :next (get-id inter)))
-;                 new-recursion (->recursion (get-id inter) (get-name inter) recured-interactions nil)
-;                 recured-new-recursion (assoc-next-nested-do-recur new-recursion)]
-;             (swap! helper-vec conj recured-new-recursion)
-;             (when-not (nil? last-helper-mon)
-;               (cond
-;                 (satisfies? branch linked-i) (swap! linked-interactions conj (assoc-next-nested-choice linked-i inter))
-;                 (satisfies? recursable linked-i) (let [ended-linked-i (assoc-next-nested-end-recur linked-i inter)]
-;                                                    (swap! linked-interactions conj ended-linked-i))
-;                 :else (swap! linked-interactions conj linked-i)))
-;             )
-;           (satisfies? branch inter)
-;           (let [branched-interactions
-;                 (for [branch (get-branches inter)]
-;                   (let [branch-help-vec (atom [])
-;                         linked-branch-interactions (atom [])]
-;                     (link-interactions branch branch-help-vec linked-branch-interactions)))
-;                 last-helper-mon (last @helper-vec)
-;                 linked-i (if (nil? last-helper-mon) nil (assoc last-helper-mon :next (get-id inter)))
-;                 new-choice (->choice (get-id inter) branched-interactions nil)]
-;             (swap! helper-vec conj new-choice)
-;             (when-not (nil? last-helper-mon)
-;               (cond
-;                 (satisfies? branch linked-i) (swap! linked-interactions conj (assoc-next-nested-choice linked-i inter))
-;                 (satisfies? recursable linked-i) (let [ended-linked-i (assoc-next-nested-end-recur linked-i inter)]
-;                                                    (swap! linked-interactions conj ended-linked-i))
-;                 :else (swap! linked-interactions conj linked-i)))
-;             )
-;           (empty? @helper-vec) (swap! helper-vec conj inter)
-;           (or (satisfies? interactable inter) (satisfies? identifiable-recur inter))
-;           (let [i (last @helper-vec)
-;                 linked-i (assoc i :next (get-id inter))]
-;             (swap! helper-vec conj inter)
-;             (cond
-;               (satisfies? branch linked-i) (swap! linked-interactions conj (assoc-next-nested-choice linked-i inter))
-;               (satisfies? recursable linked-i) (let [ended-linked-i (assoc-next-nested-end-recur linked-i inter)]
-;                                                  (swap! linked-interactions conj ended-linked-i))
-;               :else (swap! linked-interactions conj linked-i)))
-;           ))
-;       (swap! linked-interactions conj (last @helper-vec))
-;       @linked-interactions)))
 
 (defn generate-monitor
   "Generate the monitor based on the given protocol"
@@ -198,11 +87,11 @@
 (defn- allow-send
   "Allow send message in channel"
   [channel message]
-  (async/>!! (get-chan channel) message))
+  (core->!! (get-chan channel) message))
 
 (defn- allow-receive [channel]
   (log-message "allowing receive on channel!")
-  (async/<!! (get-chan channel)))
+  (core-<!! (get-chan channel)))
 
 (defn- allow-sends
   "Allow sending message on multiple channels"
@@ -214,12 +103,12 @@
   [channels message]
   (= 1 (count (distinct (for [c channels] (valid-interaction? (get-monitor c) (get-provider c) (get-consumer c) (get-label message)))))))
 
-(defn >!!!
+(defn >!!
   "Put on channel"
   [channel message]
-  (let [m (if (not (satisfies? sendable message))
-            (->message (type message) message)
-            message)]
+  (let [m (if (satisfies? sendable message)
+            message
+            (->message (type message) message))]
     (if (vector? channel)
       (do (when-not (equal-senders? channel)
             (log-error :invalid-parallel-channels "Trying to send in parallel, but the sender of the channels is not the same!"))
@@ -227,12 +116,12 @@
             (log-error :monitor-mismatch "Trying to send in parallel, but the channels do not share the same monitor!"))
           (when-not (all-valid-channels? channel m)
             (log-error :incorrect-communication "Trying to send in parallel, but the monitor is not correct for all of them!"))
-            (allow-sends channel m))
+          (allow-sends channel m))
       (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m))
             (log-error :incorrect-communication "Atomic-send communication invalid!"))
           (allow-send channel m)))))
 
-(defn <!!!
+(defn <!!
   "Take from channel"
   [channel label]
   (if (nil? (get-active-interaction (get-monitor channel)))
@@ -242,4 +131,3 @@
             (log-error :incorrect-communication "Atomic receive communication invalid!"))
           (apply-interaction (get-monitor channel) (get-provider channel) (get-consumer channel) label)
           result))))
-

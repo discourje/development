@@ -21,14 +21,14 @@
   Discourje will automatically generate a message with {:label type-of message content (in this case: String) :content original data (in this case: Greetings, from alice!)}
   So the send message will look like: Message{:label String :content Greetings, from alice!}"
   []
-  (>!!! alice-to-bob "Greetings, from alice!")
-  (>!!! alice-to-carol "Greetings, from alice!"))
+  (>!! alice-to-bob "Greetings, from alice!")
+  (>!! alice-to-carol "Greetings, from alice!"))
 
 (defn- receive-greet
   "This function will use the protocol to listen for the greet message.
   Notice how we receive by giving type as label"
   [channel]
-  (let [message (<!!! channel String)]
+  (let [message (<!! channel String)]
         (log-message (format "Received message: %s to %s" (get-content message) (get-consumer channel)))))
 
 ;start the `greet-bob-and-carol' function on thread
