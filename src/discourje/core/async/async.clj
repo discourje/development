@@ -81,7 +81,7 @@
          (let [monitor (generate-monitor protocol)]
            (vec (for [c channels] (assoc c :monitor monitor))))
          (log-error :invalid-channels "Cannot generate infrastructure, make sure all channels required for the protocol are given!")))
-     (log-error :invalid-channels "Cannot generate infrastructure, make sure all supplied channels implement the `transporable' protocol!"))))
+     (log-error :invalid-channels "Cannot generate infrastructure, make sure all supplied channels implement the `transportable' protocol!"))))
 
 
 (defn- allow-send
@@ -115,7 +115,7 @@
           (when-not (equal-monitors? channel)
             (log-error :monitor-mismatch "Trying to send in parallel, but the channels do not share the same monitor!"))
           (when-not (all-valid-channels? channel m)
-            (log-error :incorrect-communication "Trying to send in parallel, but the monitor is not correct for all of them!"))
+            (log-error :incorrect-communication "Trying to send in parallel, but the monitor is not correct for all channels!"))
           (allow-sends channel m))
       (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m))
             (log-error :incorrect-communication "Atomic-send communication invalid!"))
