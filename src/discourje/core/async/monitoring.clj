@@ -73,13 +73,13 @@
   [id interactions]
   (fn [active-interaction]
     (let [nested-id-search (find-nested-next id interactions)]
-      (println "nested-id" nested-id-search)
+      (log-message "nested-id" nested-id-search)
       nested-id-search)))
 
 (defn- multiple-receivers?
   "Does the monitor have multiple receivers?"
   [active-interaction]
-  (println (format "Checking multiple-receivers on active-interaction %s, seqable? %s, count > 1 %s"
+  (log-message (format "Checking multiple-receivers on active-interaction %s, seqable? %s, count > 1 %s"
                    active-interaction
                    (instance? Seqable (:receivers active-interaction))
                    (> (count (:receivers active-interaction)) 1)))

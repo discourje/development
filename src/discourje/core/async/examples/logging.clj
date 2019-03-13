@@ -38,6 +38,9 @@ Now setting log-level to logging, the protocol will block communication although
 When exception mode is enabled, communication will be blocked when invalid!"
 ;(set-logging-exceptions)
 
+"You can also set logging to none, to show no logs or exceptopns"
+;(set-logging-none)
+
 ;start the `greet-bob-and-carol' function on thread
 (clojure.core.async/thread (greet-bob-and-carol))
 ;start the `receive-greet' function on thread and add the channel
