@@ -31,14 +31,18 @@
 "***BY DEFAULT EXCEPTION LOGGING IS ENABLED!***"
 
 " NOTICE: How we first send to carol instead of bob, which is incorrect since our protocol specifies bob should be greeted first!
-Now setting log-level to logging, the protocol will block communication although it does not comply with the protocol"
+Now setting log-level to logging, the protocol will NOT block communication although it does not comply with the protocol"
 (set-logging)
 
-"Uncomment the line below to enable exception logging which will throw exceptions when communication does not comply with the protocol
+"Uncomment the line below to enable exception throwing which will throw exceptions when communication does not comply with the protocol
 When exception mode is enabled, communication will be blocked when invalid!"
 ;(set-logging-exceptions)
 
-"You can also set logging to none, to show no logs or exceptopns"
+"Uncomment the line below to enable exception throwing and logging which will throw exceptions when communication does not comply with the protocol
+When exception mode is enabled, communication will be blocked when invalid!"
+;(set-logging-and-exceptions)
+
+"You can also set logging to none, to show no logs or exceptions"
 ;(set-logging-none)
 
 ;start the `greet-bob-and-carol' function on thread
