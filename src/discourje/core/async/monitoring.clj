@@ -13,6 +13,12 @@
 
 (declare contains-value?)
 
+(defn- interaction-to-string
+  "Stringify an interaction, returns empty string if the given interaction is nil"
+  [interaction]
+  (if (nil? interaction)
+    "" (to-string interaction)))
+
 (defn- check-atomic-interaction
   "Check the atomic interaction"
   [label active-interaction]
@@ -29,7 +35,7 @@
       (satisfies? interactable first-interaction) (check-atomic-interaction label first-interaction)
       (satisfies? branch first-interaction) (check-branch-interaction label first-interaction)
       (satisfies? recursable first-interaction) (check-recursion-interaction label first-interaction)
-      :else (log-error :unsupported-operation "No correct next recursion monitor found"))))
+      :else (log-error :unsupported-operation "No correct next recursion monitor found" (interaction-to-string first-interaction)))))
 
 (defn- check-branch-interaction
   "Check the atomic interaction"
@@ -42,19 +48,8 @@
                             (satisfies? interactable first-in-branch) (check-atomic-interaction label first-in-branch)
                             (satisfies? branch first-in-branch) (check-branch-interaction label first-in-branch)
                             (satisfies? recursable first-in-branch) (check-recursion-interaction label first-in-branch)
-                            :else (log-error :unsupported-operation "Cannot check operation on child branch construct!")))))))
+                            :else (log-error :unsupported-operation "No correct next monitor found in first position of a branch construct!" (interaction-to-string first-in-branch))))))))
      0))
-
-(defn- swap-next-interaction!
-  "Get the next interaction"
-  [interactions]
-  (fn [active-interaction]
-    (first (filter
-             (fn [inter]
-               (cond (satisfies? interactable active-interaction) (= (get-id inter) (get-next active-interaction))
-                     :else (do (log-error :unsupported-operation "Not supported type!") false)))
-             interactions))))
-
 
 (defn- find-nested-next
   "Finds the next interaction based on id, nested in choices"
@@ -78,13 +73,13 @@
   [id interactions]
   (fn [active-interaction]
     (let [nested-id-search (find-nested-next id interactions)]
-      (println "nested-id" nested-id-search)
+      (log-message "nested-id" nested-id-search)
       nested-id-search)))
 
 (defn- multiple-receivers?
   "Does the monitor have multiple receivers?"
   [active-interaction]
-  (println (format "Checking multiple-receivers on active-interaction %s, seqable? %s, count > 1 %s"
+  (log-message (format "Checking multiple-receivers on active-interaction %s, seqable? %s, count > 1 %s"
                    active-interaction
                    (instance? Seqable (:receivers active-interaction))
                    (> (count (:receivers active-interaction)) 1)))
@@ -111,7 +106,7 @@
      (log-message (format "removing receiver %s, new receivers collection: %s" receiver newRecv))
      (if (satisfies? interactable current-interaction)
        (swap! active-interaction (fn [inter] (->interaction (:id current-interaction) (:action current-interaction) (:sender current-interaction) newRecv (:next current-interaction))))
-       (log-error :unsupported-operation (format "Cannot remove-receiver from interaction of type: %s, it should be atomic!" (type current-interaction)))))))
+       (log-error :unsupported-operation (format "Cannot remove-receiver from interaction of type: %s, it should be atomic! Interaction = %s" (type current-interaction)(interaction-to-string current-interaction)))))))
 
 (defn- swap-active-interaction-by-atomic
   "Swap active interaction by atomic"
@@ -138,7 +133,7 @@
       (satisfies? interactable first-interaction) (get-atomic-interaction sender receiver label first-interaction)
       (satisfies? branch first-interaction) (get-branch-interaction sender receiver label first-interaction)
       (satisfies? recursable first-interaction) (get-recursion-interaction sender receiver label first-interaction)
-      :else (log-error :unsupported-operation "No correct next recursion monitor found"))))
+      :else (log-error :unsupported-operation (format "No correct next recursion monitor found. %s" (interaction-to-string first-interaction))))))
 
 (defn- get-branch-interaction
   "Check the atomic interaction"
@@ -150,7 +145,7 @@
           (satisfies? interactable first-in-branch) (get-atomic-interaction sender receiver label first-in-branch)
           (satisfies? branch first-in-branch) (get-branch-interaction sender receiver label first-in-branch)
           (satisfies? recursable first-in-branch) (get-recursion-interaction sender receiver label first-in-branch)
-          :else (log-error :unsupported-operation "Cannot check operation on child branch construct!"))))))
+          :else (log-error :unsupported-operation (format "Cannot check operation on child branch construct! %s"(interaction-to-string first-in-branch))))))))
 
 
 (defn- get-first-valid-target-branch-interaction
@@ -162,7 +157,7 @@
   "Swap active interaction by branch"
   ([sender receivers label active-interaction interactions]
    (let [target-interaction (get-first-valid-target-branch-interaction sender receivers label @active-interaction)]
-     (log-message (format "target-interaction sender %s receivers %s action %s next %s, or is identifiable-recur %s" (:sender target-interaction) (:receivers target-interaction) (:action target-interaction) (:next target-interaction)(satisfies? identifiable-recur target-interaction)))
+     (log-message (format "target-interaction sender %s receivers %s action %s next %s, or is identifiable-recur %s" (:sender target-interaction) (:receivers target-interaction) (:action target-interaction) (:next target-interaction) (satisfies? identifiable-recur target-interaction)))
      (if (multiple-receivers? target-interaction)
        (remove-receiver-from-branch active-interaction target-interaction receivers)
        (swap! active-interaction (swap-next-interaction-by-id! (:next target-interaction) interactions)))))
@@ -193,7 +188,7 @@
              (swap! active-interaction (swap-next-interaction-by-id! (:next first-in-branch) interactions))))
          (satisfies? recursable target-interaction)
          (swap-active-interaction-by-recursion sender receivers label active-interaction (first (get-recursion target-interaction)) interactions)
-         :else (log-error :unsupported-operation "Cannot swap the interaction, unknown type!"))))
+         :else (log-error :unsupported-operation (format "Cannot update the interaction, unknown type: %s!" (type target-interaction))))))
 
 (defn- apply-interaction-to-mon
   "Apply new interaction"

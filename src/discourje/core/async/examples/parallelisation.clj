@@ -18,12 +18,12 @@
   "This function will use the protocol to send the greet message to bob and carol.
  Notice: We supply the put operation with a vector of channels"
   []
-  (>!!! [alice-to-bob alice-to-carol] (->message "greet" "Greetings, from alice!")))
+  (>!! [alice-to-bob alice-to-carol] (->message "greet" "Greetings, from alice!")))
 
 (defn- receive-greet
   "This function will use the protocol to listen for the greet message."
   [channel]
-  (let [message (<!!! channel "greet")]
+  (let [message (<!! channel "greet")]
     (log-message (format "Received message: %s by %s" (get-content message) (get-consumer channel)))))
 
 ;start the `greet-bob-and-carol' function on thread

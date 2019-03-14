@@ -84,20 +84,24 @@ For an example on chaining macros see: [Chaining](src/discourje/examples/macroCh
 
 Logging
 -
-Discourje also allows two levels of logging when communication does not comply with the protocol:
+Discourje also allows four levels of logging when communication does not comply with the protocol:
+- <b>none (not-blocking)</b>: No logs or exceptions
 - <b>Logging (not-blocking)</b>: Enable logging to print to the console when communication is invalid, this will not block communication.
-- <b>Exceptions (blocking)</b>: Enable exception logging to log to the console and throw exceptions when communication is invalid, this will block communication.
+- <b>Exceptions (blocking)</b>: Enable exception logging to throw exceptions when communication is invalid, this will block communication.
+- <b>Logging and Exceptions (blocking)</b>: Enable exception logging to log to the console and throw exceptions when communication is invalid, this will block communication.
 
 <b>Default configuration: Exceptions!</b>
 
 Logging configuration functions:
-- <b>set-monitor-logging</b>: Enables Logging messages.
-- <b>set-monitor-exceptions</b>: Enables throwing exceptions.
-- <b>close-logging</b>: Close the logging channel. <i>*We use a channel for showing logs to preserve order among logged messages and exceptions!</i>
+- <b>set-logging-none</b>: Disables logging of messages and exceptions.
+- <b>set-logging</b>: Enables logging of messages, yet no exceptions.
+- <b>set-logging-exceptions</b>: Enables throwing of exceptions (BLOCKING).
+- <b>set-logging-and-exceptions</b>: Enables logging of messages and throwing exceptions (BLOCKING).
+- <b>stop-logging</b>: Close the logging channel. <i>*We use a channel for showing logs to preserve order among logged messages and exceptions!</i>
 
 Log functions:
-- <b>log [message & more]</b>: Logs a `message` to the logging channel, takes a variable amount of input parameters which get concatenated!
-- <b>log-exception [type message & more]</b>: Throws an exception of type `type` with `message` to the logging channel, takes a variable amount of input parameters which get concatenated!
+- <b>log-message [message & more]</b>: Logs a `message` to the logging channel, takes a variable amount of input parameters which get concatenated!
+- <b>log-error [type message & more]</b>: Throws an exception of type `type` with `message` to the logging channel, takes a variable amount of input parameters which get concatenated!
 
 See [Logging](src/discourje/examples/logging.clj) for an example.
 

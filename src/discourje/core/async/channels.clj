@@ -73,4 +73,3 @@
   "Check if all channels have the same sender"
   [channels]
   (= 1 (count (distinct (for [c channels] (get-provider c))))))
-
