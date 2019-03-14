@@ -50,8 +50,9 @@
   [name]
   (->recur-identifier (uuid/v1) name :recur nil))
 
-(defn create-protocol [interactions]
+(defn create-protocol
   "Generate protocol based on interactions"
+  [interactions]
   (->protocol interactions))
 
 (defn generate-monitor
@@ -89,7 +90,9 @@
   [channel message]
   (async/>!! (get-chan channel) message))
 
-(defn- allow-receive [channel]
+(defn- allow-receive
+  "Allow a receive on the channel"
+  [channel]
   (log-message "allowing receive on channel!")
   (async/<!! (get-chan channel)))
 
