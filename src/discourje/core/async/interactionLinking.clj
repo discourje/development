@@ -26,10 +26,10 @@
                                (satisfies? branch inter) (let [branches (get-branches inter)
                                                                searches (for [b branches] (find-nested-recur name option b))]
                                                            (first searches))
-                               (satisfies? recursable inter) (first (find-nested-recur name option (get-recursion inter)))
-                               )))))
+                               (satisfies? recursable inter) (first (find-nested-recur name option (get-recursion inter))))))))
 
 (defn- replace-nested-recur
+  "Search and replace a recur-identifiers next ID with the given id"
   [name id option interactions]
   (let [prot (vec (for [inter interactions]
                     (cond (satisfies? identifiable-recur inter) (if (and (= (get-name inter) name) (= (get-option inter) option)) (assoc inter :next id) inter)

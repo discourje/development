@@ -125,5 +125,4 @@
                   (when (or
                           (= (get-sender interaction) role)
                           (= (get-receivers interaction) role))
-                    interaction))
-                protocol))))
+                    interaction)) protocol))))
