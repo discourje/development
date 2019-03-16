@@ -340,34 +340,34 @@
     (is (= (get-next i0r0i3b10) (get-id i0r0i3b11)))
     (is (= (get-next i0r0i3b11) nil))
     ))
-;
-;(deftest api-two-buyer-protocol-monitor-test
-;  (let [mon (generate-monitor (api-two-buyer-protocol))]
-;    (is (= 1 (count (:interactions mon))))))
-;
-;(deftest api-two-buyer-protocol-ids-test
-;  (let [mon (generate-monitor (api-two-buyer-protocol))
-;        i0 (nth (:interactions mon) 0)
-;        i0r0i0 (nth (:recursion i0)0)
-;        i0r0i1 (nth (:recursion i0)1)
-;        i0r0i2 (nth (:recursion i0)2)
-;        i0r0i3 (nth (:recursion i0)3)
-;        i0r0i3b00 (nth (nth (:branches i0r0i3)0)0)
-;        i0r0i3b01 (nth (nth (:branches i0r0i3)0)1)
-;        i0r0i3b02 (nth (nth (:branches i0r0i3)0)2)
-;        i0r0i3b10 (nth (nth (:branches i0r0i3)1)0)
-;        ]
-;    (println (:interactions mon))
-;    (is (= (get-next i0) nil))
-;    (is (= (get-next i0r0i0) (get-id i0r0i1)))
-;    (is (= (get-next i0r0i1) (get-id i0r0i2)))
-;    (is (= (get-next i0r0i2) (get-id i0r0i3)))
-;    (is (= (get-next i0r0i3) nil))
-;    (is (= (get-next i0r0i3b00) (get-id i0r0i3b01)))
-;    (is (= (get-next i0r0i3b01) (get-id i0r0i3b02)))
-;    (is (= (get-next i0r0i3b02) (get-id i0)))
-;    (is (= (get-next i0r0i3b10) nil))
-;    ))
+
+(deftest api-two-buyer-protocol-monitor-test
+  (let [mon (generate-monitor (api-two-buyer-protocol))]
+    (is (= 1 (count (:interactions mon))))))
+
+(deftest api-two-buyer-protocol-ids-test
+  (let [mon (generate-monitor (api-two-buyer-protocol))
+        i0 (nth (:interactions mon) 0)
+        i0r0i0 (nth (:recursion i0)0)
+        i0r0i1 (nth (:recursion i0)1)
+        i0r0i2 (nth (:recursion i0)2)
+        i0r0i3 (nth (:recursion i0)3)
+        i0r0i3b00 (nth (nth (:branches i0r0i3)0)0)
+        i0r0i3b01 (nth (nth (:branches i0r0i3)0)1)
+        i0r0i3b02 (nth (nth (:branches i0r0i3)0)2)
+        i0r0i3b10 (nth (nth (:branches i0r0i3)1)0)
+        ]
+    (println (:interactions mon))
+    (is (= (get-next i0) nil))
+    (is (= (get-next i0r0i0) (get-id i0r0i1)))
+    (is (= (get-next i0r0i1) (get-id i0r0i2)))
+    (is (= (get-next i0r0i2) (get-id i0r0i3)))
+    (is (= (get-next i0r0i3) nil))
+    (is (= (get-next i0r0i3b00) (get-id i0r0i3b01)))
+    (is (= (get-next i0r0i3b01) (get-id i0r0i3b02)))
+    (is (= (get-next i0r0i3b02) (get-id i0)))
+    (is (= (get-next i0r0i3b10) nil))
+    ))
 
 (deftest apply-atomic-test
   (let [mon (generate-monitor (testDualProtocol))

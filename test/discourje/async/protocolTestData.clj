@@ -259,14 +259,3 @@
                                                                [(-->> "quit" "Buyer2" "Seller") ;i0r0i3b10
                                                                 (end-recur :order-book)]])]) ;i0r0i3b11
                     ]))
-;(defn api-two-buyer-protocol []
-;  (mep
-;    (rec :order-book
-;         (-->> "title" "Buyer1" "Seller")
-;         (-->> "quote" "Seller" ["Buyer1" "Buyer2"])
-;         (-->> "quoteDiv" "Buyer1" "Buyer2")
-;         (->choice 1 [
-;           [(-->> "ok" "Buyer2" "Seller")
-;            (-->> "date" "Seller" "Buyer2")
-;            (continue :order-book)] nil]
-;           [(-->> "quit" "Buyer2" "Seller")]))))

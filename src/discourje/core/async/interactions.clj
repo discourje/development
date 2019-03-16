@@ -30,7 +30,7 @@
 (defprotocol branchable
   (get-branches [this]))
 
-(defrecord choice [id branches next]
+(defrecord branch [id branches next]
   idable
   (get-id [this] id)
   branchable

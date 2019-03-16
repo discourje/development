@@ -1,21 +1,22 @@
 ;macros.clj
 (in-ns 'discourje.core.async.async)
 
-;[rec] create recursion macro
 (defmacro rec
   "Generate recursion"
   [name interaction & more]
-  `(make-recursion name (vector interaction more)))
-;[continue] create continue recursion macro
+  `(->recursion (uuid/v1) ~name [~interaction ~@more] nil))
+
 (defmacro continue
   "Continue recursion, matched by name"
   [name]
-  `(do-recur name))
-;[choice] create choice macro
-;(defmacro choice
-;  "Generate choice"
-;  [branch & more]
-;  `(make-choice (vector branch more)))
-;[mep] specify mep macro
-(defmacro mep [interactions]
-  `(create-protocol (vector interactions)))
+  `(->recur-identifier (uuid/v1) ~name :recur nil))
+
+(defmacro choice
+  "Generate choice"
+  [branch & more]
+  `(->branch (uuid/v1) [~branch ~@more] nil))
+
+(defmacro mep
+  "Generate message exchange pattern aka protocol"
+  [interactions]
+  `(->protocol [~interactions]))

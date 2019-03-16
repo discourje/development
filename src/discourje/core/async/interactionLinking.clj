@@ -88,7 +88,7 @@
                      (link-interactions branch branch-help-vec linked-branch-interactions)))
                  last-helper-mon (last @helper-vec)
                  linked-i (if (nil? last-helper-mon) nil (assoc last-helper-mon :next (get-id inter)))
-                 new-choice (->choice (get-id inter) branched-interactions nil)]
+                 new-choice (->branch (get-id inter) branched-interactions nil)]
              (swap! helper-vec conj new-choice)
              (when-not (nil? last-helper-mon)
                (cond
