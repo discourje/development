@@ -33,7 +33,7 @@
 
 ;wait for quote
 ;wait for quote div
-;branch on data
+;branchable on data
 ;true
 ;send ok to seller
 ;send address to seller

@@ -29,9 +29,9 @@
    (reset! (:activeMonitor @protocol) nil)))
 
 (defn activateChoiceBranch
-  "Activates the choice branch and filters out the branch which was not chosen"
+  "Activates the choice branchable and filters out the branchable which was not chosen"
   [protocol branch]
-  ;(reset! (:protocol @protocol) (subvec (vec (mapcat identity [branch @(:protocol @protocol)])) 2)) ;todo check if long enough to select index 1!!!
+  ;(reset! (:protocol @protocol) (subvec (vec (mapcat identity [branchable @(:protocol @protocol)])) 2)) ;todo check if long enough to select index 1!!!
   (if (= 1 (count branch))
     (if (> (count @(:protocol @protocol)) 0)
       (let [nextMonitor (first @(:protocol @protocol))]
@@ -40,7 +40,7 @@
     (do
       (reset! (:protocol @protocol) (subvec (vec (mapcat identity [branch @(:protocol @protocol)])) 2)) ;todo check if long enough to select index 1!!!
       (reset! (:activeMonitor @protocol) (nth branch 1))
-      ; (log-message "next monitor IN CHOICE is " (to-string (nth branch 1)))
+      ; (log-message "next monitor IN CHOICE is " (to-string (nth branchable 1)))
       ))
   )
 
@@ -173,7 +173,7 @@
         (or trueResult falseResult)))))
 
 (defn getTargetBranch
-  "Get the target branch of a choice construct based on the action, sender and receiver"
+  "Get the target branchable of a choice construct based on the action, sender and receiver"
   [action from to operation protocol]
   (let [activeM @(:activeMonitor @protocol)]
     (when
@@ -184,5 +184,5 @@
         (monitorValid? (first (:falseBranch activeM)) action from to operation)
         (first (:falseBranch activeM))
         :else
-        (do (log-message (format "no choice branch: action %s from %s to %s in choice: %s" action from to (to-string activeM)))
+        (do (log-message (format "no choice branchable: action %s from %s to %s in choice: %s" action from to (to-string activeM)))
             nil)))))

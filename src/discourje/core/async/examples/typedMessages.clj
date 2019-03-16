@@ -6,8 +6,8 @@
   "This function will generate a vector with 2 interactions to send and receive the greet message.
   Notice how we use a type as label for the interaction."
   []
-  (create-protocol [(-->> String "alice" "bob")
-                    (-->> String "alice" "carol")]))
+  (create-protocol [(make-interaction String "alice" "bob")
+                    (make-interaction String "alice" "carol")]))
 
 ;setup infrastructure, generate channels and add monitor
 (def infrastructure (generate-infrastructure (define-typed-sequence-protocol)))

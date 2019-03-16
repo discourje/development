@@ -5,7 +5,7 @@
 (defn- define-hello-world-protocol
   "This function will generate a vector with 1 monitor to send and receive the hello world message."
   []
-  (create-protocol[(-->> "helloWorld" "user" "world")]))
+  (create-protocol [(make-interaction "helloWorld" "user" "world")]))
 
 ;setup infrastructure, generate channels and add monitor
 (def infrastructure (generate-infrastructure (define-hello-world-protocol)))

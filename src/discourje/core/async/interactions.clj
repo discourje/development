@@ -27,13 +27,13 @@
   stringify
   (to-string [this] (format "Interaction - Action: %s, Sender: %s, Receivers: %s" action sender receivers)))
 
-(defprotocol branch
+(defprotocol branchable
   (get-branches [this]))
 
-(defrecord choice [id branches next]
+(defrecord branch [id branches next]
   idable
   (get-id [this] id)
-  branch
+  branchable
   (get-branches [this] branches)
   linkable
   (get-next [this] next)
@@ -83,7 +83,7 @@
               (cond
                 (satisfies? discourje.core.async.async/recursable element)
                 (conj result2 (flatten (find-all-roles (:recursion element) result2)))
-                (satisfies? discourje.core.async.async/branch element)
+                (satisfies? discourje.core.async.async/branchable element)
                 (let [branched-interactions (for [branch (get-branches element)] (find-all-roles branch result2))]
                   (conj result2 (flatten branched-interactions)))
                 (satisfies? discourje.core.async.async/interactable element)
@@ -102,7 +102,7 @@
               (cond
                 (satisfies? discourje.core.async.async/recursable element)
                 (conj result2 (flatten (find-all-role-pairs (:recursion element) result2)))
-                (satisfies? discourje.core.async.async/branch element)
+                (satisfies? discourje.core.async.async/branchable element)
                 (let [branched-interactions (for [branch (get-branches element)] (find-all-role-pairs branch result2))]
                   (conj result2 (flatten branched-interactions)))
                 (satisfies? discourje.core.async.async/interactable element)

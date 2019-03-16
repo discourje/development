@@ -24,7 +24,7 @@
   (to-operation [this] :receive)
   (to-id [this] id))
 ;We also need a data structure to create a conditional with branches.
-;When the protocol encounters this it will check the conditional and continue on the correct branch.
+;When the protocol encounters this it will check the conditional and continue on the correct branchable.
 (defrecord choice [id trueBranch falseBranch]
   stringify
   (to-string [this] (format "monitor-choice |-| TrueBranch: %s | FalseBranch %s" trueBranch falseBranch))

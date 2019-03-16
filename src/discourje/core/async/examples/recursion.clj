@@ -9,11 +9,11 @@
   Recur is matched by name, in this case: :generate"
   []
   (create-protocol [(make-recursion :generate [
-                                               (-->> "number" "alice" "bob")
+                                               (make-interaction "number" "alice" "bob")
                                                (make-choice [
-                                                             [(-->> "greaterThan" "bob" "alice")
+                                                             [(make-interaction "greaterThan" "bob" "alice")
                                                               (do-recur :generate)]
-                                                             [(-->> "lessThan" "bob" "alice")
+                                                             [(make-interaction "lessThan" "bob" "alice")
                                                               (end-recur :generate)]
                                                              ])
                                                ])

@@ -1,7 +1,7 @@
 ;monitoring.clj
 (in-ns 'discourje.core.async.async)
 
-;forward declare check-branch-interaction to resolve undefined issue in check-recursion-interaction
+;forward declare check-branchable-interaction to resolve undefined issue in check-recursion-interaction
 (declare check-branch-interaction get-branch-interaction)
 
 (defprotocol monitoring
@@ -33,7 +33,7 @@
         first-interaction (first rec)]
     (cond
       (satisfies? interactable first-interaction) (check-atomic-interaction label first-interaction)
-      (satisfies? branch first-interaction) (check-branch-interaction label first-interaction)
+      (satisfies? branchable first-interaction) (check-branch-interaction label first-interaction)
       (satisfies? recursable first-interaction) (check-recursion-interaction label first-interaction)
       :else (log-error :unsupported-operation "No correct next recursion monitor found" (interaction-to-string first-interaction)))))
 
@@ -46,9 +46,9 @@
                         (let [first-in-branch (nth b 0)]
                           (cond
                             (satisfies? interactable first-in-branch) (check-atomic-interaction label first-in-branch)
-                            (satisfies? branch first-in-branch) (check-branch-interaction label first-in-branch)
+                            (satisfies? branchable first-in-branch) (check-branch-interaction label first-in-branch)
                             (satisfies? recursable first-in-branch) (check-recursion-interaction label first-in-branch)
-                            :else (log-error :unsupported-operation "No correct next monitor found in first position of a branch construct!" (interaction-to-string first-in-branch))))))))
+                            :else (log-error :unsupported-operation "No correct next monitor found in first position of a branchable construct!" (interaction-to-string first-in-branch))))))))
      0))
 
 (defn- find-nested-next
@@ -56,7 +56,7 @@
   [id interactions]
   (first (flatten (filter some? (for [inter interactions]
                                   (cond (satisfies? interactable inter) (when (= (get-id inter) id) inter)
-                                        (satisfies? branch inter) (if (= id (get-id inter))
+                                        (satisfies? branchable inter) (if (= id (get-id inter))
                                                                     inter
                                                                     (let [branches (:branches inter)
                                                                           searches (for [b branches] (find-nested-next id b))]
@@ -86,7 +86,7 @@
   (and (instance? Seqable (:receivers active-interaction)) (> (count (:receivers active-interaction)) 1)))
 
 (defn- remove-receiver-from-branch
-  "Remove a receiver from the active monitor when in first position of a branch"
+  "Remove a receiver from the active monitor when in first position of a branchable"
   [active-interaction target-interaction receiver]
   (let [recv (:receivers target-interaction)
         newRecv (vec (remove #{receiver} recv))]
@@ -131,7 +131,7 @@
         first-interaction (first rec)]
     (cond
       (satisfies? interactable first-interaction) (get-atomic-interaction sender receiver label first-interaction)
-      (satisfies? branch first-interaction) (get-branch-interaction sender receiver label first-interaction)
+      (satisfies? branchable first-interaction) (get-branch-interaction sender receiver label first-interaction)
       (satisfies? recursable first-interaction) (get-recursion-interaction sender receiver label first-interaction)
       :else (log-error :unsupported-operation (format "No correct next recursion monitor found. %s" (interaction-to-string first-interaction))))))
 
@@ -143,18 +143,18 @@
       (let [first-in-branch (nth b 0)]
         (cond
           (satisfies? interactable first-in-branch) (get-atomic-interaction sender receiver label first-in-branch)
-          (satisfies? branch first-in-branch) (get-branch-interaction sender receiver label first-in-branch)
+          (satisfies? branchable first-in-branch) (get-branch-interaction sender receiver label first-in-branch)
           (satisfies? recursable first-in-branch) (get-recursion-interaction sender receiver label first-in-branch)
-          :else (log-error :unsupported-operation (format "Cannot check operation on child branch construct! %s"(interaction-to-string first-in-branch))))))))
+          :else (log-error :unsupported-operation (format "Cannot check operation on child branchable construct! %s"(interaction-to-string first-in-branch))))))))
 
 
 (defn- get-first-valid-target-branch-interaction
-  "Find the first interactable in (nested) branch constructs."
+  "Find the first interactable in (nested) branchable constructs."
   [sender receiver label active-interaction]
   (first (filter some? (get-branch-interaction sender receiver label active-interaction))))
 
 (defn- swap-active-interaction-by-branch
-  "Swap active interaction by branch"
+  "Swap active interaction by branchable"
   ([sender receivers label active-interaction interactions]
    (let [target-interaction (get-first-valid-target-branch-interaction sender receivers label @active-interaction)]
      (log-message (format "target-interaction sender %s receivers %s action %s next %s, or is identifiable-recur %s" (:sender target-interaction) (:receivers target-interaction) (:action target-interaction) (:next target-interaction) (satisfies? identifiable-recur target-interaction)))
@@ -180,9 +180,9 @@
            (if (multiple-receivers? target-interaction)
              (remove-receiver active-interaction target-interaction receivers)
              (swap! active-interaction (swap-next-interaction-by-id! (get-next target-interaction) interactions))))
-         (satisfies? branch target-interaction)
+         (satisfies? branchable target-interaction)
          (let [first-in-branch (get-first-valid-target-branch-interaction sender receivers label target-interaction)]
-           (log-message (format "first-in-branch sender %s receivers %s action %s next %s, or is identifiable-recur %s" (:sender first-in-branch) (:receivers first-in-branch) (:action first-in-branch) (:next first-in-branch) (satisfies? identifiable-recur first-in-branch)))
+           (log-message (format "first-in-branchable sender %s receivers %s action %s next %s, or is identifiable-recur %s" (:sender first-in-branch) (:receivers first-in-branch) (:action first-in-branch) (:next first-in-branch) (satisfies? identifiable-recur first-in-branch)))
            (if (multiple-receivers? first-in-branch)
              (remove-receiver-from-branch active-interaction first-in-branch receivers)
              (swap! active-interaction (swap-next-interaction-by-id! (:next first-in-branch) interactions))))
@@ -199,7 +199,7 @@
    (cond
      (and (satisfies? interactable target-interaction) (check-atomic-interaction label target-interaction))
      (swap-active-interaction-by-atomic active-interaction target-interaction receivers interactions)
-     (and (satisfies? branch target-interaction) (check-branch-interaction label target-interaction))
+     (and (satisfies? branchable target-interaction) (check-branch-interaction label target-interaction))
      (swap-active-interaction-by-branch sender receivers label active-interaction target-interaction interactions)
      (and (satisfies? recursable target-interaction) (check-recursion-interaction label target-interaction))
      (swap-active-interaction-by-recursion sender receivers label active-interaction target-interaction interactions)
@@ -232,7 +232,7 @@
   (cond
     (satisfies? interactable active-interaction)
     (is-valid-interaction? sender receivers label active-interaction)
-    (satisfies? branch active-interaction)
+    (satisfies? branchable active-interaction)
     (> (count (filter true? (flatten (for [b (:branches active-interaction)] (is-valid-communication? sender receivers label (nth b 0) interactions))))) 0)
     (satisfies? recursable active-interaction)
     (is-valid-communication? sender receivers label (first (get-recursion active-interaction)) interactions)

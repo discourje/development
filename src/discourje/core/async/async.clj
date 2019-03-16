@@ -21,19 +21,21 @@
   (get-interactions [this] interactions))
 
 ;load helper namespace files!
-(load "interactions")
-(load "channels")
-(load "monitoring")
-(load "interactionLinking")
+(load "macros"
+      "interactions"
+      "channels"
+      "monitoring"
+      "interactionLinking"
+      )
 
-(defn -->> [action sender receiver]
+(defn make-interaction [action sender receiver]
   "Creates an interaction object specifying sending action from sender to receiver."
   (->interaction (uuid/v1) action sender receiver nil))
 
 (defn make-choice
   "Create a choice interaction"
   [branches]
-  (->choice (uuid/v1) branches nil))
+  (->branch (uuid/v1) branches nil))
 
 (defn make-recursion
   "Generate recursion"

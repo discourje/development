@@ -61,7 +61,7 @@
   `(send-to! ~sender ~action ~value ~receiver))
 
 (defmacro >s!
-  "fn [x] value into send! chained macro"
+  "                    fn [x] value into send! chained macro"
   ([action function sender receiver]
    `(fn [~'callback-value-for-fn]
       (send-to! ~sender ~action (~function ~'callback-value-for-fn) ~receiver))))

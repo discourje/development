@@ -10,7 +10,7 @@
 ;This is just a data structure to group related information.
 (defrecord monitor [action from to])
 ;We also need a data structure to create a conditional with branches.
-;When the protocol encounters this it will check the conditional and continue on the correct branch.
+;When the protocol encounters this it will check the conditional and continue on the correct branchable.
 (defrecord choice [trueMonitor falseMonitor trueBranch falseBranch])
 
 (defn- generateChannel

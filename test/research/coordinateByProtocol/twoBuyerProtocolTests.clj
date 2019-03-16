@@ -31,11 +31,11 @@
     (is (= true (choice p2 validateInt)))))
 
 (deftest branchWithBranchesTest
-  "tests branching function and evaluates the true branch, which is now just another setInt"
+  "tests branching function and evaluates the true branchable, which is now just another setInt"
   (let [p1 (createParticipant)
         p2 (createParticipant)]
     (sendInput (sendOffFunction discourje.coordinateByProtocol.twoBuyerProtocolTests/setInt) p1 p2)
-    (is (= (setInt) (choice p2 validateInt (setInt) "false branch")))))
+    (is (= (setInt) (choice p2 validateInt (setInt) "false branchable")))))
 
 
 (deftest sendInputTest

@@ -6,9 +6,9 @@
   "This function will generate a vector with 3 monitors to send and receive the number message.
   The protocol offers a choice (with internal monitors) to send messages called greaterThan or lessThan to alice depending on the data received"
   []
-  (create-protocol [(-->> "number" "alice" "bob")
-                    (make-choice [[(-->> "greaterThan" "bob" "alice")]
-                                  [(-->> "lessThan" "bob" "alice")]])]))
+  (create-protocol [(make-interaction "number" "alice" "bob")
+                    (make-choice [[(make-interaction "greaterThan" "bob" "alice")]
+                                  [(make-interaction "lessThan" "bob" "alice")]])]))
 
 ;setup infrastructure, generate channels and add monitor
 (def infrastructure (generate-infrastructure (define-branch-protocol)))

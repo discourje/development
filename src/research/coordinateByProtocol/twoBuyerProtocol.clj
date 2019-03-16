@@ -76,7 +76,7 @@
              )
 
 (list
-  ;(println ("true branch taken"))                 ;true branch
+  ;(println ("true branchable taken"))                 ;true branchable
   (delaySendInput (sendOffData "ok") buyer2 seller)         ;send ok from buyer2 to seller
   (delaySendInput (sendOffFunction generateAddress) buyer2 seller) ;send address from buyer 2 to seller
   (delaySendInput (sendOffData (getDate 3)) seller buyer2)  ;send date from seller to buyer2
@@ -90,7 +90,7 @@
   (sendInput (sendOffData (generateBook)) b1 s)             ;send title from buyer1 to seller
   (sendInput (sendOffConsumingInput quoteBook s) s b1 b2)   ;send quote from seller to both buyers, consumes the current value of the inputchannel for Seller
   (sendInput (sendOffConsumingInput quoteDiv b1) b1 b2)     ;send quoteDiv from buyer1 to buyer2
-  (choice b2 contribute?                                    ;decide to contribute to continue or not (taking true or false branch)
+  (choice b2 contribute?                                    ;decide to contribute to continue or not (taking true or false branchable)
           (list
             (delaySendInput (sendOffData "ok") buyer2 seller) ;send ok from buyer2 to seller
             (delaySendInput (sendOffFunction generateAddress) buyer2 seller) ;send address from buyer 2 to seller

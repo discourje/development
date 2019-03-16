@@ -348,4 +348,3 @@
     (is (= "2" (get-action (get-active-interaction mon))))
     (is (= "B" (get-sender (get-active-interaction mon))))
     (is (= "A" (get-receivers (get-active-interaction mon))))))
-
