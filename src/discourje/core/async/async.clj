@@ -28,7 +28,7 @@
       "interactionLinking"
       )
 
-(defn -->> [action sender receiver]
+(defn make-interaction [action sender receiver]
   "Creates an interaction object specifying sending action from sender to receiver."
   (->interaction (uuid/v1) action sender receiver nil))
 

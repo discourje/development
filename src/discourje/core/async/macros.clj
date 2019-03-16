@@ -1,6 +1,11 @@
 ;macros.clj
 (in-ns 'discourje.core.async.async)
 
+(defmacro -->>
+  "Create an Atomic-interaction"
+  [action sender receiver]
+  `(->interaction (uuid/v1) ~action ~sender ~receiver nil))
+
 (defmacro rec
   "Generate recursion"
   [name interaction & more]

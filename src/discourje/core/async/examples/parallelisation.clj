@@ -6,7 +6,7 @@
   "This function will generate a vector with 1 monitor to send and receive the greet message.
   Notice how receivers are defined as a vector in order to allow for parallelisation!"
   []
-  (create-protocol [(-->> "greet" "alice" ["bob" "carol"])]))
+  (create-protocol [(make-interaction "greet" "alice" ["bob" "carol"])]))
 
 ;setup infrastructure, generate channels and add monitor
 (def infrastructure (generate-infrastructure (define-parallel-protocol)))

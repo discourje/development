@@ -6,8 +6,8 @@
   "This function will generate a vector with 2 interactions to send and receive the greet message.
   Notice how send and receivers are defined separately in order to allow for sequencing of actions!"
   []
-  (create-protocol [(-->> "greet" "alice" "bob")
-                    (-->> "greet" "alice" "carol")]))
+  (create-protocol [(make-interaction "greet" "alice" "bob")
+                    (make-interaction "greet" "alice" "carol")]))
 
 ;Define custom channels, which differ in buffer size (1 and 2)
 (def a->b (generate-channel "alice" "bob" 1))
