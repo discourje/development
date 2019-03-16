@@ -24,6 +24,13 @@
         i3 (-->> 3 "A" "B")]
     (is (= (assoc (make-recursion :test [i1 i2 i3]) :id 1) (assoc (rec :test i1 i2 i3) :id 1)))))
 
+(deftest create-channel-test
+  (let [fnChan (generate-channel "a" "b" 1)
+        macroChan (create-channel "a" "b" 1)]
+  (is (= (get-provider fnChan) (get-provider macroChan)))
+  (is (= (get-consumer fnChan) (get-consumer macroChan)))
+  (is (= (get-buffer fnChan) (get-buffer macroChan)))))
+
 (def api-two-buyer-protocol
   (mep
     (rec :order-book

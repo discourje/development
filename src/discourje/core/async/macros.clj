@@ -23,5 +23,24 @@
 
 (defmacro mep
   "Generate message exchange pattern aka protocol"
-  [interactions]
-  `(->protocol [~interactions]))
+  [interactions & more]
+  `(->protocol [~interactions ~@more]))
+
+(defmacro add-infrastructure
+  "adds infrastructure to the mep (channels)"
+  ([message-exchange-pattern]
+  `(generate-infrastructure ~message-exchange-pattern))
+  ([message-exchange-pattern custom-channels]
+   `(generate-infrastructure ~message-exchange-pattern ~custom-channels)))
+
+(defmacro create-channel
+  "create a custom channel"
+  [sender receiver buffer]
+  `(if (nil? ~buffer)
+    (->channel ~sender ~receiver (clojure.core.async/chan) nil nil)
+    (->channel ~sender ~receiver (clojure.core.async/chan ~buffer) ~buffer nil)))
+
+(defmacro msg
+  "Generate a message"
+  [label content]
+  `(->message ~label ~content))
