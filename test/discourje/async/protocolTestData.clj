@@ -248,14 +248,25 @@
                     ]))
 
 (defn two-buyer-protocol []
-  (create-protocol [(make-recursion :order-book [ ;i0
-                                           (-->> "title" "Buyer1" "Seller") ;i0r0i0
-                                           (-->> "quote" "Seller" ["Buyer1" "Buyer2"]);i0r0i1
-                                           (-->> "quoteDiv" "Buyer1" "Buyer2");i0r0i2
-                                           (make-choice [;i0r0i3
-                                                         [(-->> "ok" "Buyer2" "Seller");i0r0i3b00
-                                                          (-->> "date" "Seller" "Buyer2");i0r0i3b01
-                                                          (do-recur :order-book)];i0r0i3b02
-                                                         [(-->> "quit" "Buyer2" "Seller");i0r0i3b10
-                                                          (end-recur :order-book)]])]);i0r0i3b11
+  (create-protocol [(make-recursion :order-book [;i0
+                                                 (-->> "title" "Buyer1" "Seller") ;i0r0i0
+                                                 (-->> "quote" "Seller" ["Buyer1" "Buyer2"]) ;i0r0i1
+                                                 (-->> "quoteDiv" "Buyer1" "Buyer2") ;i0r0i2
+                                                 (make-choice [;i0r0i3
+                                                               [(-->> "ok" "Buyer2" "Seller") ;i0r0i3b00
+                                                                (-->> "date" "Seller" "Buyer2") ;i0r0i3b01
+                                                                (do-recur :order-book)] ;i0r0i3b02
+                                                               [(-->> "quit" "Buyer2" "Seller") ;i0r0i3b10
+                                                                (end-recur :order-book)]])]) ;i0r0i3b11
                     ]))
+;(defn api-two-buyer-protocol []
+;  (mep
+;    (rec :order-book
+;         (-->> "title" "Buyer1" "Seller")
+;         (-->> "quote" "Seller" ["Buyer1" "Buyer2"])
+;         (-->> "quoteDiv" "Buyer1" "Buyer2")
+;         (->choice 1 [
+;           [(-->> "ok" "Buyer2" "Seller")
+;            (-->> "date" "Seller" "Buyer2")
+;            (continue :order-book)] nil]
+;           [(-->> "quit" "Buyer2" "Seller")]))))

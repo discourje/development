@@ -69,7 +69,7 @@
   (changeStateByData participant (blockingTakeMessage (:input @participant)) :state))
 
 (defn choice
-  "branch by function on input of given participant. Branch will also first move input -> state and then evaluate"
+  "branchable by function on input of given participant. Branch will also first move input -> state and then evaluate"
   ([participant function]
    (inputToState participant)
    (eval (function (:state @participant))))
@@ -83,11 +83,11 @@
    (if (choice participant function)
      (let [branch trueBranch] ;true
        ;(println "taking true")
-       ;(println branch)
+       ;(println branchable)
        (eval branch))
      (let [branch falseBranch] ;false
        ;(println "taking false")
-       ;(println branch)
+       ;(println branchable)
        (eval branch)
        ))))
 

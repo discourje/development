@@ -66,7 +66,7 @@
             (instance? choice currentMonitor)
             (let [target (getTargetBranch action from to :send protocol)]
               (if (nil? target)
-                (incorrectCommunication :monitor-nil (format "Protocol does not have a defined channel to monitor after checking CHOICE branch! Make sure you supply send! with an instantiated protocol!
+                (incorrectCommunication :monitor-nil (format "Protocol does not have a defined channel to monitor after checking CHOICE branchable! Make sure you supply send! with an instantiated protocol!
                  trying to send action %s from %s to %s, but active: %s" action from to currentMonitor))
                 (do
                   (when (not (instance? sendM target))
@@ -92,7 +92,7 @@
     ;          (instance? choice currentMonitor)
     ;          (let [target (getTargetBranch action from to :send protocol)]
     ;            (if (nil? target)
-    ;              (incorrectCommunication :monitor-nil (format "Protocol does not have a defined channel to monitor after checking CHOICE branch! Make sure you supply send! with an instantiated protocol!
+    ;              (incorrectCommunication :monitor-nil (format "Protocol does not have a defined channel to monitor after checking CHOICE branchable! Make sure you supply send! with an instantiated protocol!
     ;              trying to send action %s from %s to %s, but active: %s" action from to currentMonitor))
     ;              (do
     ;                (when (not (instance? sendM target))
@@ -152,7 +152,7 @@
             (instance? choice currentMonitor)
             (let [target (getTargetBranch action from to :receive protocol)]
               (if (nil? target)
-                (incorrectCommunication :monitor-nil (format "Protocol does not have a defined channel to monitor after checking CHOICE branch! Make sure you supply recv! with an instantiated protocol!
+                (incorrectCommunication :monitor-nil (format "Protocol does not have a defined channel to monitor after checking CHOICE branchable! Make sure you supply recv! with an instantiated protocol!
                                                                            trying to receive action %s from %s to %s, but active: %s" action from to currentMonitor))
                 (do
                   (when (not (instance? receiveM target))
@@ -182,7 +182,7 @@
                 ;          (instance? choice currentMonitor)
                 ;          (let [target (getTargetBranch action from to :receive protocol)]
                 ;            (if (nil? target)
-                ;              (incorrectCommunication :monitor-nil (format "Protocol does not have a defined channel to monitor after checking CHOICE branch! Make sure you supply recv! with an instantiated protocol!
+                ;              (incorrectCommunication :monitor-nil (format "Protocol does not have a defined channel to monitor after checking CHOICE branchable! Make sure you supply recv! with an instantiated protocol!
                 ;                                                           trying to receive action %s from %s to %s, but active: %s" action from to currentMonitor))
                 ;              (do
                 ;                (when (not (instance? receiveM target))

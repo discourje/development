@@ -12,10 +12,10 @@
   [name]
   `(do-recur name))
 ;[choice] create choice macro
-(defmacro choice
-  "Generate choice"
-  [branch & more]
-  `(make-choice (vector branch more)))
+;(defmacro choice
+;  "Generate choice"
+;  [branch & more]
+;  `(make-choice (vector branch more)))
 ;[mep] specify mep macro
 (defmacro mep [interactions]
-  `(create-protocol interactions))
+  `(create-protocol (vector interactions)))

@@ -21,10 +21,11 @@
   (get-interactions [this] interactions))
 
 ;load helper namespace files!
-(load "interactions")
-(load "channels")
-(load "monitoring")
-(load "interactionLinking")
+(load "interactions"
+      "channels"
+      "monitoring"
+      "interactionLinking"
+      "macros")
 
 (defn -->> [action sender receiver]
   "Creates an interaction object specifying sending action from sender to receiver."
