@@ -2,8 +2,8 @@
   (require [discourje.core.async.async :refer :all]
            [discourje.core.async.logging :refer :all]))
 
-;"This function will generate a vector with 3 monitors to send and receive the number message.
-; The protocol offers a choice (with internal monitors) to send messages called greaterThan or lessThan to alice depending on the data received
+; This function will generate a mep to send and receive the number message.
+; The mep offers a choice (with internal interactions) to send messages called greaterThan or lessThan to alice depending on the data received
 (def message-exchange-pattern
   (mep (-->> "number" "alice" "bob")
        (choice [(-->> "greaterThan" "bob" "alice")]

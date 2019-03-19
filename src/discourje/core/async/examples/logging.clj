@@ -2,8 +2,7 @@
   (require [discourje.core.async.async :refer :all]
            [discourje.core.async.logging :refer :all]))
 
-;"This function will generate a vector with 2 monitors to send and receive the greet message.
-;  Notice how send and receivers are defined separately in order to allow for sequencing of actions!"
+;This function will generate a mep with 4 monitors to send and receive the greet message.
 (def message-exchange-pattern
   (mep (-->> "greet" "alice" "bob")
        (-->> "greet" "bob" "alice")

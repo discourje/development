@@ -2,10 +2,10 @@
   (require [discourje.core.async.async :refer :all]
            [discourje.core.async.logging :refer :all]))
 
-;  "This function will generate a vector with 1 monitor to send and receive the number message (recursion).
-;  The protocol offers a choice (with internal monitors) to send messages called greaterThan or lessThan to alice depending on the data received
+;  This function will generate a mep with 1 recursion to send and receive the number message (recursion).
+;  The protocol offers a choice (with internal interactions) to send messages called greaterThan or lessThan to alice depending on the data received
 ;  When the number is greater than the threshold, the protocol will recur, if not the protocol will stop.
-;  Recur is matched by name, in this case: :generate"
+;  Recur is matched by name, in this case: :generate
 (def message-exchange-pattern
   (mep (rec :generate
             (-->> "number" "alice" "bob")
