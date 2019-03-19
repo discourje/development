@@ -45,12 +45,12 @@
 (defn can-log?
   "Is logging enabled?"
   []
-  (or (= @logging-level level-logging)) (= @logging-level level-logging-exceptions))
+  (or (= @logging-level level-logging) (= @logging-level level-logging-exceptions)))
 
 (defn can-throw?
   "Is throwing enabled?"
   []
-  (or (= @logging-level level-exceptions)) (= @logging-level level-logging-exceptions))
+  (or (= @logging-level level-exceptions) (= @logging-level level-logging-exceptions)))
 
 (defn log-message
   "Put a message on the logging channel.

@@ -2,14 +2,13 @@
   (require [discourje.core.async.async :refer :all]
            [discourje.core.async.logging :refer :all]))
 
-(defn- define-parallel-protocol
-  "This function will generate a vector with 1 monitor to send and receive the greet message.
-  Notice how receivers are defined as a vector in order to allow for parallelisation!"
-  []
-  (create-protocol [(make-interaction "greet" "alice" ["bob" "carol"])]))
+; This function will generate a vector with 1 interaction to send and receive the greet message.
+;  Notice how receivers are defined as a vector in order to allow for parallelisation!
+(def message-exchange-pattern
+  (mep (-->> "greet" "alice" ["bob" "carol"])))
 
 ;setup infrastructure, generate channels and add monitor
-(def infrastructure (generate-infrastructure (define-parallel-protocol)))
+(def infrastructure (add-infrastructure message-exchange-pattern))
 ;Get the channels
 (def alice-to-bob (get-channel "alice" "bob" infrastructure))
 (def alice-to-carol (get-channel "alice" "carol" infrastructure))
@@ -18,7 +17,7 @@
   "This function will use the protocol to send the greet message to bob and carol.
  Notice: We supply the put operation with a vector of channels"
   []
-  (>!! [alice-to-bob alice-to-carol] (->message "greet" "Greetings, from alice!")))
+  (>!! [alice-to-bob alice-to-carol] (msg "greet" "Greetings, from alice!")))
 
 (defn- receive-greet
   "This function will use the protocol to listen for the greet message."
