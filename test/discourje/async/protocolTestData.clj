@@ -1,6 +1,6 @@
 (ns discourje.async.protocolTestData
   (:require [clojure.test :refer :all]
-            [discourje.core.async.async :refer :all]))
+            [discourje.core.async :refer :all]))
 
 (deftest interactableTest
   (let [inter (make-interaction "1" "A" "B")]

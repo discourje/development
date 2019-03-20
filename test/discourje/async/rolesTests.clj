@@ -1,7 +1,7 @@
 (ns discourje.async.rolesTests
   (:require [clojure.test :refer :all]
             [discourje.async.protocolTestData :refer :all]
-            [discourje.core.async.async :refer :all]))
+            [discourje.core.async :refer :all]))
 
 (deftest unique2-roles-test
   (is (= 2 (count (get-distinct-roles (get-interactions (testDualProtocol)))))))
@@ -49,7 +49,6 @@
         ba (nth roles 2)
         ac (nth roles 3)
         cab (nth roles 4)]
-    (println roles)
     (is (== 5 (count roles)))
     (is (and (= (:sender main) "main") (= (:receivers main) ["A" "B" "C"])))
     (is (and (= (:sender ab) "A") (= (:receivers ab) "B")))

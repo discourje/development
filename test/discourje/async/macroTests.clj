@@ -1,6 +1,6 @@
 (ns discourje.async.macroTests
   (:require [clojure.test :refer :all]
-            [discourje.core.async.async :refer :all]))
+            [discourje.core.async :refer :all]))
 
 (deftest atomic-interaction-test
   (is (= (assoc (make-interaction 1 "a" "b") :id 1) (assoc (-->> 1 "a" "b") :id 1))))

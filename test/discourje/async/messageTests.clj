@@ -1,6 +1,6 @@
 (ns discourje.async.messageTests
   (:require [clojure.test :refer :all]
-            [discourje.core.async.async :refer :all]))
+            [discourje.core.async :refer :all]))
 
 (deftest messageDataTest []
   (let[m (->message "hi" "Hello World")]

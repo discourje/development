@@ -1,6 +1,6 @@
 (ns discourje.async.demoTests
   (:require [clojure.test :refer :all]
-            [discourje.core.async.async :refer :all]))
+            [discourje.core.async :refer :all]))
 
 (def buy-goods
   (mep

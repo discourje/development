@@ -1,7 +1,7 @@
 (ns discourje.async.operationTests
   (:require [clojure.test :refer :all]
             [discourje.async.protocolTestData :refer :all]
-            [discourje.core.async.async :refer :all]
+            [discourje.core.async :refer :all]
             [clojure.core.async :as async]))
 
 (deftest send-test

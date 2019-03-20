@@ -1,5 +1,5 @@
 (ns discourje.TwoBuyerProtocol.Buyer1
-  (:require [discourje.api.api :refer :all]))
+  (:require [discourje.core.async.async :refer :all]))
 
 (defn generateBook
   "generate simple book title"

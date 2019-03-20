@@ -1,6 +1,6 @@
 (ns discourje.async.stringifyTests
   (:require [clojure.test :refer :all]
-            [discourje.core.async.async :refer :all]))
+            [discourje.core.async :refer :all]))
 
 (deftest stringify-interaction-test
   (is (= "Interaction - Action: 1, Sender: A, Receivers: B" (to-string (make-interaction "1" "A" "B")))))
