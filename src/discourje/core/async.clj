@@ -123,7 +123,7 @@
             (log-error :incorrect-communication "Trying to send in parallel, but the monitor is not correct for all channels!"))
           (allow-sends channel m))
       (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m))
-            (log-error :incorrect-communication "Atomic-send communication invalid!"))
+            (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s"(get-provider channel) (get-consumer channel) (get-label m))))
           (allow-send channel m)))))
 
 (defn <!!

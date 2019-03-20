@@ -93,7 +93,7 @@
     (log-message (format "removing receiver %s, new receivers collection: %s" receiver newRecv))
     (cond
       (satisfies? interactable target-interaction)
-      (swap! active-interaction (fn [inter] (->interaction (get-id target-interaction) (get-action target-interaction) (get-sender target-interaction) newRecv (get-next target-interaction)))))))
+      (swap! active-interaction (fn [inter] (log-message (format "Still has multiple receivera? %s | %s" (multiple-receivers? active-interaction)(multiple-receivers? target-interaction)))(->interaction (get-id target-interaction) (get-action target-interaction) (get-sender target-interaction) newRecv (get-next target-interaction)))))))
 
 
 (defn- remove-receiver
@@ -105,7 +105,7 @@
          newRecv (vec (remove #{receiver} recv))]
      (log-message (format "removing receiver %s, new receivers collection: %s" receiver newRecv))
      (if (satisfies? interactable current-interaction)
-       (swap! active-interaction (fn [inter] (->interaction (:id current-interaction) (:action current-interaction) (:sender current-interaction) newRecv (:next current-interaction))))
+       (swap! active-interaction (fn [inter] (log-message (format "STILL HAS MULTIPLE RECEIVERS? %s | %s && ID = SAME %s?" (multiple-receivers? @active-interaction)(multiple-receivers? current-interaction) (= (get-id @active-interaction)(get-id current-interaction)))) (->interaction (:id current-interaction) (:action current-interaction) (:sender current-interaction) newRecv (:next current-interaction))))
        (log-error :unsupported-operation (format "Cannot remove-receiver from interaction of type: %s, it should be atomic! Interaction = %s" (type current-interaction)(interaction-to-string current-interaction)))))))
 
 (defn- swap-active-interaction-by-atomic

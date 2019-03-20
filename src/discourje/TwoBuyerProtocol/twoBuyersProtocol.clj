@@ -16,8 +16,10 @@
                (-->> "date" "seller" "buyer2")
                (continue :order-book)]
               [(-->> "quit" "buyer2" "seller")]))))
+
 ;generate the infra structure for the protocol
 (def infrastructure (add-infrastructure two-buyer-protocol))
+
 ;start each participant on another thread
 (clojure.core.async/thread (b1/order-book infrastructure))
 (clojure.core.async/thread (b2/order-book infrastructure))

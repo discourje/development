@@ -25,9 +25,10 @@
         b2-b1 (get-channel "buyer2" "buyer1" infra)]
     (>!! b1-s (msg "title" (generate-book)))
     (let [quote (<!! s-b1 "quote")]
-      (>!! b1-b2 (msg "quote-div" (quote-div quote)))
+      (do (Thread/sleep 0.1)
+      (>!! b1-b2 (msg "quote-div" (quote-div (get-content quote))))
       (when (<!! b2-b1 "repeat")
-        (order-book infra)))))
+        (order-book infra))))))
 
 
 ;send title to seller
