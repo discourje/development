@@ -93,9 +93,10 @@
 (defn- remove-receiver-from-branch
   "Remove a receiver from the active monitor when in first position of a branchable"
   [active-interaction target-interaction receiver]
+  (println "remove-receiver-from-branch")
   (let [recv (:receivers target-interaction)
         newRecv (vec (remove #{receiver} recv))]
-    (log-message (format "removing receiver %s, new receivers collection: %s" receiver newRecv))
+    (log-message (format "IN-BRANCH!! removing receiver %s, new receivers collection: %s" receiver newRecv))
     (cond
       (satisfies? interactable target-interaction)
       (swap! active-interaction (fn [inter]

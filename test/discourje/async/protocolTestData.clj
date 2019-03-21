@@ -44,6 +44,14 @@
   (mep (-->> "1" "A" ["B" "C"])
        (-->> "2" "B" "A")))
 
+(defn tesParallelParticipantsWithChoiceProtocol []
+  (mep (-->> "1" "A" "B")
+       (-->> "2" "B" "A")
+       (choice
+         [(-->> "3" "A" ["B" "C"])]
+         [(-->> "5" "A" ["B" "C"])])
+       (-->> "4" "B" "A")))
+
 (defn single-choice-protocol []
   (create-protocol [(make-choice [
                                   [(make-interaction "1" "A" "B")]

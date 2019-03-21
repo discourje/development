@@ -50,22 +50,6 @@
         (is (= java.lang.String (get-label b->a)))
         (is (= "Hello A" (get-content b->a)))))))
 
-(deftest send-receive-tesParallelParticipantsPrototocol
-  (let [channels (add-infrastructure (tesParallelParticipantsProtocol))
-        ab (get-channel "A" "B" channels)
-        ac (get-channel "A" "C" channels)
-        ba (get-channel "B" "A" channels)
-        fnA (fn [] (do (>!! [ab ac] (msg "1" "Hi"))
-                       (<!! ba "2")))
-        fnB (fn [] (do (<!! ab "1")
-                       (do (Thread/sleep 1)
-                           (>!! ba (msg "2" "hi too")))))
-        fnC (fn [] (<!! ac "1"))
-        ]
-    (clojure.core.async/thread (fnA))
-    (clojure.core.async/thread (fnC))
-    (clojure.core.async/thread (fnB))))
-
 (deftest send-receive-parallel-protocol-test
   (let [channels (generate-infrastructure (testParallelProtocol))
         ab (get-channel "A" "B" channels)
@@ -440,3 +424,43 @@
                     (is (= "quit" (get-label b2-quit-s)))
                     (is (= "Price to high" (get-content b2-quit-s)))
                     (reset! order-book false)))))))))))
+
+
+(deftest send-receive-tesParallelParticipantsPrototocol
+  (let [channels (add-infrastructure (tesParallelParticipantsProtocol))
+        ab (get-channel "A" "B" channels)
+        ac (get-channel "A" "C" channels)
+        ba (get-channel "B" "A" channels)
+        fnA (fn [] (do (>!! [ab ac] (msg "1" "Hi"))
+                       (<!! ba "2")))
+        fnB (fn [] (do (<!! ab "1")
+                       (do (Thread/sleep 1)
+                           (>!! ba (msg "2" "hi too")))))
+        fnC (fn [] (<!! ac "1"))
+        ]
+    (clojure.core.async/thread (fnA))
+    (clojure.core.async/thread (fnC))
+    (clojure.core.async/thread (fnB))))
+
+(deftest send-receive-tesParallelParticipantsWithChoiceProtocol
+  (let [channels (add-infrastructure (tesParallelParticipantsWithChoiceProtocol))
+        ab (get-channel "A" "B" channels)
+        ac (get-channel "A" "C" channels)
+        ba (get-channel "B" "A" channels)
+        fnA (fn [] (do
+                     (>!! ab (msg "1" "hi"))
+                     (let [b-a (<!! ba "2")]
+                       (do (>!! [ab ac] (msg "3" "Hi"))
+                       (<!! ba "4"))
+                       )))
+        fnB (fn [] (let [a-b (<!! ab "1")]
+                     (do
+                     (>!! ba (msg "2" "hi too"))
+                     (<!! ab "3")
+                       (do (Thread/sleep 1)
+                           (>!! ba (msg "4" "hi too"))))))
+        fnC (fn [] (<!! ac "3"))
+        ]
+    (clojure.core.async/thread (fnA))
+    (clojure.core.async/thread (fnC))
+    (clojure.core.async/thread (fnB))))
