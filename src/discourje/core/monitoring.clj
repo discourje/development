@@ -57,10 +57,10 @@
   (first (flatten (filter some? (for [inter interactions]
                                   (cond (satisfies? interactable inter) (when (= (get-id inter) id) inter)
                                         (satisfies? branchable inter) (if (= id (get-id inter))
-                                                                    inter
-                                                                    (let [branches (:branches inter)
-                                                                          searches (for [b branches] (find-nested-next id b))]
-                                                                      (first (filter some? searches))))
+                                                                        inter
+                                                                        (let [branches (:branches inter)
+                                                                              searches (for [b branches] (find-nested-next id b))]
+                                                                          (first (filter some? searches))))
                                         (satisfies? recursable inter) (if (= id (get-id inter))
                                                                         inter
                                                                         (find-nested-next id (get-recursion inter)))
@@ -68,21 +68,26 @@
                                         :else (do (log-error :unsupported-operation (format "Cannot find next monitor, unsupported type, %s!" (type inter)) nil))))
                           ))))
 
-(defn- swap-next-interaction-by-id!
+(defn- get-next-interaction-by-id!
   "Get the next interaction with next id already given"
   [id interactions]
-  (fn [active-interaction]
     (let [nested-id-search (find-nested-next id interactions)]
       (log-message "nested-id" nested-id-search)
-      nested-id-search)))
+      nested-id-search))
+
+(defn- swap-next-interaction-by-id!
+  "Swap the next interaction with next id already given"
+  [id interactions]
+  (fn [active-interaction]
+    (get-next-interaction-by-id! id interactions)))
 
 (defn- multiple-receivers?
   "Does the monitor have multiple receivers?"
   [active-interaction]
   (log-message (format "Checking multiple-receivers on active-interaction %s, seqable? %s, count > 1 %s"
-                   active-interaction
-                   (instance? Seqable (:receivers active-interaction))
-                   (> (count (:receivers active-interaction)) 1)))
+                       active-interaction
+                       (instance? Seqable (:receivers active-interaction))
+                       (> (count (:receivers active-interaction)) 1)))
   (and (instance? Seqable (:receivers active-interaction)) (> (count (:receivers active-interaction)) 1)))
 
 (defn- remove-receiver-from-branch
@@ -93,21 +98,26 @@
     (log-message (format "removing receiver %s, new receivers collection: %s" receiver newRecv))
     (cond
       (satisfies? interactable target-interaction)
-      (swap! active-interaction (fn [inter] (log-message (format "Still has multiple receivera? %s | %s" (multiple-receivers? active-interaction)(multiple-receivers? target-interaction)))(->interaction (get-id target-interaction) (get-action target-interaction) (get-sender target-interaction) newRecv (get-next target-interaction)))))))
+      (swap! active-interaction (fn [inter]
+                                  (log-message (format "Still has multiple receivera? %s | %s" (multiple-receivers? active-interaction) (multiple-receivers? target-interaction)))
+                                  (->interaction (get-id target-interaction) (get-action target-interaction) (get-sender target-interaction) newRecv (get-next target-interaction)))))))
 
 
 (defn- remove-receiver
   "Remove a receiver from the active monitor"
-  ([active-interaction receiver]
-   (remove-receiver active-interaction @active-interaction receiver))
-  ([active-interaction current-interaction receiver]
+  ([active-interaction receiver interactions]
+   (remove-receiver active-interaction @active-interaction receiver interactions))
+  ([active-interaction current-interaction receiver interactions]
    (let [recv (:receivers current-interaction)
          newRecv (vec (remove #{receiver} recv))]
      (log-message (format "removing receiver %s, new receivers collection: %s" receiver newRecv))
      (if (satisfies? interactable current-interaction)
        (swap! active-interaction (fn [inter]
-                                   (log-message (format "STILL HAS MULTIPLE RECEIVERS? %s | %s && ID = SAME %s?" (multiple-receivers? @active-interaction)(multiple-receivers? current-interaction) (= (get-id @active-interaction)(get-id current-interaction)))) (->interaction (:id current-interaction) (:action current-interaction) (:sender current-interaction) newRecv (:next current-interaction))))
-       (log-error :unsupported-operation (format "Cannot remove-receiver from interaction of type: %s, it should be atomic! Interaction = %s" (type current-interaction)(interaction-to-string current-interaction)))))))
+                                   (log-message (format "STILL HAS MULTIPLE RECEIVERS? %s | %s && ID = SAME %s? Active: %s, Current: %s" (multiple-receivers? @active-interaction) (multiple-receivers? current-interaction) (= (get-id @active-interaction) (get-id current-interaction)) @active-interaction current-interaction))
+                                   (if (or (satisfies? identifiable-recur @active-interaction) (and (multiple-receivers? @active-interaction) (= (get-id @active-interaction) (get-id current-interaction))))
+                                     (->interaction (:id current-interaction) (:action current-interaction) (:sender current-interaction) newRecv (:next current-interaction))
+                                     (get-next-interaction-by-id! (get-next current-interaction) interactions))))
+       (log-error :unsupported-operation (format "Cannot remove-receiver from interaction of type: %s, it should be atomic! Interaction = %s" (type current-interaction) (interaction-to-string current-interaction)))))))
 
 (defn- swap-active-interaction-by-atomic
   "Swap active interaction by atomic"
@@ -117,7 +127,7 @@
    (if (nil? receiver)
      (swap! active-interaction (swap-next-interaction-by-id! (get-next target-interaction) interactions))
      (if (multiple-receivers? target-interaction)
-       (remove-receiver active-interaction target-interaction receiver)
+       (remove-receiver active-interaction target-interaction receiver interactions)
        (swap! active-interaction (swap-next-interaction-by-id! (get-next target-interaction) interactions))))))
 
 (defn- get-atomic-interaction
@@ -146,7 +156,7 @@
           (satisfies? interactable first-in-branch) (get-atomic-interaction sender receiver label first-in-branch)
           (satisfies? branchable first-in-branch) (get-branch-interaction sender receiver label first-in-branch)
           (satisfies? recursable first-in-branch) (get-recursion-interaction sender receiver label first-in-branch)
-          :else (log-error :unsupported-operation (format "Cannot check operation on child branchable construct! %s"(interaction-to-string first-in-branch))))))))
+          :else (log-error :unsupported-operation (format "Cannot check operation on child branchable construct! %s" (interaction-to-string first-in-branch))))))))
 
 
 (defn- get-first-valid-target-branch-interaction
@@ -179,7 +189,7 @@
          (if (nil? receivers)
            (swap! active-interaction (swap-next-interaction-by-id! (get-next target-interaction) interactions))
            (if (multiple-receivers? target-interaction)
-             (remove-receiver active-interaction target-interaction receivers)
+             (remove-receiver active-interaction target-interaction receivers interactions)
              (swap! active-interaction (swap-next-interaction-by-id! (get-next target-interaction) interactions))))
          (satisfies? branchable target-interaction)
          (let [first-in-branch (get-first-valid-target-branch-interaction sender receivers label target-interaction)]

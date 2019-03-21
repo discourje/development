@@ -40,7 +40,7 @@
                     (make-interaction "3" "A" "C")
                     (make-interaction "4" "C" ["A" "B"])]))
 
-(def tesParallelParticipantsPrototocol
+(defn tesParallelParticipantsProtocol []
   (mep (-->> "1" "A" ["B" "C"])
        (-->> "2" "B" "A")))
 

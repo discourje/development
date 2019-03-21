@@ -51,18 +51,20 @@
         (is (= "Hello A" (get-content b->a)))))))
 
 (deftest send-receive-tesParallelParticipantsPrototocol
-  (let [channels (add-infrastructure tesParallelParticipantsPrototocol)
+  (let [channels (add-infrastructure (tesParallelParticipantsProtocol))
         ab (get-channel "A" "B" channels)
         ac (get-channel "A" "C" channels)
         ba (get-channel "B" "A" channels)
         fnA (fn [] (do (>!! [ab ac] (msg "1" "Hi"))
-                       (is (= "2" (get-label (<!! ab "2"))))))
-        fnB (fn [] (do (>!! ba (msg "2" (get-content (<!! ab "1"))))))
-        fnC (fn [] (do (is (= "1" (get-label (>!! ac "1"))))))]
+                       (<!! ba "2")))
+        fnB (fn [] (do (<!! ab "1")
+                       (do (Thread/sleep 1)
+                           (>!! ba (msg "2" "hi too")))))
+        fnC (fn [] (<!! ac "1"))
+        ]
     (clojure.core.async/thread (fnA))
-    (clojure.core.async/thread (fnB))
     (clojure.core.async/thread (fnC))
-    ))
+    (clojure.core.async/thread (fnB))))
 
 (deftest send-receive-parallel-protocol-test
   (let [channels (generate-infrastructure (testParallelProtocol))
@@ -302,11 +304,14 @@
                     (reset! flag true))))))
           (>!! [ab ac] (->message "end" "ending"))
           (let [a->b-end (<!! ab "end")
-                a->c-end (<!! ac "end")]
+                a->c-end (<!! ac "end")
+                ]
             (is (= "end" (get-label a->b-end)))
             (is (= "ending" (get-content a->b-end)))
             (is (= "end" (get-label a->c-end)))
-            (is (= "ending" (get-content a->c-end))))))))
+            (is (= "ending" (get-content a->c-end)))
+            )
+          ))))
 
 (deftest send-receive-one-recur-with-choice-protocol
   (let [channels (generate-infrastructure (one-recur-with-choice-protocol))
