@@ -50,6 +50,20 @@
         (is (= java.lang.String (get-label b->a)))
         (is (= "Hello A" (get-content b->a)))))))
 
+(deftest send-receive-tesParallelParticipantsPrototocol
+  (let [channels (add-infrastructure tesParallelParticipantsPrototocol)
+        ab (get-channel "A" "B" channels)
+        ac (get-channel "A" "C" channels)
+        ba (get-channel "B" "A" channels)
+        fnA (fn [] (do (>!! [ab ac] (msg "1" "Hi"))
+                       (is (= "2" (get-label (<!! ab "2"))))))
+        fnB (fn [] (do (>!! ba (msg "2" (get-content (<!! ab "1"))))))
+        fnC (fn [] (do (is (= "1" (get-label (>!! ac "1"))))))]
+    (clojure.core.async/thread (fnA))
+    (clojure.core.async/thread (fnB))
+    (clojure.core.async/thread (fnC))
+    ))
+
 (deftest send-receive-parallel-protocol-test
   (let [channels (generate-infrastructure (testParallelProtocol))
         ab (get-channel "A" "B" channels)
@@ -338,7 +352,7 @@
         ]
     (clojure.core.async/thread (fnA fnA))
     (clojure.core.async/thread (fnB fnB))
-      ))
+    ))
 
 (deftest send-receive-one-recur-with-startchoice-and-endchoice-protocol
   (let [channels (generate-infrastructure (one-recur-with-startchoice-and-endchoice-protocol))

@@ -40,6 +40,10 @@
                     (make-interaction "3" "A" "C")
                     (make-interaction "4" "C" ["A" "B"])]))
 
+(def tesParallelParticipantsPrototocol
+  (mep (-->> "1" "A" ["B" "C"])
+       (-->> "2" "B" "A")))
+
 (defn single-choice-protocol []
   (create-protocol [(make-choice [
                                   [(make-interaction "1" "A" "B")]
@@ -138,11 +142,11 @@
                                                  [(make-interaction "1" "A" "I")]] ;i0b1b11
                                                 )]]
                                  )
-                    (make-interaction "Done" "A" "End")]                ;i1
+                    (make-interaction "Done" "A" "End")]    ;i1
                    ))
 
 (defn single-recur-protocol []
-  (create-protocol [(make-interaction "1" "A" "B")                      ;i0
+  (create-protocol [(make-interaction "1" "A" "B")          ;i0
                     (make-recursion :test [;i1
                                            (make-interaction "1" "B" "A") ; i1r0
                                            (make-choice [;i1r1
@@ -154,7 +158,7 @@
                                                           ]
                                                          ])
                                            ])
-                    (make-interaction "end" "A" ["B" "C"])              ; i2
+                    (make-interaction "end" "A" ["B" "C"])  ; i2
                     ]))
 
 (defn single-recur-one-choice-protocol []
@@ -193,7 +197,7 @@
                                                                         ])
                                                           ])
                                    ]
-                                  [(make-interaction "2" "A" "C")]      ;i0b10
+                                  [(make-interaction "2" "A" "C")] ;i0b10
                                   ])
                     ]))
 
@@ -219,7 +223,7 @@
                                                                     ])]
 
                                     )
-                    (make-interaction "end" "A" ["B" "C"])              ;i1
+                    (make-interaction "end" "A" ["B" "C"])  ;i1
                     ]))
 
 (defn multiple-nested-recur-protocol []
