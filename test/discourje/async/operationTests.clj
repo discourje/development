@@ -437,10 +437,11 @@
                        (do (Thread/sleep 1)
                            (>!! ba (msg "2" "hi too")))))
         fnC (fn [] (<!! ac "1"))
-        ]
-    (clojure.core.async/thread (fnA))
-    (clojure.core.async/thread (fnC))
-    (clojure.core.async/thread (fnB))))
+        a (clojure.core.async/thread (fnA))
+        c (clojure.core.async/thread (fnC))]
+    (clojure.core.async/thread (fnB))
+    (is (= "hi too" (get-content (async/<!! a))))
+    (is (= "Hi") (get-content (async/<!! c)))))
 
 (deftest send-receive-tesParallelParticipantsWithChoiceProtocol
   (let [channels (add-infrastructure (tesParallelParticipantsWithChoiceProtocol))
@@ -451,16 +452,17 @@
                      (>!! ab (msg "1" "hi"))
                      (let [b-a (<!! ba "2")]
                        (do (>!! [ab ac] (msg "3" "Hi"))
-                           (println (get-content (<!! ba "4"))))
-                       )))
+                           (get-content (<!! ba "4"))))))
         fnB (fn [] (let [a-b (<!! ab "1")]
                      (do
-                     (>!! ba (msg "2" "hi too"))
-                     (<!! ab "3")
+                       (>!! ba (msg "2" "hi too"))
+                       (<!! ab "3")
                        (do (Thread/sleep 1)
                            (>!! ba (msg "4" "hi too"))))))
         fnC (fn [] (<!! ac "3"))
+        a (clojure.core.async/thread (fnA))
+        c (clojure.core.async/thread (fnC))
         ]
-    (clojure.core.async/thread (fnA))
-    (clojure.core.async/thread (fnC))
-    (clojure.core.async/thread (fnB))))
+    (clojure.core.async/thread (fnB))
+    (is (= "hi too" (async/<!! a)))
+    (is (= "Hi") (get-content (async/<!! c)))))

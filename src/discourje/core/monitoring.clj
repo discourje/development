@@ -106,12 +106,9 @@
       (satisfies? interactable target-interaction)
       (swap! active-interaction (fn [inter]
                                   (log-message (format "STILL HAS MULTIPLE RECEIVERS In First Of Branch? %s | %s && ID = SAME %s? Active: %s, Current: %s" (multiple-receivers? @active-interaction) (multiple-receivers? target-interaction) (= (get-id @active-interaction) (get-id target-interaction)) @active-interaction target-interaction))
-                                  ;(println "ACTIVE = " @active-interaction)
-                                  ;(println "TARGET = " target-interaction)
                                   (if (or (satisfies? identifiable-recur @active-interaction) (satisfies? branchable @active-interaction) (and (multiple-receivers? @active-interaction) (= (get-id @active-interaction) (get-id target-interaction))))
                                     (->interaction (:id target-interaction) (:action target-interaction) (:sender target-interaction) newRecv (:next target-interaction))
                                     (get-next-interaction-by-id! (get-next target-interaction) interactions)))))))
-
 
 (defn- remove-receiver
   "Remove a receiver from the active monitor"

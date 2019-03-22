@@ -133,6 +133,6 @@
     (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
     (let [result (allow-receive channel)]
       (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label)
-            (log-error :incorrect-communication "Atomic receive communication invalid!"))
+            (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s"(get-provider channel) (get-consumer channel) label (get-active-interaction (get-monitor channel)))))
           (apply-interaction (get-monitor channel) (get-provider channel) (get-consumer channel) label)
           result))))
