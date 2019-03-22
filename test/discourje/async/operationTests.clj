@@ -451,7 +451,7 @@
                      (>!! ab (msg "1" "hi"))
                      (let [b-a (<!! ba "2")]
                        (do (>!! [ab ac] (msg "3" "Hi"))
-                       (<!! ba "4"))
+                           (println (get-content (<!! ba "4"))))
                        )))
         fnB (fn [] (let [a-b (<!! ab "1")]
                      (do

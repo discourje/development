@@ -90,9 +90,14 @@
                        (> (count (:receivers active-interaction)) 1)))
   (and (instance? Seqable (:receivers active-interaction)) (> (count (:receivers active-interaction)) 1)))
 
+(defn- has-multiple-receivers-internal-swap
+  "While swapping active-interaction, the receivers of the current active-interaction must be checked"
+  [target-interaction]
+  )
+
 (defn- remove-receiver-from-branch
   "Remove a receiver from the active monitor when in first position of a branchable"
-  [active-interaction target-interaction receiver]
+  [active-interaction target-interaction receiver interactions]
   (println "remove-receiver-from-branch")
   (let [recv (:receivers target-interaction)
         newRecv (vec (remove #{receiver} recv))]
@@ -100,8 +105,12 @@
     (cond
       (satisfies? interactable target-interaction)
       (swap! active-interaction (fn [inter]
-                                  (log-message (format "Still has multiple receivera? %s | %s" (multiple-receivers? active-interaction) (multiple-receivers? target-interaction)))
-                                  (->interaction (get-id target-interaction) (get-action target-interaction) (get-sender target-interaction) newRecv (get-next target-interaction)))))))
+                                  (log-message (format "STILL HAS MULTIPLE RECEIVERS In First Of Branch? %s | %s && ID = SAME %s? Active: %s, Current: %s" (multiple-receivers? @active-interaction) (multiple-receivers? target-interaction) (= (get-id @active-interaction) (get-id target-interaction)) @active-interaction target-interaction))
+                                  ;(println "ACTIVE = " @active-interaction)
+                                  ;(println "TARGET = " target-interaction)
+                                  (if (or (satisfies? identifiable-recur @active-interaction) (satisfies? branchable @active-interaction) (and (multiple-receivers? @active-interaction) (= (get-id @active-interaction) (get-id target-interaction))))
+                                    (->interaction (:id target-interaction) (:action target-interaction) (:sender target-interaction) newRecv (:next target-interaction))
+                                    (get-next-interaction-by-id! (get-next target-interaction) interactions)))))))
 
 
 (defn- remove-receiver
@@ -131,10 +140,22 @@
        (remove-receiver active-interaction target-interaction receiver interactions)
        (swap! active-interaction (swap-next-interaction-by-id! (get-next target-interaction) interactions))))))
 
+(defn- is-valid-interaction?
+  "Is the given interaction valid compared to the active-interaction of the monitor"
+  [sender receivers label active-interaction]
+  (and
+    (and (if (instance? Seqable label)
+           (or (contains-value? (:action active-interaction) label) (= label (:action active-interaction)))
+           (or (= label (:action active-interaction)) (contains-value? label (:action active-interaction)))))
+    (= sender (:sender active-interaction))
+    (and (if (instance? Seqable (:receivers active-interaction))
+           (or (contains-value? receivers (:receivers active-interaction)) (= receivers (:receivers active-interaction)))
+           (or (= receivers (:receivers active-interaction)) (contains-value? (:receivers active-interaction) receivers))))))
+
 (defn- get-atomic-interaction
   "Check the atomic interaction"
   [sender receiver label active-interaction]
-  (when (and (check-atomic-interaction label active-interaction) (= (:receivers active-interaction) receiver) (= (:sender active-interaction) sender)) active-interaction))
+  (when (is-valid-interaction? sender receiver label active-interaction) active-interaction))
 
 (defn- get-recursion-interaction
   "Check the first element in a recursion interaction"
@@ -171,13 +192,13 @@
    (let [target-interaction (get-first-valid-target-branch-interaction sender receivers label @active-interaction)]
      (log-message (format "target-interaction sender %s receivers %s action %s next %s, or is identifiable-recur %s" (:sender target-interaction) (:receivers target-interaction) (:action target-interaction) (:next target-interaction) (satisfies? identifiable-recur target-interaction)))
      (if (multiple-receivers? target-interaction)
-       (remove-receiver-from-branch active-interaction target-interaction receivers)
+       (remove-receiver-from-branch active-interaction target-interaction receivers interactions)
        (swap! active-interaction (swap-next-interaction-by-id! (:next target-interaction) interactions)))))
   ([sender receivers label active-interaction target-interaction interactions]
    (let [target (get-first-valid-target-branch-interaction sender receivers label target-interaction)]
      (log-message (format "target sender %s receivers %s action %s next %s or is identifiable-recur %s" (:sender target) (:receivers target) (:action target) (:next target) (satisfies? identifiable-recur target)))
      (if (multiple-receivers? target)
-       (remove-receiver-from-branch active-interaction target receivers)
+       (remove-receiver-from-branch active-interaction target receivers interactions)
        (swap! active-interaction (swap-next-interaction-by-id! (:next target) interactions))))))
 
 (defn- swap-active-interaction-by-recursion
@@ -196,7 +217,7 @@
          (let [first-in-branch (get-first-valid-target-branch-interaction sender receivers label target-interaction)]
            (log-message (format "first-in-branchable sender %s receivers %s action %s next %s, or is identifiable-recur %s" (:sender first-in-branch) (:receivers first-in-branch) (:action first-in-branch) (:next first-in-branch) (satisfies? identifiable-recur first-in-branch)))
            (if (multiple-receivers? first-in-branch)
-             (remove-receiver-from-branch active-interaction first-in-branch receivers)
+             (remove-receiver-from-branch active-interaction first-in-branch receivers interactions)
              (swap! active-interaction (swap-next-interaction-by-id! (:next first-in-branch) interactions))))
          (satisfies? recursable target-interaction)
          (swap-active-interaction-by-recursion sender receivers label active-interaction (first (get-recursion target-interaction)) interactions)
@@ -226,17 +247,7 @@
   (when (instance? Seqable coll)
     (boolean (some #(= element %) coll))))
 
-(defn- is-valid-interaction?
-  "Is the given interaction valid compared to the active-interaction of the monitor"
-  [sender receivers label active-interaction]
-  (and
-    (and (if (instance? Seqable label)
-           (or (contains-value? (:action active-interaction) label) (= label (:action active-interaction)))
-           (or (= label (:action active-interaction)) (contains-value? label (:action active-interaction)))))
-    (= sender (:sender active-interaction))
-    (and (if (instance? Seqable (:receivers active-interaction))
-           (or (contains-value? receivers (:receivers active-interaction)) (= receivers (:receivers active-interaction)))
-           (or (= receivers (:receivers active-interaction)) (contains-value? (:receivers active-interaction) receivers))))))
+
 
 (defn is-valid-communication?
   "Checks if communication is valid by comparing input to the active monitor"
