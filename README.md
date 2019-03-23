@@ -57,7 +57,7 @@ Or by supplying the add-infrastructure macro with custom created channels. (see 
 Step 3: Use Discourje put & take abstractions
 -
 - <b>>!! [channel(s) message]</b>: Put function on channel(s), channels can be a vector of channels to support parallelism (see examples!)
-- <b><!! [channel label]</b>:  Take operation of channel matching label.
+- <b><!! [channel label(s)]</b>:  Take operation of channel matching label(s). When Expecting a choice to be made by sender, you can listen for multiple labels and act upon receiving a specific one.
 
 Note: Data being send through Discourje will always be encapsulated in a message. When pure data is transmitted through Discourje a message will be generated with Data type as label, and data as content. (See typedMessages example)
 
