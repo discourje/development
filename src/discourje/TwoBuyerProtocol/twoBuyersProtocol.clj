@@ -6,7 +6,7 @@
            [discourje.TwoBuyerProtocol.Seller :as s]))
 
 ;define two buyer protocol, Notice: it is extended with recursion!
-(defn two-buyer-protocol []
+(defn two-buyer-protocol "Define two buyer protocol"[]
   (mep (rec :order-book
             (-->> "title" "buyer1" "seller")
             (-->> "quote" "seller" ["buyer1" "buyer2"])
@@ -22,6 +22,6 @@
 (def infrastructure (add-infrastructure (two-buyer-protocol)))
 
 ;start each participant on another thread
-(clojure.core.async/thread (b2/order-book infrastructure))
 (clojure.core.async/thread (b1/order-book infrastructure))
+(clojure.core.async/thread (b2/order-book infrastructure))
 (clojure.core.async/thread (s/order-book infrastructure))

@@ -3,16 +3,11 @@
             [discourje.core.logging :refer :all])
   (:import (java.util Date Calendar)))
 
-(defn quote-book
-  "generate random integer between 1(inclusive) and 30(inclusive)"
-  [title]
+(defn quote-book "generate random integer between 1(inclusive) and 30(inclusive)" [title]
   (log-message (format "received title: %s" title))
-  (let [x (+ (rand-int 30) 1)]
-    x))
+  (+ (rand-int 30) 1))
 
-(defn get-date
-  "Generate a new date and increment an amount of days"
-  [days]
+(defn get-date "Generate a new date and increment an amount of days" [days]
   (let [cal (Calendar/getInstance)
         d (new Date)]
     (doto cal
@@ -20,20 +15,13 @@
       (.add Calendar/DATE days)
       (.getTime))))
 
-(defn get-random-date
-  "Get a random date, in the future, up to a maximum range (inclusive)"
-  [maxRange]
+(defn get-random-date "Get a random date, in the future, up to a maximum range (inclusive)" [maxRange]
   (get-date (+ (rand-int maxRange) 1)))
 
-(defn- end-reached
-  "log protocol end reached"
-  [quit]
+(defn- end-reached "log protocol end reached" [quit]
   (log-message (format "Protocol ended with: %s" quit)))
 
-
-(defn order-book
-  "Order book from seller's perspective"
-  [infra]
+(defn order-book "Order book from seller's perspective" [infra]
   (let [b1-s (get-channel "buyer1" "seller" infra)
         s-b1 (get-channel "seller" "buyer1" infra)
         s-b2 (get-channel "seller" "buyer2" infra)
