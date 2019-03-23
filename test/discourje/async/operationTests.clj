@@ -1,7 +1,7 @@
 (ns discourje.async.operationTests
   (:require [clojure.test :refer :all]
             [discourje.async.protocolTestData :refer :all]
-            [discourje.core.async.async :refer :all]
+            [discourje.core.async :refer :all]
             [clojure.core.async :as async]))
 
 (deftest send-test
@@ -288,11 +288,14 @@
                     (reset! flag true))))))
           (>!! [ab ac] (->message "end" "ending"))
           (let [a->b-end (<!! ab "end")
-                a->c-end (<!! ac "end")]
+                a->c-end (<!! ac "end")
+                ]
             (is (= "end" (get-label a->b-end)))
             (is (= "ending" (get-content a->b-end)))
             (is (= "end" (get-label a->c-end)))
-            (is (= "ending" (get-content a->c-end))))))))
+            (is (= "ending" (get-content a->c-end)))
+            )
+          ))))
 
 (deftest send-receive-one-recur-with-choice-protocol
   (let [channels (generate-infrastructure (one-recur-with-choice-protocol))
@@ -338,7 +341,7 @@
         ]
     (clojure.core.async/thread (fnA fnA))
     (clojure.core.async/thread (fnB fnB))
-      ))
+    ))
 
 (deftest send-receive-one-recur-with-startchoice-and-endchoice-protocol
   (let [channels (generate-infrastructure (one-recur-with-startchoice-and-endchoice-protocol))
@@ -421,3 +424,45 @@
                     (is (= "quit" (get-label b2-quit-s)))
                     (is (= "Price to high" (get-content b2-quit-s)))
                     (reset! order-book false)))))))))))
+
+
+(deftest send-receive-tesParallelParticipantsPrototocol
+  (let [channels (add-infrastructure (tesParallelParticipantsProtocol))
+        ab (get-channel "A" "B" channels)
+        ac (get-channel "A" "C" channels)
+        ba (get-channel "B" "A" channels)
+        fnA (fn [] (do (>!! [ab ac] (msg "1" "Hi"))
+                       (<!! ba "2")))
+        fnB (fn [] (do (<!! ab "1")
+                       (do (Thread/sleep 1)
+                           (>!! ba (msg "2" "hi too")))))
+        fnC (fn [] (<!! ac "1"))
+        a (clojure.core.async/thread (fnA))
+        c (clojure.core.async/thread (fnC))]
+    (clojure.core.async/thread (fnB))
+    (is (= "hi too" (get-content (async/<!! a))))
+    (is (= "Hi") (get-content (async/<!! c)))))
+
+(deftest send-receive-tesParallelParticipantsWithChoiceProtocol
+  (let [channels (add-infrastructure (tesParallelParticipantsWithChoiceProtocol))
+        ab (get-channel "A" "B" channels)
+        ac (get-channel "A" "C" channels)
+        ba (get-channel "B" "A" channels)
+        fnA (fn [] (do
+                     (>!! ab (msg "1" "hi"))
+                     (let [b-a (<!! ba "2")]
+                       (do (>!! [ab ac] (msg "3" "Hi"))
+                           (get-content (<!! ba "4"))))))
+        fnB (fn [] (let [a-b (<!! ab "1")]
+                     (do
+                       (>!! ba (msg "2" "hi too"))
+                       (<!! ab "3")
+                       (do (Thread/sleep 1)
+                           (>!! ba (msg "4" "hi too"))))))
+        fnC (fn [] (<!! ac "3"))
+        a (clojure.core.async/thread (fnA))
+        c (clojure.core.async/thread (fnC))
+        ]
+    (clojure.core.async/thread (fnB))
+    (is (= "hi too" (async/<!! a)))
+    (is (= "Hi") (get-content (async/<!! c)))))

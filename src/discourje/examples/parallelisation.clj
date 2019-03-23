@@ -1,36 +1,33 @@
 (ns discourje.examples.parallelisation
-  (require [discourje.api.api :refer :all]))
+  (require [discourje.core.async :refer :all]
+           [discourje.core.logging :refer :all]))
 
-(defn- defineParallelProtocol
-  "This function will generate a vector with 2 monitors to send and receive the greet message.
-  Notice how receivers are defined as a vector in order to allow for parallelisation!"
+; This function will generate a vector with 1 interaction to send and receive the greet message.
+;  Notice how receivers are defined as a vector in order to allow for parallelisation!
+(def message-exchange-pattern
+  (mep (-->> "greet" "alice" ["bob" "carol"])))
+
+;setup infrastructure, generate channels and add monitor
+(def infrastructure (add-infrastructure message-exchange-pattern))
+;Get the channels
+(def alice-to-bob (get-channel "alice" "bob" infrastructure))
+(def alice-to-carol (get-channel "alice" "carol" infrastructure))
+
+(defn- greet-bob-and-carol
+  "This function will use the protocol to send the greet message to bob and carol.
+ Notice: We supply the put operation with a vector of channels"
   []
-  [(monitor-send "greet" "alice" ["bob" "carol"])
-   (monitor-receive "greet" ["bob" "carol"] "alice")])
-;define the protocol
-(def protocol (generateProtocolFromMonitors (defineParallelProtocol)))
-(println (:channels @protocol))
-;define the participants
-(def alice (generateParticipant "alice" protocol))
-(def bob (generateParticipant "bob" protocol))
-(def carol (generateParticipant "carol" protocol))
+  (>!! [alice-to-bob alice-to-carol] (msg "greet" "Greetings, from alice!")))
 
-(defn- greetBobAndCarol
-  "This function will use the protocol to send the greet message to bob and carol."
-  [participant]
-  (log (format "%s will now send greet." (:name participant)))
-  (s! "greet" (format "Greetings, from %s!" (:name participant)) participant ["bob" "carol"]))
-
-(defn- receiveGreet
+(defn- receive-greet
   "This function will use the protocol to listen for the greet message."
-  [participant]
-  (r! "greet" "alice" participant
-              (fn [message]
-                (log (format "%s Received message: %s" (:name participant) message)))))
+  [channel]
+  (let [message (<!! channel "greet")]
+    (log-message (format "Received message: %s by %s" (get-content message) (get-consumer channel)))))
 
-;start the `GreetBobAndCarol' function on thread and add `alice' participant
-(clojure.core.async/thread (greetBobAndCarol alice))
-;start the `receiveGreet' function on thread and add `bob' participant
-(clojure.core.async/thread (receiveGreet bob))
-;start the `receiveGreet' function on thread and add `carol' participant
-(clojure.core.async/thread (receiveGreet carol))
+;start the `greet-bob-and-carol' function on thread
+(clojure.core.async/thread (greet-bob-and-carol))
+;start the `receive-greet' function on thread and add the channel
+(clojure.core.async/thread (receive-greet alice-to-bob))
+;start the `receive-greet' function on thread and add the channel
+(clojure.core.async/thread (receive-greet alice-to-carol))

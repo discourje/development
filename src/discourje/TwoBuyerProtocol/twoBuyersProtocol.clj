@@ -1,41 +1,28 @@
 (ns discourje.TwoBuyerProtocol.twoBuyersProtocol
-  (require [discourje.api.api :refer :all]
-           [discourje.core.protocol :refer :all]))
+  (require [discourje.core.async :refer :all]
+           [discourje.core.logging :refer :all]
+           [discourje.TwoBuyerProtocol.Buyer1 :as b1]
+           [discourje.TwoBuyerProtocol.Buyer2 :as b2]
+           [discourje.TwoBuyerProtocol.Seller :as s]))
 
-(defn- defineRecurringProtocol []
-  [(monitor-recursion :x
-                      [
-                       (monitor-send "title" "buyer1" "seller")
-                       (monitor-receive "title" "seller" "buyer1")
-                       (monitor-send "quote" "seller" ["buyer1" "buyer2"])
-                       (monitor-receive "quote" ["buyer1" "buyer2"] "seller")
-                       (monitor-send "quoteDiv" "buyer1" "buyer2")
-                       (monitor-receive "quoteDiv" "buyer2" "buyer1")
-                       (monitor-choice [
-                                        (monitor-send "ok" "buyer2" "seller") ;0
-                                        (monitor-choice [                     ;1
-                                                         (monitor-send "address" "buyer2" "seller")
-                                                         (monitor-receive "ok" "seller" "buyer2")
-                                                         (monitor-receive "address" "seller" "buyer2")
-                                                         ]
-                                                        [
-                                                         (monitor-receive "ok" "seller" "buyer2")
-                                                         (monitor-send "address" "buyer2" "seller")
-                                                         (monitor-receive "address" "seller" "buyer2")
-                                                         ])
-                                        (monitor-send "date" "seller" "buyer2");2
-                                        (monitor-receive "date" "buyer2" "seller")
-                                        (monitor-send "repeat" "buyer2" ["seller" "buyer1"])
-                                        (monitor-receive "repeat" ["seller" "buyer1"] "buyer2")
-                                        (do-recur :x)
-                                        ]
-                                       [
-                                        (monitor-send "quit" "buyer2" "seller")
-                                        (monitor-receive "quit" "seller" "buyer2")
-                                        (do-end-recur :x)
-                                        ])])])
+;define two buyer protocol, Notice: it is extended with recursion!
+(defn two-buyer-protocol []
+  (mep (rec :order-book
+            (-->> "title" "buyer1" "seller")
+            (-->> "quote" "seller" ["buyer1" "buyer2"])
+            (-->> "quote-received" "buyer2" "buyer1")
+            (-->> "quote-div" "buyer1" "buyer2")
+            (choice
+              [(-->> "ok" "buyer2" "seller")
+               (-->> "date" "seller" "buyer2")
+               (-->> "repeat" "buyer1" ["buyer1" "seller"])
+               (continue :order-book)]
+              [(-->> "quit" "buyer2" "seller")]))))
 
-(defn getProtocol
-  "generate the protocol, channels and set the first monitor active"
-  []
-  (generateProtocolFromMonitors (defineRecurringProtocol)))
+;generate the infra structure for the protocol
+(def infrastructure (add-infrastructure (two-buyer-protocol)))
+
+;start each participant on another thread
+(clojure.core.async/thread (b2/order-book infrastructure))
+(clojure.core.async/thread (b1/order-book infrastructure))
+(clojure.core.async/thread (s/order-book infrastructure))

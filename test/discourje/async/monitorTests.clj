@@ -1,7 +1,7 @@
 (ns discourje.async.monitorTests
   (:require [clojure.test :refer :all]
             [discourje.async.protocolTestData :refer :all]
-            [discourje.core.async.async :refer :all]))
+            [discourje.core.async :refer :all]))
 
 (deftest get-active-interaction-test
   (let [mon (generate-monitor (testDualProtocol))

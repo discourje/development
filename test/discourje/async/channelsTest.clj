@@ -1,7 +1,7 @@
 (ns discourje.async.channelsTest
   (:require [clojure.test :refer :all]
             [discourje.async.protocolTestData :refer :all]
-            [discourje.core.async.async :refer :all]))
+            [discourje.core.async :refer :all]))
 
 (deftest equal-senders-test
   (let [chans[(->channel 1 2 nil nil nil)

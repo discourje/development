@@ -1,9 +1,6 @@
 <b>Discourje</b>
 -
-- [Getting Started](GettingStarted.md)
 - [Library Name](LibraryName.md)
-- [Project information](ProjectInformation.md)
-- [ToDo](ToDo.md)
 - [Dependencies](Dependencies.md)
 
 <b>Introduction:</b>
@@ -23,6 +20,9 @@ Communication is blocking when desired (configure logging levels) and order amon
 - [Parallelisation](src/discourje/examples/parallelisation.clj)
 - [Branching](src/discourje/examples/branching.clj)
 - [Recursion](src/discourje/examples/recursion.clj)
+- [Custom Channels](src/discourje/examples/recursion.clj)
+- [Typed Messages](src/discourje/examples/recursion.clj)
+- [Logging Levels](src/discourje/examples/recursion.clj)
 - Nesting: Recursion and Branching constructs support nesting!
 
 <i>See examples for each function for more info.</i>
@@ -35,69 +35,52 @@ This simple protocol embeds all fundamental functionality a protocol language sh
 <b>Usage</b>
 -
 
-<i>See [api](src/discourje/api/api.clj) for more info.</i>
+Using Discourje takes three simple steps:
+- Define message exchange pattern
+- Generate infrastructure (channels)
+- Use Discourje put & take abstractions 
 
-A protocol can be specified by the following constructs:
+Step 1: A message exchange pattern can be specified by the following constructs
 -
-- <b>monitor-send [action sender receiver]</b>: Specifies a `send monitor` which validates that the current communication through the protocol is a send action with name `action` from `sender` to `receiver`.
-- <b>monitor-receive [action receiver sender]</b>: Specifies a `receive monitor` which validates that the current communication through the protocol is a receive action with name `action` to `receiver` from `sender`.
-- <b>monitor-choice [trueBranch falseBranch]</b>: Specifies a `choice monitor` which validates the first monitor in both the `true and false branch` and continues on target branch when an action is verified. 
-- <b>monitor-recursion [name protocol]</b>: Specifies a `recursion monitor` which recurs or ends when the protocol encounters a `do-recur[name]` or `do-end-recur[name]`. Recur is matched by name and also supports nesting!
-- <b>do-recur [name]</b>: specifies a recursion back to the `monitor-recursion` matching its name.
-- <b>do-end-recur [name]</b>: specifies an end in recursion matching the name of the `monitor-recursion`.
+- <b>-->> [action sender receiver]</b>: Specifies an `atomic-interaction` which validates that the current communication through the protocol is a send & receive with name `action` from `sender` to `receiver`.
+- <b>choice [branch & more]</b>: Specifies a `choice form` which validates the first monitor in all branches and continues on target branch when an action is verified. Notice it supports variadic input arguments.
+- <b>rec [name interaction & more]</b>: Specifies a `recursion form` which recurs when the protocol encounters a `continue [name]`. Recur is matched by name and also supports nesting!
+- <b>continue [name]</b>: Specifies a recursion back to the matching `rec`.
 
-Safe Send and Receive abstractions:
+Step 2: Generate the infrastructure (channels)
 -
-Basic Send and receive functions and macros:
-- <b>send! [action value sender receiver]</b>: Calls send <i>function</i> to send `action` with `value` from `sender` to `receiver`.
-- <b>s! [action value sender receiver]</b>: Calls Send <i>macro</i> to send `action` with `value` from `sender` to `receiver`.
-- <b>recv! [action sender receiver callback]</b>: Calls receive <i>function</i> to receive `action` from `sender` on `receiver` invoking `callback`.
-- <b>r! [action sender receiver callback]</b>: Calls receive <i>macro</i> to receive `action` from `sender` on `receiver` invoking `callback`.
+- <b>add-infrastructure [message-exchange-pattern | message-exchange-pattern custom-channels]</b>: Generates the required channels and adds the MEP as validation, or adds the MEP to the given channels. Notice arity!
 
-For chaining send and receive options the developer can use specialized macros that handle callbacks and input values;
-<b>(Chained macros support nesting)</b>
+There are two options for generating the infrastructure. Either by allowing Discourje to generate all channels. This will generate the required channels specified in the MEP with a buffer size of 1.
+Or by supplying the add-infrastructure macro with custom created channels. (see customChannels example)
 
-<i> In the naming below:
+Step 3: Use Discourje put & take abstractions
+-
+- <b>>!! [channel(s) message]</b>: Put function on channel(s), channels can be a vector of channels to support parallelism (see examples!)
+- <b><!! [channel label]</b>:  Take operation of channel matching label.
 
-- `>`: Stands for the conceptual data flow.
-- `!': Stands for non-blocking.
-- `!!': Stands for blocking.
-</i>
-
-Macros:
-- <b>>s! [action function sender receiver]</b> Creates an anonymous function with 1 parameter and feeds it as input to `function`. Then sends `action` with value, result of the `function`, from `sender` to `receiver`.
-- <b>s!> [action value sender receiver function-after-send]</b> First calls Send <i>macro</i> to send `action` with `value` from `sender` to `receiver`. Second, immediately invokes `function-after-send`.
-- <b>>s!> [action function sender receiver function-after-send]</b> First, creates an anonymous function with 1 parameter and feeds it as input to `function`. Then sends `action` with value, result of the `function`, from `sender` to `receiver`. Second, immediately invokes `function-after-send`.
-- <b>s!!#> [action value sender receiver callback]</b> Calls Send to send `action` with value `value`, from `sender` to `receiver` and generates an anonymous function which invokes callback AFTER send succeeds AND is taken from the target channel.
-- <b>s!!> [action value sender receiver callback]</b> Calls Send to send `action` with value `value`, from `sender` to `receiver` and invokes callback AFTER send succeeds AND is taken from the target channel.
-- <b>>s!!> [action value sender receiver function-after-send]</b>  First, creates an anonymous function with 1 parameter and feeds it as input to `function`. Then sends `action` with value, result of the `function`, from `sender` to `receiver` and invokes function-after-send AFTER send succeeds AND is taken from the target channel.
-- <b>>!!s!!> [action value sender receiver function-after-send]</b>  First, creates an anonymous function with 1 parameter which ads a watch (event-handler, observer-like relation) to the currently active monitor. When the currently active monitor changes state, feeds value from anonymous as input to `function`. Then sends `action` with value, result of the `function`, from `sender` to `receiver` and invokes function-after-send AFTER send succeeds AND is taken from the target channel.
-
-- <b>r!> [action sender receiver callback]</b>: Calls receive to receive `action` from `sender` on `receiver` and creates an anonymous function with 1 parameter and feeds it to `callback`.
-- <b>>r! [action sender receiver callback]</b>: Creates an anonymous function with 1 parameter which calls receive to receive `action` from `sender` on `receiver` invoking `callback`.
-- <b>>r!> [action sender receiver callback]</b>: Creates an anonymous function with 1 parameter which calls receive to receive `action` from `sender` on `receiver` invoking `callback` with the value of the anonymous function as input.
-
-
-For an example on chaining macros see: [Chaining](src/discourje/examples/macroChaining.clj) and [delayedSends](src/discourje/examples/delayedSends.clj).
-
-<i>*Reminder: Macros are not first class. This means when you want to treat send and receive as first class objects, you should use the functions instead of macros.</i>
+Note: Data being send through Discourje will always be encapsulated in a message. When pure data is transmitted through Discourje a message will be generated with Data type as label, and data as content. (See typedMessages example)
 
 Logging
 -
-Discourje also allows two levels of logging when communication does not comply with the protocol:
+Discourje also allows four levels of logging when communication does not comply with the protocol:
+- <b>none (not-blocking)</b>: No logs or exceptions
 - <b>Logging (not-blocking)</b>: Enable logging to print to the console when communication is invalid, this will not block communication.
-- <b>Exceptions (blocking)</b>: Enable exception logging to log to the console and throw exceptions when communication is invalid, this will block communication.
+- <b>Exceptions (blocking)</b>: Enable exception logging to throw exceptions when communication is invalid, this will block communication.
+- <b>Logging and Exceptions (blocking)</b>: Enable exception logging to log to the console and throw exceptions when communication is invalid, this will block communication.
 
 <b>Default configuration: Exceptions!</b>
 
 Logging configuration functions:
-- <b>set-monitor-logging</b>: Enables Logging messages.
-- <b>set-monitor-exceptions</b>: Enables throwing exceptions.
-- <b>close-logging</b>: Close the logging channel. <i>*We use a channel for showing logs to preserve order among logged messages and exceptions!</i>
+- <b>set-logging-none</b>: Disables logging of messages and exceptions.
+- <b>set-logging</b>: Enables logging of messages, yet no exceptions.
+- <b>set-logging-exceptions</b>: Enables throwing of exceptions (BLOCKING).
+- <b>set-logging-and-exceptions</b>: Enables logging of messages and throwing exceptions (BLOCKING).
+- <b>stop-logging</b>: Close the logging channel. <i>*We use a channel for showing logs to preserve order among logged messages and exceptions!</i>
 
 Log functions:
-- <b>log [message & more]</b>: Logs a `message` to the logging channel, takes a variable amount of input parameters which get concatenated!
-- <b>log-exception [type message & more]</b>: Throws an exception of type `type` with `message` to the logging channel, takes a variable amount of input parameters which get concatenated!
+- <b>log-message [message & more]</b>: Logs a `message` to the logging channel, takes a variable amount of input parameters which get concatenated!
+- <b>log-error [type message & more]</b>: Throws an exception of type `type` with `message` to the logging channel, takes a variable amount of input parameters which get concatenated!
 
 See [Logging](src/discourje/examples/logging.clj) for an example.
 
@@ -106,45 +89,36 @@ See [Logging](src/discourje/examples/logging.clj) for an example.
 Example: Hello World
 -
 ```clojure
-(defn- defineHelloWorldProtocol
-  "This function will generate a vector with 2 monitors to send and receive the hello world message."
-  []
-  [(monitor-send "helloWorld" "user" "world")
-    (monitor-receive "helloWorld" "world" "user")])
+;"This function will generate a mep with 1 interaction to send and receive the hello world message."
+(def message-exchange-pattern
+  (mep (-->> "helloWorld" "user" "world")))
 ```
-Then generate a protocol object with the specified roles and monitors:
+Then generate the infrastructure:
 ```clojure
-;define the protocol
-(def protocol (generateProtocolFromMonitors (defineHelloWorldProtocol)))
+;setup infrastructure, generate channels and add monitor
+(def infrastructure (add-infrastructure message-exchange-pattern))
 ```
 
-The next step is to generate `participants` specified by name(unique) for the protocol. A participant object implements send and receive functions in order to communicate through Discourje.
+The next step is to get the required channel for communication
 ```clojure
-;define the participants
-(def user (generateParticipant "user" protocol))
-(def world (generateParticipant "world" protocol))
+(def user-to-world (get-channel "user" "world" infrastructure))
 ```
-In the following example we implemented two functions which require a participant as (input) parameter.
-In these functions we use the s! (send macro) and r! (receive macro) for communication.
+In the following example we implemented two functions which represent user and world
 ```clojure
-(defn- sendToWorld
-  "This function will use the protocol to send the Hello World! message to world."
-  [participant]
-  (log "Will now send Hello World! to world.")
-  (s! "helloWorld" "Hello World!" participant "world"))
+(defn- send-to-world "This function will use the protocol to send the Hello World! message to world."
+  [] (>!! user-to-world (msg "helloWorld" "Hello World!")))
 
-(defn- receiveFromUser
-  "This function will use the protocol to listen for the helloWorld message."
-  [participant]
-  (r!> "helloWorld" "user" participant log))
+(defn- receive-from-user "This function will use the protocol to listen for the helloWorld message."
+  [] (let [message (<!! user-to-world "helloWorld")]
+       (log-message "World received message: " (get-content message))))
 ```
 
 The developer is then able to communicate safely among participants.
 ```clojure
-;start the `sendToWorld' function on thread and add `user' participant
-(clojure.core.async/thread (sendToWorld user))
-;start the `receiveFromUser' function on thread and add `world' participant
-(clojure.core.async/thread (receiveFromUser world))
+;start the `sendToWorld' function on thread
+(clojure.core.async/thread (send-to-world))
+;start the `receiveFromUser' function on thread
+(clojure.core.async/thread (receive-from-user))
 ```
 
 <i>See [hello world](src/discourje/examples/helloWorld.clj) for this example.</i>
