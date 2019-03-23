@@ -10,7 +10,6 @@
   (mep (rec :order-book
             (-->> "title" "buyer1" "seller")
             (-->> "quote" "seller" ["buyer1" "buyer2"])
-            (-->> "quote-received" "buyer2" "buyer1")
             (-->> "quote-div" "buyer1" "buyer2")
             (choice
               [(-->> "ok" "buyer2" "seller")
