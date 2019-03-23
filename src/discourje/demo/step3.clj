@@ -19,10 +19,11 @@
 
 ;Third step is to use Discourje put and take abstractions
 
+;Data being send through Discourje abstractions are of type:
+;message: msg[:label :content]
+
 ;define buyer logic
-(defn buyer
-  "Logic representing Buyer"
-  []
+(defn buyer "Logic representing Buyer" []
   (let [b->s (get-channel "buyer" "seller" infra)
         s->b (get-channel "seller" "buyer" infra)
         product {:product-type "book" :content {:title "The joy of Clojure"}}]
@@ -33,16 +34,13 @@
       (println "Book is out of stock!"))))
 
 ;define seller
-(defn seller
-  "Logic representing the Seller"
-  []
+(defn seller "Logic representing the Seller" []
   (let [b->s (get-channel "buyer" "seller" infra)
         s->b (get-channel "seller" "buyer" infra)
         in-stock? (fn [book] (rand-int 2))]
-   ; (>!! b->s (msg "miscommunication" "Hi buyer, this is seller speaking!")) ;Uncomment to introduce miscommunication
+    ;(>!! s->b (msg "miscommunication" "Diverging from MEP")) ;Uncomment to introduce miscommunication
     (if (== 1 (in-stock? (get-content (<!! b->s "quote-request"))))
-      (do
-        (>!! s->b (msg "quote" "$40,00"))
+      (do (>!! s->b (msg "quote" "$40,00"))
         (let [order (<!! b->s "order")]
           (println (get-content order))
           (>!! s->b (msg "order-ack" "order-ack confirmed!"))))
@@ -50,6 +48,7 @@
 
 (set-logging-and-exceptions)
 ;(set-logging-exceptions)
+;(set-logging)
 
 (clojure.core.async/thread (buyer))
 (clojure.core.async/thread (seller))

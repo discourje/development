@@ -1,7 +1,7 @@
 (ns discourje.demo.step1
   (:require [discourje.core.async :refer :all]))
 
-;First Step is to change the namespace.
+;First Step is to change the namespace. (Note: This file will not compile!)
 
 ;And define a MEP for the buy-goods protocol
 (def buy-goods
@@ -17,9 +17,7 @@
 (def channel (async/chan))
 
 ;define buyer logic
-(defn buyer
-  "Logic representing Buyer"
-  []
+(defn buyer "Logic representing Buyer" []
   (let [product {:product-type "book" :content {:title "The Joy of Clojure"}}]
     (async/>!! channel product))
   (if (not= (async/<!! channel) "out-of-stock")
@@ -28,13 +26,10 @@
     (println"Book is out of stock!")))
 
 ;define seller
-(defn seller
-  "Logic representing the Seller"
-  []
+(defn seller "Logic representing the Seller" []
   (let [in-stock? (fn [book] (rand-int 2))]
     (if (== 1 (in-stock? (async/<!! channel)))
-      (do
-        (async/>!! channel "$40,00")
+      (do (async/>!! channel "$40,00")
         (let [order (async/<!! channel)]
           (println order)
           (async/>!! channel "order-ack confirmed!")))
