@@ -22,7 +22,7 @@
       (do (async/>!! channel "$40,00")
         (let [order (async/<!! channel)]
           (println order)
-          (async/>!! channel "order-ack confirmed!")))
+          (async/>!! channel "order-acknowledgement!")))
       (async/>!! channel "out-of-stock"))))
 
 (async/thread (buyer))

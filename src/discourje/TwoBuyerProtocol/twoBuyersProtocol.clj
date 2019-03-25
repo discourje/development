@@ -9,12 +9,13 @@
 (defn two-buyer-protocol "Define two buyer protocol"[]
   (mep (rec :order-book
             (-->> "title" "buyer1" "seller")
-            (-->> "quote" "seller" ["buyer1" "buyer2"])
+            (-->> "quote" "seller" "buyer1")
             (-->> "quote-div" "buyer1" "buyer2")
             (choice
               [(-->> "ok" "buyer2" "seller")
                (-->> "date" "seller" "buyer2")
-               (-->> "repeat" "buyer1" ["buyer1" "seller"])
+               (-->> "repeat" "buyer2" "seller")
+               (-->> "repeat" "seller" "buyer1")
                (continue :order-book)]
               [(-->> "quit" "buyer2" "seller")]))))
 

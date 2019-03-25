@@ -11,7 +11,7 @@
     (choice
       [(-->> "quote" "seller" "buyer")
        (-->> "order" "buyer" "seller")
-       (-->> "order-ack" "seller" "buyer")]
+       (-->> "order-acknowledgement" "seller" "buyer")]
       [(-->> "out-of-stock" "seller" "buyer")])))
 
 ;Second step is to add infra structure to our MEP
@@ -30,7 +30,7 @@
     (>!! b->s (msg "quote-request" product))
     (if (= (get-label (<!! s->b ["quote" "out-of-stock"])) "quote")
       (do (>!! b->s (msg "order" "confirm order!"))
-          (println (get-content (<!! s->b "order-ack"))))
+          (println (get-content (<!! s->b "order-acknowledgement"))))
       (println "Book is out of stock!"))))
 
 ;define seller
@@ -43,11 +43,11 @@
       (do (>!! s->b (msg "quote" "$40,00"))
         (let [order (<!! b->s "order")]
           (println (get-content order))
-          (>!! s->b (msg "order-ack" "order-ack confirmed!"))))
+          (>!! s->b (msg "order-acknowledgement" "order-ack confirmed!"))))
       (>!! s->b (msg "out-of-stock" "Product out of stock!")))))
 
-(set-logging-and-exceptions)
-;(set-logging-exceptions)
+;(set-logging-and-exceptions)
+(set-logging-exceptions)
 ;(set-logging)
 
 (clojure.core.async/thread (buyer))

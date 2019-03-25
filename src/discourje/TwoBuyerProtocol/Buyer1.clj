@@ -15,12 +15,12 @@
 (defn order-book "order a book from buyer1's perspective" [infra]
   (let [b1-s (get-channel "buyer1" "seller" infra)
         s-b1 (get-channel "seller" "buyer1" infra)
-        b1-b2 (get-channel "buyer1" "buyer2" infra)
-        b2-b1 (get-channel "buyer2" "buyer1" infra)]
+        b1-b2 (get-channel "buyer1" "buyer2" infra)]
     (>!! b1-s (msg "title" (generate-book)))
-    (do (>!! b1-b2 (msg "quote-div" (quote-div (get-content (<!! s-b1 "quote")))))
-        (when (<!! b2-b1 "repeat")
-          (order-book infra)))))
+    (let [quote (<!! s-b1 "quote")]
+      (do (>!! b1-b2 (msg "quote-div" {:quote (get-content quote) :quote-div (quote-div (get-content quote))}))
+      (when (<!! s-b1 "repeat")
+        (order-book infra))))))
 
 ;send title to seller
 ;wait for quote

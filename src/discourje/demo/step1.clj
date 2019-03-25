@@ -10,7 +10,7 @@
     (choice
       [(-->> "quote" "seller" "buyer")
        (-->> "order" "buyer" "seller")
-       (-->> "order-ack" "seller" "buyer")]
+       (-->> "order-acknowledgement" "seller" "buyer")]
       [(-->> "out-of-stock" "seller" "buyer")])))
 
 ;define channel
@@ -32,7 +32,7 @@
       (do (async/>!! channel "$40,00")
         (let [order (async/<!! channel)]
           (println order)
-          (async/>!! channel "order-ack confirmed!")))
+          (async/>!! channel "order-acknowledgement confirmed!")))
       (async/>!! channel "out-of-stock"))))
 
 (async/thread (buyer))

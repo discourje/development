@@ -21,8 +21,8 @@ Communication is blocking when desired (configure logging levels) and order amon
 - [Branching](src/discourje/examples/branching.clj)
 - [Recursion](src/discourje/examples/recursion.clj)
 - [Custom Channels](src/discourje/examples/recursion.clj)
-- [Typed Messages](src/discourje/examples/recursion.clj)
-- [Logging Levels](src/discourje/examples/recursion.clj)
+- [Typed Messages](src/discourje/examples/typedMessages.clj)
+- [Logging Levels](src/discourje/examples/logging.clj)
 - Nesting: Recursion and Branching constructs support nesting!
 
 <i>See examples for each function for more info.</i>

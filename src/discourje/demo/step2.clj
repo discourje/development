@@ -10,7 +10,7 @@
     (choice
       [(-->> "quote" "seller" "buyer")
        (-->> "order" "buyer" "seller")
-       (-->> "order-ack" "seller" "buyer")]
+       (-->> "order-acknowledgement" "seller" "buyer")]
       [(-->> "out-of-stock" "seller" "buyer")])))
 
 ;Second step is to add infra structure to our MEP
