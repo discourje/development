@@ -1,5 +1,6 @@
 (ns discourje.demo.step2
-  (:require [discourje.core.async :refer :all]))
+  (:require [discourje.core.async :refer :all]
+            [clojure.core.async :refer [thread]]))
 
 ;First Step is to change the namespace.
 
@@ -15,27 +16,29 @@
 
 ;Second step is to add infra structure to our MEP
 
-;(def channel (async/chan))
+;define channels
 (def infra (add-infrastructure buy-goods))
+(def buyer-to-seller (get-channel "buyer" "seller" infra))
+(def seller-to-buyer (get-channel "seller" "buyer" infra))
 
 ;define buyer logic
 (defn buyer "Logic representing Buyer" []
   (let [product {:product-type "book" :content {:title "The Joy of Clojure"}}]
-    (async/>!! channel product))
-  (if (not= (async/<!! channel) "out-of-stock")
-    (do (async/>!! channel "confirm order!")
-        (println (async/<!! channel)))
+    (>!! buyer-to-seller product))
+  (if (not= (<!! seller-to-buyer) "out-of-stock")
+    (do (>!! buyer-to-seller "confirm order!")
+        (println (<!! seller-to-buyer)))
     (println"Book is out of stock!")))
 
 ;define seller
 (defn seller "Logic representing the Seller" []
   (let [in-stock? (fn [book] (rand-int 2))]
-    (if (== 1 (in-stock? (async/<!! channel)))
-      (do (async/>!! channel "$40,00")
-        (let [order (async/<!! channel)]
-          (println order)
-          (async/>!! channel "order-ack confirmed!")))
-      (async/>!! channel "out-of-stock"))))
+    (if (== 1 (in-stock? (<!! buyer-to-seller)))
+      (do (>!! seller-to-buyer "$40,00")
+          (let [order (<!! buyer-to-seller)]
+            (println order)
+            (>!! seller-to-buyer "order-acknowledgement!")))
+      (>!! seller-to-buyer "out-of-stock"))))
 
-(async/thread (buyer))
-(async/thread (seller))
+(thread (buyer))
+(thread (seller))

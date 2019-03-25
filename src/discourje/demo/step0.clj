@@ -1,29 +1,30 @@
 (ns discourje.demo.step0
-  (:require [clojure.core.async :as async]))
+  (:require [clojure.core.async :refer[>!! <!! chan thread]]))
 
 ;Standard Clojure.core.async code
 
-;define channel
-(def channel (async/chan))
+;define channels
+(def buyer-to-seller (chan))
+(def seller-to-buyer (chan))
 
 ;define buyer logic
 (defn buyer "Logic representing Buyer" []
   (let [product {:product-type "book" :content {:title "The Joy of Clojure"}}]
-    (async/>!! channel product))
-    (if (not= (async/<!! channel) "out-of-stock")
-      (do (async/>!! channel "confirm order!")
-          (println (async/<!! channel)))
+    (>!! buyer-to-seller product))
+    (if (not= (<!! seller-to-buyer) "out-of-stock")
+      (do (>!! buyer-to-seller "confirm order!")
+          (println (<!! seller-to-buyer)))
       (println"Book is out of stock!")))
 
 ;define seller
 (defn seller "Logic representing the Seller" []
   (let [in-stock? (fn [book] (rand-int 2))]
-    (if (== 1 (in-stock? (async/<!! channel)))
-      (do (async/>!! channel "$40,00")
-        (let [order (async/<!! channel)]
+    (if (== 1 (in-stock? (<!! buyer-to-seller)))
+      (do (>!! seller-to-buyer "$40,00")
+        (let [order (<!! buyer-to-seller)]
           (println order)
-          (async/>!! channel "order-acknowledgement!")))
-      (async/>!! channel "out-of-stock"))))
+          (>!! seller-to-buyer "order-acknowledgement!")))
+      (>!! seller-to-buyer "out-of-stock"))))
 
-(async/thread (buyer))
-(async/thread (seller))
+(thread (buyer))
+(thread (seller))
