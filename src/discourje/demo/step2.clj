@@ -1,19 +1,19 @@
 (ns discourje.demo.step2
   (:require [discourje.core.async :refer :all]
             [clojure.core.async :refer [thread]])
-  (:import (discourje.demo.javaObjects Book Quote Order)))
+  (:import (discourje.demo.javaObjects Book Quote Order QuoteRequest OutOfStock OrderAcknowledgement)))
 
 ;First Step is to change the namespace.
 
 ;And define a MEP for the buy-goods protocol
 (def buy-goods
   (mep
-    (-->> "quote-request" "buyer" "seller")
+    (-->> QuoteRequest "buyer" "seller")
     (choice
-      [(-->> "quote" "seller" "buyer")
-       (-->> "order" "buyer" "seller")
-       (-->> "order-acknowledgement" "seller" "buyer")]
-      [(-->> "out-of-stock" "seller" "buyer")])))
+      [(-->> Quote "seller" "buyer")
+       (-->> Order "buyer" "seller")
+       (-->> OrderAcknowledgement "seller" "buyer")]
+      [(-->> OutOfStock "seller" "buyer")])))
 
 ;Second step is to add infra structure to our MEP
 

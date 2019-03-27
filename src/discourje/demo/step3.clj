@@ -1,19 +1,19 @@
 (ns discourje.demo.step3
   (:require [discourje.core.async :refer :all]
             [discourje.core.logging :refer :all])
-  (:import (discourje.demo.javaObjects Book Quote Order)))
+  (:import (discourje.demo.javaObjects Book Quote Order QuoteRequest OutOfStock OrderAcknowledgement)))
 
 ;First Step is to change the namespace.
 
 ;And define a MEP for the buy-goods protocol
 (def buy-goods
   (mep
-    (-->> "quote-request" "buyer" "seller")
+    (-->> QuoteRequest "buyer" "seller")
     (choice
       [(-->> Quote "seller" "buyer")
        (-->> Order "buyer" "seller")
-       (-->> "order-acknowledgement" "seller" "buyer")]
-      [(-->> Quote "seller" "buyer")])))
+       (-->> OrderAcknowledgement "seller" "buyer")]
+      [(-->> OutOfStock "seller" "buyer")])))
 
 ;Second step is to add infra structure to our MEP
 
@@ -29,32 +29,33 @@
 
 (defn in-stock? "return a 50% change true in stock" [book]
   (let [in-stock (== 1 (rand-int 2))]
-    (println (format "%s is in stock: %s" (.getName book) in-stock))
+    (println (format "%s is in stock: %s" (.getName (.getProduct book)) in-stock))
     in-stock))
 
 ;Third step is to use Discourje put and take abstractions
 
 ;Data being send through Discourje abstractions are of type:
 ;message: msg[:label :content]
+;When input is supplied which is not of type message, Discourje will generate a message containing the data.
 
 ;define buyer logic
 (defn buyer "Logic representing Buyer" []
-  (>!! buyer-to-seller (msg "quote-request" product))
+  (>!! buyer-to-seller (doto (QuoteRequest.) (.setProduct product)))
   (let [quote (get-content (<!! seller-to-buyer Quote))]
         (if (.isInStock quote)
           (do (>!! buyer-to-seller (doto (Order.) (.setProduct product) (.setQuote quote)))
-              (println (get-content (<!! seller-to-buyer "order-acknowledgement"))))
+              (println (.getMessage (get-content (<!! seller-to-buyer OrderAcknowledgement)))))
           (println "Book is out of stock!"))))
 
 ;define seller
 (defn seller "Logic representing the Seller" []
   ;(>!! s->b (msg "miscommunication" "Diverging from MEP")) ;Uncomment to introduce miscommunication
-  (if (in-stock? (get-content (<!! buyer-to-seller "quote-request")))
+  (if (in-stock? (get-content (<!! buyer-to-seller QuoteRequest)))
     (do (>!! seller-to-buyer (doto (Quote.) (.setInStock true) (.setPrice 40.00) (.setProduct product)))
         (let [order (get-content (<!! buyer-to-seller Order))]
-          (>!! seller-to-buyer (msg "order-acknowledgement"
+          (>!! seller-to-buyer (doto (OrderAcknowledgement.) (.setOrder order) (.setMessage
                                     (format "order-acknowledgement: Order for product: %s confirmed at price: $%s"
-                                            (.getName (.getProduct order)) (.getPrice (.getQuote order)))))))
+                                            (.getName (.getProduct order)) (.getPrice (.getQuote order))))))))
     (>!! seller-to-buyer (doto (Quote.) (.setInStock false) (.setPrice 0) (.setProduct product)))))
 
 ;(set-logging-and-exceptions)
