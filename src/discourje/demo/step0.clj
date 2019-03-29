@@ -4,6 +4,7 @@
 
 ;Standard Clojure.core.async code
 ;We use Java Objects to demonstrate interop!
+;Notice there is a MEP hidden in the implementation!
 
 ;define channels
 (def buyer-to-seller (chan))

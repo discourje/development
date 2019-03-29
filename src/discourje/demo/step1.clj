@@ -1,6 +1,5 @@
 (ns discourje.demo.step1
-  (:require [discourje.core.async :refer :all]
-            [clojure.core.async :refer [thread]])
+  (:require [discourje.core.async :refer :all])
   (:import (discourje.demo.javaObjects Book Quote Order QuoteRequest OutOfStock OrderAcknowledgement)))
 
 ;First Step is to change the namespace. (Note: This file will not compile!)
@@ -44,5 +43,5 @@
                                        (.getName (.getProduct order)) (.getPrice (.getQuote order))))))
     (>!! seller-to-buyer (doto (Quote.) (.setInStock false) (.setPrice 0) (.setProduct product)))))
 
-(thread (buyer))
-(thread (seller))
+(clojure.core.async/thread (buyer))
+(clojure.core.async/thread (seller))

@@ -49,7 +49,7 @@
 
 ;define seller
 (defn seller "Logic representing the Seller" []
-  ;(>!! s->b (msg "miscommunication" "Diverging from MEP")) ;Uncomment to introduce miscommunication
+  ;(>!! seller-to-buyer (msg "miscommunication" "Diverging from MEP")) ;Uncomment to introduce miscommunication
   (if (in-stock? (get-content (<!! buyer-to-seller QuoteRequest)))
     (do (>!! seller-to-buyer (doto (Quote.) (.setInStock true) (.setPrice 40.00) (.setProduct product)))
         (let [order (get-content (<!! buyer-to-seller Order))]
@@ -58,9 +58,8 @@
                                             (.getName (.getProduct order)) (.getPrice (.getQuote order))))))))
     (>!! seller-to-buyer (doto (Quote.) (.setInStock false) (.setPrice 0) (.setProduct product)))))
 
-;(set-logging-and-exceptions)
-(set-logging-exceptions)
-;(set-logging)
+;(set-logging-exceptions)
+(set-logging)
 
 (clojure.core.async/thread (buyer))
 (clojure.core.async/thread (seller))
