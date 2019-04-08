@@ -3,6 +3,7 @@
   (:import (discourje.demo.javaObjects Book Quote Order QuoteRequest OutOfStock OrderAcknowledgement)))
 
 ;First Step is to change the namespace. (Note: This file will not compile!)
+; Notice only 6 lines not compiling!
 
 ;And define a MEP for the buy-goods protocol
 (def buy-goods

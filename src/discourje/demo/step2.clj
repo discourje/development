@@ -34,7 +34,7 @@
 ;define buyer logic
 (defn buyer "Logic representing Buyer" []
   (>!! buyer-to-seller product)
-  (let [quote (<!! seller-to-buyer)]
+  (let [quote (<!! seller-to-buyer1)]
     (if (.isInStock quote)
       (do (>!! buyer-to-seller (doto (Order.) (.setProduct product) (.setQuote quote)))
           (println (<!! seller-to-buyer)))

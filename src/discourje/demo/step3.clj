@@ -49,7 +49,7 @@
 
 ;define seller
 (defn seller "Logic representing the Seller" []
-  ;(>!! seller-to-buyer (msg "miscommunication" "Diverging from MEP")) ;Uncomment to introduce miscommunication
+ ;(>!! seller-to-buyer (msg "miscommunication" "Diverging from MEP")) ;Uncomment to introduce miscommunication
   (if (in-stock? (get-content (<!! buyer-to-seller QuoteRequest)))
     (do (>!! seller-to-buyer (doto (Quote.) (.setInStock true) (.setPrice 40.00) (.setProduct product)))
         (let [order (get-content (<!! buyer-to-seller Order))]
