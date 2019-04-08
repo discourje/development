@@ -1,31 +1,26 @@
 (ns discourje.TwoBuyerProtocol.Buyer1
-  (:require [discourje.api.api :refer :all]))
+  (:require [discourje.core.async :refer :all]
+            [discourje.core.logging :refer :all]))
 
-(defn generateBook
-  "generate simple book title"
-  []
-  "TheJoyOfClojure")
+(def books ["The Joy of Clojure" "Mastering Clojure Macros" "Programming Clojure"])
+(defn generate-book "generate book title" []
+  (first (shuffle books)))
 
-(defn quoteDiv
-  "returns true when the received quote is <= 15 (50% chance at this moment)"
-  [quote]
-  (log (format "received quote: %s" quote))
+(defn quote-div "Generate random number with max, quote value" [quote]
+  (log-message (format "received quote: %s" quote))
   (let [randomN (+ (rand-int quote) 1)]
-    (log "QD = " randomN)
+    (log-message "QD = " randomN)
     randomN))
 
-(defn orderBook
-  "order a book from buyer1's perspective (implements new receive monitor)"
-  [participant]
-  (s! "title" (generateBook) participant "seller")
-  (r! "quote" "seller" participant
-              (fn [x]
-                (log "buyer1 received quote!")
-                  (s! "quoteDiv" (quoteDiv x) participant "buyer2")))
-  (r! "repeat" "buyer2" participant
-              (fn [repeat](log "repeat received on buyer1 from buyer2!")
-                  (orderBook participant))))
-
+(defn order-book "order a book from buyer1's perspective" [infra]
+  (let [b1-s (get-channel "buyer1" "seller" infra)
+        s-b1 (get-channel "seller" "buyer1" infra)
+        b1-b2 (get-channel "buyer1" "buyer2" infra)]
+    (>!! b1-s (msg "title" (generate-book)))
+    (let [quote (<!! s-b1 "quote")]
+      (do (>!! b1-b2 (msg "quote-div" {:quote (get-content quote) :quote-div (quote-div (get-content quote))}))
+      (when (<!! s-b1 "repeat")
+        (order-book infra))))))
 
 ;send title to seller
 ;wait for quote

@@ -1,30 +1,23 @@
 (ns discourje.examples.helloWorld
-  (require [discourje.api.api :refer :all]))
+  (require [discourje.core.async :refer :all]
+           [discourje.core.logging :refer :all]))
+;This function will generate a mep with 1 interaction to send and receive the hello world message.
+(def message-exchange-pattern
+  (mep (-->> "helloWorld" "user" "world")))
 
-(defn- defineHelloWorldProtocol
-  "This function will generate a vector with 2 monitors to send and receive the hello world message."
-  []
-  [(monitor-send "helloWorld" "user" "world")
-    (monitor-receive "helloWorld" "world" "user")])
+;setup infrastructure, generate channels and add monitor
+(def infrastructure (add-infrastructure message-exchange-pattern))
+;get the channel
+(def user-to-world (get-channel "user" "world" infrastructure))
 
-;define the protocol
-(def protocol (generateProtocolFromMonitors (defineHelloWorldProtocol)))
-;define the participants
-(def user (generateParticipant "user" protocol))
-(def world (generateParticipant "world" protocol))
+(defn- send-to-world "This function will use the protocol to send the Hello World! message to world."
+  [] (>!! user-to-world (msg "helloWorld" "Hello World!")))
 
-(defn- sendToWorld
-  "This function will use the protocol to send the Hello World! message to world."
-  [participant]
-  (log "Will now send Hello World! to world.")
-  (s! "helloWorld" "Hello World!" participant "world"))
+(defn- receive-from-user "This function will use the protocol to listen for the helloWorld message."
+  [] (let [message (<!! user-to-world "helloWorld")]
+       (log-message "World received message: " (get-content message))))
 
-(defn- receiveFromUser
-  "This function will use the protocol to listen for the helloWorld message."
-  [participant]
-  (r!> "helloWorld" "user" participant log))
-
-;start the `sendToWorld' function on thread and add `user' participant
-(clojure.core.async/thread (sendToWorld user))
-;start the `receiveFromUser' function on thread and add `world' participant
-(clojure.core.async/thread (receiveFromUser world))
+;start the `sendToWorld' function on thread
+(clojure.core.async/thread (send-to-world))
+;start the `receiveFromUser' function on thread
+(clojure.core.async/thread (receive-from-user))

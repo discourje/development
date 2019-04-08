@@ -1,8 +1,8 @@
-(ns discourje.examples.sequencing
+(ns discourje.examples.customChannels
   (require [discourje.core.async :refer :all]
            [discourje.core.logging :refer :all]))
 
-;  This function will generate a vector with 4 interactions to send and receive the greet message.
+; This function will generate a mep with 4 interactions to send and receive the greet message.
 ;  Notice how send and receivers are defined separately in order to allow for sequencing of actions!
 (def message-exchange-pattern
   (mep (-->> "greet" "alice" "bob")
@@ -10,8 +10,15 @@
        (-->> "greet" "alice" "carol")
        (-->> "greet" "carol" "alice")))
 
-;setup infrastructure, generate channels and add monitor
-(def infrastructure (add-infrastructure message-exchange-pattern))
+;Define custom channels, which differ in buffer size (1 and 2)
+(def a->b (create-channel "alice" "bob" 1))
+(def b->a (create-channel "bob" "alice" 2))
+(def a->c (create-channel "alice" "carol" 3))
+(def c->a (create-channel "carol" "alice" 4))
+
+;setup infrastructure, generate channels and add monitor, notice that we supply the generate-infrastructure function with custom channels vector
+;generate-infrastructure will detect if all channels in the vector implement the transportable defprotocol and that all channels required for the protocol are present in the custom channel vector
+(def infrastructure (add-infrastructure message-exchange-pattern [a->b b->a a->c c->a]))
 ;Get the channels
 (def alice-to-bob (get-channel "alice" "bob" infrastructure))
 (def bob-to-alice (get-channel "bob" "alice" infrastructure))
