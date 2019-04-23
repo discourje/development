@@ -2,10 +2,10 @@
   (:require [discourje.core.async :refer :all])
   (:import (discourje.demo.javaObjects Book Quote Order QuoteRequest OutOfStock OrderAcknowledgement)))
 
-;First Step is to change the namespace. (Note: This file will not compile!)
-; Notice only 6 lines not compiling!
+;First Step is to change the namespace, from Clojure.core.async to Discourje.core.async. (Note: This file will not compile!)
+;Notice only 6 lines not compiling!
 
-;And define a MEP for the buy-goods protocol
+;Our next step is to define the MEP for the buy-goods protocol
 (def buy-goods
   (mep
     (-->> QuoteRequest "buyer" "seller")
@@ -15,7 +15,8 @@
        (-->> OrderAcknowledgement "seller" "buyer")]
       [(-->> OutOfStock "seller" "buyer")])))
 
-;define channels
+;Next, lets fix those channels.
+
 (def buyer-to-seller (chan))
 (def seller-to-buyer (chan))
 
@@ -26,7 +27,6 @@
     (println (format "%s is in stock: %s" (.getName book) in-stock))
     in-stock))
 
-;define buyer logic
 (defn buyer "Logic representing Buyer" []
   (>!! buyer-to-seller product)
   (let [quote (<!! seller-to-buyer)]
@@ -35,7 +35,6 @@
           (println (<!! seller-to-buyer)))
       (println "Book is out of stock!"))))
 
-;define seller
 (defn seller "Logic representing the Seller" []
   (if (in-stock? (<!! buyer-to-seller))
     (do (>!! seller-to-buyer (doto (Quote.) (.setInStock true) (.setPrice 40.00) (.setProduct product)))
@@ -44,5 +43,5 @@
                                        (.getName (.getProduct order)) (.getPrice (.getQuote order))))))
     (>!! seller-to-buyer (doto (Quote.) (.setInStock false) (.setPrice 0) (.setProduct product)))))
 
-(clojure.core.async/thread (buyer))
-(clojure.core.async/thread (seller))
+(thread (buyer))
+(thread (seller))

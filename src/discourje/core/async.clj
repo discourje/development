@@ -85,7 +85,6 @@
          (log-error :invalid-channels "Cannot generate infrastructure, make sure all channels required for the protocol are given!")))
      (log-error :invalid-channels "Cannot generate infrastructure, make sure all supplied channels implement the `transportable' protocol!"))))
 
-
 (defn- allow-send
   "Allow send message in channel"
   [channel message]

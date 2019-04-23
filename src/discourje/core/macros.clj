@@ -33,7 +33,7 @@
   ([message-exchange-pattern custom-channels]
    `(generate-infrastructure ~message-exchange-pattern ~custom-channels)))
 
-(defmacro create-channel
+(defmacro chan
   "create a custom channel"
   [sender receiver buffer]
   `(if (nil? ~buffer)
@@ -44,3 +44,8 @@
   "Generate a message"
   [label content]
   `(->message ~label ~content))
+
+(defmacro thread
+  "Execute body on thread"
+  [body]
+  `(async/thread ~body))

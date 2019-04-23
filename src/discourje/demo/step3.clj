@@ -3,40 +3,33 @@
             [discourje.core.logging :refer :all])
   (:import (discourje.demo.javaObjects Book Quote Order QuoteRequest OutOfStock OrderAcknowledgement)))
 
-;First Step is to change the namespace.
-
-;And define a MEP for the buy-goods protocol
-(def buy-goods
-  (mep
+(def buy-goods (mep
     (-->> QuoteRequest "buyer" "seller")
-    (choice
-      [(-->> Quote "seller" "buyer")
-       (-->> Order "buyer" "seller")
-       (-->> OrderAcknowledgement "seller" "buyer")]
+    (choice [(-->> Quote "seller" "buyer") (-->> Order "buyer" "seller") (-->> OrderAcknowledgement "seller" "buyer")]
       [(-->> OutOfStock "seller" "buyer")])))
-
-;Second step is to add infra structure to our MEP
-
-;define channels
-;(def buyer-to-seller (chan))
-;(def seller-to-buyer (chan))
-
 (def infra (add-infrastructure buy-goods))
 (def buyer-to-seller (get-channel "buyer" "seller" infra))
 (def seller-to-buyer (get-channel "seller" "buyer" infra))
-
 (def product (doto (Book.) (.setName "The Joy of Clojure")))
-
 (defn in-stock? "return a 50% change true in stock" [book]
   (let [in-stock (== 1 (rand-int 2))]
     (println (format "%s is in stock: %s" (.getName (.getProduct book)) in-stock))
     in-stock))
 
 ;Third step is to use Discourje put and take abstractions
+;So why were only the take functions not compiling?
+;Well, Discourje needs some way to identify communication.
+;As we can see, the MEP labels communication between the participants e.g. QuoteRequest Buyer -> Seller.
+;So when we take form a channel we need to identify this take operation with the label to verify.
+;In the case of this demo, we do not specifically need to identify our send operations since we specified our message labels as Java types.
+;When putting on a channel, Discourje will verify if the data being send is a message (msg[:label :content]) data structure.
+;If not it will generate a new message with the incoming data type as label.
 
-;Data being send through Discourje abstractions are of type:
-;message: msg[:label :content]
-;When input is supplied which is not of type message, Discourje will generate a message containing the data.
+;To demonstrate what happens if invalid communication is detected we can uncomment line: 45
+;On this line there is an unspecified communication from seller to buyer.
+;Here we send a new message labelled `miscommunication' with content `Diverging from MEP'.
+;When we run the code now, Discourje will throw an exception and a programmer/ system can act accordingly.
+;Note that throwing exceptions is blocking, if we do not want communication to block when invalid, we can enable logging instead of throwing exceptions.
 
 ;define buyer logic
 (defn buyer "Logic representing Buyer" []
@@ -61,5 +54,5 @@
 (set-logging-exceptions)
 ;(set-logging)
 
-(clojure.core.async/thread (buyer))
-(clojure.core.async/thread (seller))
+(thread (buyer))
+(thread (seller))
