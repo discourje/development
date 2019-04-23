@@ -13,8 +13,8 @@
 
 (def infra (add-infrastructure buy-goods))
 
-(def buyer-to-seller (create-channel "buyer" "seller" 1))
-(def seller-to-buyer (create-channel "seller" "buyer" 2))
+(def buyer-to-seller (chan "buyer" "seller" 1))
+(def seller-to-buyer (chan "seller" "buyer" 2))
 (def custom-infra
   (add-infrastructure buy-goods
                       [buyer-to-seller seller-to-buyer]))

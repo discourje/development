@@ -11,10 +11,10 @@
        (-->> "greet" "carol" "alice")))
 
 ;Define custom channels, which differ in buffer size (1 and 2)
-(def a->b (create-channel "alice" "bob" 1))
-(def b->a (create-channel "bob" "alice" 2))
-(def a->c (create-channel "alice" "carol" 3))
-(def c->a (create-channel "carol" "alice" 4))
+(def a->b (chan "alice" "bob" 1))
+(def b->a (chan "bob" "alice" 2))
+(def a->c (chan "alice" "carol" 3))
+(def c->a (chan "carol" "alice" 4))
 
 ;setup infrastructure, generate channels and add monitor, notice that we supply the generate-infrastructure function with custom channels vector
 ;generate-infrastructure will detect if all channels in the vector implement the transportable defprotocol and that all channels required for the protocol are present in the custom channel vector

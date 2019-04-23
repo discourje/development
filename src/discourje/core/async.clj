@@ -25,8 +25,7 @@
       "interactions"
       "channels"
       "monitoring"
-      "interactionLinking"
-      )
+      "interactionLinking")
 
 (defn make-interaction [action sender receiver]
   "Creates an interaction object specifying sending action from sender to receiver."
@@ -69,7 +68,7 @@
   (= 1 (count (distinct (for [c channels] (satisfies? transportable c))))))
 
 (defn generate-infrastructure
-  "Generate channels with monitor based on the protocol, also supports arity to give manually created custom channels. With for example specific buffer requirements."
+  "Generate channels with monitor based on the protocol, also supports arity to give manually created custom channels. With for example: specific buffer requirements."
   ([protocol]
    (let [monitor (generate-monitor protocol)
          roles (get-distinct-role-pairs (get-interactions protocol))
@@ -85,7 +84,6 @@
            (vec (for [c channels] (assoc c :monitor monitor))))
          (log-error :invalid-channels "Cannot generate infrastructure, make sure all channels required for the protocol are given!")))
      (log-error :invalid-channels "Cannot generate infrastructure, make sure all supplied channels implement the `transportable' protocol!"))))
-
 
 (defn- allow-send
   "Allow send message in channel"
