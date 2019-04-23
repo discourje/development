@@ -7,7 +7,6 @@
 (defprotocol monitoring
   (get-monitor-id [this])
   (get-active-interaction [this])
-  ;(send-interaction [this label])
   (apply-interaction [this sender receivers label])
   (valid-interaction? [this sender receivers label]))
 
@@ -16,8 +15,7 @@
 (defn- interaction-to-string
   "Stringify an interaction, returns empty string if the given interaction is nil"
   [interaction]
-  (if (nil? interaction)
-    "" (to-string interaction)))
+  (if (nil? interaction) "" (to-string interaction)))
 
 (defn- check-atomic-interaction
   "Check the atomic interaction"
@@ -52,7 +50,7 @@
      0))
 
 (defn- find-nested-next
-  "Finds the next interaction based on id, nested in choices"
+  "Finds the next interaction based on id, nested in choices and recursions"
   [id interactions]
   (first (flatten (filter some? (for [inter interactions]
                                   (cond (satisfies? interactable inter) (when (= (get-id inter) id) inter)
@@ -89,11 +87,6 @@
                        (instance? Seqable (:receivers active-interaction))
                        (> (count (:receivers active-interaction)) 1)))
   (and (instance? Seqable (:receivers active-interaction)) (> (count (:receivers active-interaction)) 1)))
-
-(defn- has-multiple-receivers-internal-swap
-  "While swapping active-interaction, the receivers of the current active-interaction must be checked"
-  [target-interaction]
-  )
 
 (defn- remove-receiver-from-branch
   "Remove a receiver from the active monitor when in first position of a branchable"
@@ -244,8 +237,6 @@
   (when (instance? Seqable coll)
     (boolean (some #(= element %) coll))))
 
-
-
 (defn is-valid-communication?
   "Checks if communication is valid by comparing input to the active monitor"
   [sender receivers label active-interaction interactions]
@@ -273,4 +264,3 @@
   (get-active-interaction [this] @active-interaction)
   (apply-interaction [this sender receivers label] (apply-interaction-to-mon sender receivers label active-interaction interactions))
   (valid-interaction? [this sender receivers label] (is-valid-communication? sender receivers label @active-interaction interactions)))
-

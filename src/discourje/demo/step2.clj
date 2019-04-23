@@ -2,9 +2,6 @@
   (:require [discourje.core.async :refer :all])
   (:import (discourje.demo.javaObjects Book Quote Order QuoteRequest OutOfStock OrderAcknowledgement)))
 
-;First Step is to change the namespace.
-
-;And define a MEP for the buy-goods protocol
 (def buy-goods
   (mep
     (-->> QuoteRequest "buyer" "seller")
@@ -16,11 +13,13 @@
 
 ;Second step is to add infra structure to our MEP
 
-;define channels
+;So instead of defining our channels we allow Discourje to generate them
 ;(def buyer-to-seller (chan))
 ;(def seller-to-buyer (chan))
 
+;generate the infrastructure
 (def infra (add-infrastructure buy-goods))
+;query the channels, identified by sender and receiver pairs.
 (def buyer-to-seller (get-channel "buyer" "seller" infra))
 (def seller-to-buyer (get-channel "seller" "buyer" infra))
 
@@ -30,6 +29,9 @@
   (let [in-stock (== 1 (rand-int 2))]
     (println (format "%s is in stock: %s" (.getName book) in-stock))
     in-stock))
+
+;The next step is to communicate through Discourje put and take abstractions.
+;As we can see, only the take abstraction are not compiling.
 
 ;define buyer logic
 (defn buyer "Logic representing Buyer" []
@@ -49,5 +51,5 @@
                                        (.getName (.getProduct order)) (.getPrice (.getQuote order))))))
     (>!! seller-to-buyer (doto (Quote.) (.setInStock false) (.setPrice 0) (.setProduct product)))))
 
-(clojure.core.async/thread (buyer))
-(clojure.core.async/thread (seller))
+(thread (buyer))
+(thread (seller))
