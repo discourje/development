@@ -1,4 +1,4 @@
-(ns discourje.TwoBuyerProtocol.Buyer1
+(ns discourje.TrueTwoBuyerProtocol.Buyer1
   (:require [discourje.core.async :refer :all]
             [discourje.core.logging :refer :all]))
 

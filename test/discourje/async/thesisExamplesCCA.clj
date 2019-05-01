@@ -2,6 +2,21 @@
   (:require [clojure.test :refer :all]
             [clojure.core.async :refer :all]))
 
+(def alice-to-bob (chan 1))
+(def bob-to-alice (chan 1))
+
+(defn alice []
+  (>!! alice-to-bob "Foo")
+  (println "Alice received: " (<!! bob-to-alice)))
+
+(defn bob []
+  (println "Bob received: "(<!! alice-to-bob))
+  (>!! bob-to-alice "Bar"))
+
+(thread (alice))
+(thread (bob))
+
+;-----------------------------------------------------------------------------------------------------
 (def buyer1-to-seller (chan 1))
 (def seller-to-buyer1 (chan 1))
 

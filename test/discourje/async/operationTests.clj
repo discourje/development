@@ -42,7 +42,7 @@
         ba (get-channel "B" "A" channels)]
     (do
       (>!! ab "Hello B")
-      (let [a->b (<!! ab java.lang.String)]
+      (let [a->b (<!! ab java.lang.String )]
         (is (= java.lang.String (get-label a->b)))
         (is (= "Hello B" (get-content a->b))))
       (>!! ba "Hello A")
