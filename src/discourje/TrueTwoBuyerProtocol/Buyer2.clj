@@ -13,8 +13,9 @@
   (let [s-b2 (get-channel "seller" "buyer2" infra)
         b1-b2 (get-channel "buyer1" "buyer2" infra)
         b2-s (get-channel "buyer2" "seller" infra)
+        quote (get-content (<!! s-b2 "quote"))
         quote-div (get-content (<!! b1-b2 "quote-div"))]
-    (if (contribute? (:quote quote-div) (:quote-div quote-div))
+    (if (contribute? quote quote-div)
       (do (>!! b2-s (msg "ok" (generate-address)))
           (let [date (<!! s-b2 "date")]
             (log-message (format "Thank you, I will put %s in my agenda!" (get-content date)))

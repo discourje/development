@@ -10,13 +10,12 @@
   (mep
     (rec :order-book
          (-->> "title" "buyer1" "seller")
-         (-->> "quote" "seller" "buyer1")
+         (-->> "quote" "seller" ["buyer1" "buyer2"])
          (-->> "quote-div" "buyer1" "buyer2")
          (choice
            [(-->> "ok" "buyer2" "seller")
             (-->> "date" "seller" "buyer2")
-            (-->> "repeat" "buyer2" "seller")
-            (-->> "repeat" "seller" "buyer1")
+            (-->> "repeat" "buyer2" ["buyer1" "seller"])
             (continue :order-book)]
            [(-->> "quit" "buyer2" "seller")]))))
 
