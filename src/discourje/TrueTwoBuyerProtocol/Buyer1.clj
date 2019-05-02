@@ -1,6 +1,7 @@
 (ns discourje.TrueTwoBuyerProtocol.Buyer1
   (:require [discourje.core.async :refer :all]
-            [discourje.core.logging :refer :all]))
+            [discourje.core.logging :refer :all])
+  (:use [slingshot.slingshot :only [throw+ try+]]))
 
 (def books ["The Joy of Clojure" "Mastering Clojure Macros" "Programming Clojure"])
 
@@ -16,14 +17,29 @@
 (defn order-book "order a book from buyer1's perspective" [infra]
   (let [b1-s (get-channel "buyer1" "seller" infra)
         s-b1 (get-channel "seller" "buyer1" infra)
-        b1-b2 (get-channel "buyer1" "buyer2" infra)]
-    (>!! b1-s (msg "title" (generate-book)))
+        b1-b2 (get-channel "buyer1" "buyer2" infra)
+        b2-b1 (get-channel "buyer2" "buyer1" infra)
+        title-delivered? (atom false)
+        quote-div-delivered? (atom false)]
+    (while (false? @title-delivered?)
+             (try+ (>!! b1-s (msg "title" (generate-book)))
+                   (reset! title-delivered? true)
+                   (catch [:type :incorrect-communication] {}
+                     (println "title not delivered, retrying in 1 second!")
+                     (Thread/sleep 1000))))
     (let [quote (<!! s-b1 "quote")
           div (quote-div (get-content quote))]
       (do
         ;try catch here!
-        (>!! b1-b2 (msg "quote-div" div))
-        (when (<!! s-b1 "repeat")
+        (while (false? @quote-div-delivered?)
+          (try+
+            (println "sending quotediv")
+            (>!! b1-b2 (msg "quote-div" div))
+            (reset! quote-div-delivered? true)
+            (catch [:type :incorrect-communication] {}
+              (println "quote-div not delivered, retrying in 1 second!")
+              (Thread/sleep 1000))))
+        (when (<!! b2-b1 "repeat")
           (order-book infra))))))
 
 ;send title to seller
