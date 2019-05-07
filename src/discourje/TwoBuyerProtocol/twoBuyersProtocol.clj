@@ -24,6 +24,6 @@
 (def infrastructure (add-infrastructure two-buyer-protocol))
 
 ;start each participant on another thread
-(clojure.core.async/thread (b1/order-book infrastructure))
-(clojure.core.async/thread (b2/order-book infrastructure))
-(clojure.core.async/thread (s/order-book infrastructure))
+(thread (b1/order-book infrastructure))
+(thread (b2/order-book infrastructure))
+(thread (s/order-book infrastructure))
