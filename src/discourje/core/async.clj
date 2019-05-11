@@ -1,7 +1,8 @@
 (ns discourje.core.async
   (:require [clj-uuid :as uuid]
             [discourje.core.logging :refer :all]
-            [clojure.core.async :as async])
+            [clojure.core.async :as async]
+            [clojure.core.async.impl.protocols :as bufs])
   (:import (clojure.lang Seqable)))
 
 (defprotocol sendable
@@ -25,7 +26,8 @@
       "interactions"
       "channels"
       "monitoring"
-      "interactionLinking")
+      "interactionLinking"
+      "buffers")
 
 (defn make-interaction [action sender receiver]
   "Creates an interaction object specifying sending action from sender to receiver."
