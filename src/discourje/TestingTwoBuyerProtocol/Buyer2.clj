@@ -17,7 +17,8 @@
         quote (get-content (<!!! s-b2 "quote"))
         quote-div (get-content (<!!! b1-b2 "quote-div"))]
     (if (contribute? quote quote-div)
-      (do (>!!! b2-s (msg "ok" (generate-address)))
+      (do (>!!! b2-s (msg "ok" "ok"))
+          (>!!! b2-s (msg "address" (generate-address)))
           (let [date (<!!! s-b2 "date")]
             (log-message (format "Thank you, I will put %s in my agenda!" (get-content date)))
             (>!!! b2-b1 (msg "repeat" "Order again!"))

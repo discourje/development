@@ -31,7 +31,7 @@
               (Thread/sleep 1000))))
           (let [date (<!! s-b2 "date")]
             (log-message (format "Thank you, I will put %s in my agenda!" (get-content date)))
-            (>!! [b2-s b2-b1] (msg "repeat" "Order again!"))
+            (>!! b2-b1 (msg "repeat" "Order again!"))
             (order-book infra)))
       (>!! b2-s (msg "quit" "Price to high!")))))
 

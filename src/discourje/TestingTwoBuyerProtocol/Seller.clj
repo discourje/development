@@ -31,9 +31,10 @@
     (let [choice-by-buyer2 (<!!! b2-s ["ok" "quit"])]
       (cond
         (= "ok" (get-label choice-by-buyer2))
-        (do (log-message (format "Order confirmed, will send to address: %s" (get-content choice-by-buyer2)))
-            (>!!! s-b2 (msg "date" (get-random-date 5)))
-            (order-book infra))
+        (do
+          (println (format "Order confirmed, will send to address: %s" (get-content (<!! b2-s "address"))))
+          (>!! s-b2 (msg "date" (get-random-date 5)))
+          (order-book infra))
         (= "quit" (get-label choice-by-buyer2))
         (end-reached "Quit!")))))
 

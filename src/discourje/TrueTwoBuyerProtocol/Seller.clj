@@ -34,8 +34,7 @@
         (do
           (println (format "Order confirmed, will send to address: %s" (get-content (<!! b2-s "address"))))
           (>!! s-b2 (msg "date" (get-random-date 5)))
-          (when (<!! b2-s "repeat")
-            (order-book infra)))
+            (order-book infra))
         (= "quit" (get-label choice-by-buyer2))
         (end-reached "Quit!")))))
 

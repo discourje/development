@@ -16,7 +16,7 @@
            [(-->> "ok" "buyer2" "seller")
             (-->> "address" "buyer2" "seller")
             (-->> "date" "seller" "buyer2")
-            (-->> "repeat" "buyer2" ["buyer1" "seller"])
+            (-->> "repeat" "buyer2" "buyer1")
             (continue :order-book)]
            [(-->> "quit" "buyer2" "seller")]))))
 

@@ -136,7 +136,7 @@
                 (some #(buffer-full? (get-chan %)) channel))
               (and
                 (false? (vector? channel))
-                (true? (buffer-full? (get-chan channel)))))(println "buffer somehow full")(recur)))
+                (true? (buffer-full? (get-chan channel)))))(recur)))
   ;(loop [] (when (true? (buffer-full? (get-chan channel))) (recur)))
   (>!! channel message))
 
@@ -159,6 +159,6 @@
     (let [result (peek-channel (get-chan channel))]
       (do (when-not (or (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label)  (or (= (get-label result) label) (contains-value? (get-label result) label)))
             (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) label (to-string (get-active-interaction (get-monitor channel))))))
-          (allow-receive channel)
           (apply-interaction (get-monitor channel) (get-provider channel) (get-consumer channel) label)
+          (allow-receive channel)
           result))))
