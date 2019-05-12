@@ -123,8 +123,22 @@
             (log-error :incorrect-communication "Trying to send in parallel, but the monitor is not correct for all channels!"))
           (allow-sends channel m))
       (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m))
-            (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s"(get-provider channel) (get-consumer channel) (get-label m) (to-string (get-active-interaction (get-monitor channel))))))
+            (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) (get-label m) (to-string (get-active-interaction (get-monitor channel))))))
           (allow-send channel m)))))
+
+(defn >!!!
+  "Poll buffer to be full, when there is a free spot, try put"
+  [channel message]
+    (loop []
+      (when (or
+              (and
+                (true? (vector? channel))
+                (some #(buffer-full? (get-chan %)) channel))
+              (and
+                (false? (vector? channel))
+                (true? (buffer-full? (get-chan channel)))))(println "buffer somehow full")(recur)))
+  ;(loop [] (when (true? (buffer-full? (get-chan channel))) (recur)))
+  (>!! channel message))
 
 (defn <!!
   "Take from channel"
@@ -132,7 +146,19 @@
   (if (nil? (get-active-interaction (get-monitor channel)))
     (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
     (let [result (allow-receive channel)]
-      (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label)
-            (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s"(get-provider channel) (get-consumer channel) label (to-string (get-active-interaction (get-monitor channel))))))
+      (do (when-not (or (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label) (or (= (get-label result) label) (contains-value? (get-label result) label)))
+            (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) label (to-string (get-active-interaction (get-monitor channel))))))
+          (apply-interaction (get-monitor channel) (get-provider channel) (get-consumer channel) label)
+          result))))
+
+(defn <!!! [channel label]
+  (loop []
+    (when (false? (something-in-buffer? (get-chan channel))) (recur)))
+  (if (nil? (get-active-interaction (get-monitor channel)))
+    (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
+    (let [result (peek-channel (get-chan channel))]
+      (do (when-not (or (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label)  (or (= (get-label result) label) (contains-value? (get-label result) label)))
+            (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) label (to-string (get-active-interaction (get-monitor channel))))))
+          (allow-receive channel)
           (apply-interaction (get-monitor channel) (get-provider channel) (get-consumer channel) label)
           result))))
