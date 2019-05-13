@@ -92,17 +92,33 @@
               (is (= "4" (get-label c->b)))
               (is (= "C->A-B" (get-content c->b))))))))))
 
-;(deftest send-receive-quad-protocol-test
-;  (let [channels (generate-infrastructure (testQuadProtocol))
-;        mainA (get-channel "main" "A" channels)
-;        mainB (get-channel "main" "B" channels)
-;        mainC (get-channel "main" "C" channels)
-;        ab (get-channel "A" "B" channels)
-;        ba (get-channel "B" "A" channels)
-;        ac (get-channel "A" "C" channels)
-;        ca (get-channel "C" "A" channels)
-;        cb (get-channel "C" "B" channels)
-;        ]))
+(deftest send-receive-parallel-wildcard-only-protocol-test
+  (let [channels (generate-infrastructure (testParallelProtocol))
+        ab (get-channel "A" "B" channels)
+        ba (get-channel "B" "A" channels)
+        ac (get-channel "A" "C" channels)
+        ca (get-channel "C" "A" channels)
+        cb (get-channel "C" "B" channels)]
+    (do
+      (>!! ab (->message "1" "A->B"))
+      (let [a->b (<!! ab)]
+        (is (= "1" (get-label a->b)))
+        (is (= "A->B" (get-content a->b)))
+        (>!! ba (->message "2" "B->A"))
+        (let [b->a (<!! ba)]
+          (is (= "2" (get-label b->a)))
+          (is (= "B->A" (get-content b->a)))
+          (>!! ac (->message "3" "A->C"))
+          (let [a->c (<!! ac)]
+            (is (= "3" (get-label a->c)))
+            (is (= "A->C" (get-content a->c)))
+            (>!! [ca cb] (->message "4" "C->A-B"))
+            (let [c->a (<!! ca)
+                  c->b (<!! cb)]
+              (is (= "4" (get-label c->a)))
+              (is (= "C->A-B" (get-content c->a)))
+              (is (= "4" (get-label c->b)))
+              (is (= "C->A-B" (get-content c->b))))))))))
 
 (deftest send-receive-single-parallel-test
   (let [channels (generate-infrastructure (testSingleParallelProtocol))
