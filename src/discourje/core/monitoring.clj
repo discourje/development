@@ -8,7 +8,8 @@
   (get-monitor-id [this])
   (get-active-interaction [this])
   (apply-interaction [this sender receivers label])
-  (valid-interaction? [this sender receivers label]))
+  (valid-interaction? [this sender receivers label])
+  (is-current-parallel? [this label]))
 
 (declare contains-value? is-valid-interaction?)
 
@@ -258,9 +259,24 @@
   [channels]
   (= 1 (count (distinct (for [c channels] (get-monitor-id (get-monitor c)))))))
 
+(defn- is-active-interaction-parallel? [active-interaction label interactions]
+  (cond
+    (satisfies? interactable active-interaction)
+    (and (or (nil? label) (= (get-action active-interaction) label) (contains-value? (get-action active-interaction) label))(instance? Seqable (get-receivers active-interaction)))
+    (satisfies? branchable active-interaction)
+    (> (count (filter true? (flatten (for [b (:branches active-interaction)] (is-active-interaction-parallel? (nth b 0) label interactions))))) 0)
+    (satisfies? recursable active-interaction)
+    (is-active-interaction-parallel? (first (get-recursion active-interaction)) label interactions)
+    (satisfies? identifiable-recur active-interaction)
+    (is-active-interaction-parallel? (find-nested-next (get-next active-interaction) interactions) label interactions)
+    :else
+    (do (log-error :unsupported-operation (format "Unsupported communication type: Communication invalid, type: %s" (type active-interaction)))
+        false))
+  )
 (defrecord monitor [id interactions active-interaction]
   monitoring
   (get-monitor-id [this] id)
   (get-active-interaction [this] @active-interaction)
   (apply-interaction [this sender receivers label] (apply-interaction-to-mon sender receivers label active-interaction interactions))
-  (valid-interaction? [this sender receivers label] (is-valid-communication? sender receivers label @active-interaction interactions)))
+  (valid-interaction? [this sender receivers label] (is-valid-communication? sender receivers label @active-interaction interactions))
+  (is-current-parallel? [this label] (is-active-interaction-parallel? @active-interaction label interactions)))
