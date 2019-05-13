@@ -13,6 +13,7 @@
   (let [randomN (+ (rand-int quote) 1)]
     (log-message "QD = " randomN)
     randomN))
+
 (defn order-book "order a book from buyer1's perspective" [infra]
   (let [b1-s (get-channel "buyer1" "seller" infra)
         s-b1 (get-channel "seller" "buyer1" infra)

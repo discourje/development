@@ -137,28 +137,33 @@
               (and
                 (false? (vector? channel))
                 (true? (buffer-full? (get-chan channel)))))(recur)))
-  ;(loop [] (when (true? (buffer-full? (get-chan channel))) (recur)))
   (>!! channel message))
 
 (defn <!!
   "Take from channel"
-  [channel label]
+  ([channel]
+   (<!! channel nil))
+  ([channel label]
   (if (nil? (get-active-interaction (get-monitor channel)))
     (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
     (let [result (allow-receive channel)]
-      (do (when-not (or (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label) (or (= (get-label result) label) (contains-value? (get-label result) label)))
+      (do (when-not (or (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label) (or (nil? label)(= (get-label result) label) (contains-value? (get-label result) label)))
             (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) label (to-string (get-active-interaction (get-monitor channel))))))
           (apply-interaction (get-monitor channel) (get-provider channel) (get-consumer channel) label)
-          result))))
+          result)))))
 
-(defn <!!! [channel label]
+(defn <!!!
+  "take form channel peeking"
+  ([channel]
+   (<!!! channel nil))
+  ([channel label]
   (loop []
     (when (false? (something-in-buffer? (get-chan channel))) (recur)))
   (if (nil? (get-active-interaction (get-monitor channel)))
     (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
     (let [result (peek-channel (get-chan channel))]
-      (do (when-not (or (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label)  (or (= (get-label result) label) (contains-value? (get-label result) label)))
+      (do (when-not (or (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label)  (or (nil? label) (= (get-label result) label) (contains-value? (get-label result) label)))
             (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) label (to-string (get-active-interaction (get-monitor channel))))))
           (apply-interaction (get-monitor channel) (get-provider channel) (get-consumer channel) label)
           (allow-receive channel)
-          result))))
+          result)))))
