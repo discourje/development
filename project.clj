@@ -8,4 +8,5 @@
                  [org.clojure/test.check "0.9.0"]
                  [org.clojure/core.async "0.4.474"]
                  [slingshot "0.12.2"]
-                 [danlentz/clj-uuid "0.1.7"]])
+                 [danlentz/clj-uuid "0.1.7"]
+                 [criterium "0.4.5"]])

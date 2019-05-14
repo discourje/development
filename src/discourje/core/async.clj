@@ -169,7 +169,7 @@
            result)))))
 
 (defn <!!!!
-  "take form channel peeking, and delay receive on parallel"
+  "take form channel peeking, and delay receive when parallel"
   ([channel]
    (<!!! channel nil))
   ([channel label]

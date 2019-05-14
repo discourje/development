@@ -26,14 +26,14 @@
         s-b1 (get-channel "seller" "buyer1" infra)
         s-b2 (get-channel "seller" "buyer2" infra)
         b2-s (get-channel "buyer2" "seller" infra)
-        title (<!!!! b1-s "title")]
+        title(<!!!! b1-s "title")]
     (>!!! [s-b1 s-b2] (msg "quote" (quote-book (get-content title))))
     (let [choice-by-buyer2 (<!!!! b2-s ["ok" "quit"])]
       (cond
         (= "ok" (get-label choice-by-buyer2))
         (do
           (println (format "Order confirmed, will send to address: %s" (get-content (<!!!! b2-s "address"))))
-          (>!!! s-b2 (msg "date" (get-random-date 5)))
+          (>!!! [s-b2 s-b1] (msg "date" (get-random-date 5)))
           (order-book infra))
         (= "quit" (get-label choice-by-buyer2))
         (end-reached "Quit!")))))
