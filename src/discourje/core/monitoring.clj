@@ -64,8 +64,7 @@
                                                                         inter
                                                                         (find-nested-next id (get-recursion inter)))
                                         (satisfies? identifiable-recur inter) (when (= (get-id inter) id) inter)
-                                        :else (do (log-error :unsupported-operation (format "Cannot find next monitor, unsupported type, %s!" (type inter)) nil))))
-                          ))))
+                                        :else (do (log-error :unsupported-operation (format "Cannot find next monitor, unsupported type, %s!" (type inter)) nil))))))))
 
 (defn- get-next-interaction-by-id!
   "Get the next interaction with next id already given"
@@ -221,11 +220,14 @@
   ([sender receivers label active-interaction target-interaction interactions]
    (log-message (format "Applying: label %s, receiver %s." label receivers))
    (cond
-     (and (satisfies? interactable target-interaction) (is-valid-interaction? sender receivers label target-interaction))
+    ; (and (satisfies? interactable target-interaction) (is-valid-interaction? sender receivers label target-interaction))
+     (satisfies? interactable target-interaction)
      (swap-active-interaction-by-atomic active-interaction target-interaction receivers interactions)
-     (and (satisfies? branchable target-interaction) (check-branch-interaction sender receivers label target-interaction))
+     ;(and (satisfies? branchable target-interaction) (check-branch-interaction sender receivers label target-interaction))
+     (satisfies? branchable target-interaction)
      (swap-active-interaction-by-branch sender receivers label active-interaction target-interaction interactions)
-     (and (satisfies? recursable target-interaction) (check-recursion-interaction sender receivers label target-interaction))
+     ;(and (satisfies? recursable target-interaction) (check-recursion-interaction sender receivers label target-interaction))
+     (satisfies? recursable target-interaction)
      (swap-active-interaction-by-recursion sender receivers label active-interaction target-interaction interactions)
      (satisfies? identifiable-recur target-interaction)
      (apply-interaction-to-mon sender receivers label active-interaction (find-nested-next (get-next target-interaction) interactions) interactions)

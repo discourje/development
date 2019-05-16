@@ -4,47 +4,36 @@
   (:use [slingshot.slingshot :only [throw+ try+]]))
 
 (defn buyer1 "order a book from buyer1's perspective"
-  ([infra]
-   (let [b1-s (get-channel "buyer1" "seller" infra)
-         s-b1 (get-channel "seller" "buyer1" infra)
-         b1-b2 (get-channel "buyer1" "buyer2" infra)]
-     (buyer1 b1-s s-b1 b1-b2 1)))
-  ([b1-s s-b1 b1-b2 iteration]
-   (println iteration)
-   (>!!! b1-s (msg "title" "book"))
-   (do (<!!!! s-b1 "quote")
-       (>!!! b1-b2 (msg "quote-div" 16))
-       (when (<!!!! s-b1 "date")
-         (buyer1 b1-s s-b1 b1-b2 (+ iteration 1))))))
+  [b1-s s-b1 b1-b2 title quote-div can-order?]
+  (loop [it 0]
+    (do
+      (>!!! b1-s title)
+      (<!!!! s-b1 "quote")
+      (>!!! b1-b2 quote-div)
+      (<!!!! s-b1 "date")
+      (if (false? @can-order?)
+        (println (+ 1 it))
+        (recur (+ it 1))))))
 
 (defn buyer2 "Order a book from buyer2's perspective"
-  ([infra]
-   (let [s-b2 (get-channel "seller" "buyer2" infra)
-         b1-b2 (get-channel "buyer1" "buyer2" infra)
-         b2-s (get-channel "buyer2" "seller" infra)]
-     (buyer2 s-b2 b1-b2 b2-s)))
-  ([s-b2 b1-b2 b2-s]
-   (do (<!!!! s-b2 "quote")
-       (<!!!! b1-b2 "quote-div")
-       (>!!! b2-s (msg "ok" "ok"))
-       (>!!! b2-s (msg "address" "address"))
-       (<!!! s-b2 "date")
-       (buyer2 s-b2 b1-b2 b2-s))))
+  [s-b2 b1-b2 b2-s ok address can-order?]
+  (loop []
+    (do (<!!!! s-b2 "quote")
+        (<!!!! b1-b2 "quote-div")
+        (>!!! b2-s ok)
+        (>!!! b2-s address)
+        (<!!! s-b2 "date")
+        (when (true? @can-order?) (recur)))))
 
 (defn seller "Order book from seller's perspective"
-  ([infra]
-   (let [b1-s (get-channel "buyer1" "seller" infra)
-         s-b1 (get-channel "seller" "buyer1" infra)
-         s-b2 (get-channel "seller" "buyer2" infra)
-         b2-s (get-channel "buyer2" "seller" infra)]
-     (seller b1-s s-b1 s-b2 b2-s)))
-  ([b1-s s-b1 s-b2 b2-s]
-   (do (<!!!! b1-s "title")
-       (>!!! [s-b1 s-b2] (msg "quote" 20))
-       (<!!!! b2-s "ok")
-       (<!!!! b2-s "address")
-       (>!!! [s-b2 s-b1] (msg "date" 3))
-       (seller b1-s s-b1 s-b2 b2-s))))
+  [b1-s s-b1 s-b2 b2-s quote date can-order?]
+  (loop []
+    (do (<!!!! b1-s "title")
+        (>!!! [s-b1 s-b2] quote)
+        (<!!!! b2-s "ok")
+        (<!!!! b2-s "address")
+        (>!!! [s-b2 s-b1] date)
+        (when (true? @can-order?) (recur)))))
 
 (def two-buyer-protocol
   (mep
@@ -55,17 +44,39 @@
          (choice
            [(-->> "ok" "buyer2" "seller")
             (-->> "address" "buyer2" "seller")
-            (-->> "date" "seller" ["buyer1""buyer2"])
+            (-->> "date" "seller" ["buyer1" "buyer2"])
             (continue :order-book)]
            [(-->> "quit" "buyer2" "seller")]))))
 
 ;generate the infra structure for the protocol
-(def infrastructure (add-infrastructure two-buyer-protocol))
 (set-logging-exceptions)
 ;start each participant on another thread
-(defn start! []
-  (do (thread (buyer1 infrastructure))
-      (thread (buyer2 infrastructure))
-      (thread (seller infrastructure))))
-(start!)
+(defn start! [can-order?]
+  (let [infra (add-infrastructure two-buyer-protocol)
+        b1 (thread (buyer1 (get-channel "buyer1" "seller" infra)
+                           (get-channel "seller" "buyer1" infra)
+                           (get-channel "buyer1" "buyer2" infra)
+                           (msg "title" "book")
+                           (msg "quote-div" 16)
+                           can-order?))
+        b2 (thread (buyer2 (get-channel "seller" "buyer2" infra)
+                           (get-channel "buyer1" "buyer2" infra)
+                           (get-channel "buyer2" "seller" infra)
+                           (msg "ok" "ok")
+                           (msg "address" "address")
+                           can-order?))
+        s (thread (seller (get-channel "buyer1" "seller" infra)
+                          (get-channel "seller" "buyer1" infra)
+                          (get-channel "seller" "buyer2" infra)
+                          (get-channel "buyer2" "seller" infra)
+                          (msg "quote" 20)
+                          (msg "date" 3)
+                          can-order?))]
+    (thread
+      (do (Thread/sleep 5000)
+          (reset! can-order? false)
+          (clojure.core.async/close! b1)
+          (clojure.core.async/close! b2)
+          (clojure.core.async/close! s)))))
 
+(dotimes [_ 10] (start! (atom true)))
