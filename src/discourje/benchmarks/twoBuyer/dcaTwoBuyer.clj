@@ -47,6 +47,7 @@
             (-->> "date" "seller" ["buyer1" "buyer2"])
             (continue :order-book)]
            [(-->> "quit" "buyer2" "seller")]))))
+(println (add-infrastructure two-buyer-protocol))
 
 ;generate the infra structure for the protocol
 (set-logging-exceptions)

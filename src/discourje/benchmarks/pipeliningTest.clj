@@ -1,7 +1,6 @@
 (ns discourje.benchmarks.pipeliningTest
   (require [discourje.core.async :refer :all]
            [discourje.core.logging :refer :all]
-           [discourje.core.logging :refer :all]
            [criterium.core :refer :all]))
 
 

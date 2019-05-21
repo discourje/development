@@ -1,7 +1,6 @@
 (ns discourje.benchmarks.simpleBenchmark
   (require [discourje.core.async :refer :all]
            [discourje.core.logging :refer :all]
-           [discourje.core.logging :refer :all]
            [criterium.core :refer :all]))
 
 (def coreasync-a-b (clojure.core.async/chan 1))
