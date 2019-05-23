@@ -4,20 +4,10 @@
            [criterium.core :refer :all])
   (:use [slingshot.slingshot :only [throw+ try+]]))
 
-(def two-Workers
-  (mep
-    (-->> 1 "m" ["w0" "w1"])
-    (-->> 1 "w0" "m")
-    (-->> 1 "w1" "m")))
-(def infrastructure (generate-infrastructure two-Workers))
-(def m-w1 (get-channel "m" "w0" infrastructure))
-(def w1-m (get-channel "w1" "m" infrastructure))
-(def w2-m (get-channel "w2" "m" infrastructure))
-(println two-Workers)
 (defn make-work
   "scatter gather protocol generator
 
-  Generates protocol in line of:r
+  Generates protocol in line of:
 
   worker-prot
     (mep
@@ -42,29 +32,23 @@
         message (msg 1 1)]
     (time
       (do
-        (thread (>!! m->w message))
+        (thread (>!!! m->w message))
         (doseq [w w->m]
           (thread
             (do
-              (<!! (:take w) 1)
+              (<!!!! (:take w) 1)
               (loop []
-                (if-let [result (try+ (>!! (:put w) message)
-                               (catch [:type :incorrect-communication] {}))]
-                  (recur)))
-              ;(>!! (:put w) message)
-              )))))))
-
-(defn try-times*
-  "Executes thunk. If an exception is thrown, will retry. At most n retries
-  are done. If still some exception is thrown it is bubbled upwards in
-  the call chain."
-  [n thunk]
-  (loop [n n]
-    (if-let [result (try
-                      [(thunk)]
-                      (catch Exception e
-                        (when (zero? n)
-                          (throw e))))]
-      (result 0)
-      (recur (dec n)))))
-(make-work 2)
+                (let [result (try+ (>!!! (:put w) message) true
+                                   (catch [:type :incorrect-communication] {}
+                                     false))]
+                  (when (false? result)
+                    (recur)))))))
+        (loop [worker-id 0]
+          (println worker-id)
+          (let [result (try+ (<!!!!(:put (nth w->m worker-id)) 1) (+ worker-id 1)
+                             (catch [:type :incorrect-communication] {}
+                               worker-id))]
+            (when (not (== result (- workers 1)))
+              (recur result))))))))
+(set-logging-exceptions)
+(make-work 10)
