@@ -21,34 +21,54 @@
   "
   [workers]
   (let [workers-prot (create-protocol
-                       (vec (flatten (flatten
-                                       (conj
-                                         [(-->> 1 "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
-                                         (vec (for [w (range workers)] (-->> 1 (format "w%s" w) "m")))))))) ; workers to master
+                       (vec
+                         (flatten
+                           (flatten
+                             (conj
+                               [(-->> 1 "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
+                               (vec (for [w (range workers)] (-->> 1 (format "w%s" w) "m")))))))) ; workers to master
         infra (generate-infrastructure workers-prot)
         m->w (vec (for [w (range workers)] (get-channel "m" (format "w%s" w) infra)))
         w->m (vec (for [w (range workers)] {:take (get-channel "m" (format "w%s" w) infra)
                                             :put  (get-channel (format "w%s" w) "m" infra)}))
-        message (msg 1 1)]
+        msg (msg 1 1)]
     (time
       (do
-        (thread (>!!! m->w message))
-        (doseq [w w->m]
-          (thread
-            (do
-              (<!!!! (:take w) 1)
-              (loop []
-                (let [result (try+ (>!!! (:put w) message) true
-                                   (catch [:type :incorrect-communication] {}
-                                     false))]
-                  (when (false? result)
-                    (recur)))))))
+        (thread (>!!! m->w msg))
+        (loop [index 0]
+          (let [w (nth w->m index)]
+            (do  (thread
+              (do
+                (println "taking from " (get-provider (:take w)) " for " (get-consumer (:take w)))
+                (<!!!! (:take w) 1)
+                (loop []
+                  (let [result (try+ (do (println "putting on " (get-consumer (:put w)))
+                                         (>!!! (:put w) msg) true)
+                                     (catch [:type :incorrect-communication] {:keys [type message]}
+                                       (do (println type message)
+                                         false)))]
+                    (when (false? result)
+                      (recur))))))
+                 (println "thread started"))
+            (println "done do")
+          (when (true? (< index (- workers 1)))
+            (do (println index" going to another worker " (+ 1 index))
+            (recur (+ 1 index))))))
         (loop [worker-id 0]
           (println worker-id)
-          (let [result (try+ (<!!!!(:put (nth w->m worker-id)) 1) (+ worker-id 1)
+          (let [result (try+ (do
+                               (println "master taking from " worker-id)
+                               (<!!! (:put (nth w->m worker-id)) 1) (+ worker-id 1))
                              (catch [:type :incorrect-communication] {}
-                               worker-id))]
-            (when (not (== result (- workers 1)))
-              (recur result))))))))
-(set-logging-exceptions)
-(make-work 10)
+                               (do
+                                 (println "master exception")
+                                 worker-id)))]
+            (do (println "result is " result)
+                (when (true? (< result workers))
+                  (recur result)))))
+        (println "Done")))
+    (doseq [mw m->w] (clojure.core.async/close! (get-chan mw)))
+    (doseq [wm w->m] (do (clojure.core.async/close! (get-chan (:take wm)))
+                         (clojure.core.async/close! (get-chan (:put wm)))))))
+(set-logging)
+(make-work 5)
