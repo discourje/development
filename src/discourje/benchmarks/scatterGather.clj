@@ -1,4 +1,4 @@
-(ns discourje.benchmarks.parallelism.scatterGather
+(ns discourje.benchmarks.scatterGather
   (require [discourje.core.async :refer :all]
            [discourje.core.logging :refer :all]
            [criterium.core :refer :all])
@@ -70,7 +70,10 @@
 (discourje-make-work 128)
 (discourje-make-work 256)
 
-(defn clojure-make-work [workers]
+(defn clojure-make-work
+  "Scatter gather generator for Clojure:
+   Will start all workers on separate threads and the master on the main thread in order to make the timing correct."
+  [workers]
   (let [m (clojure.core.async/chan 1)
         workers (vec (for [w (range workers)] (clojure.core.async/chan 1)))]
     (time

@@ -1,11 +1,30 @@
-(ns discourje.benchmarks.simpleBenchmark
+(ns discourje.benchmarks.testing.pipeliningTest
   (require [discourje.core.async :refer :all]
            [discourje.core.logging :refer :all]
            [criterium.core :refer :all]))
 
+
 (def coreasync-a-b (clojure.core.async/chan 1))
 
 (defn core-async-send []
+  (clojure.core.async/>!! coreasync-a-b "hi")
+  (clojure.core.async/<!! coreasync-a-b)
+  (clojure.core.async/>!! coreasync-a-b "hi")
+  (clojure.core.async/<!! coreasync-a-b)
+  (clojure.core.async/>!! coreasync-a-b "hi")
+  (clojure.core.async/<!! coreasync-a-b)
+  (clojure.core.async/>!! coreasync-a-b "hi")
+  (clojure.core.async/<!! coreasync-a-b)
+  (clojure.core.async/>!! coreasync-a-b "hi")
+  (clojure.core.async/<!! coreasync-a-b)
+  (clojure.core.async/>!! coreasync-a-b "hi")
+  (clojure.core.async/<!! coreasync-a-b)
+  (clojure.core.async/>!! coreasync-a-b "hi")
+  (clojure.core.async/<!! coreasync-a-b)
+  (clojure.core.async/>!! coreasync-a-b "hi")
+  (clojure.core.async/<!! coreasync-a-b)
+  (clojure.core.async/>!! coreasync-a-b "hi")
+  (clojure.core.async/<!! coreasync-a-b)
   (clojure.core.async/>!! coreasync-a-b "hi")
   (clojure.core.async/<!! coreasync-a-b))
 (binding [
@@ -22,7 +41,16 @@
 (time (dotimes [_ 1000] (core-async-send)))
 (def protocol
   (mep
-    (-->> "hi" "Alice" "Bob")))
+    (-->> "hi" "Alice" "Bob")
+    (-->> "hi" "Bob" "Alice")
+    (-->> "hi" "Alice" "Bob")
+    (-->> "hi" "Bob" "Alice")
+    (-->> "hi" "Alice" "Bob")
+    (-->> "hi" "Bob" "Alice")
+    (-->> "hi" "Alice" "Bob")
+    (-->> "hi" "Bob" "Alice")
+    (-->> "hi" "Alice" "Bob")
+    (-->> "hi" "Bob" "Alice")))
 
 (def infra (generate-infrastructure protocol))
 (def discourje-a-b (get-channel "Alice" "Bob" infra))

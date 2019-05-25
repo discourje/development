@@ -85,7 +85,7 @@
   (log-message (format "Checking multiple-receivers on active-interaction %s, seqable? %s, count > 1 %s"
                        active-interaction
                        (instance? Seqable (:receivers active-interaction))
-                       (> (count (:receivers active-interaction)) 1)))
+                       (and (instance? Seqable (:receivers active-interaction)) (> (count (:receivers active-interaction)) 1))))
   (and (instance? Seqable (:receivers active-interaction)) (> (count (:receivers active-interaction)) 1)))
 
 (defn- remove-receiver-from-branch
