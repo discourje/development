@@ -2,6 +2,31 @@
   (:require [clojure.test :refer :all]
             [discourje.core.async :refer :all]))
 
+
+(discourje.core.logging/set-logging-exceptions)
+
+(def foo-bar-protocol
+  (mep
+    (-->> "Foo" "Alice" "Bob")
+    (-->> "Bar" "Bob" "Alice")))
+
+(def infra (add-infrastructure foo-bar-protocol))
+(def alice-to-bob (get-channel "Alice" "Bob" infra))
+(def bob-to-alice (get-channel "Bob" "Alice" infra))
+
+(defn alice []
+  (>!! alice-to-bob (msg "Foo" "Foo content"))
+  (println "Alice received: " (get-content (<!! bob-to-alice "Bar"))))
+
+(defn bob []
+  (println "Bob received: " (get-content (<!! alice-to-bob "Foo")))
+  (>!! bob-to-alice (msg "Bar" "Bar content")))
+
+(thread (alice))
+(thread (bob))
+
+
+;----------------------------------------------------------------------------------------------------------------------
 (def protocol
   (mep
     (-->> "Title" "Buyer1" "Seller")
@@ -23,4 +48,3 @@
 
 (thread (buyer1))
 (thread (seller))
-(discourje.core.logging/set-logging-exceptions)

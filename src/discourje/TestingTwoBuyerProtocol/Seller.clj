@@ -1,4 +1,4 @@
-(ns discourje.TwoBuyerProtocol.Seller
+(ns discourje.TestingTwoBuyerProtocol.Seller
   (:require [discourje.core.async :refer :all]
             [discourje.core.logging :refer :all])
   (:import (java.util Date Calendar)))
@@ -26,18 +26,15 @@
         s-b1 (get-channel "seller" "buyer1" infra)
         s-b2 (get-channel "seller" "buyer2" infra)
         b2-s (get-channel "buyer2" "seller" infra)
-        title (<!! b1-s "title")]
-    (>!! s-b1 (msg "quote" (quote-book (get-content title))))
-    (let [choice-by-buyer2 (<!! b2-s ["ok" "quit"])]
+        title (<!!! b1-s "title")]
+    (>!!! [s-b1 s-b2] (msg "quote" (quote-book (get-content title))))
+    (let [choice-by-buyer2 (<!!! b2-s ["ok" "quit"])]
       (cond
         (= "ok" (get-label choice-by-buyer2))
-        (do (log-message (format "Order confirmed, will send to address: %s" (get-content choice-by-buyer2)))
-            (>!! s-b2 (msg "date" (get-random-date 5)))
-            (order-book infra)
-            ;(when (<!! b2-s "repeat")
-             ; (do (>!! s-b1 (msg "repeat" "repeat now"))
-              ;    (order-book infra)))
-               )
+        (do
+          (println (format "Order confirmed, will send to address: %s" (get-content (<!!! b2-s "address"))))
+          (>!!! s-b2 (msg "date" (get-random-date 5)))
+          (order-book infra))
         (= "quit" (get-label choice-by-buyer2))
         (end-reached "Quit!")))))
 

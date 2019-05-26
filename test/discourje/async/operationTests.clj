@@ -42,11 +42,25 @@
         ba (get-channel "B" "A" channels)]
     (do
       (>!! ab "Hello B")
-      (let [a->b (<!! ab java.lang.String)]
+      (let [a->b (<!! ab java.lang.String )]
         (is (= java.lang.String (get-label a->b)))
         (is (= "Hello B" (get-content a->b))))
       (>!! ba "Hello A")
       (let [b->a (<!! ba java.lang.String)]
+        (is (= java.lang.String (get-label b->a)))
+        (is (= "Hello A" (get-content b->a)))))))
+
+(deftest send-receive-wildcard-dual-test
+  (let [channels (generate-infrastructure (test-typed-DualProtocol))
+        ab (get-channel "A" "B" channels)
+        ba (get-channel "B" "A" channels)]
+    (do
+      (>!! ab "Hello B")
+      (let [a->b (<!! ab)]
+        (is (= java.lang.String (get-label a->b)))
+        (is (= "Hello B" (get-content a->b))))
+      (>!! ba "Hello A")
+      (let [b->a (<!! ba)]
         (is (= java.lang.String (get-label b->a)))
         (is (= "Hello A" (get-content b->a)))))))
 
@@ -78,17 +92,33 @@
               (is (= "4" (get-label c->b)))
               (is (= "C->A-B" (get-content c->b))))))))))
 
-;(deftest send-receive-quad-protocol-test
-;  (let [channels (generate-infrastructure (testQuadProtocol))
-;        mainA (get-channel "main" "A" channels)
-;        mainB (get-channel "main" "B" channels)
-;        mainC (get-channel "main" "C" channels)
-;        ab (get-channel "A" "B" channels)
-;        ba (get-channel "B" "A" channels)
-;        ac (get-channel "A" "C" channels)
-;        ca (get-channel "C" "A" channels)
-;        cb (get-channel "C" "B" channels)
-;        ]))
+(deftest send-receive-parallel-wildcard-only-protocol-test
+  (let [channels (generate-infrastructure (testParallelProtocol))
+        ab (get-channel "A" "B" channels)
+        ba (get-channel "B" "A" channels)
+        ac (get-channel "A" "C" channels)
+        ca (get-channel "C" "A" channels)
+        cb (get-channel "C" "B" channels)]
+    (do
+      (>!! ab (->message "1" "A->B"))
+      (let [a->b (<!! ab)]
+        (is (= "1" (get-label a->b)))
+        (is (= "A->B" (get-content a->b)))
+        (>!! ba (->message "2" "B->A"))
+        (let [b->a (<!! ba)]
+          (is (= "2" (get-label b->a)))
+          (is (= "B->A" (get-content b->a)))
+          (>!! ac (->message "3" "A->C"))
+          (let [a->c (<!! ac)]
+            (is (= "3" (get-label a->c)))
+            (is (= "A->C" (get-content a->c)))
+            (>!! [ca cb] (->message "4" "C->A-B"))
+            (let [c->a (<!! ca)
+                  c->b (<!! cb)]
+              (is (= "4" (get-label c->a)))
+              (is (= "C->A-B" (get-content c->a)))
+              (is (= "4" (get-label c->b)))
+              (is (= "C->A-B" (get-content c->b))))))))))
 
 (deftest send-receive-single-parallel-test
   (let [channels (generate-infrastructure (testSingleParallelProtocol))
@@ -293,9 +323,48 @@
             (is (= "end" (get-label a->b-end)))
             (is (= "ending" (get-content a->b-end)))
             (is (= "end" (get-label a->c-end)))
-            (is (= "ending" (get-content a->c-end)))
-            )
-          ))))
+            (is (= "ending" (get-content a->c-end))))))))
+
+(deftest send-receive-single-recur-wildcard-only-protocol
+  (let [channels (generate-infrastructure (single-recur-protocol))
+        ab (get-channel "A" "B" channels)
+        ba (get-channel "B" "A" channels)
+        ac (get-channel "A" "C" channels)
+        ca (get-channel "C" "A" channels)
+        flag (atom false)]
+    (do (>!! ab (->message "1" "AB"))
+        (let [a->b (<!! ab)]
+          (is (= "1" (get-label a->b)))
+          (is (= "AB" (get-content a->b)))
+          (while (false? @flag)
+            (>!! ba (->message "1" "AB"))
+            (let [b->a (<!! ba)]
+              (is (= "1" (get-label b->a)))
+              (is (= "AB" (get-content b->a)))
+              (if (== 1 (+ 1 (rand-int 2)))
+                (do
+                  (>!! ac (->message "2" "AC"))
+                  (let [a->c (<!! ac)]
+                    (is (= "2" (get-label a->c)))
+                    (is (= "AC" (get-content a->c)))
+                    (>!! ca (->message "2" "AC"))
+                    (let [c->a (<!! ca)]
+                      (is (= "2" (get-label c->a)))
+                      (is (= "AC" (get-content c->a))))))
+                (do
+                  (>!! ab (->message "3" "AB3"))
+                  (let [a->b3 (<!! ab)]
+                    (is (= "3" (get-label a->b3)))
+                    (is (= "AB3" (get-content a->b3)))
+                    (reset! flag true))))))
+          (>!! [ab ac] (->message "end" "ending"))
+          (let [a->b-end (<!! ab)
+                a->c-end (<!! ac)
+                ]
+            (is (= "end" (get-label a->b-end)))
+            (is (= "ending" (get-content a->b-end)))
+            (is (= "end" (get-label a->c-end)))
+            (is (= "ending" (get-content a->c-end))))))))
 
 (deftest send-receive-one-recur-with-choice-protocol
   (let [channels (generate-infrastructure (one-recur-with-choice-protocol))
