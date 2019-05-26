@@ -18,12 +18,12 @@
   (let [b1-s (get-channel "buyer1" "seller" infra)
         s-b1 (get-channel "seller" "buyer1" infra)
         b1-b2 (get-channel "buyer1" "buyer2" infra)]
-    (>!!! b1-s (msg "title" (generate-book)))
-    (let [quote (<!!!! s-b1 "quote")
+    (>!! b1-s (msg "title" (generate-book)))
+    (let [quote (<!!! s-b1 "quote")
           div (quote-div (get-content quote))]
       (do
-        (>!!! b1-b2 (msg "quote-div" div))
-        (when (<!!!! s-b1 "date")
+        (>!! b1-b2 (msg "quote-div" div))
+        (when (<!!! s-b1 "date")
           (order-book infra))))))
 
 ;send title to seller
