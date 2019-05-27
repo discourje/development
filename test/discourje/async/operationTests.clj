@@ -42,7 +42,7 @@
         ba (get-channel "B" "A" channels)]
     (do
       (>!! ab "Hello B")
-      (let [a->b (<!! ab java.lang.String )]
+      (let [a->b (<!! ab java.lang.String)]
         (is (= java.lang.String (get-label a->b)))
         (is (= "Hello B" (get-content a->b))))
       (>!! ba "Hello A")
@@ -55,6 +55,7 @@
         ab (get-channel "A" "B" channels)
         ba (get-channel "B" "A" channels)]
     (do
+      (enable-wildcard)
       (>!! ab "Hello B")
       (let [a->b (<!! ab)]
         (is (= java.lang.String (get-label a->b)))
@@ -62,7 +63,8 @@
       (>!! ba "Hello A")
       (let [b->a (<!! ba)]
         (is (= java.lang.String (get-label b->a)))
-        (is (= "Hello A" (get-content b->a)))))))
+        (is (= "Hello A" (get-content b->a)))
+        ))))
 
 (deftest send-receive-parallel-protocol-test
   (let [channels (generate-infrastructure (testParallelProtocol))
@@ -100,6 +102,7 @@
         ca (get-channel "C" "A" channels)
         cb (get-channel "C" "B" channels)]
     (do
+      (enable-wildcard)
       (>!! ab (->message "1" "A->B"))
       (let [a->b (<!! ab)]
         (is (= "1" (get-label a->b)))
@@ -196,8 +199,7 @@
       (do (>!! ab (->message "4" "AB"))
           (let [a->b (<!! ab "4")]
             (is (= "4" (get-label a->b)))
-            (is (= "AB" (get-content a->b)))))
-      )))
+            (is (= "AB" (get-content a->b))))))))
 
 
 (deftest send-receive-single-choice-in-middle-always0-choice-protocol
@@ -332,7 +334,9 @@
         ac (get-channel "A" "C" channels)
         ca (get-channel "C" "A" channels)
         flag (atom false)]
-    (do (>!! ab (->message "1" "AB"))
+    (do
+      (enable-wildcard)
+      (>!! ab (->message "1" "AB"))
         (let [a->b (<!! ab)]
           (is (= "1" (get-label a->b)))
           (is (= "AB" (get-content a->b)))
@@ -533,5 +537,5 @@
         c (clojure.core.async/thread (fnC))
         ]
     (clojure.core.async/thread (fnB))
-    (is (= "hi too" (async/<!! a)))
+    (is (= "hi too"  (async/<!! a)))
     (is (= "Hi") (get-content (async/<!! c)))))
