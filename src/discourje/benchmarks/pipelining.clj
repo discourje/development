@@ -26,7 +26,7 @@
     (time
       (loop [pipe 0]
         (do
-          (>!!! (nth channels pipe) msg)
+          (>!! (nth channels pipe) msg)
           (<!!! (nth channels pipe) 1)
           (when (true? (< pipe (- amount 1)))
             (recur (+ 1 pipe))))))))

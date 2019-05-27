@@ -38,17 +38,17 @@
         (doseq [w w->m]
           (thread
             (do
-              (<!!!! (:take w) 1)
+              (<!!! (:take w) 1)
               (loop []
                 (let [result
                       (try+ (do
-                              (>!!! (:put w) msg)
+                              (>!! (:put w) msg)
                               true)
                             (catch [:type :incorrect-communication] {}
                               false))]
                   (when (false? result)
                     (recur)))))))
-        (>!!! m->w msg)
+        (>!! m->w msg)
         (loop [worker-id 0]
           (let [result (try+ (do
                                (<!!! (:put (nth w->m worker-id)) 1)
