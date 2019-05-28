@@ -28,7 +28,8 @@
       "monitoring"
       "interactionLinking"
       "buffers"
-      "wildcard")
+      "wildcard"
+      "referencedInteractionLinking")
 
 (defn make-interaction [action sender receiver]
   "Creates an interaction object specifying sending action from sender to receiver."
