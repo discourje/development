@@ -91,18 +91,21 @@
 (defn- allow-send
   "Allow send message in channel"
   [channel message]
-  (async/>!! (get-chan channel) message))
+  (async/>!! (get-chan channel) message)
+  true)
 
 (defn- allow-receive
   "Allow a receive on the channel"
   [channel]
   (log-message "allowing receive on channel!")
-  (async/<!! (get-chan channel)))
+  (async/<!! (get-chan channel))
+  true)
 
 (defn- allow-sends
   "Allow sending message on multiple channels"
   [channels message]
-  (doseq [c channels] (allow-send c message)))
+  (doseq [c channels] (allow-send c message))
+  true)
 
 (defn all-valid-channels?
   "Do all channels comply with the monitor"
