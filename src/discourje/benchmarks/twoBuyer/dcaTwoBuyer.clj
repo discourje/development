@@ -7,10 +7,10 @@
   [b1-s s-b1 b1-b2 title quote-div can-order?]
   (loop [it 0]
     (do
-      (>!!! b1-s title)
-      (<!!!! s-b1 "quote")
-      (>!!! b1-b2 quote-div)
-      (<!!!! s-b1 "date")
+      (>!! b1-s title)
+      (<!!! s-b1 "quote")
+      (>!! b1-b2 quote-div)
+      (<!!! s-b1 "date")
       (if (false? @can-order?)
         (println (+ 1 it))
         (recur (+ it 1))))))
@@ -18,21 +18,21 @@
 (defn buyer2 "Order a book from buyer2's perspective"
   [s-b2 b1-b2 b2-s ok address can-order?]
   (loop []
-    (do (<!!!! s-b2 "quote")
-        (<!!!! b1-b2 "quote-div")
-        (>!!! b2-s ok)
-        (>!!! b2-s address)
+    (do (<!!! s-b2 "quote")
+        (<!!! b1-b2 "quote-div")
+        (>!! b2-s ok)
+        (>!! b2-s address)
         (<!!! s-b2 "date")
         (when (true? @can-order?) (recur)))))
 
 (defn seller "Order book from seller's perspective"
   [b1-s s-b1 s-b2 b2-s quote date can-order?]
   (loop []
-    (do (<!!!! b1-s "title")
-        (>!!! [s-b1 s-b2] quote)
-        (<!!!! b2-s "ok")
-        (<!!!! b2-s "address")
-        (>!!! [s-b2 s-b1] date)
+    (do (<!!! b1-s "title")
+        (>!! [s-b1 s-b2] quote)
+        (<!!! b2-s "ok")
+        (<!!! b2-s "address")
+        (>!! [s-b2 s-b1] date)
         (when (true? @can-order?) (recur)))))
 
 (def two-buyer-protocol
