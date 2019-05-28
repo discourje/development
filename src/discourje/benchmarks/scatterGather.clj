@@ -50,11 +50,13 @@
                     (recur)))))))
         (>!! m->w msg)
         (loop [worker-id 0]
-          (let [result (try+ (do
-                               (<!!! (:put (nth w->m worker-id)) 1)
+          (let [result ;(try+
+                         (do
+                               (<!! (:put (nth w->m worker-id)) 1)
                                (+ worker-id 1))
-                             (catch [:type :incorrect-communication] {}
-                               worker-id))]
+                             ;(catch [:type :incorrect-communication] {}
+                              ; worker-id))
+                ]
             (when (true? (< result workers))
               (recur result))))))
     (doseq [mw m->w] (clojure.core.async/close! (get-chan mw)))
@@ -74,18 +76,21 @@
   "Scatter gather generator for Clojure:
    Will start all workers on separate threads and the master on the main thread in order to make the timing correct."
   [workers]
-  (let [m (clojure.core.async/chan 1)
-        workers (vec (for [w (range workers)] (clojure.core.async/chan 1)))]
+  (let [master-to-workers (vec (for [_ (range workers)] (clojure.core.async/chan 1)))
+        workers-to-master (vec (for [_ (range workers)] (clojure.core.async/chan 1)))]
     (time
       (do
-        (doseq [w workers]
+        (doseq [worker-id (range workers)]
           (thread (do
-                    (clojure.core.async/<!! w)
-                    (clojure.core.async/>!! m 1))))
-        (doseq [w workers]
-          (do
-            (clojure.core.async/>!! w 1)
-            (clojure.core.async/<!! m)))))))
+                    (clojure.core.async/<!! (nth workers-to-master worker-id))
+                    (clojure.core.async/>!! (nth master-to-workers worker-id) 1))))
+        (doseq [w workers-to-master] (clojure.core.async/>!! w 1))
+        (loop [worker-id 0]
+            (clojure.core.async/<!! (nth master-to-workers worker-id))
+          (when (true? (< worker-id (- workers 1)))
+            (recur (+ 1 worker-id))))))
+    (doseq [chan (range workers)] (clojure.core.async/close! (nth master-to-workers chan))
+                                  (clojure.core.async/close! (nth workers-to-master chan)))))
 
 (clojure-make-work 2)
 (clojure-make-work 4)
@@ -94,4 +99,4 @@
 (clojure-make-work 32)
 (clojure-make-work 64)
 (clojure-make-work 128)
-(clojure-make-work 265)
+(clojure-make-work 256)

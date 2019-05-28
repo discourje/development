@@ -145,7 +145,7 @@
   ([channel]
    (<!! channel nil))
   ([channel label]
-   (if (false? (get-wildcard))
+   (if (and (nil? label) (false? (get-wildcard)))
      (log-error :wildcard-exception "Taking from a channel without specifying a label is not allowed while wildcards are disabled!")
      (do (loop []
            (when (false? (something-in-buffer? (get-chan channel))) (recur)))
@@ -163,7 +163,7 @@
   ([channel]
    (<!!! channel nil))
   ([channel label]
-   (if (false? (get-wildcard))
+   (if (and (nil? label) (false? (get-wildcard)))
      (log-error :wildcard-exception "Taking from a channel without specifying a label is not allowed while wildcards are disabled!")
      (do (loop []
            (when (false? (something-in-buffer? (get-chan channel))) (recur)))

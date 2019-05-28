@@ -30,6 +30,7 @@
           (<!!! (nth channels pipe) 1)
           (when (true? (< pipe (- amount 1)))
             (recur (+ 1 pipe))))))))
+(disable-wildcard)
 (set-logging-exceptions)
 (discourje-pipeline 2)
 (discourje-pipeline 4)
