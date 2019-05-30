@@ -50,12 +50,9 @@
                     (recur)))))))
         (>!! m->w msg)
         (loop [worker-id 0]
-          (let [result ;(try+
-                         (do
-                               (<!! (:put (nth w->m worker-id)) 1)
-                               (+ worker-id 1))
-                             ;(catch [:type :incorrect-communication] {}
-                              ; worker-id))
+          (let [result (do
+                         (<!! (:put (nth w->m worker-id)) 1)
+                         (+ worker-id 1))
                 ]
             (when (true? (< result workers))
               (recur result))))))
@@ -86,7 +83,7 @@
                     (clojure.core.async/>!! (nth master-to-workers worker-id) 1))))
         (doseq [w workers-to-master] (clojure.core.async/>!! w 1))
         (loop [worker-id 0]
-            (clojure.core.async/<!! (nth master-to-workers worker-id))
+          (clojure.core.async/<!! (nth master-to-workers worker-id))
           (when (true? (< worker-id (- workers 1)))
             (recur (+ 1 worker-id))))))
     (doseq [chan (range workers)] (clojure.core.async/close! (nth master-to-workers chan))
