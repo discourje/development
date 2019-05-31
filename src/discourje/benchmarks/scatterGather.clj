@@ -72,6 +72,67 @@
 (discourje-make-work 128)
 (discourje-make-work 256)
 
+(defn discourje-make-work-no-throws
+  "Scatter gather protocol generator for Discourje:
+  Will start all workers on separate threads and the master on the main thread in order to make the timing correct.
+
+  Generates protocol in line of:
+
+  worker-prot
+    (mep
+      (-->> 1 master [worker0 worker1 .. workerN])
+      (-->> 1 worker0 master)
+      (-->> 1 worker1 master)
+      (-->> 1 ....... master)
+      (-->> 1 workerN master))
+
+      Starts all participants on separate threads and sends the (msg 1 1) message to all workers and back.
+  "
+  [workers]
+  (let [workers-prot (create-protocol
+                       (vec
+                         (flatten
+                           (flatten
+                             (conj
+                               [(-->> 1 "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
+                               (vec (for [w (range workers)] (-->> 1 (format "w%s" w) "m")))))))) ; workers to master
+        infra (generate-infrastructure workers-prot)
+        m->w (vec (for [w (range workers)] (get-channel "m" (format "w%s" w) infra)))
+        w->m (vec (for [w (range workers)] {:take (get-channel "m" (format "w%s" w) infra)
+                                            :put  (get-channel (format "w%s" w) "m" infra)}))
+        msg (msg 1 1)]
+    (time
+      (do
+        (doseq [w w->m]
+          (thread
+            (do
+              (<!!! (:take w) 1)
+              (loop []
+                  (when (nil? (>!! (:put w) msg))
+                    (recur))))))
+        (>!! m->w msg)
+        (loop [worker-id 0]
+          (let [result
+                (do
+                  (<!! (:put (nth w->m worker-id)) 1)
+                  (+ worker-id 1))
+                ]
+            (when (true? (< result workers))
+              (recur result))))))
+    (doseq [mw m->w] (clojure.core.async/close! (get-chan mw)))
+    (doseq [wm w->m] (do (clojure.core.async/close! (get-chan (:take wm)))
+                         (clojure.core.async/close! (get-chan (:put wm)))))))
+(set-logging-exceptions)
+(discourje-make-work-no-throws 2)
+(discourje-make-work-no-throws 4)
+(discourje-make-work-no-throws 8)
+(discourje-make-work-no-throws 16)
+(discourje-make-work-no-throws 32)
+(discourje-make-work-no-throws 64)
+(discourje-make-work-no-throws 128)
+(discourje-make-work-no-throws 256)
+
+
 (defn clojure-make-work
   "Scatter gather generator for Clojure:
    Will start all workers on separate threads and the master on the main thread in order to make the timing correct."

@@ -4,7 +4,6 @@
            [criterium.core :refer :all])
   (:use [slingshot.slingshot :only [throw+ try+]]))
 
-
 (defn discourje-pipeline
   "Pipe-lining protocol generator for Discourje:
   Will start all logic on the main thread
