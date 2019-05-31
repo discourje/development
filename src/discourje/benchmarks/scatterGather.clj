@@ -77,14 +77,15 @@
    Will start all workers on separate threads and the master on the main thread in order to make the timing correct."
   [workers]
   (let [master-to-workers (vec (for [_ (range workers)] (clojure.core.async/chan 1)))
-        workers-to-master (vec (for [_ (range workers)] (clojure.core.async/chan 1)))]
+        workers-to-master (vec (for [_ (range workers)] (clojure.core.async/chan 1)))
+        msg (msg 1 1)]
     (time
       (do
         (doseq [worker-id (range workers)]
           (thread (do
                     (clojure.core.async/<!! (nth workers-to-master worker-id))
-                    (clojure.core.async/>!! (nth master-to-workers worker-id) 1))))
-        (doseq [w workers-to-master] (clojure.core.async/>!! w 1))
+                    (clojure.core.async/>!! (nth master-to-workers worker-id) msg))))
+        (doseq [w workers-to-master] (clojure.core.async/>!! w msg))
         (loop [worker-id 0]
             (clojure.core.async/<!! (nth master-to-workers worker-id))
           (when (true? (< worker-id (- workers 1)))
