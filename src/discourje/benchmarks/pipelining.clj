@@ -2,7 +2,9 @@
   (require [discourje.core.async :refer :all]
            [discourje.core.logging :refer :all]
            [criterium.core :refer :all])
-  (:use [slingshot.slingshot :only [throw+ try+]]))
+  ;(:use [discourje.core.async :only [create-protocol generate-infrastructure mep -->> choice >!! <!! <!!! get-label get-content add-infrastructure get-channel msg get-chan]])
+  )
+
 
 
 (defn discourje-pipeline
@@ -31,30 +33,32 @@
            (when (true? (< pipe (- amount 1)))
              (recur (+ 1 pipe))))))))
   ([amount iterations]
-   (let [protocol (create-protocol (vec (for [p (range amount)] (-->> 1 p (+ p 1)))))
-         infras (vec (for [_ (range iterations)] (generate-infrastructure protocol)))
-         channels (vec (for [i infras] (vec (for [p (range amount)] (get-channel p (+ p 1) i)))))
-         msg (msg 1 1)]
-     (time
-       (doseq [chans channels]
-         (loop [pipe 0]
-           (do
-             (>!! (nth chans pipe) msg)
-             (<!!! (nth chans pipe) 1)
-             (when (true? (< pipe (- amount 1)))
-               (recur (+ 1 pipe)))))))
-     (doseq [i (range iterations)] (doseq [a (range amount)] (clojure.core.async/close! (get-chan (nth (nth channels i) a))))))))
+   (if (<= iterations 1)
+     (discourje-pipeline amount)
+     (let [protocol (create-protocol (vec (for [p (range amount)] (-->> 1 p (+ p 1)))))
+           infras (vec (for [_ (range iterations)] (generate-infrastructure protocol)))
+           channels (vec (for [i infras] (vec (for [p (range amount)] (get-channel p (+ p 1) i)))))
+           msg (msg 1 1)]
+       (time
+         (doseq [chans channels]
+           (loop [pipe 0]
+             (do
+               (>!! (nth chans pipe) msg)
+               (<!!! (nth chans pipe) 1)
+               (when (true? (< pipe (- amount 1)))
+                 (recur (+ 1 pipe)))))))
+       (doseq [i (range iterations)] (doseq [a (range amount)] (clojure.core.async/close! (get-chan (nth (nth channels i) a)))))))))
 
-(set-logging-exceptions)
-(discourje-pipeline 2)
-(discourje-pipeline 2)
-(discourje-pipeline 4)
-(discourje-pipeline 8)
-(discourje-pipeline 16)
-(discourje-pipeline 32)
-(discourje-pipeline 64)
-(discourje-pipeline 128)
-(discourje-pipeline 256)
+;(set-logging-exceptions)
+;(discourje-pipeline 2)
+;(discourje-pipeline 2)
+;(discourje-pipeline 4)
+;(discourje-pipeline 8)
+;(discourje-pipeline 16)
+;(discourje-pipeline 32)
+;(discourje-pipeline 64)
+;(discourje-pipeline 128)
+;(discourje-pipeline 256)
 
 (defn clojure-pipeline
   ([amount]
@@ -68,22 +72,24 @@
            (when (true? (< pipe (- amount 1)))
              (recur (+ 1 pipe))))))))
   ([amount iterations]
-   (let [channels (vec (for [_ (range iterations)] (vec (for [_ (range amount)] (clojure.core.async/chan 1)))))
-         msg (msg 1 1)]
-     (time
-       (doseq [chans channels]
-         (loop [pipe 0]
-           (do
-             (clojure.core.async/>!! (nth chans pipe) msg)
-             (clojure.core.async/<!! (nth chans pipe))
-             (when (true? (< pipe (- amount 1)))
-               (recur (+ 1 pipe))))))))))
+   (if (<= iterations 1)
+     (clojure-pipeline amount)
+     (let [channels (vec (for [_ (range iterations)] (vec (for [_ (range amount)] (clojure.core.async/chan 1)))))
+           msg (msg 1 1)]
+       (time
+         (doseq [chans channels]
+           (loop [pipe 0]
+             (do
+               (clojure.core.async/>!! (nth chans pipe) msg)
+               (clojure.core.async/<!! (nth chans pipe))
+               (when (true? (< pipe (- amount 1)))
+                 (recur (+ 1 pipe)))))))))))
 
-(clojure-pipeline 2)
-(clojure-pipeline 4)
-(clojure-pipeline 8)
-(clojure-pipeline 16)
-(clojure-pipeline 32)
-(clojure-pipeline 64)
-(clojure-pipeline 128)
-(clojure-pipeline 256)
+;(clojure-pipeline 2)
+;(clojure-pipeline 4)
+;(clojure-pipeline 8)
+;(clojure-pipeline 16)
+;(clojure-pipeline 32)
+;(clojure-pipeline 64)
+;(clojure-pipeline 128)
+;(clojure-pipeline 256)

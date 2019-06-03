@@ -5,6 +5,9 @@
             [clojure.core.async.impl.protocols :as bufs])
   (:import (clojure.lang Seqable)))
 
+;(defn -main [& args]
+;  (println "Test!"))
+
 (defprotocol sendable
   (get-label [this])
   (get-content [this]))

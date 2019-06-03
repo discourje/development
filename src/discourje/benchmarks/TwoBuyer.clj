@@ -1,7 +1,7 @@
 (ns discourje.benchmarks.TwoBuyer
   (:require [discourje.core.async :refer :all]
-            [discourje.core.logging :refer :all])
-  (:use [slingshot.slingshot :only [throw+ try+]]))
+            [discourje.core.logging :refer :all]))
+  ;(:use [discourje.core.async :only [create-protocol thread generate-infrastructure mep -->> choice >!! <!! <!!! get-label get-content add-infrastructure get-channel msg get-chan]]))
 
 (def two-buyer-protocol
   (mep
@@ -14,14 +14,14 @@
        (-->> "date" "seller" "buyer2")]
       [(-->> "quit" "buyer2" "seller")])))
 
-(defn discourje-buyer1 "order a book from buyer1's perspective"
+(defn- discourje-buyer1 "order a book from buyer1's perspective"
   [b1-s s-b1 b1-b2 title div]
   (do
     (>!! b1-s title)
     (<!!! s-b1 "quote")
     (>!! b1-b2 div)))
 
-(defn discourje-buyer2 "Order a book from buyer2's perspective"
+(defn- discourje-buyer2 "Order a book from buyer2's perspective"
   [s-b2 b1-b2 b2-s ok address]
   (do
     (<!!! s-b2 "quote")
@@ -30,7 +30,7 @@
     (>!! b2-s address)
     (<!!! s-b2 "date")))
 
-(defn discourje-seller "Order book from seller's perspective"
+(defn- discourje-seller "Order book from seller's perspective"
   [b1-s s-b1 s-b2 b2-s quote date]
   (do
     (<!! b1-s "title")
@@ -65,25 +65,25 @@
           (discourje-buyer2 (nth s-b2 i) (nth b1-b2 i) (nth b2-s i) ok address)))) ;[s-b2 b1-b2 b2-s ok address]
     (doseq [i infra] (doseq [c i] (clojure.core.async/close! (get-chan c))))))
 
-(set-logging-exceptions)
-(discourje-two-buyer 1)
-(discourje-two-buyer 2)
-(discourje-two-buyer 4)
-(discourje-two-buyer 8)
-(discourje-two-buyer 16)
-(discourje-two-buyer 32)
-(discourje-two-buyer 64)
-(discourje-two-buyer 128)
-(discourje-two-buyer 256)
+;(set-logging-exceptions)
+;(discourje-two-buyer 1)
+;(discourje-two-buyer 2)
+;(discourje-two-buyer 4)
+;(discourje-two-buyer 8)
+;(discourje-two-buyer 16)
+;(discourje-two-buyer 32)
+;(discourje-two-buyer 64)
+;(discourje-two-buyer 128)
+;(discourje-two-buyer 256)
 
-(defn clojure-buyer1 "order a book from buyer1's perspective"
+(defn- clojure-buyer1 "order a book from buyer1's perspective"
   [b1-s s-b1 b1-b2 title div]
   (do
     (clojure.core.async/>!! b1-s title)
     (clojure.core.async/<!! s-b1)
     (clojure.core.async/>!! b1-b2 div)))
 
-(defn clojure-buyer2 "Order a book from buyer2's perspective"
+(defn- clojure-buyer2 "Order a book from buyer2's perspective"
   [s-b2 b1-b2 b2-s ok address]
   (do
     (clojure.core.async/<!! s-b2)
@@ -92,7 +92,7 @@
     (clojure.core.async/>!! b2-s address)
     (clojure.core.async/<!! s-b2)))
 
-(defn clojure-seller "Order book from seller's perspective"
+(defn- clojure-seller "Order book from seller's perspective"
   [b1-s s-b1 s-b2 b2-s quote date]
   (do
     (clojure.core.async/<!! b1-s)
@@ -131,12 +131,12 @@
       (clojure.core.async/close! (nth b1-b2 i))
       (clojure.core.async/close! (nth s-b2 i))
       (clojure.core.async/close! (nth b2-s i)))))
-(clojure-two-buyer 1)
-(clojure-two-buyer 2)
-(clojure-two-buyer 4)
-(clojure-two-buyer 8)
-(clojure-two-buyer 16)
-(clojure-two-buyer 32)
-(clojure-two-buyer 64)
-(clojure-two-buyer 128)
-(clojure-two-buyer 256)
+;(clojure-two-buyer 1)
+;(clojure-two-buyer 2)
+;(clojure-two-buyer 4)
+;(clojure-two-buyer 8)
+;(clojure-two-buyer 16)
+;(clojure-two-buyer 32)
+;(clojure-two-buyer 64)
+;(clojure-two-buyer 128)
+;(clojure-two-buyer 256)

@@ -22,7 +22,7 @@
         title-delivered? (atom false)
         quote-div-delivered? (atom false)]
     (while (false? @title-delivered?)
-      (try+ (>!!! b1-s (msg "title" (generate-book)))
+      (try+ (>!! b1-s (msg "title" (generate-book)))
             (reset! title-delivered? true)
             (catch [:type :incorrect-communication] {}
               (println "title not delivered, retrying in 1 second!")
@@ -34,7 +34,7 @@
         (while (false? @quote-div-delivered?)
           (try+
             (println "sending quotediv")
-            (>!!! b1-b2 (msg "quote-div" div))
+            (>!! b1-b2 (msg "quote-div" div))
             (reset! quote-div-delivered? true)
             (catch [:type :incorrect-communication] {}
               (println "quote-div not delivered, retrying in 1 second!")

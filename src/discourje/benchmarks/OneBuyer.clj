@@ -1,7 +1,7 @@
 (ns discourje.benchmarks.OneBuyer
   (:require [discourje.core.async :refer :all]
-            [discourje.core.logging :refer :all])
-  (:use [slingshot.slingshot :only [throw+ try+]]))
+            [discourje.core.logging :refer :all]))
+  ;(:use [discourje.core.async :only [mep -->> choice >!! <!! <!!! get-label get-content add-infrastructure get-channel msg get-chan]]))
 
 (def buy-goods
   (mep
@@ -12,7 +12,7 @@
        (-->> "order-ack" "seller" "buyer")]
       [(-->> "out-of-stock" "seller" "buyer")])))
 
-(defn discourje-buyer
+(defn- discourje-buyer
   "Logic representing Buyer"
   [b->s s->b quote-request order]
   (>!! b->s quote-request)
@@ -21,7 +21,7 @@
         (<!! s->b "order-ack"))
     "Book is out of stock!"))
 
-(defn discourje-seller
+(defn- discourje-seller
   "Logic representing the Seller"
   [b->s s->b in-stock? quote order-ack out-of-stock]
   (if (== 1 (in-stock? (get-content (<!! b->s "quote-request"))))
@@ -50,18 +50,18 @@
     (doseq [i (range iterations)]
       (clojure.core.async/close! (get-chan (nth b->s i)))
       (clojure.core.async/close! (get-chan (nth s->b i))))))
-(set-logging-exceptions)
-(discourje-one-buyer 1)
-(discourje-one-buyer 2)
-(discourje-one-buyer 4)
-(discourje-one-buyer 8)
-(discourje-one-buyer 16)
-(discourje-one-buyer 32)
-(discourje-one-buyer 64)
-(discourje-one-buyer 128)
-(discourje-one-buyer 256)
+;(set-logging-exceptions)
+;(discourje-one-buyer 1)
+;(discourje-one-buyer 2)
+;(discourje-one-buyer 4)
+;(discourje-one-buyer 8)
+;(discourje-one-buyer 16)
+;(discourje-one-buyer 32)
+;(discourje-one-buyer 64)
+;(discourje-one-buyer 128)
+;(discourje-one-buyer 256)
 
-(defn clojure-buyer
+(defn- clojure-buyer
   "Logic representing Buyer"
   [b->s s->b quote-request order]
   (do (clojure.core.async/>!! b->s quote-request)
@@ -70,7 +70,7 @@
             (clojure.core.async/<!! s->b))
         "Book is out of stock!")))
 
-(defn clojure-seller
+(defn- clojure-seller
   "Logic representing the Seller"
   [b->s s->b in-stock? quote order-ack out-of-stock]
   (if (== 1 (in-stock? (clojure.core.async/<!! b->s)))
@@ -98,12 +98,12 @@
     (doseq [i (range iterations)] (clojure.core.async/close! (nth b->s i))
                           (clojure.core.async/close! (nth s->b i)))))
 
-(clojure-one-buyer 1)
-(clojure-one-buyer 2)
-(clojure-one-buyer 4)
-(clojure-one-buyer 8)
-(clojure-one-buyer 16)
-(clojure-one-buyer 32)
-(clojure-one-buyer 64)
-(clojure-one-buyer 128)
-(clojure-one-buyer 256)
+;(clojure-one-buyer 1)
+;(clojure-one-buyer 2)
+;(clojure-one-buyer 4)
+;(clojure-one-buyer 8)
+;(clojure-one-buyer 16)
+;(clojure-one-buyer 32)
+;(clojure-one-buyer 64)
+;(clojure-one-buyer 128)
+;(clojure-one-buyer 256)

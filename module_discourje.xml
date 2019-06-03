@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_discourje" default="compile.module.discourje">
+  <dirname property="module.discourje.basedir" file="${ant.file.module_discourje}"/>
+  
+  <property name="module.jdk.home.discourje" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.discourje" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.discourje" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.discourje" value="-encoding UTF-8 -source 12 -target 12 ${compiler.args}"/>
+  
+  <property name="discourje.output.dir" value="${module.discourje.basedir}/target/classes"/>
+  <property name="discourje.testoutput.dir" value="${module.discourje.basedir}/target/classes"/>
+  
+  <path id="discourje.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="discourje.module.production.classpath">
+    <path refid="${module.jdk.classpath.discourje}"/>
+    <path refid="library.leiningen:_clojure-complete:0.2.5.classpath"/>
+    <path refid="library.leiningen:_criterium:0.4.5.classpath"/>
+    <path refid="library.leiningen:_danlentz/clj-uuid:0.1.7.classpath"/>
+    <path refid="library.leiningen:_nrepl:0.6.0.classpath"/>
+    <path refid="library.leiningen:_org.clojure/clojure:1.8.0.classpath"/>
+    <path refid="library.leiningen:_org.clojure/core.async:0.4.474.classpath"/>
+    <path refid="library.leiningen:_org.clojure/core.cache:0.6.5.classpath"/>
+    <path refid="library.leiningen:_org.clojure/core.memoize:0.5.9.classpath"/>
+    <path refid="library.leiningen:_org.clojure/data.priority-map:0.0.7.classpath"/>
+    <path refid="library.leiningen:_org.clojure/test.check:0.9.0.classpath"/>
+    <path refid="library.leiningen:_org.clojure/tools.analyzer.jvm:0.7.0.classpath"/>
+    <path refid="library.leiningen:_org.clojure/tools.analyzer:0.6.9.classpath"/>
+    <path refid="library.leiningen:_org.clojure/tools.reader:1.0.0-beta4.classpath"/>
+    <path refid="library.leiningen:_org.ow2.asm/asm-all:4.2.classpath"/>
+    <path refid="library.leiningen:_primitive-math:0.1.4.classpath"/>
+    <path refid="library.leiningen:_slingshot:0.12.2.classpath"/>
+  </path>
+  
+  <path id="discourje.runtime.production.module.classpath">
+    <pathelement location="${discourje.output.dir}"/>
+    <path refid="library.leiningen:_clojure-complete:0.2.5.classpath"/>
+    <path refid="library.leiningen:_criterium:0.4.5.classpath"/>
+    <path refid="library.leiningen:_danlentz/clj-uuid:0.1.7.classpath"/>
+    <path refid="library.leiningen:_nrepl:0.6.0.classpath"/>
+    <path refid="library.leiningen:_org.clojure/clojure:1.8.0.classpath"/>
+    <path refid="library.leiningen:_org.clojure/core.async:0.4.474.classpath"/>
+    <path refid="library.leiningen:_org.clojure/core.cache:0.6.5.classpath"/>
+    <path refid="library.leiningen:_org.clojure/core.memoize:0.5.9.classpath"/>
+    <path refid="library.leiningen:_org.clojure/data.priority-map:0.0.7.classpath"/>
+    <path refid="library.leiningen:_org.clojure/test.check:0.9.0.classpath"/>
+    <path refid="library.leiningen:_org.clojure/tools.analyzer.jvm:0.7.0.classpath"/>
+    <path refid="library.leiningen:_org.clojure/tools.analyzer:0.6.9.classpath"/>
+    <path refid="library.leiningen:_org.clojure/tools.reader:1.0.0-beta4.classpath"/>
+    <path refid="library.leiningen:_org.ow2.asm/asm-all:4.2.classpath"/>
+    <path refid="library.leiningen:_primitive-math:0.1.4.classpath"/>
+    <path refid="library.leiningen:_slingshot:0.12.2.classpath"/>
+  </path>
+  
+  <path id="discourje.module.classpath">
+    <path refid="${module.jdk.classpath.discourje}"/>
+    <pathelement location="${discourje.output.dir}"/>
+    <path refid="library.leiningen:_clojure-complete:0.2.5.classpath"/>
+    <path refid="library.leiningen:_criterium:0.4.5.classpath"/>
+    <path refid="library.leiningen:_danlentz/clj-uuid:0.1.7.classpath"/>
+    <path refid="library.leiningen:_nrepl:0.6.0.classpath"/>
+    <path refid="library.leiningen:_org.clojure/clojure:1.8.0.classpath"/>
+    <path refid="library.leiningen:_org.clojure/core.async:0.4.474.classpath"/>
+    <path refid="library.leiningen:_org.clojure/core.cache:0.6.5.classpath"/>
+    <path refid="library.leiningen:_org.clojure/core.memoize:0.5.9.classpath"/>
+    <path refid="library.leiningen:_org.clojure/data.priority-map:0.0.7.classpath"/>
+    <path refid="library.leiningen:_org.clojure/test.check:0.9.0.classpath"/>
+    <path refid="library.leiningen:_org.clojure/tools.analyzer.jvm:0.7.0.classpath"/>
+    <path refid="library.leiningen:_org.clojure/tools.analyzer:0.6.9.classpath"/>
+    <path refid="library.leiningen:_org.clojure/tools.reader:1.0.0-beta4.classpath"/>
+    <path refid="library.leiningen:_org.ow2.asm/asm-all:4.2.classpath"/>
+    <path refid="library.leiningen:_primitive-math:0.1.4.classpath"/>
+    <path refid="library.leiningen:_slingshot:0.12.2.classpath"/>
+  </path>
+  
+  <path id="discourje.runtime.module.classpath">
+    <pathelement location="${discourje.output.dir}"/>
+    <path refid="library.leiningen:_clojure-complete:0.2.5.classpath"/>
+    <path refid="library.leiningen:_criterium:0.4.5.classpath"/>
+    <path refid="library.leiningen:_danlentz/clj-uuid:0.1.7.classpath"/>
+    <path refid="library.leiningen:_nrepl:0.6.0.classpath"/>
+    <path refid="library.leiningen:_org.clojure/clojure:1.8.0.classpath"/>
+    <path refid="library.leiningen:_org.clojure/core.async:0.4.474.classpath"/>
+    <path refid="library.leiningen:_org.clojure/core.cache:0.6.5.classpath"/>
+    <path refid="library.leiningen:_org.clojure/core.memoize:0.5.9.classpath"/>
+    <path refid="library.leiningen:_org.clojure/data.priority-map:0.0.7.classpath"/>
+    <path refid="library.leiningen:_org.clojure/test.check:0.9.0.classpath"/>
+    <path refid="library.leiningen:_org.clojure/tools.analyzer.jvm:0.7.0.classpath"/>
+    <path refid="library.leiningen:_org.clojure/tools.analyzer:0.6.9.classpath"/>
+    <path refid="library.leiningen:_org.clojure/tools.reader:1.0.0-beta4.classpath"/>
+    <path refid="library.leiningen:_org.ow2.asm/asm-all:4.2.classpath"/>
+    <path refid="library.leiningen:_primitive-math:0.1.4.classpath"/>
+    <path refid="library.leiningen:_slingshot:0.12.2.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.discourje">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.discourje">
+    <patternset refid="excluded.from.module.discourje"/>
+  </patternset>
+  
+  <path id="discourje.module.sourcepath">
+    <dirset dir="${module.discourje.basedir}">
+      <include name="src/discourje/demo/javaObjects"/>
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  <path id="discourje.module.test.sourcepath">
+    <dirset dir="${module.discourje.basedir}">
+      <include name="test"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.discourje" depends="compile.module.discourje.production,compile.module.discourje.tests" description="Compile module discourje"/>
+  
+  <target name="compile.module.discourje.production" depends="register.custom.compilers" description="Compile module discourje; production classes">
+    <mkdir dir="${discourje.output.dir}"/>
+    <javac2 destdir="${discourje.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.discourje}/javac">
+      <compilerarg line="${compiler.args.discourje}"/>
+      <bootclasspath refid="discourje.module.bootclasspath"/>
+      <classpath refid="discourje.module.production.classpath"/>
+      <src refid="discourje.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.discourje"/>
+    </javac2>
+    
+    <copy todir="${discourje.output.dir}">
+      <fileset dir="${module.discourje.basedir}/src/discourje/demo/javaObjects">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.discourje.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.discourje.tests" depends="register.custom.compilers,compile.module.discourje.production" description="compile module discourje; test classes" unless="skip.tests">
+    <mkdir dir="${discourje.testoutput.dir}"/>
+    <javac2 destdir="${discourje.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.discourje}/javac">
+      <compilerarg line="${compiler.args.discourje}"/>
+      <bootclasspath refid="discourje.module.bootclasspath"/>
+      <classpath refid="discourje.module.classpath"/>
+      <src refid="discourje.module.test.sourcepath"/>
+      <patternset refid="excluded.from.compilation.discourje"/>
+    </javac2>
+    
+    <copy todir="${discourje.testoutput.dir}">
+      <fileset dir="${module.discourje.basedir}/test">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="clean.module.discourje" description="cleanup module">
+    <delete dir="${discourje.output.dir}"/>
+    <delete dir="${discourje.testoutput.dir}"/>
+  </target>
+</project>
