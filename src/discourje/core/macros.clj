@@ -49,3 +49,13 @@
   "Execute body on thread"
   [body]
   `(async/thread ~body))
+
+(defmacro close!
+  "Close the channel"
+  [channel]
+  `(async/close! (get-chan ~channel)))
+
+(defmacro close-infrastructure!
+  "Close all channels of the Discourje infrastructure"
+  [infra]
+  `(doseq [c ~infra] (close! c)))

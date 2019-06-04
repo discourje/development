@@ -12,7 +12,7 @@
                  [criterium "0.4.5"]]
   :source-paths ["src"]
   :main discourje.main
-  :aot :all
+  :aot [discourje.main]
   ;:uberjar {:aot :all
   ;          :source-paths ["src/discourje"]
   ;          :main discourje.main}

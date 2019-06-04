@@ -1,4 +1,5 @@
 (ns discourje.main
+  (:gen-class)
   (:require [discourje.core.async :refer :all]))
 
 (defn -main [& args]
