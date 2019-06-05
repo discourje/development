@@ -26,8 +26,7 @@
             (>!! b2-s (msg "address" (generate-address)))
             (reset! ok-delivered? true)
             (catch [:type :incorrect-communication] {}
-              (println "address not delivered, retrying in 1 second!")
-              (Thread/sleep 1000))))
+              (println "address not delivered, retrying..."))))
           (let [date (<!!! s-b2 "date")]
             (log-message (format "Thank you, I will put %s in my agenda!" (get-content date)))
             (order-book infra)))

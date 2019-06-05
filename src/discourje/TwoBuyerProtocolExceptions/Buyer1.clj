@@ -24,8 +24,7 @@
              (try+ (>!! b1-s (msg "title" (generate-book)))
                    (reset! title-delivered? true)
                    (catch [:type :incorrect-communication] {}
-                     (println "title not delivered, retrying in 1 second!")
-                     (Thread/sleep 1000))))
+                     (println "title not delivered, retrying..."))))
     (let [quote (<!!! s-b1 "quote")
           div (quote-div (get-content quote))]
       (do
@@ -35,8 +34,7 @@
             (>!! b1-b2 (msg "quote-div" div))
             (reset! quote-div-delivered? true)
             (catch [:type :incorrect-communication] {}
-              (println "quote-div not delivered, retrying in 1 second!")
-              (Thread/sleep 1000))))
+              (println "quote-div not delivered, retrying..."))))
         (when (<!!! s-b1 "date")
           (order-book infra))))))
 
