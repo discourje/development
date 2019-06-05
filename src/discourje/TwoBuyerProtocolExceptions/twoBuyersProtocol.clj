@@ -1,9 +1,9 @@
-(ns discourje.TrueTwoBuyerProtocol.twoBuyersProtocol
+(ns discourje.TwoBuyerProtocolExceptions.twoBuyersProtocol
   (require [discourje.core.async :refer :all]
            [discourje.core.logging :refer :all]
-           [discourje.TrueTwoBuyerProtocol.Buyer1 :as b1]
-           [discourje.TrueTwoBuyerProtocol.Buyer2 :as b2]
-           [discourje.TrueTwoBuyerProtocol.Seller :as s]
+           [discourje.TwoBuyerProtocolExceptions.Buyer1 :as b1]
+           [discourje.TwoBuyerProtocolExceptions.Buyer2 :as b2]
+           [discourje.TwoBuyerProtocolExceptions.Seller :as s]
            [discourje.core.logging :refer :all]))
 
 ;define two buyer protocol, Notice: it is extended with recursion!
@@ -16,8 +16,7 @@
          (choice
            [(-->> "ok" "buyer2" "seller")
             (-->> "address" "buyer2" "seller")
-            (-->> "date" "seller" "buyer2")
-            (-->> "repeat" "buyer2" "buyer1")
+            (-->> "date" "seller" ["buyer2" "buyer1"])
             (continue :order-book)]
            [(-->> "quit" "buyer2" "seller")]))))
 
