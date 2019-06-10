@@ -3,7 +3,6 @@
            [discourje.core.logging :refer :all]
            [criterium.core :refer :all])
   (:use [slingshot.slingshot :only [throw+ try+]]))
-       ; [discourje.core.async :only [create-protocol generate-infrastructure thread mep -->> choice >!! <!! <!!! get-label get-content add-infrastructure get-channel msg get-chan]]))
 
 (defn discourje-scatter-gather
   "Scatter gather protocol generator for Discourje:
@@ -34,7 +33,7 @@
          w->m (vec (for [w (range workers)] {:take (get-channel "m" (format "w%s" w) infra)
                                              :put  (get-channel (format "w%s" w) "m" infra)}))
          msg (msg 1 1)]
-     (time
+     (custom-time
        (do
          (doseq [w w->m]
            (thread
@@ -74,7 +73,7 @@
            w->m (vec (for [i infra] (vec (for [w (range workers)] {:take (get-channel "m" (format "w%s" w) i)
                                                                    :put  (get-channel (format "w%s" w) "m" i)}))))
            msg (msg 1 1)]
-       (time
+       (custom-time
          (doseq [i (range iterations)]
            (do
              (doseq [w (nth w->m i)]
@@ -118,7 +117,7 @@
    (let [master-to-workers (vec (for [_ (range workers)] (clojure.core.async/chan 1)))
          workers-to-master (vec (for [_ (range workers)] (clojure.core.async/chan 1)))
          msg (msg 1 1)]
-     (time
+     (custom-time
        (do
          (doseq [worker-id (range workers)]
            (thread (do
@@ -137,7 +136,7 @@
      (let [master-to-workers (vec (for [_ (range iterations)] (vec (for [_ (range workers)] (clojure.core.async/chan 1)))))
            workers-to-master (vec (for [_ (range iterations)] (vec (for [_ (range workers)] (clojure.core.async/chan 1)))))
            msg (msg 1 1)]
-       (time
+       (custom-time
          (doseq [i (range iterations)]
            (do
              (doseq [worker-id (range workers)]

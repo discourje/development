@@ -16,13 +16,16 @@
 (defn- exists-argument? "find argument" [arguments key]
   (not (nil? (find-value arguments key))))
 
+(defn now "get current date time" [] (new java.util.Date))
+(println (clojure.string/replace (str (now)) #" " "-"))
+
 (defn- run-discourje-benchmark [function amount iterations]
   (cond
     (= function "pl") (start-discourje-pipeline amount iterations)
     (= function "sg") (start-discourje-scattergather amount iterations)
     (= function "ob") (start-discourje-one-buyer iterations)
     (= function "tb") (start-discourje-two-buyers iterations)
-    :else (println "No valid function command given for discourje benchmark!")))
+    :else "No valid function command given for discourje benchmark!"))
 
 (defn- run-clojure-benchmark [function amount iterations]
   (cond
@@ -30,9 +33,9 @@
     (= function "sg") (start-clojure-scattergather amount iterations)
     (= function "ob") (start-clojure-one-buyer iterations)
     (= function "tb") (start-clojure-two-buyers iterations)
-    :else (println "No valid function command given for clojure benchmark!")))
+    :else "No valid function command given for clojure benchmark!"))
 
-(defn parse-int "parse string to integer"[key s]
+(defn parse-int "parse string to integer" [key s]
   (try (Integer. (re-find #"[0-9]*" s))
        (catch Exception e (println "No valid argument for" key "setting value to 1") 1)))
 
@@ -40,12 +43,22 @@
   (let [arguments (vec (for [arg (partition 2 (split-args input))] (vec arg)))
         amount (parse-int "-a" (find-value arguments "-a" "1"))
         iterations (parse-int "-i" (find-value arguments "-i" "1"))
-        is-discourje (exists-argument? arguments "-d")]
+        output-dir (find-value arguments "-o")
+        -d (find-value arguments "-d")
+        -c (find-value arguments "-c")
+        now (clojure.string/replace (str (now)) #" " "-")]
     (println "parsed arguments:" arguments)
-    (if is-discourje
-      (run-discourje-benchmark (find-value arguments "-d") amount iterations)
-      (run-clojure-benchmark (find-value arguments "-c") amount iterations))))
-
+    (cond
+      (not (nil? -d)) (spit
+                        (format "%s/StartTime:%s_-d_%s-a_%s_-i_%s.txt" output-dir now -d amount iterations)
+                        (run-discourje-benchmark -d amount iterations))
+      (not (nil? -c)) (spit
+                        (format "%s/StartTime:%s_-c_%s-a_%s_-i_%s.txt" output-dir now -c amount iterations)
+                        (run-clojure-benchmark -c amount iterations))
+      :else (spit
+              (format "%s/StartTime:%s_-d_%s-a_%s_-i_b%s.txt" output-dir now "" amount iterations)
+              (format "Invalid function given! %s" input)))))
+(parse-arguments "-c pl -a 200 -i 1000 -o /home/plcbo/Documents")
 (defn -main
   "Run benchmarks for Discourje and clojure:
 
@@ -64,7 +77,9 @@
   iterations for all benchmarks can be set through
   -i <iterations>: integer
 
-  Example: -c pl -a 200 -i 1000
+  -o to set the output dir target
+
+  Example: -c pl -a 200 -i 1000 -o /home/<username>/Documents
   Will start Clojure pipeline with 200 elements for 1000 iterations.
 
   All examples:

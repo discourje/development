@@ -1,7 +1,6 @@
 (ns discourje.benchmarks.TwoBuyer
   (:require [discourje.core.async :refer :all]
             [discourje.core.logging :refer :all]))
-  ;(:use [discourje.core.async :only [create-protocol thread generate-infrastructure mep -->> choice >!! <!! <!!! get-label get-content add-infrastructure get-channel msg get-chan]]))
 
 (def two-buyer-protocol
   (mep
@@ -57,7 +56,7 @@
         address (msg "address" "Open University, Valkenburgerweg 177, 6419 AT, Heerlen")
         quote (msg "quote" 15)
         date (msg "date" 1)]
-    (time
+    (custom-time
       (doseq [i (range iterations)]
         (do
           (thread (discourje-buyer1 (nth b1-s i) (nth s-b1 i) (nth b1-b2 i) title div)) ;  [b1-s s-b1 b1-b2 title div]
@@ -119,7 +118,7 @@
         address (msg "address" "Open University, Valkenburgerweg 177, 6419 AT, Heerlen")
         quote (msg "quote" 15)
         date (msg "date" 1)]
-    (time
+    (custom-time
       (doseq [i (range iterations)]
         (do
           (thread (clojure-buyer1 (nth b1-s i) (nth s-b1 i) (nth b1-b2 i) title div))

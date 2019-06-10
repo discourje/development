@@ -1,7 +1,6 @@
 (ns discourje.benchmarks.OneBuyer
   (:require [discourje.core.async :refer :all]
             [discourje.core.logging :refer :all]))
-  ;(:use [discourje.core.async :only [mep -->> choice >!! <!! <!!! get-label get-content add-infrastructure get-channel msg get-chan]]))
 
 (def buy-goods
   (mep
@@ -42,7 +41,7 @@
         quote (msg "quote" "$40,00")
         order-ack (msg "order-ack" "order-ack confirmed!")
         out-of-stock (msg "out-of-stock" "Product out of stock!")]
-    (time
+    (custom-time
       (doseq [i (range iterations)]
         (do
           (clojure.core.async/thread (discourje-buyer (nth b->s i) (nth s->b i) quote-request order))
@@ -90,7 +89,7 @@
         quote (msg "quote" "$40,00")
         order-ack (msg "order-ack" "order-ack confirmed!")
         out-of-stock (msg "out-of-stock" "Product out of stock!")]
-    (time
+    (custom-time
       (doseq [i (range iterations)]
         (do
           (clojure.core.async/thread (clojure-buyer (nth b->s i) (nth s->b i) quote-request order))

@@ -1,11 +1,6 @@
 (ns discourje.benchmarks.pipelining
   (require [discourje.core.async :refer :all]
-           [discourje.core.logging :refer :all]
-           [criterium.core :refer :all])
-  ;(:use [discourje.core.async :only [create-protocol generate-infrastructure mep -->> choice >!! <!! <!!! get-label get-content add-infrastructure get-channel msg get-chan]])
-  )
-
-
+           [discourje.core.logging :refer :all]) )
 
 (defn discourje-pipeline
   "Pipe-lining protocol generator for Discourje, also has arity for setting the iterations:
@@ -25,7 +20,7 @@
          infra (generate-infrastructure protocol)
          channels (vec (for [p (range amount)] (get-channel p (+ p 1) infra)))
          msg (msg 1 1)]
-     (time
+     (custom-time
        (loop [pipe 0]
          (do
            (>!! (nth channels pipe) msg)
@@ -39,7 +34,7 @@
            infras (vec (for [_ (range iterations)] (generate-infrastructure protocol)))
            channels (vec (for [i infras] (vec (for [p (range amount)] (get-channel p (+ p 1) i)))))
            msg (msg 1 1)]
-       (time
+       (custom-time
          (doseq [chans channels]
            (loop [pipe 0]
              (do
@@ -64,7 +59,7 @@
   ([amount]
    (let [channels (vec (for [_ (range amount)] (clojure.core.async/chan 1)))
          msg (msg 1 1)]
-     (time
+     (custom-time
        (loop [pipe 0]
          (do
            (clojure.core.async/>!! (nth channels pipe) msg)
@@ -76,7 +71,7 @@
      (clojure-pipeline amount)
      (let [channels (vec (for [_ (range iterations)] (vec (for [_ (range amount)] (clojure.core.async/chan 1)))))
            msg (msg 1 1)]
-       (time
+       (custom-time
          (doseq [chans channels]
            (loop [pipe 0]
              (do

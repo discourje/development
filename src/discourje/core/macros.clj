@@ -59,3 +59,10 @@
   "Close all channels of the Discourje infrastructure"
   [infra]
   `(doseq [c ~infra] (close! c)))
+
+(defmacro custom-time
+  "Evaluates expr and prints the time it took.  Returns the value of expr."
+  [expr]
+  `(let [start# (. System (nanoTime))
+         ret# ~expr]
+     (str "Elapsed time: " (/ (double (- (. System (nanoTime)) start#)) 1000000.0) " msecs")))
