@@ -57,8 +57,8 @@
                         (run-clojure-benchmark -c amount iterations))
       :else (spit
               (format "%s/StartTime:%s_-d_%s-a_%s_-i_b%s.txt" output-dir now "" amount iterations)
-              (format "Invalid function given! %s" input)))))
-(parse-arguments "-c pl -a 200 -i 1000 -o /home/plcbo/Documents")
+              (format "Invalid input given! %s" input)))))
+
 (defn -main
   "Run benchmarks for Discourje and clojure:
 
