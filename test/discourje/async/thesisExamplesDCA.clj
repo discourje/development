@@ -90,3 +90,22 @@
 (defn carol []
   (println "Carol received: " (get-content (<!! alice-to-carol)))
   (>!! carol-to-alice 4))
+
+(defn multicast [interactions]
+  interactions)
+
+(def scatter-gather-multicast
+  (mep
+    (-->> 1 "master" ["worker0","worker1", "...", "workerN"])
+    (multicast [(-->> 1 "worker0" "master")
+                (-->> 1 "worker1" "master")
+                (-->> 1 ".."      "master")
+                (-->> 1 "workerN" "master")])))
+
+(def scatter-gather-multicast-nested
+  (mep
+    (-->> 1 "master" ["worker0","worker1", "...", "workerN"])
+    (multicast [[(-->> 1 "worker0" "master") (-->> "confirm" "master" "worker0")]
+                [(-->> 1 "worker1" "master") (-->> "confirm" "master" "worker1")]
+                [(-->> 1 ".."      "master") (-->> "confirm" "master" "...")]
+                [(-->> 1 "workerN" "master") (-->> "confirm" "master" "workerN")]])))

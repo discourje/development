@@ -9,7 +9,8 @@
                  [org.clojure/core.async "0.4.474"]
                  [slingshot "0.12.2"]
                  [danlentz/clj-uuid "0.1.7"]
-                 [criterium "0.4.5"]]
+                 [criterium "0.4.5"]
+                 [str-to-argv "0.1.1"]]
   :source-paths ["src"]
   :main discourje.main
   :aot [discourje.main]
