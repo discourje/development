@@ -13,9 +13,6 @@
        default-value
        value))))
 
-(defn- exists-argument? "find argument" [arguments key]
-  (not (nil? (find-value arguments key))))
-
 (defn now "get current date time" [] (new java.util.Date))
 (println (clojure.string/replace (str (now)) #" " "-"))
 
@@ -48,6 +45,7 @@
         -c (find-value arguments "-c")
         now (clojure.string/replace (str (now)) #" " "-")]
     (println "parsed arguments:" arguments)
+    (set-exceptions-only)
     (cond
       (not (nil? -d)) (spit
                         (format "%s/StartTime:%s_-d_%s-a_%s_-i_%s.txt" output-dir now -d amount iterations)
@@ -84,16 +82,16 @@
 
   All examples:
   Clojure:
-  -c pl -a 200 -i 1000
-  -c sg -a 200 -i 1000
-  -c ob -i 1000
-  -c tb -i 1000
+  -c pl -a 200 -i 1000 -o /home/<username>/Documents
+  -c sg -a 200 -i 1000 -o /home/<username>/Documents
+  -c ob -i 1000 -o /home/<username>/Documents
+  -c tb -i 1000 -o /home/<username>/Documents
 
   Discourje:
-  -d pl -a 200 -i 1000
-  -d sg -a 200 -i 1000
-  -d ob -i 1000
-  -d tb -i 1000
+  -d pl -a 200 -i 1000 -o /home/<username>/Documents
+  -d sg -a 200 -i 1000 -o /home/<username>/Documents
+  -d ob -i 1000 -o /home/<username>/Documents
+  -d tb -i 1000 -o /home/<username>/Documents
   "
   [& args]
   (parse-arguments (clojure.string/join " " args)))

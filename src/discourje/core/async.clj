@@ -33,6 +33,11 @@
       "buffers"
       "wildcard")
 
+(defn close-infrastructure!
+  "Close all channels of the Discourje infrastructure"
+  [infra]
+  (doseq [c infra] (close! c)))
+
 (defn make-interaction [action sender receiver]
   "Creates an interaction object specifying sending action from sender to receiver."
   (->interaction (uuid/v1) action sender receiver nil))

@@ -40,15 +40,16 @@
         in-stock? (fn [book] (rand-int 2))
         quote (msg "quote" "$40,00")
         order-ack (msg "order-ack" "order-ack confirmed!")
-        out-of-stock (msg "out-of-stock" "Product out of stock!")]
-    (custom-time
-      (doseq [i (range iterations)]
-        (do
-          (clojure.core.async/thread (discourje-buyer (nth b->s i) (nth s->b i) quote-request order))
-          (discourje-seller (nth b->s i) (nth s->b i) in-stock? quote order-ack out-of-stock))))
+        out-of-stock (msg "out-of-stock" "Product out of stock!")
+        time (custom-time
+               (doseq [i (range iterations)]
+                 (do
+                   (clojure.core.async/thread (discourje-buyer (nth b->s i) (nth s->b i) quote-request order))
+                   (discourje-seller (nth b->s i) (nth s->b i) in-stock? quote order-ack out-of-stock))))]
     (doseq [i (range iterations)]
       (clojure.core.async/close! (get-chan (nth b->s i)))
-      (clojure.core.async/close! (get-chan (nth s->b i))))))
+      (clojure.core.async/close! (get-chan (nth s->b i))))
+    time))
 ;(set-logging-exceptions)
 ;(discourje-one-buyer 1)
 ;(discourje-one-buyer 2)
@@ -88,14 +89,15 @@
         in-stock? (fn [book] (rand-int 2))
         quote (msg "quote" "$40,00")
         order-ack (msg "order-ack" "order-ack confirmed!")
-        out-of-stock (msg "out-of-stock" "Product out of stock!")]
-    (custom-time
-      (doseq [i (range iterations)]
-        (do
-          (clojure.core.async/thread (clojure-buyer (nth b->s i) (nth s->b i) quote-request order))
-          (clojure-seller (nth b->s i) (nth s->b i) in-stock? quote order-ack out-of-stock))))
+        out-of-stock (msg "out-of-stock" "Product out of stock!")
+        time (custom-time
+               (doseq [i (range iterations)]
+                 (do
+                   (clojure.core.async/thread (clojure-buyer (nth b->s i) (nth s->b i) quote-request order))
+                   (clojure-seller (nth b->s i) (nth s->b i) in-stock? quote order-ack out-of-stock))))]
     (doseq [i (range iterations)] (clojure.core.async/close! (nth b->s i))
-                          (clojure.core.async/close! (nth s->b i)))))
+                                  (clojure.core.async/close! (nth s->b i)))
+    time))
 
 ;(clojure-one-buyer 1)
 ;(clojure-one-buyer 2)

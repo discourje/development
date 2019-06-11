@@ -55,14 +55,15 @@
         ok (msg "ok" "ok")
         address (msg "address" "Open University, Valkenburgerweg 177, 6419 AT, Heerlen")
         quote (msg "quote" 15)
-        date (msg "date" 1)]
-    (custom-time
-      (doseq [i (range iterations)]
-        (do
-          (thread (discourje-buyer1 (nth b1-s i) (nth s-b1 i) (nth b1-b2 i) title div)) ;  [b1-s s-b1 b1-b2 title div]
-          (thread (discourje-seller (nth b1-s i) (nth s-b1 i) (nth s-b2 i) (nth b2-s i) quote date)) ;[b1-s s-b1 s-b2 b2-s quote date]
-          (discourje-buyer2 (nth s-b2 i) (nth b1-b2 i) (nth b2-s i) ok address)))) ;[s-b2 b1-b2 b2-s ok address]
-    (doseq [i infra] (doseq [c i] (clojure.core.async/close! (get-chan c))))))
+        date (msg "date" 1)
+        time (custom-time
+               (doseq [i (range iterations)]
+                 (do
+                   (thread (discourje-buyer1 (nth b1-s i) (nth s-b1 i) (nth b1-b2 i) title div))
+                   (thread (discourje-seller (nth b1-s i) (nth s-b1 i) (nth s-b2 i) (nth b2-s i) quote date))
+                   (discourje-buyer2 (nth s-b2 i) (nth b1-b2 i) (nth b2-s i) ok address))))]
+    (doseq [i infra] (doseq [c i] (clojure.core.async/close! (get-chan c))))
+    time))
 
 ;(set-logging-exceptions)
 ;(discourje-two-buyer 1)
@@ -117,19 +118,20 @@
         ok (msg "ok" "ok")
         address (msg "address" "Open University, Valkenburgerweg 177, 6419 AT, Heerlen")
         quote (msg "quote" 15)
-        date (msg "date" 1)]
-    (custom-time
-      (doseq [i (range iterations)]
-        (do
-          (thread (clojure-buyer1 (nth b1-s i) (nth s-b1 i) (nth b1-b2 i) title div))
-          (thread (clojure-seller (nth b1-s i) (nth s-b1 i) (nth s-b2 i) (nth b2-s i) quote date))
-          (clojure-buyer2 (nth s-b2 i) (nth b1-b2 i) (nth b2-s i) ok address))))
+        date (msg "date" 1)
+        time (custom-time
+               (doseq [i (range iterations)]
+                 (do
+                   (thread (clojure-buyer1 (nth b1-s i) (nth s-b1 i) (nth b1-b2 i) title div))
+                   (thread (clojure-seller (nth b1-s i) (nth s-b1 i) (nth s-b2 i) (nth b2-s i) quote date))
+                   (clojure-buyer2 (nth s-b2 i) (nth b1-b2 i) (nth b2-s i) ok address))))]
     (doseq [i (range iterations)]
       (clojure.core.async/close! (nth b1-s i))
       (clojure.core.async/close! (nth s-b1 i))
       (clojure.core.async/close! (nth b1-b2 i))
       (clojure.core.async/close! (nth s-b2 i))
-      (clojure.core.async/close! (nth b2-s i)))))
+      (clojure.core.async/close! (nth b2-s i)))
+    time))
 ;(clojure-two-buyer 1)
 ;(clojure-two-buyer 2)
 ;(clojure-two-buyer 4)

@@ -53,12 +53,7 @@
 (defmacro close!
   "Close the channel"
   [channel]
-  `(async/close! (get-chan ~channel)))
-
-(defmacro close-infrastructure!
-  "Close all channels of the Discourje infrastructure"
-  [infra]
-  `(doseq [c ~infra] (close! c)))
+  `(clojure.core.async/close! (get-chan ~channel)))
 
 (defmacro custom-time
   "Evaluates expr and prints the time it took.  Returns the value of expr."
