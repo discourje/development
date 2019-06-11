@@ -83,7 +83,7 @@
                         (clojure.core.async/<!! (nth chans pipe))
                         (when (true? (< pipe (- amount 1)))
                           (recur (+ 1 pipe)))))))]
-       (doseq [c channels] (clojure.core.async/close! c))
+       (doseq [i (range iterations)](doseq [a (range amount)] (clojure.core.async/close! (nth (nth channels i) a))))
        time))))
 
 ;(clojure-pipeline 2)

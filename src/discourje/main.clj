@@ -49,13 +49,13 @@
     (cond
       (not (nil? -d)) (spit
                         (format "%s/StartTime:%s_-d_%s-a_%s_-i_%s.txt" output-dir now -d amount iterations)
-                        (run-discourje-benchmark -d amount iterations))
+                        (format "[%s] : %s" input (run-discourje-benchmark -d amount iterations)))
       (not (nil? -c)) (spit
                         (format "%s/StartTime:%s_-c_%s-a_%s_-i_%s.txt" output-dir now -c amount iterations)
-                        (run-clojure-benchmark -c amount iterations))
+                        (format "[%s] : %s" input (run-clojure-benchmark -c amount iterations)))
       :else (spit
               (format "%s/StartTime:%s_-d_%s-a_%s_-i_b%s.txt" output-dir now "" amount iterations)
-              (format "Invalid input given! %s" input)))))
+              (format "Invalid input given! [%s]" input)))))
 
 (defn -main
   "Run benchmarks for Discourje and clojure:
