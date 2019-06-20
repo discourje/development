@@ -109,3 +109,19 @@
                 [(-->> 1 "worker1" "master") (-->> "confirm" "master" "worker1")]
                 [(-->> 1 ".."      "master") (-->> "confirm" "master" "...")]
                 [(-->> 1 "workerN" "master") (-->> "confirm" "master" "workerN")]])))
+
+(defmacro unless [condition body]
+  `(if (not ~condition)
+     (do ~@body)))
+
+(defn without-macro []
+  (if (not (< 6 5))
+    (do (println "6 is not smaller than 5!"))))
+
+(defn with-macro []
+  (unless (< 6 5) (println "6 is not smaller than 5!")))
+
+(without-macro)
+
+
+(with-macro)

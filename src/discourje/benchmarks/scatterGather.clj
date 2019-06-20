@@ -69,44 +69,44 @@
                                 (conj
                                   [(-->> 1 "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
                                   (vec (for [w (range workers)] (-->> 1 (format "w%s" w) "m")))))))) ; workers to master
-           infra (vec (for [_ (range iterations)] (generate-infrastructure workers-prot)))
-           m->w (vec (for [i infra] (vec (for [w (range workers)] (get-channel "m" (format "w%s" w) i)))))
-           w->m (vec (for [i infra] (vec (for [w (range workers)] {:take (get-channel "m" (format "w%s" w) i)
-                                                                   :put  (get-channel (format "w%s" w) "m" i)}))))
+           infra (generate-infrastructure workers-prot)
+           m->w (vec (for [w (range workers)] (get-channel "m" (format "w%s" w) infra)))
+           w->m (vec (for [w (range workers)] {:take (get-channel "m" (format "w%s" w) infra)
+                                               :put  (get-channel (format "w%s" w) "m" infra)}))
            msg (msg 1 1)
            time (custom-time
-                  (doseq [i (range iterations)]
-                    (do
-                      (doseq [w (nth w->m i)]
-                        (thread
+                  (println 1)
+                  (doseq [_ (range iterations)]
                           (do
-                            (<!!! (:take w) 1)
-                            (loop []
-                              (let [result
-                                    (try+ (do
-                                            (>!! (:put w) msg)
-                                            true)
-                                          (catch [:type :incorrect-communication] {}
-                                            false))]
-                                (when (false? result)
-                                  (recur)))))))
-                      (>!! (nth m->w i) msg)
-                      (loop [worker-id 0]
-                        (let [result (do
-                                       (<!! (:put (nth (nth w->m i) worker-id)) 1)
-                                       (+ worker-id 1))]
-                          (when (true? (< result workers))
-                            (recur result)))))))]
-       (doseq [i (range iterations)]
-         (doseq [mw (nth m->w i)] (clojure.core.async/close! (get-chan mw)))
-         (doseq [wm (nth w->m i)] (do (clojure.core.async/close! (get-chan (:take wm)))
-                                      (clojure.core.async/close! (get-chan (:put wm))))))
+                            (doseq [w w->m]
+                              (thread
+                                (do
+                                  (println 2)
+                                  (<!!! (:take w) 1)
+                                  (loop []
+                                    (let [result
+                                          (try+ (do
+                                                  (>!! (:put w) msg)
+                                                  true)
+                                                (catch [:type :incorrect-communication] {}
+                                                  false))]
+                                      (println 3)
+                                      (when (false? result)
+                                        (recur)))))))
+                            (>!! m->w msg)
+                            (loop [worker-id 0]
+                              (let [result (do
+                                             (<!! (:put (nth w->m worker-id)) 1)
+                                             (+ worker-id 1))]
+                                (when (true? (< result workers))
+                                  (recur result))))
+                            (force-monitor-reset! m->w))))]
        time))))
 ;(set-logging-exceptions)
 ;(discourje-scatter-gather 2)
 ;(discourje-scatter-gather 4)
 ;(discourje-scatter-gather 8)
-;(discourje-scatter-gather 16)
+(discourje-scatter-gather 16 16)
 ;(discourje-scatter-gather 32)
 ;(discourje-scatter-gather 64)
 ;(discourje-scatter-gather 128)

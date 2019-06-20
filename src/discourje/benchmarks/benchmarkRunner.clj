@@ -8,16 +8,16 @@
 ;(in-ns 'discourje.core.async)
 
 (defn start-discourje-one-buyer [iterations]
-  (discourje.benchmarks.OneBuyer/discourje-one-buyer iterations))
+  (discourje.benchmarks.OneBuyer/discourje-one-buyer-monitor-reset iterations))
 
 (defn start-clojure-one-buyer [iterations]
-  (discourje.benchmarks.OneBuyer/clojure-one-buyer iterations))
+  (discourje.benchmarks.OneBuyer/clojure-one-buyer-reset iterations))
 
 (defn start-discourje-two-buyers [iterations]
-  (discourje.benchmarks.TwoBuyer/discourje-two-buyer iterations))
+  (discourje.benchmarks.TwoBuyer/discourje-two-buyer-monitor-reset iterations))
 
 (defn start-clojure-two-buyers [iterations]
-  (discourje.benchmarks.TwoBuyer/clojure-two-buyer iterations))
+  (discourje.benchmarks.TwoBuyer/clojure-two-buyer-reset iterations))
 
 (defn start-discourje-pipeline [amount iterations]
   (discourje.benchmarks.pipelining/discourje-pipeline amount iterations))

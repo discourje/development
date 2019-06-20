@@ -47,6 +47,9 @@
     (println "parsed arguments:" arguments)
     (set-exceptions-only)
     (cond
+      (nil? output-dir) (spit
+                          (format "%s/StartTime:%s_-d_%s-a_%s_-i_%s.txt" output-dir now -d amount iterations)
+                          (format "[%s] : %s" input "output directory missing!"))
       (not (nil? -d)) (spit
                         (format "%s/StartTime:%s_-d_%s-a_%s_-i_%s.txt" output-dir now -d amount iterations)
                         (format "[%s] : %s" input (run-discourje-benchmark -d amount iterations)))

@@ -44,11 +44,31 @@
         time (custom-time
                (doseq [i (range iterations)]
                  (do
-                   (clojure.core.async/thread (discourje-buyer (nth b->s i) (nth s->b i) quote-request order))
-                   (discourje-seller (nth b->s i) (nth s->b i) in-stock? quote order-ack out-of-stock))))]
+                   (clojure.core.async/thread (discourje-seller (nth b->s i) (nth s->b i) in-stock? quote order-ack out-of-stock))
+                   (discourje-buyer (nth b->s i) (nth s->b i) quote-request order))))]
     (doseq [i (range iterations)]
       (clojure.core.async/close! (get-chan (nth b->s i)))
       (clojure.core.async/close! (get-chan (nth s->b i))))
+    time))
+
+(defn discourje-one-buyer-monitor-reset [iterations]
+  (let [infra (add-infrastructure buy-goods)
+        b->s (get-channel "buyer" "seller" infra)
+        s->b (get-channel "seller" "buyer" infra)
+        product {:product-type "book" :content {:title "The joy of Clojure"}}
+        quote-request (msg "quote-request" product)
+        order (msg "order" "confirm order!")
+        in-stock? (fn [book] (rand-int 2))
+        quote (msg "quote" "$40,00")
+        order-ack (msg "order-ack" "order-ack confirmed!")
+        out-of-stock (msg "out-of-stock" "Product out of stock!")
+        time (custom-time
+               (doseq [_ (range iterations)]
+                 (do
+                   (clojure.core.async/thread (discourje-seller b->s s->b in-stock? quote order-ack out-of-stock))
+                   (discourje-buyer b->s s->b quote-request order)
+                   (force-monitor-reset! (get-monitor b->s)))))]
+
     time))
 ;(set-logging-exceptions)
 ;(discourje-one-buyer 1)
@@ -98,7 +118,24 @@
     (doseq [i (range iterations)] (clojure.core.async/close! (nth b->s i))
                                   (clojure.core.async/close! (nth s->b i)))
     time))
-
+(defn clojure-one-buyer-reset [iterations]
+  (let [infra (add-infrastructure buy-goods)
+        b->s (get-channel "buyer" "seller" infra)
+        s->b (get-channel "seller" "buyer" infra)
+        product {:product-type "book" :content {:title "The joy of Clojure"}}
+        quote-request (msg "quote-request" product)
+        order (msg "order" "confirm order!")
+        in-stock? (fn [book] (rand-int 2))
+        quote (msg "quote" "$40,00")
+        order-ack (msg "order-ack" "order-ack confirmed!")
+        out-of-stock (msg "out-of-stock" "Product out of stock!")
+        time (custom-time
+               (doseq [_ (range iterations)]
+                 (do
+                   (clojure.core.async/thread (clojure-seller (get-chan b->s) (get-chan s->b) in-stock? quote order-ack out-of-stock))
+                   (clojure-buyer (get-chan b->s) (get-chan s->b) quote-request order)
+                   (force-monitor-reset! (get-monitor b->s)))))]
+        time))
 ;(clojure-one-buyer 1)
 ;(clojure-one-buyer 2)
 ;(clojure-one-buyer 4)
