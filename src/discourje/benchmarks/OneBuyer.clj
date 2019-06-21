@@ -118,6 +118,7 @@
     (doseq [i (range iterations)] (clojure.core.async/close! (nth b->s i))
                                   (clojure.core.async/close! (nth s->b i)))
     time))
+
 (defn clojure-one-buyer-reset [iterations]
   (let [infra (add-infrastructure buy-goods)
         b->s (get-channel "buyer" "seller" infra)

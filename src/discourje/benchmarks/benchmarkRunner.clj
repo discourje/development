@@ -4,8 +4,6 @@
             [discourje.benchmarks.pipelining :refer :all]
             [discourje.benchmarks.scatterGather :refer :all]
             [discourje.core.logging :refer :all]))
-;main.clj
-;(in-ns 'discourje.core.async)
 
 (defn start-discourje-one-buyer [iterations]
   (discourje.benchmarks.OneBuyer/discourje-one-buyer-monitor-reset iterations))

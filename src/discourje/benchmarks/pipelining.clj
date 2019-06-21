@@ -53,7 +53,7 @@
 ;(discourje-pipeline 4)
 ;(discourje-pipeline 8)
 ;(discourje-pipeline 16)
-(discourje-pipeline 16 16)
+;(discourje-pipeline 16 16)
 ;(discourje-pipeline 64)
 ;(discourje-pipeline 128)
 ;(discourje-pipeline 256)
