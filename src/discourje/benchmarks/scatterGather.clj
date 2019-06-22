@@ -104,7 +104,16 @@
 ;(discourje-scatter-gather 4)
 ;(discourje-scatter-gather 8)
 ;(discourje-scatter-gather 16 16)
-;(discourje-scatter-gather 32)
+(discourje-scatter-gather 1 10000000)
+;(discourje-scatter-gather 2 150000)
+;(discourje-scatter-gather 3 70000)
+;(discourje-scatter-gather 4 8000)
+;(discourje-scatter-gather 6 3000)
+;(discourje-scatter-gather 8 1500)
+;(discourje-scatter-gather 12 560)
+;(discourje-scatter-gather 16 400)
+;(discourje-scatter-gather 24 180) FOR 1 MIN!!!
+;(discourje-scatter-gather 32 100) FOR 1 MIN!!!
 ;(discourje-scatter-gather 64)
 ;(discourje-scatter-gather 128)
 ;(discourje-scatter-gather 256)

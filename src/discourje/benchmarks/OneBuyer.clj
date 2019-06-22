@@ -76,7 +76,7 @@
 ;(discourje-one-buyer 4)
 ;(discourje-one-buyer 8)
 ;(discourje-one-buyer 16)
-;(discourje-one-buyer 32)
+;(discourje-one-buyer-monitor-reset 650000)
 ;(discourje-one-buyer 64)
 ;(discourje-one-buyer 128)
 ;(discourje-one-buyer 256)

@@ -87,7 +87,7 @@
                    (force-monitor-reset! (get-monitor b1-s )))))]
      time))
 
-;(set-logging-exceptions)
+(set-logging-exceptions)
 ;(discourje-two-buyer 1)
 ;(discourje-two-buyer 2)
 ;(discourje-two-buyer 4)
@@ -178,7 +178,7 @@
                    (clojure-buyer2 (get-chan s-b2) (get-chan b1-b2) (get-chan b2-s) ok address)
                    (force-monitor-reset! (get-monitor b1-s)))))]
     time))
-;(clojure-two-buyer-reset 10000)
+;(clojure-two-buyer-reset 630000)
 ;(clojure-two-buyer 1)
 ;(clojure-two-buyer 2)
 ;(clojure-two-buyer 4)
