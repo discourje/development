@@ -2,7 +2,8 @@
   (:require [clojure.test :refer :all]
             [discourje.async.protocolTestData :refer :all]
             [discourje.core.async :refer :all]
-            [clojure.core.async :as async]))
+            [clojure.core.async :as async]
+            [discourje.core.logging :refer :all]))
 
 (deftest send-test
   (let [channels (generate-infrastructure (testDualProtocol))
@@ -26,6 +27,7 @@
         ba (get-channel "B" "A" channels)
         m1 (->message "1" "Hello B")
         m2 (->message "2" "Hello A")]
+    (set-logging-exceptions)
     (do
       (>!! ab m1)
       (let [a->b (<!! ab "1")]

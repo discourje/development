@@ -69,9 +69,9 @@
 (defn- get-next-interaction-by-id!
   "Get the next interaction with next id already given"
   [id interactions]
-    (let [nested-id-search (find-nested-next id interactions)]
-      (log-message "nested-id" nested-id-search)
-      nested-id-search))
+  (let [nested-id-search (find-nested-next id interactions)]
+    (log-message "nested-id" nested-id-search)
+    nested-id-search))
 
 (defn- swap-next-interaction-by-id!
   "Swap the next interaction with next id already given"
@@ -116,8 +116,10 @@
                                    (log-message (format "STILL HAS MULTIPLE RECEIVERS? %s | %s && ID = SAME %s? Active: %s, Current: %s" (multiple-receivers? @active-interaction) (multiple-receivers? current-interaction) (= (get-id @active-interaction) (get-id current-interaction)) @active-interaction current-interaction))
                                    (if (or (satisfies? identifiable-recur @active-interaction) (and (multiple-receivers? @active-interaction) (= (get-id @active-interaction) (get-id current-interaction))))
                                      (->interaction (:id current-interaction) (:action current-interaction) (:sender current-interaction) (vec (remove #{receiver} (:receivers @active-interaction))) (:next current-interaction))
-                                     (get-next-interaction-by-id! (get-next current-interaction) interactions))))
-       (log-error :unsupported-operation (format "Cannot remove-receiver from interaction of type: %s, it should be atomic! Interaction = %s" (type current-interaction) (interaction-to-string current-interaction)))))))
+                                     (if (not= nil (get-next current-interaction))
+                                       @(get-next current-interaction)
+                                       nil))))
+     (log-error :unsupported-operation (format "Cannot remove-receiver from interaction of type: %s, it should be atomic! Interaction = %s" (type current-interaction) (interaction-to-string current-interaction)))))) )
 
 (defn- swap-active-interaction-by-atomic
   "Swap active interaction by atomic"
@@ -128,7 +130,9 @@
      (swap! active-interaction (swap-next-interaction-by-id! (get-next target-interaction) interactions))
      (if (multiple-receivers? target-interaction)
        (remove-receiver active-interaction target-interaction receiver interactions)
-       (swap! active-interaction (swap-next-interaction-by-id! (get-next target-interaction) interactions))))))
+       (reset! active-interaction (if (not= nil (get-next target-interaction))
+                                    @(get-next target-interaction)
+                                    nil))))))
 
 (defn- is-valid-interaction?
   "Is the given interaction valid compared to the active-interaction of the monitor"
@@ -220,7 +224,7 @@
   ([sender receivers label active-interaction target-interaction interactions]
    (log-message (format "Applying: label %s, receiver %s." label receivers))
    (cond
-    ; (and (satisfies? interactable target-interaction) (is-valid-interaction? sender receivers label target-interaction))
+     ; (and (satisfies? interactable target-interaction) (is-valid-interaction? sender receivers label target-interaction))
      (satisfies? interactable target-interaction)
      (swap-active-interaction-by-atomic active-interaction target-interaction receivers interactions)
      ;(and (satisfies? branchable target-interaction) (check-branch-interaction sender receivers label target-interaction))
@@ -264,7 +268,7 @@
 (defn- is-active-interaction-parallel? [active-interaction label interactions]
   (cond
     (satisfies? interactable active-interaction)
-    (and (or (nil? label) (= (get-action active-interaction) label) (contains-value? (get-action active-interaction) label))(instance? Seqable (get-receivers active-interaction)))
+    (and (or (nil? label) (= (get-action active-interaction) label) (contains-value? (get-action active-interaction) label)) (instance? Seqable (get-receivers active-interaction)))
     (satisfies? branchable active-interaction)
     (> (count (filter true? (flatten (for [b (:branches active-interaction)] (is-active-interaction-parallel? (nth b 0) label interactions))))) 0)
     (satisfies? recursable active-interaction)
