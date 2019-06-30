@@ -1,7 +1,6 @@
 (ns discourje.benchmarks.TwoBuyer
   (:require [discourje.core.async :refer :all]
-            [discourje.core.logging :refer :all])
-  (:use [slingshot.slingshot :only [throw+ try+]]))
+            [discourje.core.logging :refer :all]))
 
 (def two-buyer-protocol
   (mep
@@ -14,14 +13,14 @@
        (-->> "date" "seller" "buyer2")]
       [(-->> "quit" "buyer2" "seller")])))
 
-(defn discourje-buyer1 "order a book from buyer1's perspective"
+(defn- discourje-buyer1 "order a book from buyer1's perspective"
   [b1-s s-b1 b1-b2 title div]
   (do
     (>!! b1-s title)
     (<!!! s-b1 "quote")
     (>!! b1-b2 div)))
 
-(defn discourje-buyer2 "Order a book from buyer2's perspective"
+(defn- discourje-buyer2 "Order a book from buyer2's perspective"
   [s-b2 b1-b2 b2-s ok address]
   (do
     (<!!! s-b2 "quote")
@@ -30,7 +29,7 @@
     (>!! b2-s address)
     (<!!! s-b2 "date")))
 
-(defn discourje-seller "Order book from seller's perspective"
+(defn- discourje-seller "Order book from seller's perspective"
   [b1-s s-b1 s-b2 b2-s quote date]
   (do
     (<!! b1-s "title")
@@ -45,7 +44,7 @@
         "Quit!"))))
 
 (defn discourje-two-buyer [iterations]
-  (let [infra (vec (for [_ (range iterations)] (generate-infrastructure two-buyer-protocol)))
+  (time(let [infra (vec (for [_ (range iterations)] (generate-infrastructure two-buyer-protocol)))
         b1-s (vec (for [i infra] (get-channel "buyer1" "seller" i)))
         s-b1 (vec (for [i infra] (get-channel "seller" "buyer1" i)))
         b1-b2 (vec (for [i infra] (get-channel "buyer1" "buyer2" i)))
@@ -56,34 +55,39 @@
         ok (msg "ok" "ok")
         address (msg "address" "Open University, Valkenburgerweg 177, 6419 AT, Heerlen")
         quote (msg "quote" 15)
-        date (msg "date" 1)]
-    (time
-      (doseq [i (range iterations)]
-        (do
-          (thread (discourje-buyer1 (nth b1-s i) (nth s-b1 i) (nth b1-b2 i) title div)) ;  [b1-s s-b1 b1-b2 title div]
-          (thread (discourje-seller (nth b1-s i) (nth s-b1 i) (nth s-b2 i) (nth b2-s i) quote date)) ;[b1-s s-b1 s-b2 b2-s quote date]
-          (discourje-buyer2 (nth s-b2 i) (nth b1-b2 i) (nth b2-s i) ok address)))) ;[s-b2 b1-b2 b2-s ok address]
-    (doseq [i infra] (doseq [c i] (clojure.core.async/close! (get-chan c))))))
+        date (msg "date" 1)
+        time (time
+               (doseq [i (range iterations)]
+                 (do
+                   (thread (discourje-buyer1 (nth b1-s i) (nth s-b1 i) (nth b1-b2 i) title div))
+                   (thread (discourje-seller (nth b1-s i) (nth s-b1 i) (nth s-b2 i) (nth b2-s i) quote date))
+                   (discourje-buyer2 (nth s-b2 i) (nth b1-b2 i) (nth b2-s i) ok address))))]
+    (doseq [i infra] (doseq [c i] (clojure.core.async/close! (get-chan c))))
+    time)))
 
-(set-logging-exceptions)
-(discourje-two-buyer 1)
-(discourje-two-buyer 2)
-(discourje-two-buyer 4)
-(discourje-two-buyer 8)
-(discourje-two-buyer 16)
-(discourje-two-buyer 32)
-(discourje-two-buyer 64)
-(discourje-two-buyer 128)
-(discourje-two-buyer 256)
+(defn discourje-two-buyer-monitor-reset [iterations]
+   (let [infra (generate-infrastructure two-buyer-protocol)
+        b1-s (get-channel "buyer1" "seller" infra)
+        s-b1 (get-channel "seller" "buyer1" infra)
+        b1-b2 (get-channel "buyer1" "buyer2" infra)
+        s-b2 (get-channel "seller" "buyer2" infra)
+        b2-s (get-channel "buyer2" "seller" infra)
+        title (msg "title" "The Joy of Clojure")
+        div (msg "quote-div" 16)
+        ok (msg "ok" "ok")
+        address (msg "address" "Open University, Valkenburgerweg 177, 6419 AT, Heerlen")
+        quote (msg "quote" 15)
+        date (msg "date" 1)
+        time (custom-time
+               (doseq [_ (range iterations)]
+                 (do
+                   (thread (discourje-buyer1 b1-s s-b1 b1-b2 title div))
+                   (thread (discourje-seller b1-s s-b1 s-b2 b2-s  quote date))
+                   (discourje-buyer2 s-b2 b1-b2 b2-s ok address)
+                   (force-monitor-reset! (get-monitor b1-s )))))]
+     time))
 
-(defn clojure-buyer1 "order a book from buyer1's perspective"
-  [b1-s s-b1 b1-b2 title div]
-  (do
-    (clojure.core.async/>!! b1-s title)
-    (clojure.core.async/<!! s-b1)
-    (clojure.core.async/>!! b1-b2 div)))
-
-(defn clojure-buyer2 "Order a book from buyer2's perspective"
+(defn- clojure-buyer2 "Order a book from buyer2's perspective"
   [s-b2 b1-b2 b2-s ok address]
   (do
     (clojure.core.async/<!! s-b2)
@@ -92,7 +96,14 @@
     (clojure.core.async/>!! b2-s address)
     (clojure.core.async/<!! s-b2)))
 
-(defn clojure-seller "Order book from seller's perspective"
+(defn- clojure-buyer1 "order a book from buyer1's perspective"
+  [b1-s s-b1 b1-b2 title div]
+  (do
+    (clojure.core.async/>!! b1-s title)
+    (clojure.core.async/<!! s-b1)
+    (clojure.core.async/>!! b1-b2 div)))
+
+(defn- clojure-seller "Order book from seller's perspective"
   [b1-s s-b1 s-b2 b2-s quote date]
   (do
     (clojure.core.async/<!! b1-s)
@@ -118,25 +129,39 @@
         ok (msg "ok" "ok")
         address (msg "address" "Open University, Valkenburgerweg 177, 6419 AT, Heerlen")
         quote (msg "quote" 15)
-        date (msg "date" 1)]
-    (time
-      (doseq [i (range iterations)]
-        (do
-          (thread (clojure-buyer1 (nth b1-s i) (nth s-b1 i) (nth b1-b2 i) title div))
-          (thread (clojure-seller (nth b1-s i) (nth s-b1 i) (nth s-b2 i) (nth b2-s i) quote date))
-          (clojure-buyer2 (nth s-b2 i) (nth b1-b2 i) (nth b2-s i) ok address))))
+        date (msg "date" 1)
+        time (custom-time
+               (doseq [i (range iterations)]
+                 (do
+                   (clojure.core.async/thread (clojure-buyer1 (nth b1-s i) (nth s-b1 i) (nth b1-b2 i) title div))
+                   (clojure.core.async/thread (clojure-seller (nth b1-s i) (nth s-b1 i) (nth s-b2 i) (nth b2-s i) quote date))
+                   (clojure-buyer2 (nth s-b2 i) (nth b1-b2 i) (nth b2-s i) ok address))))]
     (doseq [i (range iterations)]
       (clojure.core.async/close! (nth b1-s i))
       (clojure.core.async/close! (nth s-b1 i))
       (clojure.core.async/close! (nth b1-b2 i))
       (clojure.core.async/close! (nth s-b2 i))
-      (clojure.core.async/close! (nth b2-s i)))))
-(clojure-two-buyer 1)
-(clojure-two-buyer 2)
-(clojure-two-buyer 4)
-(clojure-two-buyer 8)
-(clojure-two-buyer 16)
-(clojure-two-buyer 32)
-(clojure-two-buyer 64)
-(clojure-two-buyer 128)
-(clojure-two-buyer 256)
+      (clojure.core.async/close! (nth b2-s i)))
+    time))
+
+(defn clojure-two-buyer-reset [iterations]
+  (let [infra (generate-infrastructure two-buyer-protocol)
+        b1-s (get-channel "buyer1" "seller" infra)
+        s-b1 (get-channel "seller" "buyer1" infra)
+        b1-b2 (get-channel "buyer1" "buyer2" infra)
+        s-b2 (get-channel "seller" "buyer2" infra)
+        b2-s (get-channel "buyer2" "seller" infra)
+        title (msg "title" "The Joy of Clojure")
+        div (msg "quote-div" 16)
+        ok (msg "ok" "ok")
+        address (msg "address" "Open University, Valkenburgerweg 177, 6419 AT, Heerlen")
+        quote (msg "quote" 15)
+        date (msg "date" 1)
+        time (custom-time
+               (doseq [_ (range iterations)]
+                 (do
+                   (clojure.core.async/thread (clojure-buyer1 (get-chan b1-s) (get-chan s-b1) (get-chan b1-b2) title div))
+                   (clojure.core.async/thread (clojure-seller (get-chan b1-s) (get-chan s-b1) (get-chan s-b2) (get-chan b2-s) quote date))
+                   (clojure-buyer2 (get-chan s-b2) (get-chan b1-b2) (get-chan b2-s) ok address)
+                   (force-monitor-reset! (get-monitor b1-s)))))]
+    time))

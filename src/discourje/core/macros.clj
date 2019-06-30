@@ -49,3 +49,15 @@
   "Execute body on thread"
   [body]
   `(async/thread ~body))
+
+(defmacro close!
+  "Close the channel"
+  [channel]
+  `(clojure.core.async/close! (get-chan ~channel)))
+
+(defmacro custom-time
+  "Evaluates expr and prints the time it took.  Returns the value of expr."
+  [expr]
+  `(let [start# (. System (nanoTime))
+         ret# ~expr]
+     (str "Elapsed time: " (/ (double (- (. System (nanoTime)) start#)) 1000000.0) " msecs")))

@@ -5,6 +5,9 @@
             [clojure.core.async.impl.protocols :as bufs])
   (:import (clojure.lang Seqable)))
 
+;(defn -main [& args]
+;  (println "Test!"))
+
 (defprotocol sendable
   (get-label [this])
   (get-content [this]))
@@ -29,6 +32,11 @@
       "interactionLinking"
       "buffers"
       "wildcard")
+
+(defn close-infrastructure!
+  "Close all channels of the Discourje infrastructure"
+  [infra]
+  (doseq [c infra] (close! c)))
 
 (defn make-interaction [action sender receiver]
   "Creates an interaction object specifying sending action from sender to receiver."

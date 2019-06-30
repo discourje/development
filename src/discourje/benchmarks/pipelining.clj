@@ -1,9 +1,6 @@
 (ns discourje.benchmarks.pipelining
   (require [discourje.core.async :refer :all]
-           [discourje.core.logging :refer :all]
-           [criterium.core :refer :all])
-  (:use [slingshot.slingshot :only [throw+ try+]]))
-
+           [discourje.core.logging :refer :all]))
 
 (defn discourje-pipeline
   "Pipe-lining protocol generator for Discourje, also has arity for setting the iterations:
@@ -22,68 +19,208 @@
    (let [protocol (create-protocol (vec (for [p (range amount)] (-->> 1 p (+ p 1)))))
          infra (generate-infrastructure protocol)
          channels (vec (for [p (range amount)] (get-channel p (+ p 1) infra)))
-         msg (msg 1 1)]
-     (time
-       (loop [pipe 0]
-         (do
-           (>!! (nth channels pipe) msg)
-           (<!!! (nth channels pipe) 1)
-           (when (true? (< pipe (- amount 1)))
-             (recur (+ 1 pipe))))))))
+         msg (msg 1 1)
+         time (custom-time
+                (loop [pipe 0]
+                  (do
+                    (>!! (nth channels pipe) msg)
+                    (<!!! (nth channels pipe) 1)
+                    (when (true? (< pipe (- amount 1)))
+                      (recur (+ 1 pipe))))))]
+     (close-infrastructure! infra)
+     time))
   ([amount iterations]
-   (let [protocol (create-protocol (vec (for [p (range amount)] (-->> 1 p (+ p 1)))))
-         infras (vec (for [_ (range iterations)] (generate-infrastructure protocol)))
-         channels (vec (for [i infras] (vec (for [p (range amount)] (get-channel p (+ p 1) i)))))
-         msg (msg 1 1)]
-     (time
-       (doseq [chans channels]
-         (loop [pipe 0]
-           (do
-             (>!! (nth chans pipe) msg)
-             (<!!! (nth chans pipe) 1)
-             (when (true? (< pipe (- amount 1)))
-               (recur (+ 1 pipe)))))))
-     (doseq [i (range iterations)] (doseq [a (range amount)] (clojure.core.async/close! (get-chan (nth (nth channels i) a))))))))
+   (if (<= iterations 1)
+     (discourje-pipeline amount)
+     (let [protocol (create-protocol (vec (for [p (range amount)] (-->> 1 p (+ p 1)))))
+           infra (generate-infrastructure protocol)
+           channels (vec (for [p (range amount)] (get-channel p (+ p 1) infra)))
+           msg (msg 1 1)
+           time (custom-time
+                  (doseq [_ (range iterations)]
+                    (do (loop [pipe 0]
+                          (do
+                            (>!! (nth channels pipe) msg)
+                            (<!! (nth channels pipe) 1)
+                            (when (true? (< pipe (- amount 1)))
+                              (recur (+ 1 pipe)))))
+                        (force-monitor-reset! (get-monitor (first channels)))
+                        )))]
+       time))))
 
+(defn discourje-pipeline-new-reverse
+  "Pipe-lining protocol generator for Discourje, also has arity for setting the iterations:
+  Will start all logic on the main thread
+
+  Generates protocol in line of:
+
+  pipeline-prot
+    (mep
+      (-->> 1 p0 p1)
+      (-->> 1 p1 p2)
+      (-->> 1 .. ..)
+      (-->> 1 .. pn))
+  "
+  ([amount iterations]
+   (let [protocol (create-protocol (vec (for [p (range (- amount 1))] (-->> 1 p (+ p 1)))))
+         infra (generate-infrastructure protocol)
+         channels (vec (for [p (range (- amount 1))] (get-channel p (+ p 1) infra)))
+         msg (msg 1 1)
+         max (- amount 2)
+         time (cond
+                (< amount 2) "invalid amount!"
+                (== amount 2) (custom-time
+                                (doseq [_ (range iterations)]
+                                  (do
+                                    (do (thread (do (>!! (first channels) msg)))
+                                        (<!! (first channels) 1))
+                                    (force-monitor-reset! (get-monitor (first channels))))))
+                :else
+                (custom-time
+                  (doseq [_ (range iterations)]
+                    (do
+                      (loop [element max]
+                        (if (== 0 element)
+                          (thread (>!! (first channels) msg))
+                          (thread (do (<!! (nth channels (- element 1)) 1)
+                                      (>!! (nth channels element) msg))))
+                        (when (< 0 element)
+                          (recur (- element 1))))
+                      (<!! (last channels) 1)
+                      (force-monitor-reset! (get-monitor (first channels)))))))]
+     time)))
 (set-logging-exceptions)
-(discourje-pipeline 2)
-(discourje-pipeline 2)
-(discourje-pipeline 4)
-(discourje-pipeline 8)
-(discourje-pipeline 16)
-(discourje-pipeline 32)
-(discourje-pipeline 64)
-(discourje-pipeline 128)
-(discourje-pipeline 256)
+(discourje-pipeline-new-reverse 32 100)
+
+(defn clojure-pipeline-new-reverse
+  ([amount iterations]
+   (let [protocol (create-protocol (vec (for [p (range (- amount 1))] (-->> 1 p (+ p 1)))))
+         infra (generate-infrastructure protocol)
+         channels (vec (for [p (range (- amount 1))] (get-channel p (+ p 1) infra)))
+         msg (msg 1 1)
+         max (- amount 2)
+         time (cond
+                (< amount 2) "invalid amount!"
+                (== amount 2) (custom-time
+                                (doseq [_ (range iterations)]
+                                  (do
+                                    (do (thread (do (clojure.core.async/>!! (get-chan (first channels)) msg)))
+                                        (clojure.core.async/<!! (get-chan (first channels))))
+                                    (force-monitor-reset! (get-monitor (first channels))))))
+                :else
+                (custom-time
+                  (doseq [_ (range iterations)]
+                    (do
+                      (loop [element max]
+                        (if (== 0 element)
+                          (thread (clojure.core.async/>!! (get-chan (first channels)) msg))
+                          (thread (do (clojure.core.async/<!! (get-chan (nth channels (- element 1))))
+                                      (clojure.core.async/>!! (get-chan (nth channels element)) msg))))
+                        (when (< 0 element)
+                          (recur (- element 1))))
+                      (clojure.core.async/<!! (get-chan (last channels)))
+                      (force-monitor-reset! (get-monitor (first channels)))))))]
+     time)))
+
+(defn discourje-pipeline-new
+  "Pipe-lining protocol generator for Discourje, also has arity for setting the iterations:
+  Will start all logic on the main thread
+
+  Generates protocol in line of:
+
+  pipeline-prot
+    (mep
+      (-->> 1 p0 p1)
+      (-->> 1 p1 p2)
+      (-->> 1 .. ..)
+      (-->> 1 .. pn))
+  "
+  ([amount iterations]
+   (let [protocol (create-protocol (vec (for [p (range (- amount 1))] (-->> 1 p (+ p 1)))))
+         infra (generate-infrastructure protocol)
+         channels (vec (for [p (range (- amount 1))] (get-channel p (+ p 1) infra)))
+         msg (msg 1 1)
+         max (- amount 3)
+         time (cond
+                (< amount 2) "invalid amount!"
+                (== amount 2) (custom-time
+                                (doseq [_ (range iterations)]
+                                  (do
+                                    (do (thread (do (>!! (first channels) msg)))
+                                        (<!! (first channels) 1))
+                                    (force-monitor-reset! (get-monitor (first channels))))))
+                :else
+                (custom-time
+                  (doseq [_ (range iterations)]
+                    (do
+                      (thread (>!! (first channels) msg))
+                      (loop [element 0]
+                        (thread (do (<!! (nth channels element) 1)
+                                    (>!! (nth channels (+ element 1)) msg)))
+                        (when (< element max)
+                          (recur (+ 1 element))))
+                      (<!! (last channels) 1)
+                      (force-monitor-reset! (get-monitor (first channels)))))))]
+     time)))
+
+(defn clojure-pipeline-new
+  ([amount iterations]
+   (let [protocol (create-protocol (vec (for [p (range (- amount 1))] (-->> 1 p (+ p 1)))))
+         infra (generate-infrastructure protocol)
+         channels (vec (for [p (range (- amount 1))] (get-channel p (+ p 1) infra)))
+         msg (msg 1 1)
+         max (- amount 3)
+         time (cond
+                (< amount 2) "invalid amount!"
+                (== amount 2) (custom-time
+                                (doseq [_ (range iterations)]
+                                  (do
+                                    (do (thread (do (clojure.core.async/>!! (get-chan (first channels)) msg)))
+                                        (clojure.core.async/<!! (get-chan (first channels))))
+                                    (force-monitor-reset! (get-monitor (first channels))))))
+                :else
+                (custom-time
+                  (doseq [_ (range iterations)]
+                    (do
+                      (thread (clojure.core.async/>!! (get-chan (first channels)) msg))
+                      (loop [element 0]
+                        (thread (do (clojure.core.async/<!! (get-chan (nth channels element)))
+                                    (clojure.core.async/>!! (get-chan (nth channels (+ element 1))) msg)))
+                        (when (< element max)
+                          (recur (+ 1 element))))
+
+                      (clojure.core.async/<!! (get-chan (last channels)))
+                      (force-monitor-reset! (get-monitor (first channels)))))))]
+     time)))
 
 (defn clojure-pipeline
   ([amount]
    (let [channels (vec (for [_ (range amount)] (clojure.core.async/chan 1)))
-         msg (msg 1 1)]
-     (time
-       (loop [pipe 0]
-         (do
-           (clojure.core.async/>!! (nth channels pipe) msg)
-           (clojure.core.async/<!! (nth channels pipe))
-           (when (true? (< pipe (- amount 1)))
-             (recur (+ 1 pipe))))))))
+         msg (msg 1 1)
+         time (custom-time
+                (loop [pipe 0]
+                  (do
+                    (clojure.core.async/>!! (nth channels pipe) msg)
+                    (clojure.core.async/<!! (nth channels pipe))
+                    (when (true? (< pipe (- amount 1)))
+                      (recur (+ 1 pipe))))))]
+     (doseq [c channels] (clojure.core.async/close! c))
+     time))
   ([amount iterations]
-   (let [channels (vec (for [_ (range iterations)] (vec (for [_ (range amount)] (clojure.core.async/chan 1)))))
-         msg (msg 1 1)]
-     (time
-       (doseq [chans channels]
-         (loop [pipe 0]
-           (do
-             (clojure.core.async/>!! (nth chans pipe) msg)
-             (clojure.core.async/<!! (nth chans pipe))
-             (when (true? (< pipe (- amount 1)))
-               (recur (+ 1 pipe))))))))))
+   (if (<= iterations 1)
+     (clojure-pipeline amount)
+     (let [protocol (create-protocol (vec (for [p (range amount)] (-->> 1 p (+ p 1)))))
+           infra (generate-infrastructure protocol)
+           channels (vec (for [p (range amount)] (get-channel p (+ p 1) infra)))
+           msg (msg 1 1)
+           time (custom-time
+                  (doseq [_ (range iterations)]
+                    (do (loop [pipe 0]
+                          (do
+                            (clojure.core.async/>!! (get-chan (nth channels pipe)) msg)
+                            (clojure.core.async/<!! (get-chan (nth channels pipe)))
+                            (when (true? (< pipe (- amount 1)))
+                              (recur (+ 1 pipe)))))
+                        (force-monitor-reset! (get-monitor (first channels))))))]
 
-(clojure-pipeline 2)
-(clojure-pipeline 4)
-(clojure-pipeline 8)
-(clojure-pipeline 16)
-(clojure-pipeline 32)
-(clojure-pipeline 64)
-(clojure-pipeline 128)
-(clojure-pipeline 256)
+       time))))

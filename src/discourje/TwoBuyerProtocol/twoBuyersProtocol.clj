@@ -10,18 +10,18 @@
   (mep
     (rec :order-book
          (-->> "title" "buyer1" "seller")
-         (-->> "quote" "seller" "buyer1")
+         (-->> "quote" "seller" ["buyer1" "buyer2"])
          (-->> "quote-div" "buyer1" "buyer2")
          (choice
            [(-->> "ok" "buyer2" "seller")
-            (-->> "date" "seller" "buyer2")
-            (-->> "repeat" "buyer2" "buyer1")
+            (-->> "address" "buyer2" "seller")
+            (-->> "date" "seller" ["buyer1" "buyer2"])
             (continue :order-book)]
            [(-->> "quit" "buyer2" "seller")]))))
 
 ;generate the infra structure for the protocol
 (def infrastructure (add-infrastructure two-buyer-protocol))
-
+(set-logging-and-exceptions)
 ;start each participant on another thread
 (thread (b1/order-book infrastructure))
 (thread (b2/order-book infrastructure))

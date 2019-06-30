@@ -1,4 +1,4 @@
-(ns DelayedParallelTwoBuyerProtocol.Buyer1
+(ns discourje.TwoBuyerProtocolExceptions.Buyer1
   (:require [discourje.core.async :refer :all]
             [discourje.core.logging :refer :all])
   (:use [slingshot.slingshot :only [throw+ try+]]))

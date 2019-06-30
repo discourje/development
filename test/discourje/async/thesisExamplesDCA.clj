@@ -48,3 +48,80 @@
 
 (thread (buyer1))
 (thread (seller))
+;------------------------------------------------------------------------------------------------------------------------
+(def integer-protocol
+  (mep
+    (-->> java.lang.Integer "Alice" "Bob")
+    (-->> java.lang.Integer "Bob" "Alice")
+    (-->> java.lang.Integer "Alice" "Carol")
+    (-->> java.lang.Integer "Carol" "Alice")))
+
+(def infra (add-infrastructure integer-protocol))
+(def alice-to-bob (get-channel "Alice" "Bob" infra))
+(def alice-to-carol (get-channel "Alice" "Carol" infra))
+(def carol-to-alice (get-channel "Carol" "Alice" infra))
+(def bob-to-alice (get-channel "Bob" "Alice" infra))
+;------------BEFORE-----------------
+(defn alice []
+  (>!! alice-to-bob (msg java.lang.Integer 1))
+  (println "Alice received: " (get-content (<!! bob-to-alice java.lang.Integer)))
+  (>!! alice-to-carol (msg java.lang.Integer 3))
+  (println "Alice received: " (get-content (<!! carol-to-alice java.lang.Integer))))
+
+(defn bob []
+  (println "Bob received: " (get-content (<!! alice-to-bob java.lang.Integer)))
+  (>!! bob-to-alice (msg java.lang.Integer 2)))
+
+(defn carol []
+  (println "Carol received: " (get-content (<!! alice-to-carol java.lang.Integer)))
+  (>!! carol-to-alice (msg java.lang.Integer 4)))
+;------------AFTER-----------------
+(enable-wildcard)
+(defn alice []
+  (>!! alice-to-bob 1)
+  (println "Alice received: " (get-content (<!! bob-to-alice)))
+  (>!! alice-to-carol 3)
+  (println "Alice received: " (get-content (<!! carol-to-alice))))
+
+(defn bob []
+  (println "Bob received: " (get-content (<!! alice-to-bob)))
+  (>!! bob-to-alice 2))
+
+(defn carol []
+  (println "Carol received: " (get-content (<!! alice-to-carol)))
+  (>!! carol-to-alice 4))
+
+(defn multicast [interactions]
+  interactions)
+
+(def scatter-gather-multicast
+  (mep
+    (-->> 1 "master" ["worker0","worker1", "...", "workerN"])
+    (multicast [(-->> 1 "worker0" "master")
+                (-->> 1 "worker1" "master")
+                (-->> 1 ".."      "master")
+                (-->> 1 "workerN" "master")])))
+
+(def scatter-gather-multicast-nested
+  (mep
+    (-->> 1 "master" ["worker0","worker1", "...", "workerN"])
+    (multicast [[(-->> 1 "worker0" "master") (-->> "confirm" "master" "worker0")]
+                [(-->> 1 "worker1" "master") (-->> "confirm" "master" "worker1")]
+                [(-->> 1 ".."      "master") (-->> "confirm" "master" "...")]
+                [(-->> 1 "workerN" "master") (-->> "confirm" "master" "workerN")]])))
+
+(defmacro unless [condition body]
+  `(if (not ~condition)
+     (do ~@body)))
+
+(defn without-macro []
+  (if (not (< 6 5))
+    (do (println "6 is not smaller than 5!"))))
+
+(defn with-macro []
+  (unless (< 6 5) (println "6 is not smaller than 5!")))
+
+(without-macro)
+
+
+(with-macro)
