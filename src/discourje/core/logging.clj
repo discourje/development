@@ -13,6 +13,8 @@
 (def level-logging-exceptions :logging-exceptions)
 ;set default exception logging
 (def logging-level (atom level-logging-exceptions))
+;is throwing enabled?
+(def is-throwing-enabled (atom true))
 
 (defn- generate-exception
   "Generate a custom exception, as map data structure."
@@ -39,6 +41,9 @@
   []
   (reset! logging-level level-logging-exceptions))
 
+(defn set-throwing "set throwing flag"[flag]
+  (reset! is-throwing-enabled flag))
+
 ; define a channel to log data to, we use a channel to preserve order among println
 (def logging-channel (async/chan))
 
@@ -50,7 +55,8 @@
 (defn can-throw?
   "Is throwing enabled?"
   []
-  (or (= @logging-level level-exceptions) (= @logging-level level-logging-exceptions)))
+  (and (true? is-throwing-enabled)
+       (or (= @logging-level level-exceptions) (= @logging-level level-logging-exceptions))))
 
 (defn log-message
   "Put a message on the logging channel.
@@ -59,14 +65,14 @@
   (when (and (not (nil? logging-channel)) (can-log?))
     (async/>!! logging-channel (format "%s %s" message (apply str (flatten more))))))
 
-
 (defn log-error
   "Always log message but throw exception (error) if exceptions level is set!"
   [type message & more]
   (let [msg (format "%s %s" message (apply str (flatten more)))]
     (if (can-throw?)
       (throw+ (generate-exception type msg))
-      (log-message (format "ERROR-[%s] - %s" type msg)))))
+      (log-message (format "ERROR-[%s] - %s" type msg)))
+    nil))
 
 ;loop take on channel as long as the channel is open.
 (async/thread
