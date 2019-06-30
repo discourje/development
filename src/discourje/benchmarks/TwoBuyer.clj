@@ -87,19 +87,6 @@
                    (force-monitor-reset! (get-monitor b1-s )))))]
      time))
 
-(set-logging-exceptions)
-;(discourje-two-buyer 1)
-;(discourje-two-buyer 2)
-;(discourje-two-buyer 4)
-;(discourje-two-buyer 8)
-;(discourje-two-buyer 16)
-;(discourje-two-buyer 32)
-;(discourje-two-buyer 64)
-;(discourje-two-buyer 10000)
-;(discourje-two-buyer-monitor-reset 10000)
-;(discourje-two-buyer 128)
-;(discourje-two-buyer 256)
-
 (defn- clojure-buyer2 "Order a book from buyer2's perspective"
   [s-b2 b1-b2 b2-s ok address]
   (do
@@ -178,13 +165,3 @@
                    (clojure-buyer2 (get-chan s-b2) (get-chan b1-b2) (get-chan b2-s) ok address)
                    (force-monitor-reset! (get-monitor b1-s)))))]
     time))
-;(clojure-two-buyer-reset 630000)
-;(clojure-two-buyer 1)
-;(clojure-two-buyer 2)
-;(clojure-two-buyer 4)
-;(clojure-two-buyer 8)
-;(clojure-two-buyer 16)
-;(clojure-two-buyer 32)
-;(clojure-two-buyer 64)
-;(clojure-two-buyer 128)
-;(clojure-two-buyer 256)

@@ -18,10 +18,10 @@
   (discourje.benchmarks.TwoBuyer/clojure-two-buyer-reset iterations))
 
 (defn start-discourje-pipeline [amount iterations]
-  (discourje.benchmarks.pipelining/discourje-pipeline amount iterations))
+  (discourje.benchmarks.pipelining/discourje-pipeline-new-reverse amount iterations))
 
 (defn start-clojure-pipeline [amount iterations]
-  (discourje.benchmarks.pipelining/clojure-pipeline amount iterations))
+  (discourje.benchmarks.pipelining/clojure-pipeline-new-reverse amount iterations))
 
 (defn start-discourje-scattergather [workers iterations]
   (discourje.benchmarks.scatterGather/discourje-scatter-gather workers iterations))

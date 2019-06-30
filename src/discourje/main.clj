@@ -14,7 +14,6 @@
        value))))
 
 (defn now "get current date time" [] (new java.util.Date))
-(println (clojure.string/replace (str (now)) #" " "-"))
 
 (defn- run-discourje-benchmark [function amount iterations]
   (cond

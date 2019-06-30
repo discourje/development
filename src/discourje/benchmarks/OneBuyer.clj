@@ -70,16 +70,6 @@
                    (force-monitor-reset! (get-monitor b->s)))))]
 
     time))
-;(set-logging-exceptions)
-;(discourje-one-buyer 1)
-;(discourje-one-buyer 2)
-;(discourje-one-buyer 4)
-;(discourje-one-buyer 8)
-;(discourje-one-buyer 16)
-;(discourje-one-buyer-monitor-reset 650000)
-;(discourje-one-buyer 64)
-;(discourje-one-buyer 128)
-;(discourje-one-buyer 256)
 
 (defn- clojure-buyer
   "Logic representing Buyer"

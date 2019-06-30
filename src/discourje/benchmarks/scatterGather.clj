@@ -104,7 +104,6 @@
 ;(discourje-scatter-gather 4)
 ;(discourje-scatter-gather 8)
 ;(discourje-scatter-gather 16 16)
-(discourje-scatter-gather 1 10000000)
 ;(discourje-scatter-gather 2 150000)
 ;(discourje-scatter-gather 3 70000)
 ;(discourje-scatter-gather 4 8000)
@@ -179,12 +178,3 @@
                              (recur result))))
                        (force-monitor-reset! (get-monitor (first m->w))))))]
         time))))
-
-;(clojure-scatter-gather 2)
-;(clojure-scatter-gather 4)
-;(clojure-scatter-gather 8)
-;(clojure-scatter-gather 16 16)
-;(clojure-scatter-gather 32)
-;(clojure-scatter-gather 64)
-;(clojure-scatter-gather 128)
-;(clojure-scatter-gather 256)
