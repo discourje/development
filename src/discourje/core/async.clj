@@ -108,13 +108,13 @@
   [channel]
   (log-message "allowing receive on channel!")
   (async/<!! (get-chan channel))
-  true)
+  channel)
 
 (defn- allow-sends
   "Allow sending message on multiple channels"
   [channels message]
   (doseq [c channels] (allow-send c message))
-  true)
+  channels)
 
 (defn all-valid-channels?
   "Do all channels comply with the monitor"

@@ -68,7 +68,7 @@
          msg (msg 1 1)
          max (- amount 2)
          time (cond
-                (< amount 2) "invalid amount!"
+                (< amount 2) "invalid amount"
                 (== amount 2) (custom-time
                                 (doseq [_ (range iterations)]
                                   (do
@@ -90,7 +90,7 @@
                       (force-monitor-reset! (get-monitor (first channels)))))))]
      time)))
 (set-logging-exceptions)
-(discourje-pipeline-new-reverse 32 100)
+(discourje-pipeline-new-reverse 32 1)
 
 (defn clojure-pipeline-new-reverse
   ([amount iterations]

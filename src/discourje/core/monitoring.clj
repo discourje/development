@@ -281,7 +281,7 @@
   )
 
 (defn force-monitor-reset! "Force the monitor to go back to the first interaction." [monitor]
-  (reset! (:active-interaction monitor) (first (:interactions monitor))))
+  (reset! (:active-interaction monitor) (:interactions monitor)))
 
 (defrecord monitor [id interactions active-interaction]
   monitoring
