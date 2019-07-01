@@ -138,10 +138,10 @@
   "Is the given interaction valid compared to the active-interaction of the monitor"
   [sender receivers label active-interaction]
   (and
+    (= sender (:sender active-interaction))
     (and (if (instance? Seqable label)
            (or (contains-value? (:action active-interaction) label) (= label (:action active-interaction)))
            (or (nil? label) (= label (:action active-interaction)) (contains-value? label (:action active-interaction)))))
-    (= sender (:sender active-interaction))
     (and (if (instance? Seqable (:receivers active-interaction))
            (or (contains-value? receivers (:receivers active-interaction)) (= receivers (:receivers active-interaction)))
            (or (= receivers (:receivers active-interaction)) (contains-value? (:receivers active-interaction) receivers))))))

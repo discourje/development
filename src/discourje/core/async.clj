@@ -101,7 +101,7 @@
   "Allow send message in channel"
   [channel message]
   (async/>!! (get-chan channel) message)
-  true)
+  channel)
 
 (defn- allow-receive
   "Allow a receive on the channel"

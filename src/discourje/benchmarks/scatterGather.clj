@@ -39,8 +39,8 @@
                       (do
                         (<!!! (:take w) 1)
                         (loop []
-                            (when (nil? (>!! (:put w) msg))
-                              (recur))))))
+                          (when (nil? (>!! (:put w) msg))
+                            (recur))))))
                   (>!! m->w msg)
                   (loop [worker-id 0]
                     (let [result (do
@@ -69,22 +69,31 @@
            msg (msg 1 1)
            time (custom-time
                   (doseq [_ (range iterations)]
+                    (do
+
+                      (>!! m->w msg)
+                      ;(doseq [w w->m]
+                      ;  (thread
+                      ;    (do
+                      ;      (<!!! (:take w) 1)
+                      ;      (loop []
+                      ;        (when (nil? (>!! (:put w) msg))
+                      ;          (recur))))))
+                      (doseq [w w->m]
+                        (thread
                           (do
-                            (doseq [w w->m]
-                              (thread
-                                (do
-                                  (<!!! (:take w) 1)
-                                    (loop []
-                                      (when (nil? (>!! (:put w) msg))
-                                        (recur))))))
-                            (>!! m->w msg)
-                            (loop [worker-id 0]
-                              (let [result (do
-                                             (<!! (:put (nth w->m worker-id)) 1)
-                                             (+ worker-id 1))]
-                                (when (< result workers)
-                                  (recur result))))
-                            (force-monitor-reset! (get-monitor (first m->w))))))]
+                            (<!!! (:take w) 1)
+                            (loop []
+                              (let [result (>!! (:put w) msg)]
+                                (when (nil? result)
+                                  (recur)))))))
+                      (loop [worker-id 0]
+                        (let [result (do
+                                       (<!! (:put (nth w->m worker-id)) 1)
+                                       (+ worker-id 1))]
+                          (when (< result workers)
+                            (recur result))))
+                      (force-monitor-reset! (get-monitor (first m->w))))))]
        time))))
 ;(set-logging-exceptions)
 ;(discourje-scatter-gather 2)
@@ -98,8 +107,79 @@
 ;(discourje-scatter-gather 8 1500)
 ;(discourje-scatter-gather 12 560)
 ;(discourje-scatter-gather 16 400)
-(discourje-scatter-gather 24 180) ;FOR 1 MIN!!!
-;(discourje-scatter-gather 32 100) FOR 1 MIN!!!
+;(discourje-scatter-gather 24 180) ;FOR 1 MIN!!!
+;(discourje-scatter-gather 32 100) ;FOR 1 MIN!!!
 ;(discourje-scatter-gather 64)
 ;(discourje-scatter-gather 128)
 ;(discourje-scatter-gather 256)
+
+(defn clojure-scatter-gather
+  ([workers]
+   (let [workers-prot (create-protocol
+                        (vec
+                          (flatten
+                            (flatten
+                              (conj
+                                [(-->> 1 "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
+                                (vec (for [w (range workers)] (-->> 1 (format "w%s" w) "m")))))))) ; workers to master
+         infra (generate-infrastructure workers-prot)
+         m->w (vec (for [w (range workers)] (get-channel "m" (format "w%s" w) infra)))
+         w->m (vec (for [w (range workers)] {:take (get-channel "m" (format "w%s" w) infra)
+                                             :put  (get-channel (format "w%s" w) "m" infra)}))
+         msg (msg 1 1)
+         time (custom-time
+                (do
+                  (doseq [w m->w] (clojure.core.async/>!! (get-chan w) msg))
+                  (doseq [w w->m]
+                    (thread
+                      (do
+                        (clojure.core.async/<!! (get-chan (:take w)))
+                        (loop []
+                          (when (nil? (clojure.core.async/>!! (get-chan (:put w)) msg))
+                            (recur))))))
+                  (loop [worker-id 0]
+                    (let [result (do
+                                   (clojure.core.async/<!! (get-chan (:put (nth w->m worker-id))))
+                                   (+ worker-id 1))]
+                      (when (true? (< result workers))
+                        (recur result))))))]
+     (doseq [mw m->w] (clojure.core.async/close! (get-chan mw)))
+     (doseq [wm w->m] (do (clojure.core.async/close! (get-chan (:take wm)))
+                          (clojure.core.async/close! (get-chan (:put wm)))))
+     time))
+  ([workers iterations]
+   (if (<= iterations 1)
+     (discourje-scatter-gather workers)
+     (let [workers-prot (create-protocol
+                          (vec
+                            (flatten
+                              (flatten
+                                (conj
+                                  [(-->> 1 "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
+                                  (vec (for [w (range workers)] (-->> 1 (format "w%s" w) "m")))))))) ; workers to master
+           infra (generate-infrastructure workers-prot)
+           m->w (vec (for [w (range workers)] (get-channel "m" (format "w%s" w) infra)))
+           w->m (vec (for [w (range workers)] {:take (get-channel "m" (format "w%s" w) infra)
+                                               :put  (get-channel (format "w%s" w) "m" infra)}))
+           msg (msg 1 1)
+           time (custom-time
+                  (doseq [_ (range iterations)]
+                    (do
+                      (doseq [w m->w] (clojure.core.async/>!! (get-chan w) msg))
+                      (doseq [w w->m]
+                        (thread
+                          (do
+                            (clojure.core.async/<!! (get-chan (:take w)))
+                            (loop []
+                              (when (nil? (clojure.core.async/>!! (get-chan (:put w)) msg))
+                                (recur))))))
+                      (loop [worker-id 0]
+                        (let [result (do
+                                       (clojure.core.async/<!! (get-chan (:put (nth w->m worker-id))))
+                                       (+ worker-id 1))]
+                          (when (< result workers)
+                            (recur result))))
+                      (force-monitor-reset! (get-monitor (first m->w))))))]
+       time))))
+
+;(clojure-scatter-gather 16 16)
