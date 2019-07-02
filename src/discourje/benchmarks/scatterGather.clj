@@ -70,23 +70,14 @@
            time (custom-time
                   (doseq [_ (range iterations)]
                     (do
-
-                      (>!! m->w msg)
-                      ;(doseq [w w->m]
-                      ;  (thread
-                      ;    (do
-                      ;      (<!!! (:take w) 1)
-                      ;      (loop []
-                      ;        (when (nil? (>!! (:put w) msg))
-                      ;          (recur))))))
                       (doseq [w w->m]
                         (thread
                           (do
                             (<!!! (:take w) 1)
                             (loop []
-                              (let [result (>!! (:put w) msg)]
-                                (when (nil? result)
-                                  (recur)))))))
+                              (when (nil? (>!! (:put w) msg))
+                                (recur))))))
+                      (>!! m->w msg)
                       (loop [worker-id 0]
                         (let [result (do
                                        (<!! (:put (nth w->m worker-id)) 1)
@@ -129,7 +120,6 @@
          msg (msg 1 1)
          time (custom-time
                 (do
-                  (doseq [w m->w] (clojure.core.async/>!! (get-chan w) msg))
                   (doseq [w w->m]
                     (thread
                       (do
@@ -137,6 +127,7 @@
                         (loop []
                           (when (nil? (clojure.core.async/>!! (get-chan (:put w)) msg))
                             (recur))))))
+                  (doseq [w m->w] (clojure.core.async/>!! (get-chan w) msg))
                   (loop [worker-id 0]
                     (let [result (do
                                    (clojure.core.async/<!! (get-chan (:put (nth w->m worker-id))))
