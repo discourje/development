@@ -10,7 +10,7 @@
        (-->> "greet" "alice" "carol")
        (-->> "greet" "carol" "alice")))
 
-;Define custom channels, which differ in buffer size (1 and 2)
+;Define custom channels, which differ in buffer size (1 and 2, 3, 4)
 (def a->b (chan "alice" "bob" 1))
 (def b->a (chan "bob" "alice" 2))
 (def a->c (chan "alice" "carol" 3))

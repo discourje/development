@@ -12,7 +12,7 @@
       [(-->> OutOfStock "seller" "buyer")])))
 
 ;Second step is to add infra structure to our MEP
-
+(def infra (add-infrastructure buy-goods))
 ;So instead of defining our channels we allow Discourje to generate them
 ;(def buyer-to-seller (chan))
 ;(def seller-to-buyer (chan))

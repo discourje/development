@@ -4,7 +4,7 @@
 (defmacro -->>
   "Create an Atomic-interaction"
   [action sender receiver]
-  `(->interaction (uuid/v1) ~action ~sender ~receiver nil))
+    `(->interaction (uuid/v1) ~action ~sender ~receiver nil))
 
 (defmacro rec
   "Generate recursion"
@@ -29,7 +29,7 @@
 (defmacro add-infrastructure
   "adds infrastructure to the mep (channels)"
   ([message-exchange-pattern]
-  `(generate-infrastructure ~message-exchange-pattern))
+   `(generate-infrastructure ~message-exchange-pattern))
   ([message-exchange-pattern custom-channels]
    `(generate-infrastructure ~message-exchange-pattern ~custom-channels)))
 
@@ -37,8 +37,8 @@
   "create a custom channel"
   [sender receiver buffer]
   `(if (nil? ~buffer)
-    (->channel ~sender ~receiver (clojure.core.async/chan) nil nil)
-    (->channel ~sender ~receiver (clojure.core.async/chan ~buffer) ~buffer nil)))
+     (->channel ~sender ~receiver (clojure.core.async/chan) nil nil)
+     (->channel ~sender ~receiver (clojure.core.async/chan ~buffer) ~buffer nil)))
 
 (defmacro msg
   "Generate a message"
@@ -49,3 +49,15 @@
   "Execute body on thread"
   [body]
   `(async/thread ~body))
+
+(defmacro close!
+  "Close the channel"
+  [channel]
+  `(clojure.core.async/close! (get-chan ~channel)))
+
+(defmacro custom-time
+  "Evaluates expr and prints the time it took.  Returns the value of expr."
+  [expr]
+  `(let [start# (. System (nanoTime))
+         ret# ~expr]
+     (str "Elapsed time: " (/ (double (- (. System (nanoTime)) start#)) 1000000.0) " msecs")))

@@ -108,3 +108,8 @@
   (let [roles (get-distinct-role-pairs (get-interactions (two-buyer-protocol)))
         channels (generate-minimum-channels roles nil 1)]
     (is (= 5 (count channels)))))
+(deftest minimum-amount-testSingleParallelProtocol-roles-test
+  (let [roles (get-distinct-role-pairs (get-interactions (testSingleParallelProtocol)))
+        channels (generate-minimum-channels roles nil 1)]
+    (println channels)
+    (is (= 2 (count channels)))))
