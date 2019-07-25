@@ -10,9 +10,26 @@
   (conj (pop coll) x))
 
 (defn- remove-atoms [root-interaction]
-    (loop [unreferenced-root @root-interaction]
-     continue here with removing all atom references to single ref )
-  )
+  (let [root @root-interaction]
+    (when-not (nil? (get-next root))
+      (loop [root-node root
+             current-interaction @(get-next root)]
+        (cond
+          (or (satisfies? interactable current-interaction) (satisfies? identifiable-recur current-interaction))
+          (assoc previous-interaction :next current-interaction)
+          (satisfies? branchable current-interaction)
+          (let [branches (for [b (get-branches current-interaction)] (remove-atoms b))]
+            (assoc current-interaction :branches branches)
+            (assoc previous-interaction :next current-interaction))
+          (satisfies? recursable current-interaction)
+          (let [recursion (remove-atoms (get-recursion current-interaction))]
+            (assoc current-interaction :recursion recursion)
+            (assoc previous-interaction :next current-interaction))
+          )
+        (when-not (nil? (get-next current-interaction))
+          (recur root-note @(get-next current-interaction)))
+        ))
+    root))
 
 (defn link-interactions-by-reference
   ([protocol]
@@ -51,7 +68,7 @@
              (log-error :unsupported-reference-link "unsupported reference link interaction"))
            (when (true? (< i (- (count interactions) 1)))
              (recur (+ 1 i) inter)))))
-     (remove-atoms first-interaction)
+     (println (remove-atoms first-interaction))
      first-interaction)))
 
 (def interz [(-->> 1 "a" "b")
@@ -68,4 +85,4 @@
                   )
              (-->> "sdasd" "1" "2")])
 ;
-(println (link-interactions-by-reference 1 interz))
+(link-interactions-by-reference 1 interz)
