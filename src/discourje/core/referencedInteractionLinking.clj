@@ -9,31 +9,9 @@
   [coll x]
   (conj (pop coll) x))
 
-(defn- remove-atoms [root-interaction]
-  (let [root @root-interaction]
-    (when-not (nil? (get-next root))
-      (loop [root-node root
-             current-interaction @(get-next root)]
-        (cond
-          (or (satisfies? interactable current-interaction) (satisfies? identifiable-recur current-interaction))
-          (assoc previous-interaction :next current-interaction)
-          (satisfies? branchable current-interaction)
-          (let [branches (for [b (get-branches current-interaction)] (remove-atoms b))]
-            (assoc current-interaction :branches branches)
-            (assoc previous-interaction :next current-interaction))
-          (satisfies? recursable current-interaction)
-          (let [recursion (remove-atoms (get-recursion current-interaction))]
-            (assoc current-interaction :recursion recursion)
-            (assoc previous-interaction :next current-interaction))
-          )
-        (when-not (nil? (get-next current-interaction))
-          (recur root-note @(get-next current-interaction)))
-        ))
-    root))
-
 (defn link-interactions-by-reference
   ([protocol]
-   (link-interactions-by-reference (get-interactions protocol) 1)
+   (link-interactions-by-reference 1 (get-interactions protocol))
     )
   ([index interactions]
    (let [first-interaction (atom (first interactions))]
@@ -48,11 +26,11 @@
                  (if (nil? (get-next @current-branch-inter))
                    (swap! current-branch-inter assoc-next-atom inter)
                    (recur (get-next @current-branch-inter)))))
-             ;(satisfies? recursable @new-inter)
-             ;(loop [next-interaction (get-recursion @new-inter)]
-             ;  (if (and (satisfies? identifiable-recur @next-interaction) (= (get-name @next-interaction) (get-name @new-inter)))
-             ;    (swap! next-interaction assoc-next-atom new-inter)
-             ;    (recur (get-next @next-interaction))))
+             (satisfies? recursable @new-inter)
+             (loop [next-interaction (get-recursion @new-inter)]
+               (if (and (satisfies? identifiable-recur @next-interaction) (= (get-name @next-interaction) (get-name @new-inter)))
+                 (swap! next-interaction assoc-next-atom new-inter)
+                 (recur (get-next @next-interaction))))
              (or (satisfies? interactable (nth interactions i)) (satisfies? identifiable-recur (nth interactions i)))
              (swap! new-inter assoc-next-atom inter)
              (satisfies? branchable (nth interactions i))
@@ -68,7 +46,6 @@
              (log-error :unsupported-reference-link "unsupported reference link interaction"))
            (when (true? (< i (- (count interactions) 1)))
              (recur (+ 1 i) inter)))))
-     (println (remove-atoms first-interaction))
      first-interaction)))
 
 (def interz [(-->> 1 "a" "b")

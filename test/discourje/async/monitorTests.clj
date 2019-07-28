@@ -1,40 +1,41 @@
 (ns discourje.async.monitorTests
   (:require [clojure.test :refer :all]
             [discourje.async.protocolTestData :refer :all]
-            [discourje.core.async :refer :all]))
+            [discourje.core.async :refer :all])
+  (:import (clojure.lang Atom)))
+
+(defn nth-next [root index]
+  (loop [node (if (and (not= nil root) (instance? Atom root)) @root root)
+         value 0]
+    (if (== value index)
+      node
+      (recur @(get-next node) (+ value 1)))))
 
 (deftest get-active-interaction-test
   (let [mon (generate-monitor (testDualProtocol))
-        i0 (nth (:interactions mon) 0)
-        i1 (nth (:interactions mon) 1)]
+        i0 (nth-next (:interactions mon) 0)
+        i1 (nth-next (:interactions mon) 1)]
     (is (= "1" (get-action (get-active-interaction mon))))
     (is (= "A" (get-sender (get-active-interaction mon))))
     (is (= "B" (get-receivers (get-active-interaction mon))))
-    (is (= (get-next i0) (get-id i1)))
+    (is (= @(get-next i0) i1))
     (is (= (get-next i1) nil))))
-
-(deftest dual-protocol-monitor-test
-  (let [mon (generate-monitor (testDualProtocol))]
-    (is (= 2 (count (:interactions mon))))))
 
 (deftest dual-protocol-ids-test
   (let [mon (generate-monitor (testDualProtocol))
-        i0 (nth (:interactions mon) 0)
-        i1 (nth (:interactions mon) 1)]
-    (is (= (get-next i0) (get-id i1)))
+        i0 (nth-next (:interactions mon) 0)
+        i1 (nth-next (:interactions mon) 1)]
+    (is (= @(get-next i0) i1))
     (is (= (get-next i1) nil))))
 
-(deftest triple-protocol-monitor-test
-  (let [mon (generate-monitor (testTripleProtocol))]
-    (is (= 3 (count (:interactions mon))))))
 
 (deftest triple-protocol-ids-test
   (let [mon (generate-monitor (testTripleProtocol))
-        i0 (nth (:interactions mon) 0)
-        i1 (nth (:interactions mon) 1)
-        i2 (nth (:interactions mon) 2)]
-    (is (= (get-next i0) (get-id i1)))
-    (is (= (get-next i1) (get-id i2)))
+        i0 (nth-next (:interactions mon) 0)
+        i1 (nth-next (:interactions mon) 1)
+        i2 (nth-next (:interactions mon) 2)]
+    (is (= @(get-next i0) i1))
+    (is (= @(get-next i1) i2))
     (is (= (get-next i2) nil))))
 
 (deftest parallel-protocol-monitor-test
@@ -43,64 +44,47 @@
 
 (deftest parallel-protocol-ids-test
   (let [mon (generate-monitor (testParallelProtocol))
-        i0 (nth (:interactions mon) 0)
-        i1 (nth (:interactions mon) 1)
-        i2 (nth (:interactions mon) 2)
-        i3 (nth (:interactions mon) 3)]
-    (is (= (get-next i0) (get-id i1)))
-    (is (= (get-next i1) (get-id i2)))
-    (is (= (get-next i2) (get-id i3)))
+        i0 (nth-next (:interactions mon) 0)
+        i1 (nth-next (:interactions mon) 1)
+        i2 (nth-next (:interactions mon) 2)
+        i3 (nth-next (:interactions mon) 3)]
+    (is (= @(get-next i0) i1))
+    (is (= @(get-next i1) i2))
+    (is (= @(get-next i2) i3))
     (is (= (get-next i3) nil))))
-
-(deftest quad-protocol-monitor-test
-  (let [mon (generate-monitor (testQuadProtocol))]
-    (is (= 5 (count (:interactions mon))))))
 
 (deftest quad-protocol-ids-test
   (let [mon (generate-monitor (testQuadProtocol))
-        i0 (nth (:interactions mon) 0)
-        i1 (nth (:interactions mon) 1)
-        i2 (nth (:interactions mon) 2)
-        i3 (nth (:interactions mon) 3)
-        i4 (nth (:interactions mon) 4)]
-    (is (= (get-next i0) (get-id i1)))
-    (is (= (get-next i1) (get-id i2)))
-    (is (= (get-next i2) (get-id i3)))
-    (is (= (get-next i3) (get-id i4)))
+        i0 (nth-next (:interactions mon) 0)
+        i1 (nth-next (:interactions mon) 1)
+        i2 (nth-next (:interactions mon) 2)
+        i3 (nth-next (:interactions mon) 3)
+        i4 (nth-next (:interactions mon) 4)]
+    (is (= @(get-next i0) i1))
+    (is (= @(get-next i1) i2))
+    (is (= @(get-next i2) i3))
+    (is (= @(get-next i3) i4))
     (is (= (get-next i4) nil))))
-
-(deftest quad-protocol-monitor-test
-  (let [mon (generate-monitor (testQuadProtocol))]
-    (is (= 5 (count (:interactions mon))))))
-
-(deftest single-choice-protocol-test
-  (let [mon (generate-monitor (single-choice-protocol))]
-    (is (= 1 (count (:interactions mon))))))
-
-(deftest single-choice-in-middle-protocol-test
-  (let [mon (generate-monitor (single-choice-in-middle-protocol))]
-    (println (:interactions mon))
-    (is (= 3 (count (:interactions mon))))))
 
 (deftest single-choice-in-middle-protocol-ids-test
   (let [mon (generate-monitor (single-choice-in-middle-protocol))
-        i0 (nth (:interactions mon) 0)
-        i1 (nth (:interactions mon) 1)
-        branch0 (nth (:branches i1) 0)
-        i100 (nth branch0 0)
-        i101 (nth branch0 1)
+        i0 (nth-next (:interactions mon) 0)
+        i1 (nth-next (:interactions mon) 1)
+        branch0 (nth(:branches i1) 0)
+        i100 (nth-next branch0 0)
+        i101 (nth-next branch0 1)
         branch1 (nth (:branches i1) 1)
-        i110 (nth branch1 0)
-        i111 (nth branch1 1)
-        i2 (nth (:interactions mon) 2)]
+        i110 (nth-next branch1 0)
+        i111 (nth-next branch1 1)
+        i2 (nth-next (:interactions mon) 2)]
     (println (:interactions mon))
-    (is (= (get-next i0) (get-id i1)))
-    (is (= (get-next i1) (get-id i2)))
-    (is (= (get-next i100) (get-id i101)))
-    (is (= (get-next i101) (get-id i2)))
-    (is (= (get-next i110) (get-id i111)))
-    (is (= (get-next i111) (get-id i2)))
-    (is (= (get-next i2) nil))))
+    (is (= @(get-next i0)  i1))
+    (is (= @(get-next i1)  i2))
+    (is (= @(get-next i100)  i101))
+    (is (= @(get-next i101)  i2))
+    (is (= @(get-next i110)  i111))
+    (is (= @(get-next i111)  i2))
+    (is (= @(get-next i2) nil))))
 
 (deftest single-choice-5branches-protocol-test
   (let [mon (generate-monitor (single-choice-5branches-protocol))]

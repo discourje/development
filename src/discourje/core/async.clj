@@ -72,7 +72,7 @@
   "Generate the monitor based on the given protocol"
   [protocol]
   (let [linked-interactions (link-interactions-by-reference protocol)]
-    (->monitor (uuid/v1) @linked-interactions (atom @linked-interactions))))
+    (->monitor (uuid/v1) linked-interactions (atom @linked-interactions))))
 
 (defn- all-channels-implement-transportable?
   "Do all custom supplied channels implement the transportable interface?"
