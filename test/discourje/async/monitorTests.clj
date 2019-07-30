@@ -12,100 +12,32 @@
       (recur @(get-next node) (+ value 1)))))
 
 (deftest get-active-interaction-test
-  (let [mon (generate-monitor (testDualProtocol))
-        i0 (nth-next (:interactions mon) 0)
-        i1 (nth-next (:interactions mon) 1)]
+  (let [mon (generate-monitor (testDualProtocol false))]
+    (is (= (:interactions mon) testDualProtocolControl))
     (is (= "1" (get-action (get-active-interaction mon))))
     (is (= "A" (get-sender (get-active-interaction mon))))
-    (is (= "B" (get-receivers (get-active-interaction mon))))
-    (is (= @(get-next i0) i1))
-    (is (= (get-next i1) nil))))
-
-(deftest dual-protocol-ids-test
-  (let [mon (generate-monitor (testDualProtocol))
-        i0 (nth-next (:interactions mon) 0)
-        i1 (nth-next (:interactions mon) 1)]
-    (is (= @(get-next i0) i1))
-    (is (= (get-next i1) nil))))
-
+    (is (= "B" (get-receivers (get-active-interaction mon))))))
 
 (deftest triple-protocol-ids-test
-  (let [mon (generate-monitor (testTripleProtocol))
-        i0 (nth-next (:interactions mon) 0)
-        i1 (nth-next (:interactions mon) 1)
-        i2 (nth-next (:interactions mon) 2)]
-    (is (= @(get-next i0) i1))
-    (is (= @(get-next i1) i2))
-    (is (= (get-next i2) nil))))
-
-(deftest parallel-protocol-monitor-test
-  (let [mon (generate-monitor (testParallelProtocol))]
-    (is (= 4 (count (:interactions mon))))))
+  (let [mon (generate-monitor (testTripleProtocol false))]
+    (is (= (:interactions mon) testTripleProtocolControl))))
 
 (deftest parallel-protocol-ids-test
-  (let [mon (generate-monitor (testParallelProtocol))
-        i0 (nth-next (:interactions mon) 0)
-        i1 (nth-next (:interactions mon) 1)
-        i2 (nth-next (:interactions mon) 2)
-        i3 (nth-next (:interactions mon) 3)]
-    (is (= @(get-next i0) i1))
-    (is (= @(get-next i1) i2))
-    (is (= @(get-next i2) i3))
-    (is (= (get-next i3) nil))))
+  (let [mon (generate-monitor (testParallelProtocol false))]
+    (is (= (:interactions mon) testParallelProtocolControl))))
 
 (deftest quad-protocol-ids-test
-  (let [mon (generate-monitor (testQuadProtocol))
-        i0 (nth-next (:interactions mon) 0)
-        i1 (nth-next (:interactions mon) 1)
-        i2 (nth-next (:interactions mon) 2)
-        i3 (nth-next (:interactions mon) 3)
-        i4 (nth-next (:interactions mon) 4)]
-    (is (= @(get-next i0) i1))
-    (is (= @(get-next i1) i2))
-    (is (= @(get-next i2) i3))
-    (is (= @(get-next i3) i4))
-    (is (= (get-next i4) nil))))
+  (let [mon (generate-monitor (testQuadProtocol false))]
+    (is (= (:interactions mon) testQuadProtocolControl))))
 
 (deftest single-choice-in-middle-protocol-ids-test
-  (let [mon (generate-monitor (single-choice-in-middle-protocol))
-        i0 (nth-next (:interactions mon) 0)
-        i1 (nth-next (:interactions mon) 1)
-        branch0 (nth(:branches i1) 0)
-        i100 (nth-next branch0 0)
-        i101 (nth-next branch0 1)
-        branch1 (nth (:branches i1) 1)
-        i110 (nth-next branch1 0)
-        i111 (nth-next branch1 1)
-        i2 (nth-next (:interactions mon) 2)]
-    (println (:interactions mon))
-    (is (= @(get-next i0)  i1))
-    (is (= @(get-next i1)  i2))
-    (is (= @(get-next i100)  i101))
-    (is (= @(get-next i101)  i2))
-    (is (= @(get-next i110)  i111))
-    (is (= @(get-next i111)  i2))
-    (is (= @(get-next i2) nil))))
-
-(deftest single-choice-5branches-protocol-test
-  (let [mon (generate-monitor (single-choice-5branches-protocol))]
-    (is (= 2 (count (:interactions mon))))))
+  (let [mon (generate-monitor (single-choice-in-middle-protocol false))]
+    (is (= (:interactions mon) single-choice-in-middle-protocolControl))))
 
 (deftest single-choice-5branches-protocol-ids-test
-  (let [mon (generate-monitor (single-choice-5branches-protocol))
-        i0 (nth (:interactions mon) 0)
-        i0b0 (nth (nth (:branches i0) 0) 0)
-        i0b1 (nth (nth (:branches i0) 1) 0)
-        i0b2 (nth (nth (:branches i0) 2) 0)
-        i0b3 (nth (nth (:branches i0) 3) 0)
-        i0b4 (nth (nth (:branches i0) 4) 0)
-        i1 (nth (:interactions mon) 1)]
-    (is (= (get-next i0) (get-id i1)))
-    (is (= (get-next i0b0) (get-id i1)))
-    (is (= (get-next i0b1) (get-id i1)))
-    (is (= (get-next i0b2) (get-id i1)))
-    (is (= (get-next i0b3) (get-id i1)))
-    (is (= (get-next i0b4) (get-id i1)))
-    (is (= (get-next i1) nil))))
+  (let [mon (generate-monitor (single-choice-5branches-protocol false))]
+    (println mon)
+    (is (= (:interactions mon) single-choice-5branches-protocolControl))))
 
 (deftest dual-choice-protocol-test
   (let [mon (generate-monitor (dual-choice-protocol))]
@@ -117,8 +49,8 @@
         i0b0 (nth (nth (:branches i0) 0) 0)
         i0b10 (nth (nth (:branches i0) 1) 0)
         i0b11 (nth (nth (:branches i0) 1) 1)
-        i0b1b10 (nth (nth (:branches i0b11)0)0)
-        i0b1b11 (nth (nth (:branches i0b11)1)0)
+        i0b1b10 (nth (nth (:branches i0b11) 0) 0)
+        i0b1b11 (nth (nth (:branches i0b11) 1) 0)
         i1 (nth (:interactions mon) 1)]
     (is (= (get-next i0) (get-id i1)))
     (is (= (get-next i0b0) (get-id i1)))
@@ -160,21 +92,21 @@
 (deftest multiple-nested-branches-protocol-ids-test
   (let [mon (generate-monitor (multiple-nested-branches-protocol))
         i0 (nth (:interactions mon) 0)
-        i0b0 (nth (:branches i0)0)
-        i0b0b00 (nth (nth (:branches (nth i0b0 0))0)0)
-        i0b0b01 (nth (nth (:branches (nth i0b0 0))0)1)
-        i0b0b10 (nth (nth (:branches (nth i0b0 0))1)0)
-        i0b1  (nth (:branches i0) 1)
-        i0b1b0 (nth (nth (:branches (nth i0b1 0))0)0)
-        i0b1b0b0 (nth (:branches i0b1b0)0)
-        i0b1b0b0b00 (nth (nth (:branches (nth i0b1b0b0 0))0)0)
-        i0b1b0b0b10 (nth (nth (:branches (nth i0b1b0b0 0))1)0)
-        i0b1b0b0b11 (nth (nth (:branches (nth i0b1b0b0 0))1)1)
-        i0b1b0b0b12 (nth (nth (:branches (nth i0b1b0b0 0))1)2)
-        i0b1b0b10 (nth (nth (:branches i0b1b0)1)0)
-        i0b1b11 (nth (nth (:branches (nth i0b1 0))1)0)
+        i0b0 (nth (:branches i0) 0)
+        i0b0b00 (nth (nth (:branches (nth i0b0 0)) 0) 0)
+        i0b0b01 (nth (nth (:branches (nth i0b0 0)) 0) 1)
+        i0b0b10 (nth (nth (:branches (nth i0b0 0)) 1) 0)
+        i0b1 (nth (:branches i0) 1)
+        i0b1b0 (nth (nth (:branches (nth i0b1 0)) 0) 0)
+        i0b1b0b0 (nth (:branches i0b1b0) 0)
+        i0b1b0b0b00 (nth (nth (:branches (nth i0b1b0b0 0)) 0) 0)
+        i0b1b0b0b10 (nth (nth (:branches (nth i0b1b0b0 0)) 1) 0)
+        i0b1b0b0b11 (nth (nth (:branches (nth i0b1b0b0 0)) 1) 1)
+        i0b1b0b0b12 (nth (nth (:branches (nth i0b1b0b0 0)) 1) 2)
+        i0b1b0b10 (nth (nth (:branches i0b1b0) 1) 0)
+        i0b1b11 (nth (nth (:branches (nth i0b1 0)) 1) 0)
         i1 (nth (:interactions mon) 1)
-       ]
+        ]
     (is (= (get-next i0) (get-id i1)))
     (is (= (get-next i0b0b00) (get-id i0b0b01)))
     (is (= (get-next i0b0b01) (get-id i1)))
@@ -197,11 +129,11 @@
         i1 (nth (:interactions mon) 1)
         i1r0 (nth (:recursion i1) 0)
         i1r1 (nth (:recursion i1) 1)
-        i1r1b00 (nth (nth (:branches i1r1)0) 0)
-        i1r1b01 (nth (nth (:branches i1r1)0) 1)
-        i1r1b02 (nth (nth (:branches i1r1)0) 2)
-        i1r1b10 (nth (nth (:branches i1r1)1) 0)
-        i1r1b11 (nth (nth (:branches i1r1)1) 1)
+        i1r1b00 (nth (nth (:branches i1r1) 0) 0)
+        i1r1b01 (nth (nth (:branches i1r1) 0) 1)
+        i1r1b02 (nth (nth (:branches i1r1) 0) 2)
+        i1r1b10 (nth (nth (:branches i1r1) 1) 0)
+        i1r1b11 (nth (nth (:branches i1r1) 1) 1)
         i2 (nth (:interactions mon) 2)]
     (is (= (get-next i0) (get-id i1)))
     (is (= (get-next i1r0) (get-id i1r1)))
@@ -223,17 +155,17 @@
         i0r0 (nth (:recursion i0) 0)
         i0r0i0 (nth (:recursion i0r0) 0)
         i0r0i1 (nth (:recursion i0r0) 1)
-        i0r0i1b00 (nth (nth (:branches i0r0i1)0)0)
-        i0r0i1b01 (nth (nth (:branches i0r0i1)0)1)
-        i0r0i1b02 (nth (nth (:branches i0r0i1)0)2)
-        i0r0i1b10 (nth (nth (:branches i0r0i1)1)0)
-        i0r0i1b11 (nth (nth (:branches i0r0i1)1)1)
-        i0r0i2  (nth (:recursion i0r0) 2)
-        i0r0i2b00 (nth (nth (:branches i0r0i2)0)0)
-        i0r0i2b01 (nth (nth (:branches i0r0i2)0)1)
-        i0r0i2b02 (nth (nth (:branches i0r0i2)0)2)
-        i0r0i2b10 (nth (nth (:branches i0r0i2)1)0)
-        i0r0i2b11 (nth (nth (:branches i0r0i2)1)1)
+        i0r0i1b00 (nth (nth (:branches i0r0i1) 0) 0)
+        i0r0i1b01 (nth (nth (:branches i0r0i1) 0) 1)
+        i0r0i1b02 (nth (nth (:branches i0r0i1) 0) 2)
+        i0r0i1b10 (nth (nth (:branches i0r0i1) 1) 0)
+        i0r0i1b11 (nth (nth (:branches i0r0i1) 1) 1)
+        i0r0i2 (nth (:recursion i0r0) 2)
+        i0r0i2b00 (nth (nth (:branches i0r0i2) 0) 0)
+        i0r0i2b01 (nth (nth (:branches i0r0i2) 0) 1)
+        i0r0i2b02 (nth (nth (:branches i0r0i2) 0) 2)
+        i0r0i2b10 (nth (nth (:branches i0r0i2) 1) 0)
+        i0r0i2b11 (nth (nth (:branches i0r0i2) 1) 1)
         i1 (nth (:interactions mon) 1)]
     (println (:interactions mon))
     (println i0r0i1b02)
@@ -302,15 +234,15 @@
 (deftest two-buyer-protocol-ids-test
   (let [mon (generate-monitor (two-buyer-protocol))
         i0 (nth (:interactions mon) 0)
-        i0r0i0 (nth (:recursion i0)0)
-        i0r0i1 (nth (:recursion i0)1)
-        i0r0i2 (nth (:recursion i0)2)
-        i0r0i3 (nth (:recursion i0)3)
-        i0r0i3b00 (nth (nth (:branches i0r0i3)0)0)
-        i0r0i3b01 (nth (nth (:branches i0r0i3)0)1)
-        i0r0i3b02 (nth (nth (:branches i0r0i3)0)2)
-        i0r0i3b10 (nth (nth (:branches i0r0i3)1)0)
-        i0r0i3b11 (nth (nth (:branches i0r0i3)1)1)
+        i0r0i0 (nth (:recursion i0) 0)
+        i0r0i1 (nth (:recursion i0) 1)
+        i0r0i2 (nth (:recursion i0) 2)
+        i0r0i3 (nth (:recursion i0) 3)
+        i0r0i3b00 (nth (nth (:branches i0r0i3) 0) 0)
+        i0r0i3b01 (nth (nth (:branches i0r0i3) 0) 1)
+        i0r0i3b02 (nth (nth (:branches i0r0i3) 0) 2)
+        i0r0i3b10 (nth (nth (:branches i0r0i3) 1) 0)
+        i0r0i3b11 (nth (nth (:branches i0r0i3) 1) 1)
         ]
     (is (= (get-next i0) nil))
     (is (= (get-next i0r0i0) (get-id i0r0i1)))

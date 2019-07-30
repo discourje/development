@@ -9,7 +9,9 @@
   (get-active-interaction [this])
   (apply-interaction [this sender receivers label])
   (valid-interaction? [this sender receivers label])
-  (is-current-parallel? [this label]))
+  (is-current-parallel? [this label])
+  (register-rec! [this rec])
+  (get-rec [this name]))
 
 (declare contains-value? is-valid-interaction?)
 
@@ -283,10 +285,12 @@
 (defn force-monitor-reset! "Force the monitor to go back to the first interaction." [monitor]
   (reset! (:active-interaction monitor) (:interactions monitor)))
 
-(defrecord monitor [id interactions active-interaction]
+(defrecord monitor [id interactions active-interaction recursion-set]
   monitoring
   (get-monitor-id [this] id)
   (get-active-interaction [this] @active-interaction)
   (apply-interaction [this sender receivers label] (apply-interaction-to-mon sender receivers label active-interaction interactions))
   (valid-interaction? [this sender receivers label] (is-valid-communication? sender receivers label @active-interaction interactions))
-  (is-current-parallel? [this label] (is-active-interaction-parallel? @active-interaction label interactions)))
+  (is-current-parallel? [this label] (is-active-interaction-parallel? @active-interaction label interactions))
+  (register-rec! [this rec] (conj recursion-set rec))
+  (get-rec [this name] (name recursion-set)))

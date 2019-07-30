@@ -1,6 +1,5 @@
-(ns discourje.async.nestedMepMacroTest
-  (:require [clojure.test :refer :all]
-            [discourje.core.async :refer :all]))
+;nestedMonitorLinking.clj
+(in-ns 'discourje.core.async)
 
 (declare nest-mep)
 (defn- assoc-interaction [nth-i it]
