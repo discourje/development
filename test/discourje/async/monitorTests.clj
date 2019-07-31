@@ -36,50 +36,18 @@
 
 (deftest single-choice-5branches-protocol-ids-test
   (let [mon (generate-monitor (single-choice-5branches-protocol false))]
-    (println mon)
     (is (= (:interactions mon) single-choice-5branches-protocolControl))))
 
-(deftest dual-choice-protocol-test
-  (let [mon (generate-monitor (dual-choice-protocol))]
-    (is (= 2 (count (:interactions mon))))))
-
 (deftest dual-choice-protocol-ids-test
-  (let [mon (generate-monitor (dual-choice-protocol))
-        i0 (nth (:interactions mon) 0)
-        i0b0 (nth (nth (:branches i0) 0) 0)
-        i0b10 (nth (nth (:branches i0) 1) 0)
-        i0b11 (nth (nth (:branches i0) 1) 1)
-        i0b1b10 (nth (nth (:branches i0b11) 0) 0)
-        i0b1b11 (nth (nth (:branches i0b11) 1) 0)
-        i1 (nth (:interactions mon) 1)]
-    (is (= (get-next i0) (get-id i1)))
-    (is (= (get-next i0b0) (get-id i1)))
-    (is (= (get-next i0b10) (get-id i0b11)))
-    (is (= (get-next i0b1b10) (get-id i1)))
-    (is (= (get-next i0b1b11) (get-id i1)))
-    (is (= (get-next i1) nil))))
+  (let [mon (generate-monitor (dual-choice-protocol false))]
+    (println (:interactions mon))
+    (is (= (:interactions mon) dual-choice-protocolControl))))
 
-
-(deftest multiple-nested-choice-branch-protocol-test
-  (let [mon (generate-monitor (multiple-nested-choice-branch-protocol))]
-    (is (= 1 (count (:interactions mon))))))
 
 (deftest multiple-nested-choice-branch-protocol-ids-test
-  (let [mon (generate-monitor (multiple-nested-choice-branch-protocol))
-        i0 (nth (:interactions mon) 0)
-        i0b00 (nth (nth (:branches i0) 0) 0)
-        i0b00b00 (nth (nth (:branches i0b00) 0) 0)
-        i0b00b10 (nth (nth (:branches i0b00) 1) 0)
-        i0b10 (nth (nth (:branches i0) 1) 0)
-        i0b10b00 (nth (nth (:branches i0b10) 0) 0)
-        i0b10b10 (nth (nth (:branches i0b10) 1) 0)]
-    (is (= (get-next i0) nil))
-    (is (= (get-next i0b00) nil))
-    (is (= (get-next i0b10) nil))
-    (is (= (get-next i0b00b00) nil))
-    (is (= (get-next i0b00b10) nil))
-    (is (= (get-next i0b10b00) nil))
-    (is (= (get-next i0b10b10) nil))))
+  (let [mon (generate-monitor (multiple-nested-choice-branch-protocol false))]
+    (println (:interactions mon))
+    (is (= (:interactions mon) multiple-nested-choice-branch-protocolControl))))
 
 (deftest single-choice-multiple-interactions-protocol-test
   (let [mon (generate-monitor (single-choice-multiple-interactions-protocol))]

@@ -163,16 +163,34 @@
                  ]
             nil))
 
-(defn dual-choice-protocol []
-  (create-protocol [(make-choice [
-                                  [(make-interaction "1" "A" "B")]
-                                  [(make-interaction "hi" "A" "C")
-                                   (make-choice [
-                                                 [(make-interaction "hiA" "C" "A")]
-                                                 [(make-interaction "hiD" "C" "D")]]
-                                                )]]
-                                 )
-                    (make-interaction "Done" "A" "End")]))
+(defn dual-choice-protocol [include-ids]
+  (if include-ids (create-protocol [(make-choice [
+                                                  [(make-interaction "1" "A" "B")]
+                                                  [(make-interaction "hi" "A" "C")
+                                                   (make-choice [
+                                                                 [(make-interaction "hiA" "C" "A")]
+                                                                 [(make-interaction "hiD" "C" "D")]]
+                                                                )]]
+                                                 )
+                                    (make-interaction "Done" "A" "End")]))
+  (create-protocol [(->branch nil [
+                                   [(->interaction nil "1" "A" "B" nil)]
+                                   [(->interaction nil "hi" "A" "C" nil)
+                                    (->branch nil [
+                                                   [(->interaction nil "hiA" "C" "A" nil)]
+                                                   [(->interaction nil "hiD" "C" "D" nil)]]
+                                              nil)]]
+                              nil)
+                    (->interaction nil "Done" "A" "End" nil)]))
+(def dual-choice-protocolControl
+  (->branch nil [
+                 (->interaction nil "1" "A" "B" (->interaction nil "Done" "A" "End" nil))
+                 (->interaction nil "hi" "A" "C"
+                                (->branch nil [
+                                               (->interaction nil "hiA" "C" "A" (->interaction nil "Done" "A" "End" nil))
+                                               (->interaction nil "hiD" "C" "D" (->interaction nil "Done" "A" "End" nil))]
+                                          nil))]
+            nil))
 
 (defn single-choice-multiple-interactions-protocol []
   (create-protocol [(make-interaction "1" "A" "B")
@@ -201,17 +219,38 @@
                                  )
                     (make-interaction "Done" "A" "End")]))
 
-(defn multiple-nested-choice-branch-protocol []
-  (create-protocol [(make-choice [;i0
-                                  [(make-choice [;i0b00
-                                                 [(make-interaction "1" "A" "B")] ;i0b00b00
-                                                 [(make-interaction "2" "A" "B")]] ;i0b00b10
-                                                )]
-                                  [(make-choice [;i0b10
-                                                 [(make-interaction "3" "A" "B")] ;i0b10b00
-                                                 [(make-interaction "4" "A" "B")]] ;i0b10b10
-                                                )]]
-                                 )]))
+(defn multiple-nested-choice-branch-protocol [include-ids]
+  (if include-ids (create-protocol [(make-choice [;i0
+                                                  [(make-choice [;i0b00
+                                                                 [(make-interaction "1" "A" "B")] ;i0b00b00
+                                                                 [(make-interaction "2" "A" "B")]] ;i0b00b10
+                                                                )]
+                                                  [(make-choice [;i0b10
+                                                                 [(make-interaction "3" "A" "B")] ;i0b10b00
+                                                                 [(make-interaction "4" "A" "B")]] ;i0b10b10
+                                                                )]]
+                                                 )])
+                  (create-protocol [(->branch nil [;i0
+                                                   [(->branch nil [;i0b00
+                                                                   [(->interaction nil "1" "A" "B" nil)] ;i0b00b00
+                                                                   [(->interaction nil "2" "A" "B" nil)]] ;i0b00b10
+                                                              nil)]
+                                                   [(->branch nil [;i0b10
+                                                                   [(->interaction nil "3" "A" "B" nil)] ;i0b10b00
+                                                                   [(->interaction nil "4" "A" "B" nil)]] ;i0b10b10
+                                                              nil)]]
+                                              nil)])))
+(def multiple-nested-choice-branch-protocolControl
+  (->branch nil [;i0
+                 (->branch nil [;i0b00
+                                 (->interaction nil "1" "A" "B" nil)
+                                 (->interaction nil "2" "A" "B" nil)]
+                            nil)
+                 (->branch nil [;i0b10
+                                 (->interaction nil "3" "A" "B" nil)
+                                 (->interaction nil "4" "A" "B" nil)]
+                            nil)]
+            nil))
 
 (defn multiple-nested-branches-protocol []
   (create-protocol [
