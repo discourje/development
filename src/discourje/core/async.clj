@@ -54,11 +54,6 @@
   [name recursion]
   (->recursion (uuid/v1) name recursion nil))
 
-(defn end-recur
-  "end a recursion"
-  [name]
-  (->recur-identifier (uuid/v1) name :end nil))
-
 (defn do-recur
   "do recur to start of recursion"
   [name]

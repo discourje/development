@@ -40,78 +40,25 @@
 
 (deftest dual-choice-protocol-ids-test
   (let [mon (generate-monitor (dual-choice-protocol false))]
-    (println (:interactions mon))
     (is (= (:interactions mon) dual-choice-protocolControl))))
 
 
 (deftest multiple-nested-choice-branch-protocol-ids-test
   (let [mon (generate-monitor (multiple-nested-choice-branch-protocol false))]
-    (println (:interactions mon))
     (is (= (:interactions mon) multiple-nested-choice-branch-protocolControl))))
 
 (deftest single-choice-multiple-interactions-protocol-test
-  (let [mon (generate-monitor (single-choice-multiple-interactions-protocol))]
-    (is (= 6 (count (:interactions mon))))))
-
-(deftest multiple-nested-branches-protocol-test
-  (let [mon (generate-monitor (multiple-nested-branches-protocol))]
-    (is (= 2 (count (:interactions mon))))))
+  (let [mon (generate-monitor (single-choice-multiple-interactions-protocol false))]
+    (is (= (:interactions mon) single-choice-multiple-interactions-protocolControl))))
 
 (deftest multiple-nested-branches-protocol-ids-test
-  (let [mon (generate-monitor (multiple-nested-branches-protocol))
-        i0 (nth (:interactions mon) 0)
-        i0b0 (nth (:branches i0) 0)
-        i0b0b00 (nth (nth (:branches (nth i0b0 0)) 0) 0)
-        i0b0b01 (nth (nth (:branches (nth i0b0 0)) 0) 1)
-        i0b0b10 (nth (nth (:branches (nth i0b0 0)) 1) 0)
-        i0b1 (nth (:branches i0) 1)
-        i0b1b0 (nth (nth (:branches (nth i0b1 0)) 0) 0)
-        i0b1b0b0 (nth (:branches i0b1b0) 0)
-        i0b1b0b0b00 (nth (nth (:branches (nth i0b1b0b0 0)) 0) 0)
-        i0b1b0b0b10 (nth (nth (:branches (nth i0b1b0b0 0)) 1) 0)
-        i0b1b0b0b11 (nth (nth (:branches (nth i0b1b0b0 0)) 1) 1)
-        i0b1b0b0b12 (nth (nth (:branches (nth i0b1b0b0 0)) 1) 2)
-        i0b1b0b10 (nth (nth (:branches i0b1b0) 1) 0)
-        i0b1b11 (nth (nth (:branches (nth i0b1 0)) 1) 0)
-        i1 (nth (:interactions mon) 1)
-        ]
-    (is (= (get-next i0) (get-id i1)))
-    (is (= (get-next i0b0b00) (get-id i0b0b01)))
-    (is (= (get-next i0b0b01) (get-id i1)))
-    (is (= (get-next i0b0b10) (get-id i1)))
-    (is (= (get-next i0b1b11) (get-id i1)))
-    (is (= (get-next i0b1b0b10) (get-id i1)))
-    (is (= (get-next i0b1b0b0b00) (get-id i1)))
-    (is (= (get-next i0b1b0b0b10) (get-id i0b1b0b0b11)))
-    (is (= (get-next i0b1b0b0b11) (get-id i0b1b0b0b12)))
-    (is (= (get-next i0b1b0b0b12) (get-id i1)))
+  (let [mon (generate-monitor (multiple-nested-branches-protocol false))]
+    (is (= (:interactions mon) multiple-nested-branches-protocolControl))
     ))
 
-(deftest single-recur-protocol-monitor-test
-  (let [mon (generate-monitor (single-recur-protocol))]
-    (is (= 3 (count (:interactions mon))))))
-
 (deftest single-recur-protocol-ids-test
-  (let [mon (generate-monitor (single-recur-protocol))
-        i0 (nth (:interactions mon) 0)
-        i1 (nth (:interactions mon) 1)
-        i1r0 (nth (:recursion i1) 0)
-        i1r1 (nth (:recursion i1) 1)
-        i1r1b00 (nth (nth (:branches i1r1) 0) 0)
-        i1r1b01 (nth (nth (:branches i1r1) 0) 1)
-        i1r1b02 (nth (nth (:branches i1r1) 0) 2)
-        i1r1b10 (nth (nth (:branches i1r1) 1) 0)
-        i1r1b11 (nth (nth (:branches i1r1) 1) 1)
-        i2 (nth (:interactions mon) 2)]
-    (is (= (get-next i0) (get-id i1)))
-    (is (= (get-next i1r0) (get-id i1r1)))
-    (is (= (get-next i1r1b00) (get-id i1r1b01)))
-    (is (= (get-next i1r1b01) (get-id i1r1b02)))
-    (is (= (get-next i1r1b02) (get-id i1)))
-    (is (= (get-next i1r1b10) (get-id i1r1b11)))
-    (is (= (get-next i1r1b11) (get-id i2)))
-    (is (= (get-next i1) (get-id i2)))
-    (is (= (get-next i2) nil))))
+  (let [mon (generate-monitor (single-recur-protocol false))]
+    (is (= (:interactions mon) single-recur-protocolControl))))
 
 (deftest nested-recur-protocol-monitor-test
   (let [mon (generate-monitor (nested-recur-protocol))]
