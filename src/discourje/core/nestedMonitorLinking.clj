@@ -4,17 +4,15 @@
 (declare nest-mep)
 (defn- assoc-interaction [nth-i it]
   (cond
-    (satisfies? identifiable-recur nth-i)
-    (do  (println nth-i "    " it)
-    nth-i)
-    (satisfies? interactable it)
+    (or (nil? it) (satisfies? identifiable-recur nth-i))
+    nth-i
+    (or (satisfies? interactable it) (satisfies? identifiable-recur it))
     (assoc nth-i :next it)
     (satisfies? branchable it)
-    (let [branches (for [b (get-branches it)] (nest-mep (conj b (:next it))))]
+    (let [branches (for [b (get-branches it)] (nest-mep (if-not (nil? (:next it)) (conj b (:next it)) b)))]
       (assoc nth-i :next (assoc (assoc it :next nil) :branches branches)))
     (satisfies? recursable it)
-    (let [rec (nest-mep (conj (get-recursion it) (:next it)))]
-      (println rec)
+    (let [rec (nest-mep (if-not (nil? (:next it)) (conj (get-recursion it) (:next it)) (get-recursion it)))]
       (assoc nth-i :next (assoc (assoc it :next nil) :recursion rec)))))
 
 (defn- assoc-last-interaction [nth-i]
@@ -25,7 +23,7 @@
       (let [branches (for [b (get-branches last)] (nest-mep (if-not (nil? next) (conj b next) b)))]
         (assoc (assoc last :next nil) :branches branches))
       (satisfies? recursable last)
-      (let [rec (nest-mep (get-recursion last))]
+      (let [rec (nest-mep (if-not (nil? next) (conj (get-recursion last) next) (get-recursion last)))]
         (assoc (assoc last :next nil) :recursion rec)))))
 
 (defn nest-mep [interactions]
@@ -39,12 +37,13 @@
               (assoc-last-interaction link)
               link))
           (let [linked (assoc-interaction (nth interactions i) it)]
+            (println "nth{{" (nth interactions i) "}}")
+            (println "it {{" it "}}")
+            (println "LINKING {{" linked "}}")
             (recur (- i 1) linked))))
       (cond
         (or (satisfies? interactable (first interactions)) (satisfies? identifiable-recur (first interactions)))
         (first interactions)
-        (satisfies? branchable (first interactions))
+        (or (satisfies? branchable (first interactions)) (satisfies? recursable (first interactions)))
         (assoc-last-interaction (first interactions))
-        (satisfies? recursable (first interactions))
-        (println "FAILED RECURSION")
         ))))

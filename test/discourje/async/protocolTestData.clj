@@ -375,24 +375,22 @@
                                                                            [(->interaction nil "2" "A" "C" nil)
                                                                             (->interaction nil "2" "C" "A" nil)
                                                                             (->recur-identifier nil :test :recur nil)]
-                                                                           [(->interaction nil "3" "A" "B" nil)
-                                                                            ]
-                                                                           ] nil)
+                                                                           [(->interaction nil "3" "A" "B" nil)]] nil)
                                                             ] nil)
                                     (->interaction nil "end" "A" ["B" "C"] nil)
                                     ])))
 (def single-recur-protocolControl
   (->interaction nil "1" "A" "B"
-                 (->recursion nil :test [
-                                         (->interaction nil "1" "B" "A"
-                                                        (->branch nil [
-                                                                       (->interaction nil "2" "A" "C"
-                                                                                      (->interaction nil "2" "C" "A"
-                                                                                                     (->recur-identifier nil :test :recur nil)))
-                                                                       (->interaction nil "3" "A" "B" (->interaction nil "end" "A" ["B" "C"] nil))
+                 (->recursion nil :test
+                              (->interaction nil "1" "B" "A"
+                                             (->branch nil [
+                                                            (->interaction nil "2" "A" "C"
+                                                                           (->interaction nil "2" "C" "A"
+                                                                                          (->recur-identifier nil :test :recur nil)))
+                                                            (->interaction nil "3" "A" "B" (->interaction nil "end" "A" ["B" "C"] nil))
 
-                                                                       ] nil))
-                                         ] nil))
+                                                            ] nil))
+                              nil))
   )
 
 (defn single-recur-one-choice-protocol []
@@ -401,8 +399,7 @@
                                                (make-choice [
                                                              [(make-interaction "2" "B" "A")
                                                               (do-recur :generate)]
-                                                             [(make-interaction "3" "B" "A")
-                                                              (end-recur :generate)]
+                                                             [(make-interaction "3" "B" "A")]
                                                              ])
                                                ])
                     ]))
@@ -412,8 +409,7 @@
                                            (make-choice [;i0r0
                                                          [(make-interaction "2" "A" "C") ;i0r0b00
                                                           (do-recur :test)] ;i0r0b01
-                                                         [(make-interaction "3" "A" "B") ;i0r0b10
-                                                          (end-recur :test) ;i0r0b11
+                                                         [(make-interaction "3" "A" "B")
                                                           ]
                                                          ])
                                            ])
@@ -425,8 +421,7 @@
                                                           (make-choice [;i0b0r00
                                                                         [(make-interaction "2" "A" "C") ;i0b0r00b00
                                                                          (do-recur :test)] ;i0b0r00b01
-                                                                        [(make-interaction "3" "A" "B") ;i0b0r00b10
-                                                                         (end-recur :test) ;i0b0r00b11
+                                                                        [(make-interaction "3" "A" "B")
                                                                          ]
                                                                         ])
                                                           ])
@@ -436,29 +431,66 @@
                     ]))
 
 
-(defn nested-recur-protocol []
-  (create-protocol [(make-recursion :test [;i0
-                                           (make-recursion :nested [; i0r0
-                                                                    (make-interaction "1" "B" "A") ;i0r0i0
-                                                                    (make-choice [;i0r0i1
-                                                                                  [(make-interaction "2" "A" "C") ;i0r0i1b00
-                                                                                   (make-interaction "2" "C" "A") ;i0r0i1b01
-                                                                                   (do-recur :nested)] ;i0r0i1b02
-                                                                                  [(make-interaction "3" "A" "B") ;i0r0i1b10
-                                                                                   (end-recur :nested)] ;i0r0i1b11
-                                                                                  ])
-                                                                    (make-choice [;i0r0i2
-                                                                                  [(make-interaction "2" "A" "C") ;i0r0i2b00
-                                                                                   (make-interaction "2" "C" "D") ;i0r0i2b01
-                                                                                   (do-recur :test)] ;i0r0i2b02
-                                                                                  [(make-interaction "3" "A" "E") ; i0r0i2b10
-                                                                                   (end-recur :test)] ;i0r0i2b11
-                                                                                  ])
-                                                                    ])]
+(defn nested-recur-protocol [include-ids]
+  (if include-ids (create-protocol [(make-recursion :test [;i0
+                                                           (make-recursion :nested [; i0r0
+                                                                                    (make-interaction "1" "B" "A") ;i0r0i0
+                                                                                    (make-choice [;i0r0i1
+                                                                                                  [(make-interaction "2" "A" "C") ;i0r0i1b00
+                                                                                                   (make-interaction "2" "C" "A") ;i0r0i1b01
+                                                                                                   (do-recur :nested)] ;i0r0i1b02
+                                                                                                  [(make-interaction "3" "A" "B")] ;i0r0i1b11
+                                                                                                  ])
+                                                                                    (make-choice [;i0r0i2
+                                                                                                  [(make-interaction "2" "A" "C") ;i0r0i2b00
+                                                                                                   (make-interaction "2" "C" "D") ;i0r0i2b01
+                                                                                                   (do-recur :test)] ;i0r0i2b02
+                                                                                                  [(make-interaction "3" "A" "E")] ;i0r0i2b11
+                                                                                                  ])
+                                                                                    ])]
 
-                                    )
-                    (make-interaction "end" "A" ["B" "C"])  ;i1
-                    ]))
+                                                    )
+                                    (make-interaction "end" "A" ["B" "C"]) ;i1
+                                    ])
+                  (create-protocol [(->recursion nil :test [;i0
+                                                            (->recursion nil :nested [; i0r0
+                                                                                      (->interaction nil "1" "B" "A" nil) ;i0r0i0
+                                                                                      (->branch nil [;i0r0i1
+                                                                                                     [(->interaction nil "2" "A" "C" nil)
+                                                                                                      (->interaction nil "2" "C" "A" nil)
+                                                                                                      (->recur-identifier nil :nested :recur nil)]
+                                                                                                     [(->interaction nil "3" "A" "B" nil)]
+                                                                                                     ] nil)
+                                                                                      (->branch nil [
+                                                                                                     [(->interaction nil "2" "A" "C" nil)
+                                                                                                      (->interaction nil "2" "C" "D" nil)
+                                                                                                      (->recur-identifier nil :test :recur nil)]
+                                                                                                     [(->interaction nil "3" "A" "E" nil)]
+                                                                                                     ] nil)
+                                                                                      ] nil)]
+
+                                                 nil)
+                                    (->interaction nil "end" "A" ["B" "C"] nil)])))
+(def nested-recur-protocolControl
+  (->recursion nil :test
+               (->recursion nil :nested                     ; i0r0
+                            (->interaction nil "1" "B" "A"
+                                           (->branch nil [;i0r0i1
+                                                          (->interaction nil "2" "A" "C"
+                                                                         (->interaction nil "2" "C" "A"
+                                                                                        (->recur-identifier nil :nested :recur nil)))
+                                                          (->interaction nil "3" "A" "B" (->branch nil [
+                                                                                                        (->interaction nil "2" "A" "C"
+                                                                                                                       (->interaction nil "2" "C" "D"
+                                                                                                                                      (->recur-identifier nil :test :recur nil)))
+                                                                                                        (->interaction nil "3" "A" "E" (->interaction nil "end" "A" ["B" "C"] nil))
+                                                                                                        ] nil))
+                                                          ] nil))
+
+                            nil)
+
+               nil)
+  )
 
 (defn multiple-nested-recur-protocol []
   (create-protocol [(make-recursion :test [;i0
@@ -470,15 +502,13 @@
                                                                                                                   (do-recur :nested-again)])] ;i0r0i1b02
                                                                                   [(make-interaction "4" "A" "B")
                                                                                    (do-recur :nested)]
-                                                                                  [(make-interaction "3" "A" "D") ;i0r0i1b10
-                                                                                   (end-recur :nested)] ;i0r0i1b11
+                                                                                  [(make-interaction "3" "A" "D")] ;i0r0i1b11
                                                                                   ])
                                                                     (make-choice [;i0r0i2
                                                                                   [(make-interaction "2" "A" "C") ;i0r0i2b00
                                                                                    (make-interaction "2" "C" "E") ;i0r0i2b01
                                                                                    (do-recur :test)] ;i0r0i2b02
-                                                                                  [(make-interaction "3" "A" "F") ; i0r0i2b10
-                                                                                   (end-recur :test)] ;i0r0i2b11
+                                                                                  [(make-interaction "3" "A" "F")] ;i0r0i2b11
                                                                                   ])
                                                                     ])]
 
@@ -494,6 +524,5 @@
                                                                [(make-interaction "ok" "Buyer2" "Seller") ;i0r0i3b00
                                                                 (make-interaction "date" "Seller" "Buyer2") ;i0r0i3b01
                                                                 (do-recur :order-book)] ;i0r0i3b02
-                                                               [(make-interaction "quit" "Buyer2" "Seller") ;i0r0i3b10
-                                                                (end-recur :order-book)]])]) ;i0r0i3b11
+                                                               [(make-interaction "quit" "Buyer2" "Seller")]])]) ;i0r0i3b11
                     ]))
