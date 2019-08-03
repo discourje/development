@@ -36,14 +36,16 @@
             (if (or (satisfies? branchable link) (satisfies? recursable link))
               (assoc-last-interaction link)
               link))
-          (let [linked (assoc-interaction (nth interactions i) it)]
-            (println "nth{{" (nth interactions i) "}}")
-            (println "it {{" it "}}")
-            (println "LINKING {{" linked "}}")
-            (recur (- i 1) linked))))
-      (cond
-        (or (satisfies? interactable (first interactions)) (satisfies? identifiable-recur (first interactions)))
-        (first interactions)
-        (or (satisfies? branchable (first interactions)) (satisfies? recursable (first interactions)))
-        (assoc-last-interaction (first interactions))
-        ))))
+            (if (vector? interactions)
+              (let [linked (assoc-interaction (nth interactions i) it)]
+                (println "nth{{" (nth interactions i) "}}")
+                (println "it {{" it "}}")
+                (println "LINKING {{" linked "}}")
+                (recur (- i 1) linked))
+              interactions)))
+        (cond
+          (or (satisfies? interactable (first interactions)) (satisfies? identifiable-recur (first interactions)))
+          (first interactions)
+          (or (satisfies? branchable (first interactions)) (satisfies? recursable (first interactions)))
+          (assoc-last-interaction (first interactions))
+          ))))
