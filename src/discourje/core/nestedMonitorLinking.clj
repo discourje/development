@@ -38,9 +38,6 @@
               link))
             (if (vector? interactions)
               (let [linked (assoc-interaction (nth interactions i) it)]
-                (println "nth{{" (nth interactions i) "}}")
-                (println "it {{" it "}}")
-                (println "LINKING {{" linked "}}")
                 (recur (- i 1) linked))
               interactions)))
         (cond

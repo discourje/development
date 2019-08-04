@@ -53,8 +53,7 @@
 
 (deftest multiple-nested-branches-protocol-ids-test
   (let [mon (generate-monitor (multiple-nested-branches-protocol false))]
-    (is (= (:interactions mon) multiple-nested-branches-protocolControl))
-    ))
+    (is (= (:interactions mon) multiple-nested-branches-protocolControl))))
 
 (deftest single-recur-protocol-ids-test
   (let [mon (generate-monitor (single-recur-protocol false))]
@@ -64,81 +63,20 @@
   (let [mon (generate-monitor (nested-recur-protocol false))]
     (is (= (:interactions mon) nested-recur-protocolControl))))
 
-(deftest one-recur-with-choice-protocol-monitor-test
-  (let [mon (generate-monitor (one-recur-with-choice-protocol))]
-    (is (= 1 (count (:interactions mon))))))
-
 (deftest one-recur-with-choice-protocol-ids-test
-  (let [mon (generate-monitor (one-recur-with-choice-protocol))
-        i0 (nth (:interactions mon) 0)
-        i0r0 (nth (:recursion i0) 0)
-        i0r0b00 (nth (nth (:branches i0r0) 0) 0)
-        i0r0b01 (nth (nth (:branches i0r0) 0) 1)
-        i0r0b10 (nth (nth (:branches i0r0) 1) 0)
-        i0r0b11 (nth (nth (:branches i0r0) 1) 1)
-        ]
-    (is (= (get-next i0) nil))
-    (is (= (get-next i0r0) nil))
-    (is (= (get-next i0r0b00) (get-id i0r0b01)))
-    (is (= (get-next i0r0b01) (get-id i0)))
-    (is (= (get-next i0r0b10) (get-id i0r0b11)))
-    (is (= (get-next i0r0b11) nil))))
-
-(deftest one-recur-with-startchoice-and-endchoice-protocol-monitor-test
-  (let [mon (generate-monitor (one-recur-with-startchoice-and-endchoice-protocol))]
-    (is (= 1 (count (:interactions mon))))))
+  (let [mon (generate-monitor (one-recur-with-choice-protocol false))]
+    (is (= (:interactions mon)one-recur-with-choice-protocolControl))))
 
 (deftest one-recur-with-startchoice-and-endchoice-protocol-ids-test
-  (let [mon (generate-monitor (one-recur-with-startchoice-and-endchoice-protocol))
-        i0 (nth (:interactions mon) 0)
-        i0b0r0 (nth (nth (:branches i0) 0) 0)
-        i0b0r00 (nth (:recursion i0b0r0) 0)
-        i0b0r00b00 (nth (nth (:branches i0b0r00) 0) 0)
-        i0b0r00b01 (nth (nth (:branches i0b0r00) 0) 1)
-        i0b0r00b10 (nth (nth (:branches i0b0r00) 1) 0)
-        i0b0r00b11 (nth (nth (:branches i0b0r00) 1) 1)
-        i0b10 (nth (nth (:branches i0) 1) 0)
-        ]
-    (is (= (get-next i0) nil))
-    (is (= (get-next i0b0r0) nil))
-    (is (= (get-next i0b10) nil))
-    (is (= (get-next i0b0r00) nil))
-    (is (= (get-next i0b0r00b00) (get-id i0b0r00b01)))
-    (is (= (get-next i0b0r00b01) (get-id i0b0r0)))
-    (is (= (get-next i0b0r00b10) (get-id i0b0r00b11)))
-    (is (= (get-next i0b0r00b11) nil))))
-
-(deftest two-buyer-protocol-monitor-test
-  (let [mon (generate-monitor (two-buyer-protocol))]
-    (is (= 1 (count (:interactions mon))))))
+  (let [mon (generate-monitor (one-recur-with-startchoice-and-endchoice-protocol false))]
+    (is (= (:interactions mon) one-recur-with-startchoice-and-endchoice-protocolControl))))
 
 (deftest two-buyer-protocol-ids-test
-  (let [mon (generate-monitor (two-buyer-protocol))
-        i0 (nth (:interactions mon) 0)
-        i0r0i0 (nth (:recursion i0) 0)
-        i0r0i1 (nth (:recursion i0) 1)
-        i0r0i2 (nth (:recursion i0) 2)
-        i0r0i3 (nth (:recursion i0) 3)
-        i0r0i3b00 (nth (nth (:branches i0r0i3) 0) 0)
-        i0r0i3b01 (nth (nth (:branches i0r0i3) 0) 1)
-        i0r0i3b02 (nth (nth (:branches i0r0i3) 0) 2)
-        i0r0i3b10 (nth (nth (:branches i0r0i3) 1) 0)
-        i0r0i3b11 (nth (nth (:branches i0r0i3) 1) 1)
-        ]
-    (is (= (get-next i0) nil))
-    (is (= (get-next i0r0i0) (get-id i0r0i1)))
-    (is (= (get-next i0r0i1) (get-id i0r0i2)))
-    (is (= (get-next i0r0i2) (get-id i0r0i3)))
-    (is (= (get-next i0r0i3) nil))
-    (is (= (get-next i0r0i3b00) (get-id i0r0i3b01)))
-    (is (= (get-next i0r0i3b01) (get-id i0r0i3b02)))
-    (is (= (get-next i0r0i3b02) (get-id i0)))
-    (is (= (get-next i0r0i3b10) (get-id i0r0i3b11)))
-    (is (= (get-next i0r0i3b11) nil))
-    ))
+  (let [mon (generate-monitor (two-buyer-protocol false))]
+    (is (= (:interactions mon)two-buyer-protocolControl))))
 
 (deftest apply-atomic-test
-  (let [mon (generate-monitor (testDualProtocol))
+  (let [mon (generate-monitor (testDualProtocol true))
         message (->message "1" "hello world")]
     (apply-interaction mon "A" "B" (get-label message))
     (is (= "2" (get-action (get-active-interaction mon))))

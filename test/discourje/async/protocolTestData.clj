@@ -27,7 +27,7 @@
                  (->interaction nil "2" "B" "A" nil)))
 
 (defn test-typed-DualProtocol [include-ids]
-  (if include-ids (create-protocol [(make-interaction java.lang.String "A" "B")
+  (when include-ids (create-protocol [(make-interaction java.lang.String "A" "B")
                                     (make-interaction java.lang.String "B" "A")])
                   (create-protocol [(->interaction nil java.lang.String "A" "B" nil)
                                     (->interaction nil java.lang.String "B" "A" nil)])))
@@ -404,31 +404,74 @@
                                                ])
                     ]))
 
-(defn one-recur-with-choice-protocol []
-  (create-protocol [(make-recursion :test [;i0
-                                           (make-choice [;i0r0
-                                                         [(make-interaction "2" "A" "C") ;i0r0b00
-                                                          (do-recur :test)] ;i0r0b01
-                                                         [(make-interaction "3" "A" "B")
-                                                          ]
-                                                         ])
-                                           ])
-                    ])
-  )
-(defn one-recur-with-startchoice-and-endchoice-protocol []
-  (create-protocol [(make-choice [;i0
-                                  [(make-recursion :test [;i0b0r0
-                                                          (make-choice [;i0b0r00
-                                                                        [(make-interaction "2" "A" "C") ;i0b0r00b00
-                                                                         (do-recur :test)] ;i0b0r00b01
-                                                                        [(make-interaction "3" "A" "B")
-                                                                         ]
-                                                                        ])
-                                                          ])
-                                   ]
-                                  [(make-interaction "2" "A" "C")] ;i0b10
-                                  ])
-                    ]))
+(defn one-recur-with-choice-protocol [include-ids]
+  (if include-ids (create-protocol [(make-recursion :test [
+                                                           (make-choice [
+                                                                         [(make-interaction "2" "A" "C")
+                                                                          (do-recur :test)]
+                                                                         [(make-interaction "3" "A" "B")
+                                                                          ]
+                                                                         ])
+                                                           ])
+                                    ])
+                  (create-protocol [(->recursion nil :test [
+                                                            (->branch nil [
+                                                                           [(->interaction nil "2" "A" "C" nil)
+                                                                            (->recur-identifier nil :test :recur nil)]
+                                                                           [(->interaction nil "3" "A" "B" nil)
+                                                                            ]
+                                                                           ] nil)
+                                                            ] nil)
+                                    ])
+                  ))
+(def one-recur-with-choice-protocolControl
+  (->recursion nil :test
+               (->branch nil [
+                              (->interaction nil "2" "A" "C"
+                                             (->recur-identifier nil :test :recur nil))
+                              (->interaction nil "3" "A" "B" nil)
+                              ] nil)
+               nil))
+
+(defn one-recur-with-startchoice-and-endchoice-protocol [include-ids]
+  (if include-ids (create-protocol [(make-choice [;i0
+                                                  [(make-recursion :test [;i0b0r0
+                                                                          (make-choice [;i0b0r00
+                                                                                        [(make-interaction "2" "A" "C") ;i0b0r00b00
+                                                                                         (do-recur :test)] ;i0b0r00b01
+                                                                                        [(make-interaction "3" "A" "B")
+                                                                                         ]
+                                                                                        ])
+                                                                          ])
+                                                   ]
+                                                  [(make-interaction "2" "A" "C")] ;i0b10
+                                                  ])
+                                    ])
+                  (create-protocol [(->branch nil [
+                                                   [(->recursion nil :test [
+                                                                            (->branch nil [
+                                                                                           [(->interaction nil "2" "A" "C" nil)
+                                                                                            (->recur-identifier nil :test :recur nil)]
+                                                                                           [(->interaction nil "3" "A" "B" nil)
+                                                                                            ]
+                                                                                           ] nil)
+                                                                            ] nil)
+                                                    ]
+                                                   [(->interaction nil "2" "A" "C" nil)]
+                                                   ] nil)
+                                    ])))
+
+(def one-recur-with-startchoice-and-endchoice-protocolControl
+  (->branch nil [
+                 (->recursion nil :test
+                              (->branch nil [
+                                             (->interaction nil "2" "A" "C"
+                                                            (->recur-identifier nil :test :recur nil))
+                                             (->interaction nil "3" "A" "B" nil)
+                                             ] nil)
+                              nil)
+                 (->interaction nil "2" "A" "C" nil)
+                 ] nil))
 
 
 (defn nested-recur-protocol [include-ids]
@@ -515,14 +558,36 @@
                                     )                       ;i1
                     ]))
 
-(defn two-buyer-protocol []
-  (create-protocol [(make-recursion :order-book [;i0
-                                                 (make-interaction "title" "Buyer1" "Seller") ;i0r0i0
-                                                 (make-interaction "quote" "Seller" ["Buyer1" "Buyer2"]) ;i0r0i1
-                                                 (make-interaction "quoteDiv" "Buyer1" "Buyer2") ;i0r0i2
-                                                 (make-choice [;i0r0i3
-                                                               [(make-interaction "ok" "Buyer2" "Seller") ;i0r0i3b00
-                                                                (make-interaction "date" "Seller" "Buyer2") ;i0r0i3b01
-                                                                (do-recur :order-book)] ;i0r0i3b02
-                                                               [(make-interaction "quit" "Buyer2" "Seller")]])]) ;i0r0i3b11
-                    ]))
+(defn two-buyer-protocol [include-ids]
+  (if include-ids (create-protocol [(make-recursion :order-book [
+                                                                 (make-interaction "title" "Buyer1" "Seller")
+                                                                 (make-interaction "quote" "Seller" ["Buyer1" "Buyer2"])
+                                                                 (make-interaction "quoteDiv" "Buyer1" "Buyer2")
+                                                                 (make-choice [
+                                                                               [(make-interaction "ok" "Buyer2" "Seller")
+                                                                                (make-interaction "date" "Seller" "Buyer2")
+                                                                                (do-recur :order-book)]
+                                                                               [(make-interaction "quit" "Buyer2" "Seller")]])])
+                                    ])
+                  (create-protocol [(->recursion nil :order-book [
+                                                                  (->interaction nil "title" "Buyer1" "Seller" nil)
+                                                                  (->interaction nil "quote" "Seller" ["Buyer1" "Buyer2"] nil)
+                                                                  (->interaction nil "quoteDiv" "Buyer1" "Buyer2" nil)
+                                                                  (->branch nil [
+                                                                                 [(->interaction nil "ok" "Buyer2" "Seller" nil)
+                                                                                  (->interaction nil "date" "Seller" "Buyer2" nil)
+                                                                                  (->recur-identifier nil :order-book :recur nil)]
+                                                                                 [(->interaction nil "quit" "Buyer2" "Seller" nil)]] nil)] nil)
+                                    ])))
+(def two-buyer-protocolControl
+  (->recursion nil :order-book
+               (->interaction nil "title" "Buyer1" "Seller"
+                              (->interaction nil "quote" "Seller" ["Buyer1" "Buyer2"]
+                                             (->interaction nil "quoteDiv" "Buyer1" "Buyer2"
+                                                            (->branch nil [
+                                                                           (->interaction nil "ok" "Buyer2" "Seller"
+                                                                                          (->interaction nil "date" "Seller" "Buyer2"
+                                                                                                         (->recur-identifier nil :order-book :recur nil)))
+                                                                           (->interaction nil "quit" "Buyer2" "Seller" nil)] nil))))
+               nil)
+  )

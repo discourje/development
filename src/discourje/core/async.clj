@@ -3,7 +3,7 @@
             [discourje.core.logging :refer :all]
             [clojure.core.async :as async]
             [clojure.core.async.impl.protocols :as bufs])
-  (:import (clojure.lang Seqable)))
+  (:import (clojure.lang Seqable, Atom)))
 
 ;(defn -main [& args]
 ;  (println "Test!"))
@@ -68,7 +68,7 @@
   "Generate the monitor based on the given protocol"
   [protocol]
   (let [linked-interactions (nest-mep (get-interactions protocol))]
-    (->monitor (uuid/v1) linked-interactions (atom linked-interactions) #{})))
+    (->monitor (uuid/v1) linked-interactions (atom linked-interactions) (atom {}))))
 
 (defn- all-channels-implement-transportable?
   "Do all custom supplied channels implement the transportable interface?"
