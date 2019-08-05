@@ -170,8 +170,7 @@
   "Add a recursion to rectable for continues to query"
   [rec-set rec]
   (when (nil? ((get-name rec) @rec-set))
-    (swap! rec-set assoc (get-name rec) rec))
-  (println rec-set))
+    (swap! rec-set assoc (get-name rec) rec)))
 
 (defn- apply-interaction-to-mon
   "Apply new interaction"
