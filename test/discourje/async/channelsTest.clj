@@ -20,22 +20,22 @@
     (is false? (equal-senders? chans))))
 
 (deftest dual-channels-test
-  (let [roles (get-distinct-roles (get-interactions (testDualProtocol)))
+  (let [roles (get-distinct-roles (get-interactions (testDualProtocol true)))
         channels (generate-channels roles nil 1)]
     (is (= 2 (count channels)))))
 
 (deftest triple-channels-test
-  (let [roles (get-distinct-roles (get-interactions (testTripleProtocol)))
+  (let [roles (get-distinct-roles (get-interactions (testTripleProtocol true)))
         channels (generate-channels roles nil 1)]
     (is (= 6 (count channels)))))
 
 (deftest triple-channels-roles-test
-  (let [roles (get-distinct-roles (get-interactions (testParallelProtocol)))
+  (let [roles (get-distinct-roles (get-interactions (testParallelProtocol true)))
         channels (generate-channels roles nil 1)]
     (is (= 6 (count channels)))))
 
 (deftest quad-channels-roles-test
-  (let [roles (get-distinct-roles (get-interactions (testQuadProtocol)))
+  (let [roles (get-distinct-roles (get-interactions (testQuadProtocol true)))
         channels (generate-channels roles nil 1)]
     (is (= 12 (count channels)))))
 
@@ -45,22 +45,22 @@
     (is (= 6 (count channels)))))
 
 (deftest single-choice-in-middle-protocol-roles-test
-  (let [roles (get-distinct-roles (get-interactions (single-choice-in-middle-protocol)))
+  (let [roles (get-distinct-roles (get-interactions (single-choice-in-middle-protocol true)))
         channels (generate-channels roles nil 1)]
     (is (= 20 (count channels)))))
 
 (deftest single-choice-5branches-protocol-roles-test
-  (let [roles (get-distinct-roles (get-interactions (single-choice-5branches-protocol)))
+  (let [roles (get-distinct-roles (get-interactions (single-choice-5branches-protocol true)))
         channels (generate-channels roles nil 1)]
     (is (= 42 (count channels)))))
 
 (deftest dual-choice-protocol-roles-test
-  (let [roles (get-distinct-roles (get-interactions (dual-choice-protocol)))
+  (let [roles (get-distinct-roles (get-interactions (dual-choice-protocol true)))
         channels (generate-channels roles nil 1)]
     (is (= 20 (count channels)))))
 
 (deftest single-choice-multiple-interactions-protocol-roles-test
-  (let [roles (get-distinct-roles (get-interactions (single-choice-multiple-interactions-protocol)))
+  (let [roles (get-distinct-roles (get-interactions (single-choice-multiple-interactions-protocol true)))
         channels (generate-channels roles nil 1)]
     (is (= 12 (count channels)))))
 
@@ -70,17 +70,17 @@
     (is (= 20 (count channels)))))
 
 (deftest multiple-nested-branches-protocol-roles-test
-  (let [roles (get-distinct-roles (get-interactions (multiple-nested-branches-protocol)))
+  (let [roles (get-distinct-roles (get-interactions (multiple-nested-branches-protocol true)))
         channels (generate-channels roles nil 1)]
     (is (= 90 (count channels)))))
 
 (deftest single-recur-protocol-roles-test
-  (let [roles (get-distinct-roles (get-interactions (single-recur-protocol)))
+  (let [roles (get-distinct-roles (get-interactions (single-recur-protocol true)))
         channels (generate-channels roles nil 1)]
     (is (= 6 (count channels)))))
 
 (deftest nested-recur-protocol-roles-test
-  (let [roles (get-distinct-roles (get-interactions (nested-recur-protocol)))
+  (let [roles (get-distinct-roles (get-interactions (nested-recur-protocol true)))
         channels (generate-channels roles nil 1)]
     (is (= 20 (count channels)))))
 
@@ -90,22 +90,22 @@
     (is (= 30 (count channels)))))
 
 (deftest minimum-amount-quad-channels-roles-test
-  (let [roles (get-distinct-role-pairs (get-interactions (testQuadProtocol)))
+  (let [roles (get-distinct-role-pairs (get-interactions (testQuadProtocol true)))
         channels (generate-minimum-channels roles nil 1)]
     (is (= 8 (count channels)))))
 
 (deftest minimum-amount-multiple-nested-branches-protocol-roles-test
-  (let [roles (get-distinct-role-pairs (get-interactions (multiple-nested-branches-protocol)))
+  (let [roles (get-distinct-role-pairs (get-interactions (multiple-nested-branches-protocol true)))
         channels (generate-minimum-channels roles nil 1)]
     (is (= 12 (count channels)))))
 
 (deftest minimum-amount-single-recur-protocol-roles-test
-  (let [roles (get-distinct-role-pairs (get-interactions (single-recur-protocol)))
+  (let [roles (get-distinct-role-pairs (get-interactions (single-recur-protocol true)))
         channels (generate-minimum-channels roles nil 1)]
     (is (= 4 (count channels)))))
 
 (deftest minimum-amount-two-buyer-protocol-roles-test
-  (let [roles (get-distinct-role-pairs (get-interactions (two-buyer-protocol)))
+  (let [roles (get-distinct-role-pairs (get-interactions (two-buyer-protocol true)))
         channels (generate-minimum-channels roles nil 1)]
     (is (= 5 (count channels)))))
 (deftest minimum-amount-testSingleParallelProtocol-roles-test

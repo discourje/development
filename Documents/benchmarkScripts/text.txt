@@ -1,7 +1,0 @@
-=> "Elapsed time: 10043.251363 msecs"
-(discourje-two-buyer 100000)
-=> "Elapsed time: 91246.922682 msecs"
-(discourje-two-buyer 300000)
-=> "Elapsed time: 338001.005934 msecs"
-(discourje-two-buyer 200000)
-=> "Elapsed time: 181279.676437 msecs"
