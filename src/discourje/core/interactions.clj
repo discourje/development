@@ -12,6 +12,9 @@
   (get-sender [this])
   (get-receivers [this]))
 
+(defprotocol parallelizable
+  (get-parallel [this]))
+
 (defprotocol stringify
   (to-string [this]))
 
@@ -38,7 +41,17 @@
   linkable
   (get-next [this] next)
   stringify
-  (to-string [this] (format "Branching with first branches - %s" (apply str (for [b branches] (format "[ %s ]" (to-string (first b))))))))
+  (to-string [this] (format "Branching with branches - %s" (apply str (for [b branches] (format "[ %s ]" (to-string b)))))))
+
+(defrecord parallel [id parallels next]
+  idable
+  (get-id [this] id)
+  parallelizable
+  (get-parallel [this] parallels)
+  linkable
+  (get-next [this] next)
+  stringify
+  (to-string [this] (format "Parallel with parallels - %s" (apply str (for [p parallels] (format "[ %s ]" (to-string p)))))))
 
 (defprotocol namable
   (get-name [this]))

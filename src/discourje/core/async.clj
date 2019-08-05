@@ -175,7 +175,7 @@
          (if (nil? (get-active-interaction (get-monitor channel)))
            (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
            (let [result (peek-channel (get-chan channel))
-                 isParallel (is-current-parallel? (get-monitor channel) label)
+                 isParallel (is-current-multicast? (get-monitor channel) label)
                  id (get-id (get-active-interaction (get-monitor channel)))]
              (if-not (or (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label) (or (nil? label) (= (get-label result) label) (contains-value? (get-label result) label)))
                (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) label (to-string (get-active-interaction (get-monitor channel))))))

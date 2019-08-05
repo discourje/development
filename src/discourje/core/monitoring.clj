@@ -9,7 +9,7 @@
   (get-active-interaction [this])
   (apply-interaction [this sender receivers label])
   (valid-interaction? [this sender receivers label])
-  (is-current-parallel? [this label])
+  (is-current-multicast? [this label])
   (register-rec! [this rec])
   (get-rec [this name]))
 
@@ -216,16 +216,16 @@
   [channels]
   (= 1 (count (distinct (for [c channels] (get-monitor-id (get-monitor c)))))))
 
-(defn- is-active-interaction-parallel? [monitor active-interaction label]
+(defn- is-active-interaction-multicast? [monitor active-interaction label]
   (cond
     (satisfies? interactable active-interaction)
     (and (or (nil? label) (= (get-action active-interaction) label) (contains-value? (get-action active-interaction) label)) (instance? Seqable (get-receivers active-interaction)))
     (satisfies? branchable active-interaction)
-    (> (count (filter true? (flatten (for [b (:branches active-interaction)] (is-active-interaction-parallel? monitor b label))))) 0)
+    (> (count (filter true? (flatten (for [b (:branches active-interaction)] (is-active-interaction-multicast? monitor b label))))) 0)
     (satisfies? recursable active-interaction)
-    (is-active-interaction-parallel? monitor (get-recursion active-interaction) label)
+    (is-active-interaction-multicast? monitor (get-recursion active-interaction) label)
     (satisfies? identifiable-recur active-interaction)
-    (is-active-interaction-parallel? monitor (get-rec monitor (get-name (get-next active-interaction))) label)
+    (is-active-interaction-multicast? monitor (get-rec monitor (get-name (get-next active-interaction))) label)
     :else
     (do (log-error :unsupported-operation (format "Unsupported communication type: Communication invalid, type: %s" (type active-interaction)))
         false))
@@ -240,6 +240,6 @@
   (get-active-interaction [this] @active-interaction)
   (apply-interaction [this sender receivers label] (apply-interaction-to-mon this sender receivers label active-interaction @active-interaction))
   (valid-interaction? [this sender receivers label] (is-valid-communication? this sender receivers label @active-interaction))
-  (is-current-parallel? [this label] (is-active-interaction-parallel? this @active-interaction label))
+  (is-current-multicast? [this label] (is-active-interaction-multicast? this @active-interaction label))
   (register-rec! [this rec] (add-rec-to-table recursion-set rec))
   (get-rec [this name] (name @recursion-set)))
