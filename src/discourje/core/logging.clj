@@ -62,18 +62,18 @@
   "Put a message on the logging channel.
   We use a channel to preserve order among messages!"
   [message & more]
-  ;(when (and (not (nil? logging-channel)) (can-log?))
-  ;  (async/>!! logging-channel (format "%s %s" message (apply str (flatten more)))))
+  (when (and (not (nil? logging-channel)) (can-log?))
+    (async/>!! logging-channel (format "%s %s" message (apply str (flatten more)))))
   nil)
 
 (defn log-error
   "Always log message but throw exception (error) if exceptions level is set!"
   [type message & more]
-  ;(let [msg (format "%s %s" message (apply str (flatten more)))]
-  ;  (if (can-throw?)
-  ;    (throw+ (generate-exception type msg))
-  ;    (log-message (format "ERROR-[%s] - %s" type msg)))
-  ;  nil)
+  (let [msg (format "%s %s" message (apply str (flatten more)))]
+    (if (can-throw?)
+      (throw+ (generate-exception type msg))
+      (log-message (format "ERROR-[%s] - %s" type msg)))
+    nil)
   nil)
 
 ;loop take on channel as long as the channel is open.

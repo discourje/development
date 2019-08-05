@@ -5,9 +5,6 @@
             [clojure.core.async.impl.protocols :as bufs])
   (:import (clojure.lang Seqable, Atom)))
 
-;(defn -main [& args]
-;  (println "Test!"))
-
 (defprotocol sendable
   (get-label [this])
   (get-content [this]))
@@ -29,10 +26,8 @@
       "interactions"
       "channels"
       "monitoring"
-      "interactionLinking"
       "buffers"
       "wildcard"
-      "referencedInteractionLinking"
       "nestedMonitorLinking")
 
 (defn close-infrastructure!

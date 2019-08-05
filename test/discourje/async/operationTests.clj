@@ -469,7 +469,7 @@
         (is (= "Hello A" (get-content b->a)))))))
 
 (deftest send-receive-two-buyer-protocol-test
-  (let [channels (generate-infrastructure (two-buyer-protocol))
+  (let [channels (generate-infrastructure (two-buyer-protocol true))
         b1s (get-channel "Buyer1" "Seller" channels)
         sb1 (get-channel "Seller" "Buyer1" channels)
         sb2 (get-channel "Seller" "Buyer2" channels)
