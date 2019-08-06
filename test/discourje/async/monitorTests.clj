@@ -82,3 +82,27 @@
     (is (= "2" (get-action (get-active-interaction mon))))
     (is (= "B" (get-sender (get-active-interaction mon))))
     (is (= "A" (get-receivers (get-active-interaction mon))))))
+
+(deftest parallel-after-interaction-test
+  (let [mon (generate-monitor (parallel-after-interaction false))]
+    (is (= (:interactions mon) parallel-after-interactionControl))))
+
+(deftest parallel-after-interaction-with-after-test
+  (let [mon (generate-monitor (parallel-after-interaction-with-after false))]
+    (is (= (:interactions mon) parallel-after-interaction-with-afterControl))))
+
+(deftest parallel-after-choice-with-after-test
+  (let [mon (generate-monitor (parallel-after-choice-with-after false))]
+    (is (= (:interactions mon) parallel-after-choice-with-afterControl))))
+
+(deftest parallel-after-choice-with-after-choice-test
+  (let [mon (generate-monitor (parallel-after-choice-with-after-choice false))]
+    (is (= (:interactions mon) parallel-after-choice-with-after-choiceControl))))
+
+(deftest parallel-after-rec-with-after-test
+  (let [mon (generate-monitor (parallel-after-rec-with-after false))]
+    (is (= (:interactions mon) parallel-after-rec-with-afterControl))))
+
+(deftest parallel-after-rec-with-after-rec-test
+  (let [mon (generate-monitor (parallel-after-rec-with-after-rec false))]
+    (is (= (:interactions mon) parallel-after-rec-with-after-recControl))))

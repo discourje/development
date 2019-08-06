@@ -69,7 +69,7 @@
   linkable
   (get-next [this] next)
   stringify
-  (to-string [this] (format "Recursion name: %s, with first in recursion- %s" name (to-string (first recursion)))))
+  (to-string [this] (format "Recursion name: %s, with first in recursion- %s" name (to-string recursion))))
 
 (defprotocol identifiable-recur
   (get-option [this]))

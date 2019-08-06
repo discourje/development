@@ -21,6 +21,11 @@
   [branch & more]
   `(->branch (uuid/v1) [~branch ~@more] nil))
 
+(defmacro par
+  "Generate parallel"
+  [parallels & more]
+  `(->parallel (uuid/v1) [~parallels ~@more] nil))
+
 (defmacro mep
   "Generate message exchange pattern aka protocol"
   [interactions & more]

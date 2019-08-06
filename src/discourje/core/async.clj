@@ -54,6 +54,11 @@
   [name]
   (->recur-identifier (uuid/v1) name :recur nil))
 
+(defn make-parallel
+  "Generate parallel construct"
+  [parallels]
+  (->parallel (uuid/v1) parallels nil))
+
 (defn create-protocol
   "Generate protocol based on interactions"
   [interactions]
