@@ -4,46 +4,46 @@
             [discourje.core.async :refer :all]))
 
 (deftest unique2-roles-test
-  (is (= 2 (count (get-distinct-roles (get-interactions (testDualProtocol)))))))
+  (is (= 2 (count (get-distinct-roles (get-interactions (testDualProtocol true)))))))
 
 (deftest unique3-roles-test
-  (is (= 3 (count (get-distinct-roles (get-interactions (testTripleProtocol)))))))
+  (is (= 3 (count (get-distinct-roles (get-interactions (testTripleProtocol true)))))))
 
 (deftest unique3-parallel-roles-test
-  (is (= 3 (count (get-distinct-roles (get-interactions (testParallelProtocol)))))))
+  (is (= 3 (count (get-distinct-roles (get-interactions (testParallelProtocol true)))))))
 
 (deftest unique4-parallel-roles-test
-  (is (= 4 (count (get-distinct-roles (get-interactions (testQuadProtocol)))))))
+  (is (= 4 (count (get-distinct-roles (get-interactions (testQuadProtocol true)))))))
 
 (deftest unique3-roles-single-choice-test
   (is (= 3 (count (get-distinct-roles (get-interactions (single-choice-protocol)))))))
 
 (deftest unique7-roles-single-choice-5branches-test
-  (is (= 7 (count (get-distinct-roles (get-interactions (single-choice-5branches-protocol)))))))
+  (is (= 7 (count (get-distinct-roles (get-interactions (single-choice-5branches-protocol true)))))))
 
 (deftest unique5-roles-dual-choice-test
-  (is (= 5 (count (get-distinct-roles (get-interactions (dual-choice-protocol)))))))
+  (is (= 5 (count (get-distinct-roles (get-interactions (dual-choice-protocol true)))))))
 
 (deftest unique4-roles-single-choice-multiple-interactions-protocol-test
-  (is (= 4 (count (get-distinct-roles (get-interactions (single-choice-multiple-interactions-protocol)))))))
+  (is (= 4 (count (get-distinct-roles (get-interactions (single-choice-multiple-interactions-protocol true)))))))
 
 (deftest unique4-roles-single-nested-branch-choice-test
   (is (= 5 (count (get-distinct-roles (get-interactions (single-nested-choice-branch-protocol)))))))
 
 (deftest unique10-roles-multiple-nested-branch-choice-test
-  (is (= 10 (count (get-distinct-roles (get-interactions (multiple-nested-branches-protocol)))))))
+  (is (= 10 (count (get-distinct-roles (get-interactions (multiple-nested-branches-protocol true)))))))
 
 (deftest unique3-roles-single-recur-test
-  (is (= 3 (count (get-distinct-roles (get-interactions (single-recur-protocol)))))))
+  (is (= 3 (count (get-distinct-roles (get-interactions (single-recur-protocol true)))))))
 
 (deftest unique5-roles-nested-recur-protocol-test
-  (is (= 5 (count (get-distinct-roles (get-interactions (nested-recur-protocol)))))))
+  (is (= 5 (count (get-distinct-roles (get-interactions (nested-recur-protocol true)))))))
 
 (deftest unique6-roles-multiple-nested-recur-protocol-test
   (is (= 6 (count (get-distinct-roles (get-interactions (multiple-nested-recur-protocol)))))))
 
 (deftest unique-minimum-role-pairs-test
-  (let [roles (get-distinct-role-pairs (get-interactions (testQuadProtocol)))
+  (let [roles (get-distinct-role-pairs (get-interactions (testQuadProtocol true)))
         main (nth roles 0)
         ab (nth roles 1)
         ba (nth roles 2)
@@ -58,17 +58,17 @@
     ))
 
 (deftest unique-minimum-multiple-nested-branches-protocol-role-pairs-test
-  (let [roles (get-distinct-role-pairs (get-interactions (multiple-nested-branches-protocol)))]
+  (let [roles (get-distinct-role-pairs (get-interactions (multiple-nested-branches-protocol true)))]
     (is (== 10 (count roles)))))
 
 (deftest unique-minimum-single-recur-protocol-role-pairs-test
-  (let [roles (get-distinct-role-pairs (get-interactions (single-recur-protocol)))]
+  (let [roles (get-distinct-role-pairs (get-interactions (single-recur-protocol true)))]
     (is (== 5 (count roles)))))
 
 (deftest two-buyer-protocol-role-test
-  (let [roles (get-distinct-roles (get-interactions (two-buyer-protocol)))]
+  (let [roles (get-distinct-roles (get-interactions (two-buyer-protocol true)))]
     (is (== 3 (count roles)))))
 
 (deftest two-buyer-protocol-role-pairs-test
-  (let [roles (get-distinct-role-pairs (get-interactions (two-buyer-protocol)))]
+  (let [roles (get-distinct-role-pairs (get-interactions (two-buyer-protocol true)))]
     (is (== 5 (count roles)))))

@@ -2,10 +2,11 @@
   (:require [clojure.test :refer :all]
             [discourje.async.protocolTestData :refer :all]
             [discourje.core.async :refer :all]
-            [clojure.core.async :as async]))
+            [clojure.core.async :as async]
+            [discourje.core.logging :refer :all]))
 
 (deftest send-test
-  (let [channels (generate-infrastructure (testDualProtocol))
+  (let [channels (generate-infrastructure (testDualProtocol true))
         c (get-channel "A" "B" channels)]
     (>!! c (->message "1" "hello world"))
     (let [m (async/<!! (get-chan c))]
@@ -13,7 +14,7 @@
       (is (= "hello world" (get-content m))))))
 
 (deftest receive-test
-  (let [channels (generate-infrastructure (testDualProtocol))
+  (let [channels (generate-infrastructure (testDualProtocol true))
         c (get-channel "A" "B" channels)]
     (async/>!! (get-chan c) (->message "1" "hello world"))
     (let [m (<!! c "1")]
@@ -21,11 +22,12 @@
       (is (= "hello world" (get-content m))))))
 
 (deftest send-receive-dual-test
-  (let [channels (generate-infrastructure (testDualProtocol))
+  (let [channels (generate-infrastructure (testDualProtocol true))
         ab (get-channel "A" "B" channels)
         ba (get-channel "B" "A" channels)
         m1 (->message "1" "Hello B")
         m2 (->message "2" "Hello A")]
+    (set-logging-exceptions)
     (do
       (>!! ab m1)
       (let [a->b (<!! ab "1")]
@@ -37,7 +39,7 @@
         (is (= "Hello A" (get-content b->a)))))))
 
 (deftest send-receive-typed-dual-test
-  (let [channels (generate-infrastructure (test-typed-DualProtocol))
+  (let [channels (generate-infrastructure (test-typed-DualProtocol true))
         ab (get-channel "A" "B" channels)
         ba (get-channel "B" "A" channels)]
     (do
@@ -51,7 +53,7 @@
         (is (= "Hello A" (get-content b->a)))))))
 
 (deftest send-receive-wildcard-dual-test
-  (let [channels (generate-infrastructure (test-typed-DualProtocol))
+  (let [channels (generate-infrastructure (test-typed-DualProtocol true))
         ab (get-channel "A" "B" channels)
         ba (get-channel "B" "A" channels)]
     (do
@@ -67,7 +69,7 @@
         ))))
 
 (deftest send-receive-parallel-protocol-test
-  (let [channels (generate-infrastructure (testParallelProtocol))
+  (let [channels (generate-infrastructure (testParallelProtocol true))
         ab (get-channel "A" "B" channels)
         ba (get-channel "B" "A" channels)
         ac (get-channel "A" "C" channels)
@@ -95,7 +97,7 @@
               (is (= "C->A-B" (get-content c->b))))))))))
 
 (deftest send-receive-parallel-wildcard-only-protocol-test
-  (let [channels (generate-infrastructure (testParallelProtocol))
+  (let [channels (generate-infrastructure (testParallelProtocol true))
         ab (get-channel "A" "B" channels)
         ba (get-channel "B" "A" channels)
         ac (get-channel "A" "C" channels)
@@ -176,7 +178,7 @@
           (is (= "Hi C" (get-content a->c))))))))
 
 (deftest send-receive-multiple-nested-choice-branch-protocol
-  (let [channels (generate-infrastructure (multiple-nested-choice-branch-protocol))
+  (let [channels (generate-infrastructure (multiple-nested-choice-branch-protocol true))
         ab (get-channel "A" "B" channels)
         n (+ 1 (rand-int 4))]
     (cond
@@ -203,7 +205,7 @@
 
 
 (deftest send-receive-single-choice-in-middle-always0-choice-protocol
-  (let [channels (generate-infrastructure (single-choice-in-middle-protocol))
+  (let [channels (generate-infrastructure (single-choice-in-middle-protocol true))
         sf (get-channel "Start" "Finish" channels)
         fs (get-channel "Finish" "Start" channels)
         ab (get-channel "A" "B" channels)
@@ -212,6 +214,7 @@
         mab (->message "1" "1B")
         mba (->message "bla" "blaA")
         mfs (->message "88" "ending!")]
+    (set-logging-and-exceptions)
     (do
       (>!! sf msf)
       (let [s->f (<!! sf "99")]
@@ -228,10 +231,11 @@
             (>!! fs mfs)
             (let [f->s (<!! fs "88")]
               (is (= "88" (get-label f->s)))
-              (is (= "ending!" (get-content f->s))))))))))
+              (is (= "ending!" (get-content f->s)))))
+          )))))
 
 (deftest send-receive-single-choice-multiple-interactions-protocol-test
-  (let [channels (generate-infrastructure (single-choice-multiple-interactions-protocol))
+  (let [channels (generate-infrastructure (single-choice-multiple-interactions-protocol true))
         ab (get-channel "A" "B" channels)
         ba (get-channel "B" "A" channels)
         ac (get-channel "A" "C" channels)
@@ -287,12 +291,13 @@
                           (is (= "bye all" (get-content a->d5)))))))))))))))
 
 (deftest send-receive-single-recur-protocol
-  (let [channels (generate-infrastructure (single-recur-protocol))
+  (let [channels (generate-infrastructure (single-recur-protocol true))
         ab (get-channel "A" "B" channels)
         ba (get-channel "B" "A" channels)
         ac (get-channel "A" "C" channels)
         ca (get-channel "C" "A" channels)
         flag (atom false)]
+    (set-logging-and-exceptions)
     (do (>!! ab (->message "1" "AB"))
         (let [a->b (<!! ab "1")]
           (is (= "1" (get-label a->b)))
@@ -328,7 +333,7 @@
             (is (= "ending" (get-content a->c-end))))))))
 
 (deftest send-receive-single-recur-wildcard-only-protocol
-  (let [channels (generate-infrastructure (single-recur-protocol))
+  (let [channels (generate-infrastructure (single-recur-protocol true))
         ab (get-channel "A" "B" channels)
         ba (get-channel "B" "A" channels)
         ac (get-channel "A" "C" channels)
@@ -371,7 +376,7 @@
             (is (= "ending" (get-content a->c-end))))))))
 
 (deftest send-receive-one-recur-with-choice-protocol
-  (let [channels (generate-infrastructure (one-recur-with-choice-protocol))
+  (let [channels (generate-infrastructure (one-recur-with-choice-protocol true))
         ab (get-channel "A" "B" channels)
         ac (get-channel "A" "C" channels)
         flag (atom false)]
@@ -417,20 +422,24 @@
     ))
 
 (deftest send-receive-one-recur-with-startchoice-and-endchoice-protocol
-  (let [channels (generate-infrastructure (one-recur-with-startchoice-and-endchoice-protocol))
+  (let [channels (generate-infrastructure (one-recur-with-startchoice-and-endchoice-protocol true))
         ab (get-channel "A" "B" channels)
         ac (get-channel "A" "C" channels)
         flag (atom false)]
+    (set-logging-and-exceptions)
     (if (== 1 (+ 1 (rand-int 2)))
       (while (false? @flag)
         (if (== 1 (+ 1 (rand-int 2)))
           (do
+            (println "repeating")
             (>!! ac (->message "2" "AC"))
             (let [a->c (<!! ac "2")]
               (is (= "2" (get-label a->c)))
               (is (= "AC" (get-content a->c)))))
           (do
+            (println "took other branch")
             (>!! ab (->message "3" "AB3"))
+            (println "send complete")
             (let [a->b3 (<!! ab "3")]
               (is (= "3" (get-label a->b3)))
               (is (= "AB3" (get-content a->b3)))
@@ -442,7 +451,7 @@
           (is (= "AC" (get-content a->c))))))))
 
 (deftest send-receive-dual-custom-channels-test
-  (let [channels (generate-infrastructure (testDualProtocol) [(generate-channel "A" "B" nil 3) (generate-channel "B" "A" nil 2)])
+  (let [channels (generate-infrastructure (testDualProtocol true) [(generate-channel "A" "B" nil 3) (generate-channel "B" "A" nil 2)])
         ab (get-channel "A" "B" channels)
         ba (get-channel "B" "A" channels)
         m1 (->message "1" "Hello B")
@@ -460,7 +469,7 @@
         (is (= "Hello A" (get-content b->a)))))))
 
 (deftest send-receive-two-buyer-protocol-test
-  (let [channels (generate-infrastructure (two-buyer-protocol))
+  (let [channels (generate-infrastructure (two-buyer-protocol true))
         b1s (get-channel "Buyer1" "Seller" channels)
         sb1 (get-channel "Seller" "Buyer1" channels)
         sb2 (get-channel "Seller" "Buyer2" channels)

@@ -3,10 +3,7 @@
             [discourje.core.logging :refer :all]
             [clojure.core.async :as async]
             [clojure.core.async.impl.protocols :as bufs])
-  (:import (clojure.lang Seqable)))
-
-;(defn -main [& args]
-;  (println "Test!"))
+  (:import (clojure.lang Seqable, Atom)))
 
 (defprotocol sendable
   (get-label [this])
@@ -29,9 +26,9 @@
       "interactions"
       "channels"
       "monitoring"
-      "interactionLinking"
       "buffers"
-      "wildcard")
+      "wildcard"
+      "nestedMonitorLinking")
 
 (defn close-infrastructure!
   "Close all channels of the Discourje infrastructure"
@@ -52,11 +49,6 @@
   [name recursion]
   (->recursion (uuid/v1) name recursion nil))
 
-(defn end-recur
-  "end a recursion"
-  [name]
-  (->recur-identifier (uuid/v1) name :end nil))
-
 (defn do-recur
   "do recur to start of recursion"
   [name]
@@ -70,8 +62,8 @@
 (defn generate-monitor
   "Generate the monitor based on the given protocol"
   [protocol]
-  (let [linked-interactions (link-interactions protocol)]
-    (->monitor (uuid/v1) linked-interactions (atom (first linked-interactions)))))
+  (let [linked-interactions (nest-mep (get-interactions protocol))]
+    (->monitor (uuid/v1) linked-interactions (atom linked-interactions) (atom {}))))
 
 (defn- all-channels-implement-transportable?
   "Do all custom supplied channels implement the transportable interface?"
@@ -100,20 +92,20 @@
   "Allow send message in channel"
   [channel message]
   (async/>!! (get-chan channel) message)
-  true)
+  channel)
 
 (defn- allow-receive
   "Allow a receive on the channel"
   [channel]
   (log-message "allowing receive on channel!")
   (async/<!! (get-chan channel))
-  true)
+  channel)
 
 (defn- allow-sends
   "Allow sending message on multiple channels"
   [channels message]
   (doseq [c channels] (allow-send c message))
-  true)
+  channels)
 
 (defn all-valid-channels?
   "Do all channels comply with the monitor"
@@ -140,16 +132,18 @@
                 message
                 (->message (type message) message))]
         (if (vector? channel)
-          (do (when-not (equal-senders? channel)
-                (log-error :invalid-parallel-channels "Trying to send in parallel, but the sender of the channels is not the same!"))
-              (when-not (equal-monitors? channel)
-                (log-error :monitor-mismatch "Trying to send in parallel, but the channels do not share the same monitor!"))
-              (when-not (all-valid-channels? channel m)
-                (log-error :incorrect-communication "Trying to send in parallel, but the monitor is not correct for all channels!"))
-              (allow-sends channel m))
-          (do (when-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m))
-                (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) (get-label m) (to-string (get-active-interaction (get-monitor channel))))))
-              (allow-send channel m))))))
+          (cond
+            (false? (equal-senders? channel))
+            (log-error :invalid-parallel-channels "Trying to send in parallel, but the sender of the channels is not the same!")
+            (false? (equal-monitors? channel))
+            (log-error :monitor-mismatch "Trying to send in parallel, but the channels do not share the same monitor!")
+            (false? (all-valid-channels? channel m))
+            (log-error :incorrect-communication "Trying to send in parallel, but the monitor is not correct for all channels!")
+            :else
+            (allow-sends channel m))
+          (if-not (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m))
+            (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) (get-label m) (to-string (get-active-interaction (get-monitor channel)))))
+            (allow-send channel m))))))
 
 (defn <!!
   "take form channel"
@@ -163,9 +157,9 @@
          (if (nil? (get-active-interaction (get-monitor channel)))
            (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
            (let [result (peek-channel (get-chan channel))]
-             (do (when-not (or (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label) (or (nil? label) (= (get-label result) label) (contains-value? (get-label result) label)))
-                   (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) label (to-string (get-active-interaction (get-monitor channel))))))
-                 (apply-interaction (get-monitor channel) (get-provider channel) (get-consumer channel) label)
+             (if-not (or (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label) (or (nil? label) (= (get-label result) label) (contains-value? (get-label result) label)))
+               (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) label (to-string (get-active-interaction (get-monitor channel))))))
+             (do (apply-interaction (get-monitor channel) (get-provider channel) (get-consumer channel) label)
                  (allow-receive channel)
                  result)))))))
 
@@ -183,9 +177,9 @@
            (let [result (peek-channel (get-chan channel))
                  isParallel (is-current-parallel? (get-monitor channel) label)
                  id (get-id (get-active-interaction (get-monitor channel)))]
-             (do (when-not (or (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label) (or (nil? label) (= (get-label result) label) (contains-value? (get-label result) label)))
-                   (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) label (to-string (get-active-interaction (get-monitor channel))))))
-                 (apply-interaction (get-monitor channel) (get-provider channel) (get-consumer channel) label)
+             (if-not (or (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label) (or (nil? label) (= (get-label result) label) (contains-value? (get-label result) label)))
+               (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) label (to-string (get-active-interaction (get-monitor channel))))))
+             (do (apply-interaction (get-monitor channel) (get-provider channel) (get-consumer channel) label)
                  (allow-receive channel)
                  (loop [par isParallel]
                    (when (true? par) (recur (= id (get-id (get-active-interaction (get-monitor channel)))))))
