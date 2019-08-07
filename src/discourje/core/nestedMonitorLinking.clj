@@ -14,8 +14,8 @@
     (let [branches (for [b (get-branches it)] (nest-mep (if-not (nil? (:next it)) (conj b (:next it)) b)))]
       (assoc nth-i :next (assoc (assoc it :next nil) :branches branches)))
     (satisfies? parallelizable it)
-    (let [parallels (for [p (get-parallel it)] (nest-mep (if-not (nil? (:next it)) (conj p (:next it)) p)))]
-      (assoc nth-i :next (assoc (assoc it :next nil) :parallels parallels)))
+    (let [parallels (for [p (get-parallel it)] (nest-mep p))]
+      (assoc nth-i :next (assoc it :parallels parallels)))
     (satisfies? recursable it)
     (let [rec (nest-mep (if-not (nil? (:next it)) (conj (get-recursion it) (:next it)) (get-recursion it)))]
       (assoc nth-i :next (assoc (assoc it :next nil) :recursion rec)))
@@ -31,8 +31,8 @@
       (let [branches (for [b (get-branches last)] (nest-mep (if-not (nil? next) (conj b next) b)))]
         (assoc (assoc last :next nil) :branches branches))
       (satisfies? parallelizable last)
-      (let [parallels (for [p (get-parallel last)] (nest-mep (if-not (nil? next) (conj p next) p)))]
-        (assoc (assoc last :next nil) :parallels parallels))
+      (let [parallels (for [p (get-parallel last)] (nest-mep p))]
+        (assoc last :parallels parallels))
       (satisfies? recursable last)
       (let [rec (nest-mep (if-not (nil? next) (conj (get-recursion last) next) (get-recursion last)))]
         (assoc (assoc last :next nil) :recursion rec)))))

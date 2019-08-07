@@ -55,7 +55,12 @@
   (->recur-identifier (uuid/v1) name :recur nil))
 
 (defn make-parallel
-  "Generate parallel construct"
+  "Generate parallel construct
+  Future features to add:
+  - `break': When reached on a parallel branch, will end ALL parallels and continue on main path
+  - `await': WHen reached on a parallel branch, will wait for other parallels to have reached a certain point (maybe specified by a certain interaction)
+  - `':
+  "
   [parallels]
   (->parallel (uuid/v1) parallels nil))
 
