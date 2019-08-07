@@ -431,15 +431,12 @@
       (while (false? @flag)
         (if (== 1 (+ 1 (rand-int 2)))
           (do
-            (println "repeating")
             (>!! ac (->message "2" "AC"))
             (let [a->c (<!! ac "2")]
               (is (= "2" (get-label a->c)))
               (is (= "AC" (get-content a->c)))))
           (do
-            (println "took other branch")
             (>!! ab (->message "3" "AB3"))
-            (println "send complete")
             (let [a->b3 (<!! ab "3")]
               (is (= "3" (get-label a->b3)))
               (is (= "AB3" (get-content a->b3)))
@@ -548,3 +545,22 @@
     (clojure.core.async/thread (fnB))
     (is (= "hi too"  (async/<!! a)))
     (is (= "Hi") (get-content (async/<!! c)))))
+
+
+(deftest send-and-receive-parallel-after-interaction-test
+  (let[channels (add-infrastructure (parallel-after-interaction true))
+       ab (get-channel "b" "b" channels)
+       ba (get-channel "b" "a" channels)]
+    (>!! ab (msg 1 1))
+    (let [a->b (<!! ab 1)]
+      (is (= (get-label a->b) 1))
+      (do (>!! ba (msg 2 2))
+          (let [b->a2 (<!! ba 2)]
+            (is (= (get-label b->a2) 2))
+            (>!! ab (msg 3 3))
+            (is (= (get-label (<!! ba 3)) 3))))
+      (do (>!! ba (msg 4 4))
+          (let [b->a4 (<!! ba 4)]
+            (is (= (get-label b->a4) 4))
+            (>!! ab (msg 5 5))
+            (is (= (get-label (<!! ba 5)) 5)))))))
