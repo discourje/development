@@ -106,3 +106,11 @@
 (deftest parallel-after-rec-with-after-rec-test
   (let [mon (generate-monitor (parallel-after-rec-with-after-rec false))]
     (is (= (:interactions mon) parallel-after-rec-with-after-recControl))))
+
+(deftest nested-parallel-test
+  (let [mon (generate-monitor (nested-parallel false))]
+    (is (= (:interactions mon) nested-parallelControl))))
+
+(deftest after-parallel-nested-parallel-test
+  (let [mon (generate-monitor (after-parallel-nested-parallel false))]
+    (is (= (:interactions mon) after-parallel-nested-parallelControl))))
