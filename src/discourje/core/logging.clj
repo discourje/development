@@ -55,7 +55,7 @@
 (defn can-throw?
   "Is throwing enabled?"
   []
-  (and (true? is-throwing-enabled)
+  (and (true? @is-throwing-enabled)
        (or (= @logging-level level-exceptions) (= @logging-level level-logging-exceptions))))
 
 (defn log-message
