@@ -342,38 +342,38 @@
     (do
       (enable-wildcard)
       (>!! ab (->message "1" "AB"))
-        (let [a->b (<!! ab)]
-          (is (= "1" (get-label a->b)))
-          (is (= "AB" (get-content a->b)))
-          (while (false? @flag)
-            (>!! ba (->message "1" "AB"))
-            (let [b->a (<!! ba)]
-              (is (= "1" (get-label b->a)))
-              (is (= "AB" (get-content b->a)))
-              (if (== 1 (+ 1 (rand-int 2)))
-                (do
-                  (>!! ac (->message "2" "AC"))
-                  (let [a->c (<!! ac)]
-                    (is (= "2" (get-label a->c)))
-                    (is (= "AC" (get-content a->c)))
-                    (>!! ca (->message "2" "AC"))
-                    (let [c->a (<!! ca)]
-                      (is (= "2" (get-label c->a)))
-                      (is (= "AC" (get-content c->a))))))
-                (do
-                  (>!! ab (->message "3" "AB3"))
-                  (let [a->b3 (<!! ab)]
-                    (is (= "3" (get-label a->b3)))
-                    (is (= "AB3" (get-content a->b3)))
-                    (reset! flag true))))))
-          (>!! [ab ac] (->message "end" "ending"))
-          (let [a->b-end (<!! ab)
-                a->c-end (<!! ac)
-                ]
-            (is (= "end" (get-label a->b-end)))
-            (is (= "ending" (get-content a->b-end)))
-            (is (= "end" (get-label a->c-end)))
-            (is (= "ending" (get-content a->c-end))))))))
+      (let [a->b (<!! ab)]
+        (is (= "1" (get-label a->b)))
+        (is (= "AB" (get-content a->b)))
+        (while (false? @flag)
+          (>!! ba (->message "1" "AB"))
+          (let [b->a (<!! ba)]
+            (is (= "1" (get-label b->a)))
+            (is (= "AB" (get-content b->a)))
+            (if (== 1 (+ 1 (rand-int 2)))
+              (do
+                (>!! ac (->message "2" "AC"))
+                (let [a->c (<!! ac)]
+                  (is (= "2" (get-label a->c)))
+                  (is (= "AC" (get-content a->c)))
+                  (>!! ca (->message "2" "AC"))
+                  (let [c->a (<!! ca)]
+                    (is (= "2" (get-label c->a)))
+                    (is (= "AC" (get-content c->a))))))
+              (do
+                (>!! ab (->message "3" "AB3"))
+                (let [a->b3 (<!! ab)]
+                  (is (= "3" (get-label a->b3)))
+                  (is (= "AB3" (get-content a->b3)))
+                  (reset! flag true))))))
+        (>!! [ab ac] (->message "end" "ending"))
+        (let [a->b-end (<!! ab)
+              a->c-end (<!! ac)
+              ]
+          (is (= "end" (get-label a->b-end)))
+          (is (= "ending" (get-content a->b-end)))
+          (is (= "end" (get-label a->c-end)))
+          (is (= "ending" (get-content a->c-end))))))))
 
 (deftest send-receive-one-recur-with-choice-protocol
   (let [channels (generate-infrastructure (one-recur-with-choice-protocol true))
@@ -543,14 +543,14 @@
         c (clojure.core.async/thread (fnC))
         ]
     (clojure.core.async/thread (fnB))
-    (is (= "hi too"  (async/<!! a)))
+    (is (= "hi too" (async/<!! a)))
     (is (= "Hi") (get-content (async/<!! c)))))
 
 
 (deftest send-and-receive-parallel-after-interaction-test
-  (let[channels (add-infrastructure (parallel-after-interaction true))
-       ab (get-channel "a" "b" channels)
-       ba (get-channel "b" "a" channels)]
+  (let [channels (add-infrastructure (parallel-after-interaction true))
+        ab (get-channel "a" "b" channels)
+        ba (get-channel "b" "a" channels)]
     (>!! ab (msg 1 1))
     (let [a->b (<!! ab 1)]
       (is (= (get-label a->b) 1))
@@ -564,3 +564,24 @@
             (is (= (get-label b->a4) 4))
             (>!! ab (msg 5 5))
             (is (= (get-label (<!! ab 5)) 5)))))))
+
+(deftest send-and-receive-parallel-after-interaction-with-after-test
+  (let [channels (add-infrastructure (parallel-after-interaction-with-after true))
+        ab (get-channel "a" "b" channels)
+        ba (get-channel "b" "a" channels)]
+    (>!! ab (msg 1 1))
+    (let [a->b (<!! ab 1)]
+      (is (= (get-label a->b) 1))
+      (do (>!! ba (msg 2 2))
+          (let [b->a2 (<!! ba 2)]
+            (is (= (get-label b->a2) 2))
+            (>!! ab (msg 3 3))
+            (is (= (get-label (<!! ab 3)) 3))))
+      (do (>!! ba (msg 4 4))
+          (let [b->a4 (<!! ba 4)]
+            (is (= (get-label b->a4) 4))
+            (>!! ab (msg 5 5))
+            (is (= (get-label (<!! ab 5)) 5))))
+      (do (>!! ba (msg 6 6))
+          (let [b->a6 (<!! ba 6)]
+            (is (= (get-label b->a6) 6)))))))

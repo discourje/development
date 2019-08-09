@@ -187,6 +187,7 @@
       (swap! active-interaction
              (fn [inter]
                (let [parallel-with-removed-par (remove (fn [x] (= (get-id x) (get-id target))) (get-parallel inter))]
+                 sadasdasdasd
                  (if (nil? (get-next target))
                    (assoc inter :parallels parallel-with-removed-par)
                    (assoc inter :parallels (conj parallel-with-removed-par (get-next target))))))))))
