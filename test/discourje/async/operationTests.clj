@@ -549,7 +549,7 @@
 
 (deftest send-and-receive-parallel-after-interaction-test
   (let[channels (add-infrastructure (parallel-after-interaction true))
-       ab (get-channel "b" "b" channels)
+       ab (get-channel "a" "b" channels)
        ba (get-channel "b" "a" channels)]
     (>!! ab (msg 1 1))
     (let [a->b (<!! ab 1)]
@@ -558,9 +558,9 @@
           (let [b->a2 (<!! ba 2)]
             (is (= (get-label b->a2) 2))
             (>!! ab (msg 3 3))
-            (is (= (get-label (<!! ba 3)) 3))))
+            (is (= (get-label (<!! ab 3)) 3))))
       (do (>!! ba (msg 4 4))
           (let [b->a4 (<!! ba 4)]
             (is (= (get-label b->a4) 4))
             (>!! ab (msg 5 5))
-            (is (= (get-label (<!! ba 5)) 5)))))))
+            (is (= (get-label (<!! ab 5)) 5)))))))
