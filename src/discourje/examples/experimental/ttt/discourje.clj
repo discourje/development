@@ -25,17 +25,17 @@
           (bobfn board'' b->a b<-a)
           (output board''))))))
 
-(defn s [] (spec (fix :X (seq (--> (alice) (bob) Long)
-                              (--> (bob) (alice) Long)
-                              (fix :X)))))
-
 (defn ttt-discourje
   [time m]
   (let [board init-board
         a->b (chan 1 (alice) (bob) m)
         b->a (chan 1 (bob) (alice) m)]
     (bench time #(let [a (thread (alicefn board a->b b->a))
-                                   b (thread (bobfn board b->a a->b))]
-                               (join [a b]) (monitor-reset m)))))
+                       b (thread (bobfn board b->a a->b))]
+                   (join [a b]) (monitor-reset m)))))
 
-(ttt-discourje 5 (monitor (s)))
+(def ttt (fix :X (seq (--> (alice) (bob) Long)
+                      (--> (bob) (alice) Long)
+                      (fix :X))))
+
+(ttt-discourje 5 (monitor (spec ttt)))

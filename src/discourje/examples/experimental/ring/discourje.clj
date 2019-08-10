@@ -22,8 +22,9 @@
                                                    n)))]
                     (join aaa) (monitor-reset m))))))
 
-(ring-discourje 1 2
-                (monitor (spec {:k 2}
-                               (fix :X (seq (rep seq [:i (range :k)]
-                                                 (--> (alice :i) (alice (inc :i)) Long))
-                                            (fix :X))))))
+(defn ring [k]
+  (fix :X (seq (rep seq [:i (range k)]
+                    (--> (alice :i) (alice (inc :i)) Long))
+               (fix :X))))
+
+(ring-discourje 1 2 (monitor (spec (ring 2))))

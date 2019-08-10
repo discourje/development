@@ -42,7 +42,7 @@
   ([sp]
    `(let [s# (eval ~sp)]
       (->protocol (if (vector? s#) s# [s#]))))
-  ([smap sp]
+  ([smap sp] ;; TODO: Deprecated!
    `(spec (eval (prewalk-replace '~smap '~sp)))))
 
 (defn monitor [spec]
