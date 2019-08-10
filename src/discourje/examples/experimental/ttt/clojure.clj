@@ -25,17 +25,17 @@
           (bobfn board'' b->a b<-a)
           (output board''))))))
 
-
-
-
-
 (defn ttt-discourje
   [time]
   (let [board init-board
         a->b (chan 1)
         b->a (chan 1)]
     (bench time #(let [a (thread (alicefn board a->b b->a))
-                                   b (thread (bobfn board b->a a->b))]
-                               (join [a b])))))
+                       b (thread (bobfn board b->a a->b))]
+                   (join [a b])))))
+
+
+
+
 
 (ttt-discourje 5)
