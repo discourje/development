@@ -187,10 +187,11 @@
       (swap! active-interaction
              (fn [inter]
                (let [parallel-with-removed-par (remove (fn [x] (= (get-id x) (get-id target))) (get-parallel inter))]
-                 sadasdasdasd
-                 (if (nil? (get-next target))
-                   (assoc inter :parallels parallel-with-removed-par)
-                   (assoc inter :parallels (conj parallel-with-removed-par (get-next target))))))))))
+                 (if (and (empty? parallel-with-removed-par) (nil? (get-next target)))
+                   (get-next inter)
+                   (if (nil? (get-next target))
+                     (assoc inter :parallels parallel-with-removed-par)
+                     (assoc inter :parallels (conj parallel-with-removed-par (get-next target)))))))))))
 
 (defn- swap-active-interaction-by-recursion
   "Swap active interaction bu recursion"

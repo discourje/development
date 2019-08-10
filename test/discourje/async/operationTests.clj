@@ -585,3 +585,91 @@
       (do (>!! ba (msg 6 6))
           (let [b->a6 (<!! ba 6)]
             (is (= (get-label b->a6) 6)))))))
+
+(deftest send-and-receive-parallel-after-interaction-with-after-test-THEADED
+  (let [channels (add-infrastructure (parallel-after-interaction-with-after true))
+        ab (get-channel "a" "b" channels)
+        ba (get-channel "b" "a" channels)
+        fn-first-parallel (fn [] (do (>!! ba (msg 2 2))
+                                     (<!! ba 2)
+                                     (>!! ab (msg 3 3))
+                                     (get-label (<!! ab 3))))
+        fn-second-parallel (fn [] (do (>!! ba (msg 4 4))
+                                      (<!! ba 4)
+                                      (>!! ab (msg 5 5))
+                                      (get-label (<!! ab 5))))]
+    (>!! ab (msg 1 1))
+    (let [a->b (<!! ab 1)]
+      (is (= (get-label a->b) 1))
+      (let [fn1 (clojure.core.async/thread (fn-first-parallel))
+            fn2 (clojure.core.async/thread (fn-second-parallel))]
+        (is (= (async/<!! fn1) 3))
+        (is (= (async/<!! fn2) 5))
+        (do (>!! ba (msg 6 6))
+            (let [b->a6 (<!! ba 6)]
+              (is (= (get-label b->a6) 6))))))))
+
+
+(deftest send-and-receive-parallel-after-choice-with-after-test
+  (let [channels (add-infrastructure (parallel-after-choice-with-after true))
+        ab (get-channel "a" "b" channels)
+        ba (get-channel "b" "a" channels)]
+    (>!! ab (msg 0 0))
+    (let [a->b (<!! ab 0)]
+      (is (= (get-label a->b) 0))
+      (do (>!! ba (msg 2 2))
+          (let [b->a2 (<!! ba 2)]
+            (is (= (get-label b->a2) 2))
+            (>!! ab (msg 3 3))
+            (is (= (get-label (<!! ab 3)) 3))))
+      (do (>!! ba (msg 4 4))
+          (let [b->a4 (<!! ba 4)]
+            (is (= (get-label b->a4) 4))
+            (>!! ab (msg 5 5))
+            (is (= (get-label (<!! ab 5)) 5))))
+      (do (>!! ba (msg 6 6))
+          (let [b->a6 (<!! ba 6)]
+            (is (= (get-label b->a6) 6)))))))
+
+(deftest send-and-receive-parallel-after-choice-with-after-choice-test
+  (let [channels (add-infrastructure (parallel-after-choice-with-after-choice true))
+        ab (get-channel "a" "b" channels)
+        ba (get-channel "b" "a" channels)]
+    (>!! ab (msg 0 0))
+    (let [a->b (<!! ab 0)]
+      (is (= (get-label a->b) 0))
+      (do (>!! ba (msg 2 2))
+          (let [b->a2 (<!! ba 2)]
+            (is (= (get-label b->a2) 2))
+            (>!! ab (msg 3 3))
+            (is (= (get-label (<!! ab 3)) 3))))
+      (do (>!! ba (msg 4 4))
+          (let [b->a4 (<!! ba 4)]
+            (is (= (get-label b->a4) 4))
+            (>!! ab (msg 5 5))
+            (is (= (get-label (<!! ab 5)) 5))))
+      (do (>!! ba (msg 6 6))
+          (let [b->a6 (<!! ba 6)]
+            (is (= (get-label b->a6) 6)))))))
+
+(deftest send-and-receive-parallel-after-rec-with-after-test
+  (let [channels (add-infrastructure (parallel-after-rec-with-after true))
+        ab (get-channel "a" "b" channels)
+        ba (get-channel "b" "a" channels)]
+    (set-throwing false)
+    (>!! ab (msg 0 0))
+    (let [a->b (<!! ab 0)]
+      (is (= (get-label a->b) 0))
+      (do (>!! ba (msg 2 2))
+          (let [b->a2 (<!! ba 2)]
+            (is (= (get-label b->a2) 2))
+            (>!! ab (msg 3 3))
+            (is (= (get-label (<!! ab 3)) 3))))
+      (do (>!! ba (msg 4 4))
+          (let [b->a4 (<!! ba 4)]
+            (is (= (get-label b->a4) 4))
+            (>!! ab (msg 5 5))
+            (is (= (get-label (<!! ab 5)) 5))))
+      (do (>!! ba (msg 6 6))
+          (let [b->a6 (<!! ba 6)]
+            (is (= (get-label b->a6) 6)))))))
