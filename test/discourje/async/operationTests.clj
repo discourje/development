@@ -403,9 +403,8 @@
               (let [response (<!! ba ["2" "3"])]
                 (cond
                   (= (get-label response) "2") (do
-                                                 (println (format "greaterThan received with message: %s" (get-content response)))
                                                  (fnA fnA))
-                  (= (get-label response) "3") (println (format "lessThan received with message: %s" (get-content response))))))
+                  (= (get-label response) "3")   response)))
         fnB (fn [fnB]
               (let [numberMap (<!! ab "1")
                     threshold (:threshold (get-content numberMap))
@@ -417,9 +416,9 @@
                   (>!! ba (->message "3" "Number send is smaller!")))))
 
         ]
-    (clojure.core.async/thread (fnA fnA))
+    (let [result-a (clojure.core.async/thread (fnA fnA))]
     (clojure.core.async/thread (fnB fnB))
-    ))
+    (is (= (get-label (async/<!! result-a)) "3")))))
 
 (deftest send-receive-one-recur-with-startchoice-and-endchoice-protocol
   (let [channels (generate-infrastructure (one-recur-with-startchoice-and-endchoice-protocol true))
@@ -504,7 +503,7 @@
                     (is (= "Price to high" (get-content b2-quit-s)))
                     (reset! order-book false)))))))))))
 
-
+continue here!
 (deftest send-receive-tesParallelParticipantsPrototocol
   (let [channels (add-infrastructure (tesParallelParticipantsProtocol))
         ab (get-channel "A" "B" channels)
