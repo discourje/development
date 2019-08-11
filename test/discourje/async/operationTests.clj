@@ -651,7 +651,6 @@
   (let [channels (add-infrastructure (parallel-after-rec-with-after true))
         ab (get-channel "a" "b" channels)
         ba (get-channel "b" "a" channels)]
-    (set-throwing false)
     (>!! ab (msg 0 0))
     (let [a->b (<!! ab 0)]
       (is (= (get-label a->b) 0))
@@ -668,3 +667,195 @@
       (do (>!! ba (msg 6 6))
           (let [b->a6 (<!! ba 6)]
             (is (= (get-label b->a6) 6)))))))
+
+(deftest send-and-receive-parallel-after-rec-with-after-rec-test
+  (let [channels (add-infrastructure (parallel-after-rec-with-after-rec true))
+        ab (get-channel "a" "b" channels)
+        ba (get-channel "b" "a" channels)]
+    (>!! ab (msg 0 0))
+    (let [a->b (<!! ab 0)]
+      (is (= (get-label a->b) 0))
+      (do (>!! ba (msg 2 2))
+          (let [b->a2 (<!! ba 2)]
+            (is (= (get-label b->a2) 2))
+            (>!! ab (msg 3 3))
+            (is (= (get-label (<!! ab 3)) 3))))
+      (do (>!! ba (msg 4 4))
+          (let [b->a4 (<!! ba 4)]
+            (is (= (get-label b->a4) 4))
+            (>!! ab (msg 5 5))
+            (is (= (get-label (<!! ab 5)) 5))))
+      (do (>!! ba (msg 7 7))
+          (let [b->a6 (<!! ba 7)]
+            (is (= (get-label b->a6) 7)))))))
+(deftest send-and-receive-parallel-after-rec-with-after-rec-test
+  (let [channels (add-infrastructure (parallel-after-rec-with-after-rec true))
+        ab (get-channel "a" "b" channels)
+        ba (get-channel "b" "a" channels)]
+    (>!! ab (msg 0 0))
+    (let [a->b (<!! ab 0)]
+      (is (= (get-label a->b) 0))
+      (do (>!! ba (msg 2 2))
+          (let [b->a2 (<!! ba 2)]
+            (is (= (get-label b->a2) 2))
+            (>!! ab (msg 3 3))
+            (is (= (get-label (<!! ab 3)) 3))))
+      (do (>!! ba (msg 4 4))
+          (let [b->a4 (<!! ba 4)]
+            (is (= (get-label b->a4) 4))
+            (>!! ab (msg 5 5))
+            (is (= (get-label (<!! ab 5)) 5))))
+      (do (>!! ba (msg 6 6))
+          (let [b->a6 (<!! ba 6)]
+            (is (= (get-label b->a6) 6))))
+      (do (>!! ba (msg 7 7))
+          (let [b->a7 (<!! ba 7)]
+            (is (= (get-label b->a7) 7)))))))
+
+(deftest send-and-receive-nested-parallel-test
+  (let [channels (add-infrastructure (nested-parallel true))
+        ab (get-channel "a" "b" channels)
+        ba (get-channel "b" "a" channels)]
+    (>!! ab (msg 1 1))
+    (let [a->b (<!! ab 1)]
+      (is (= (get-label a->b) 1))
+      (do (>!! ba (msg 2 2))
+          (let [b->a2 (<!! ba 2)]
+            (is (= (get-label b->a2) 2))
+            (>!! ab (msg 3 3))
+            (is (= (get-label (<!! ab 3)) 3)))
+          (>!! ba (msg 4 4))
+          (let [b->a4 (<!! ba 4)]
+            (is (= (get-label b->a4) 4))
+            (>!! ab (msg 5 5))
+            (is (= (get-label (<!! ab 5)) 5))))
+      (do (>!! ba (msg "a" "a"))
+          (let [b->aA (<!! ba "a")]
+            (is (= (get-label b->aA) "a"))
+            (>!! ab (msg "b" "b"))
+            (is (= (get-label (<!! ab "b")) "b")))
+          (>!! ba (msg "b" "a"))
+          (let [b->aB (<!! ba "b")]
+            (is (= (get-label b->aB) "b"))
+            (>!! ab (msg "a" "a"))
+            (is (= (get-label (<!! ab "a")) "a")))))))
+
+(deftest send-and-receive-nested-parallel-Threaded-test
+  (let [channels (add-infrastructure (nested-parallel true))
+        ab (get-channel "a" "b" channels)
+        ba (get-channel "b" "a" channels)
+        fn-par-00 (fn []
+                    (>!! ba (msg "a" "a"))
+                    (<!! ba "a")
+                    (>!! ab (msg "b" "b"))
+                    (<!! ab "b"))
+        fn-par-01 (fn []
+                    (>!! ba (msg "b" "a"))
+                    (<!! ba "b")
+                    (>!! ab (msg "a" "a"))
+                    (<!! ab "a"))
+        fn-par-10 (fn []
+                    (>!! ba (msg 2 2))
+                    (<!! ba 2)
+                    (>!! ab (msg 3 3))
+                    (<!! ab 3))
+        fn-par-11 (fn []
+                    (>!! ba (msg 4 4))
+                    (<!! ba 4)
+                    (>!! ab (msg 5 5))
+                    (<!! ab 5))
+        ]
+    (>!! ab (msg 1 1))
+    (let [a->b (<!! ab 1)
+          f00 (async/thread (fn-par-00))
+          f01 (async/thread (fn-par-01))
+          f10 (async/thread (fn-par-10))
+          f11 (async/thread (fn-par-11))]
+      (is (= (get-label a->b) 1))
+      (is (= (get-label (async/<!! f00)) "b"))
+      (is (= (get-label (async/<!! f01)) "a"))
+      (is (= (get-label (async/<!! f10)) 3))
+      (is (= (get-label (async/<!! f11)) 5)))))
+
+(deftest send-and-receive-after-parallel-nested-parallel-test
+  (let [channels (add-infrastructure (after-parallel-nested-parallel true))
+        ab (get-channel "a" "b" channels)
+        ba (get-channel "b" "a" channels)]
+    (do
+      (>!! ba (msg 0 0))
+      (is (= (get-label (<!! ba 0)) 0))
+      (>!! ab (msg 1 1))
+      (is (= (get-label (<!! ab 1)) 1)))
+    (do
+      (>!! ba (msg "hi" "hi"))
+      (is (= (get-label (<!! ba "hi")) "hi"))
+      (>!! ab (msg "hi" "hi"))
+      (is (= (get-label (<!! ab "hi")) "hi")))
+    (do (>!! ba (msg 2 2))
+        (let [b->a2 (<!! ba 2)]
+          (is (= (get-label b->a2) 2))
+          (>!! ab (msg 3 3))
+          (is (= (get-label (<!! ab 3)) 3)))
+        (>!! ba (msg 4 4))
+        (let [b->a4 (<!! ba 4)]
+          (is (= (get-label b->a4) 4))
+          (>!! ab (msg 5 5))
+          (is (= (get-label (<!! ab 5)) 5))))
+    (do (>!! ba (msg "a" "a"))
+        (let [b->aA (<!! ba "a")]
+          (is (= (get-label b->aA) "a"))
+          (>!! ab (msg "b" "b"))
+          (is (= (get-label (<!! ab "b")) "b")))
+        (>!! ba (msg "b" "a"))
+        (let [b->aB (<!! ba "b")]
+          (is (= (get-label b->aB) "b"))
+          (>!! ab (msg "a" "a"))
+          (is (= (get-label (<!! ab "a")) "a"))))))
+
+(deftest send-and-receive-after-parallel-nested-parallel-Threaded-test
+  (let [channels (add-infrastructure (after-parallel-nested-parallel true))
+        ab (get-channel "a" "b" channels)
+        ba (get-channel "b" "a" channels)
+        fn-par0 (fn []
+                  (>!! ba (msg 0 0))
+                  (<!! ba 0)
+                  (>!! ab (msg 1 1))
+                  (<!! ab 1))
+        fn-par1 (fn []
+                  (>!! ba (msg "hi" "hi"))
+                  (<!! ba "hi")
+                  (>!! ab (msg "hi" "hi"))
+                  (<!! ab "hi"))
+        fn-par-00 (fn []
+                    (>!! ba (msg "a" "a"))
+                    (<!! ba "a")
+                    (>!! ab (msg "b" "b"))
+                    (<!! ab "b"))
+        fn-par-01 (fn []
+                    (>!! ba (msg "b" "a"))
+                    (<!! ba "b")
+                    (>!! ab (msg "a" "a"))
+                    (<!! ab "a"))
+        fn-par-10 (fn []
+                    (>!! ba (msg 2 2))
+                    (<!! ba 2)
+                    (>!! ab (msg 3 3))
+                    (<!! ab 3))
+        fn-par-11 (fn []
+                    (>!! ba (msg 4 4))
+                    (<!! ba 4)
+                    (>!! ab (msg 5 5))
+                    (<!! ab 5))
+        ]
+    (let [f0 (async/thread (fn-par0))
+          f1 (async/thread (fn-par1))]
+      (is (= (get-label (async/<!! f0)) 1))
+      (is (= (get-label (async/<!! f1)) "hi"))
+      (let [f00 (async/thread (fn-par-00))
+            f01 (async/thread (fn-par-01))
+            f10 (async/thread (fn-par-10))
+            f11 (async/thread (fn-par-11))]
+        (is (= (get-label (async/<!! f00)) "b"))
+        (is (= (get-label (async/<!! f01)) "a"))
+        (is (= (get-label (async/<!! f10)) 3))
+        (is (= (get-label (async/<!! f11)) 5))))))

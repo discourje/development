@@ -730,7 +730,7 @@
 
 (defn parallel-after-rec-with-after-rec [include-ids]
   (if include-ids (create-protocol [(make-recursion :test [
-                                                    (choice [[(make-interaction 1 "a" "b")
+                                                    (make-choice [[(make-interaction 1 "a" "b")
                                                               (do-recur :test)]
                                                              [(make-interaction 0 "a" "b")]])])
                                     (make-parallel [[(make-interaction 2 "b" "a")
@@ -738,7 +738,7 @@
                                                     [(make-interaction 4 "b" "a")
                                                      (make-interaction 5 "a" "b")]])
                                     (make-recursion :test2 [
-                                                            (choice [[(make-interaction 6 "b" "a")
+                                                            (make-choice [[(make-interaction 6 "b" "a")
                                                                       (do-recur :test2)]
                                                                      [(make-interaction 7 "b" "a")]])])])
                   (create-protocol [(->recursion nil :test
