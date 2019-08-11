@@ -688,6 +688,7 @@
       (do (>!! ba (msg 7 7))
           (let [b->a6 (<!! ba 7)]
             (is (= (get-label b->a6) 7)))))))
+
 (deftest send-and-receive-parallel-after-rec-with-after-rec-test
   (let [channels (add-infrastructure (parallel-after-rec-with-after-rec true))
         ab (get-channel "a" "b" channels)

@@ -169,7 +169,7 @@
            (let [result (peek-channel (get-chan channel))
                  monitor-and-label-check (and (or (and (nil? label) (true? (get-wildcard))) (= (get-label result) label) (contains-value? (get-label result) label)) (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label))]
              (when-not monitor-and-label-check
-               (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) label (to-string (get-active-interaction (get-monitor channel))))))
+               (log-error :incorrect-communication (format "Atomic-receive communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) label (to-string (get-active-interaction (get-monitor channel))))))
              (if (or (and (nil? label) (true? (get-wildcard))) (= (get-label result) label) (contains-value? (get-label result) label))
                (do (apply-interaction (get-monitor channel) (get-provider channel) (get-consumer channel) label)
                    (allow-receive channel)
@@ -192,7 +192,7 @@
                  id (get-id (get-active-interaction (get-monitor channel)))
                  monitor-and-label-check (and (or (and (nil? label) (true? (get-wildcard))) (= (get-label result) label) (contains-value? (get-label result) label)) (valid-interaction? (get-monitor channel) (get-provider channel) (get-consumer channel) label))]
              (when-not monitor-and-label-check
-               (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) label (to-string (get-active-interaction (get-monitor channel))))))
+               (log-error :incorrect-communication (format "Atomic-receive communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) label (to-string (get-active-interaction (get-monitor channel))))))
              (if (or (and (nil? label) (true? (get-wildcard))) (= (get-label result) label) (contains-value? (get-label result) label))
                (do (apply-interaction (get-monitor channel) (get-provider channel) (get-consumer channel) label)
                    (allow-receive channel)
