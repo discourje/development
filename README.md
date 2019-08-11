@@ -17,7 +17,8 @@ Communication is blocking when desired (configure logging levels) and order amon
 <b>Current supported functionality:</b>
 - 
 - [Sequencing](src/discourje/examples/sequencing.clj)
-- [Parallelisation](src/discourje/examples/multicast.clj)
+- [Parallelisation](src/discourje/examples/parallelization.clj)
+- [Multicast](src/discourje/examples/multicast.clj)
 - [Branching](src/discourje/examples/branching.clj)
 - [Recursion](src/discourje/examples/recursion.clj)
 - [Custom Channels](src/discourje/examples/customChannels.clj)

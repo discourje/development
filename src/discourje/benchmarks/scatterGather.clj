@@ -148,10 +148,7 @@
                                    (+ worker-id 1))]
                       (when (true? (< result workers))
                         (recur result))))))]
-     (println workers-prot)
-     time
-     )
-    )
+     time))
   ([workers iterations]
    (if (<= iterations 1)
      (discourje-scatter-gather workers)
@@ -182,10 +179,8 @@
                                        (+ worker-id 1))]
                           (when (< result workers)
                             (recur result))))
-                      (force-monitor-reset! (get-monitor (first m->w))))))
-           ]
-       time
-       ))))
+                      (force-monitor-reset! (get-monitor (first m->w))))))]
+       time))))
 
 (discourje-scatter-gather-parallel 10 10)
 (defn clojure-scatter-gather
