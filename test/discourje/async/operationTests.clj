@@ -404,7 +404,7 @@
                 (cond
                   (= (get-label response) "2") (do
                                                  (fnA fnA))
-                  (= (get-label response) "3")   response)))
+                  (= (get-label response) "3") response)))
         fnB (fn [fnB]
               (let [numberMap (<!! ab "1")
                     threshold (:threshold (get-content numberMap))
@@ -417,8 +417,8 @@
 
         ]
     (let [result-a (clojure.core.async/thread (fnA fnA))]
-    (clojure.core.async/thread (fnB fnB))
-    (is (= (get-label (async/<!! result-a)) "3")))))
+      (clojure.core.async/thread (fnB fnB))
+      (is (= (get-label (async/<!! result-a)) "3")))))
 
 (deftest send-receive-one-recur-with-startchoice-and-endchoice-protocol
   (let [channels (generate-infrastructure (one-recur-with-startchoice-and-endchoice-protocol true))
@@ -503,7 +503,7 @@
                     (is (= "Price to high" (get-content b2-quit-s)))
                     (reset! order-book false)))))))))))
 
-continue here!
+
 (deftest send-receive-tesParallelParticipantsPrototocol
   (let [channels (add-infrastructure (tesParallelParticipantsProtocol))
         ab (get-channel "A" "B" channels)
@@ -511,10 +511,9 @@ continue here!
         ba (get-channel "B" "A" channels)
         fnA (fn [] (do (>!! [ab ac] (msg "1" "Hi"))
                        (<!! ba "2")))
-        fnB (fn [] (do (<!! ab "1")
-                       (do (Thread/sleep 1)
-                           (>!! ba (msg "2" "hi too")))))
-        fnC (fn [] (<!! ac "1"))
+        fnB (fn [] (do (<!!! ab "1")
+                       (>!! ba (msg "2" "hi too"))))
+        fnC (fn [] (<!!! ac "1"))
         a (clojure.core.async/thread (fnA))
         c (clojure.core.async/thread (fnC))]
     (clojure.core.async/thread (fnB))
@@ -528,19 +527,16 @@ continue here!
         ba (get-channel "B" "A" channels)
         fnA (fn [] (do
                      (>!! ab (msg "1" "hi"))
-                     (let [b-a (<!! ba "2")]
-                       (do (>!! [ab ac] (msg "3" "Hi"))
-                           (get-content (<!! ba "4"))))))
-        fnB (fn [] (let [a-b (<!! ab "1")]
-                     (do
+                     (<!! ba "2")
+                     (>!! [ab ac] (msg "3" "Hi"))
+                     (get-content (<!!! ba "4"))))
+        fnB (fn [] (do (<!! ab "1")
                        (>!! ba (msg "2" "hi too"))
                        (<!! ab "3")
-                       (do (Thread/sleep 1)
-                           (>!! ba (msg "4" "hi too"))))))
+                       (>!! ba (msg "4" "hi too"))))
         fnC (fn [] (<!! ac "3"))
         a (clojure.core.async/thread (fnA))
-        c (clojure.core.async/thread (fnC))
-        ]
+        c (clojure.core.async/thread (fnC))]
     (clojure.core.async/thread (fnB))
     (is (= "hi too" (async/<!! a)))
     (is (= "Hi") (get-content (async/<!! c)))))
