@@ -182,7 +182,6 @@
                       (force-monitor-reset! (get-monitor (first m->w))))))]
        time))))
 
-(discourje-scatter-gather-parallel 10 10)
 (defn clojure-scatter-gather
   ([workers]
    (let [workers-prot (create-protocol
