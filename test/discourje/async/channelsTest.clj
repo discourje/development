@@ -113,3 +113,14 @@
         channels (generate-minimum-channels roles nil 1)]
     (println channels)
     (is (= 2 (count channels)))))
+
+(deftest minimum-amount-parallel-after-interaction-roles-test
+  (let [roles (get-distinct-role-pairs (get-interactions (parallel-after-interaction true)))
+        channels (generate-minimum-channels roles nil 1)]
+    (println channels)
+    (is (= 2 (count channels)))))
+
+(deftest parallel-after-rec-with-after-rec-roles-test
+  (let [roles (get-distinct-role-pairs (get-interactions (parallel-after-rec-with-after-rec true)))
+        channels (generate-minimum-channels roles nil 1)]
+    (is (= 2 (count channels)))))

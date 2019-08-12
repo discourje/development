@@ -12,6 +12,9 @@
   (get-sender [this])
   (get-receivers [this]))
 
+(defprotocol parallelizable
+  (get-parallel [this]))
+
 (defprotocol stringify
   (to-string [this]))
 
@@ -38,7 +41,17 @@
   linkable
   (get-next [this] next)
   stringify
-  (to-string [this] (format "Branching with first branches - %s" (apply str (for [b branches] (format "[ %s ]" (to-string (first b))))))))
+  (to-string [this] (format "Branching with branches - %s" (apply str (for [b branches] (format "[ %s ]" (to-string b)))))))
+
+(defrecord parallel [id parallels next]
+  idable
+  (get-id [this] id)
+  parallelizable
+  (get-parallel [this] parallels)
+  linkable
+  (get-next [this] next)
+  stringify
+  (to-string [this] (format "Parallel with parallels - %s" (apply str (for [p parallels] (format "[ %s ]" (to-string p)))))))
 
 (defprotocol namable
   (get-name [this]))
@@ -56,7 +69,7 @@
   linkable
   (get-next [this] next)
   stringify
-  (to-string [this] (format "Recursion name: %s, with first in recursion- %s" name (to-string (first recursion)))))
+  (to-string [this] (format "Recursion name: %s, with recursion- %s" name (to-string recursion))))
 
 (defprotocol identifiable-recur
   (get-option [this]))
@@ -86,6 +99,9 @@
                 (satisfies? discourje.core.async/branchable element)
                 (let [branched-interactions (for [branch (get-branches element)] (find-all-roles branch result2))]
                   (conj result2 (flatten branched-interactions)))
+                (satisfies? discourje.core.async/parallelizable element)
+                (let [parallel-interactions (for [p (get-parallel element)] (find-all-roles p result2))]
+                  (conj result2 (flatten parallel-interactions)))
                 (satisfies? discourje.core.async/interactable element)
                 (do
                   (if (instance? Seqable (get-receivers element))
@@ -101,10 +117,13 @@
             (for [element protocol]
               (cond
                 (satisfies? discourje.core.async/recursable element)
-                (conj result2 (flatten (find-all-role-pairs (:recursion element) result2)))
+                (conj result2 (flatten (find-all-role-pairs (get-recursion element) result2)))
                 (satisfies? discourje.core.async/branchable element)
                 (let [branched-interactions (for [branch (get-branches element)] (find-all-role-pairs branch result2))]
                   (conj result2 (flatten branched-interactions)))
+                (satisfies? discourje.core.async/parallelizable element)
+                (let [parallel-interactions (for [p (get-parallel element)] (find-all-role-pairs p result2))]
+                  (conj result2 (flatten parallel-interactions)))
                 (satisfies? discourje.core.async/interactable element)
                 (conj result2 {:sender (get-sender element) :receivers (get-receivers element)})))))))
 
