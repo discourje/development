@@ -5,6 +5,16 @@
             [clojure.core.async.impl.protocols :as bufs])
   (:import (clojure.lang Seqable, Atom)))
 
+; choice next
+; swap branch multiple threads
+; swap as transaction retry all validation for choice
+; save monitor
+;valid interaction
+;   false = exception
+;   true = apply, allen succees when de hudige monitor is nog steeds hetzelfde
+; keeptrack of send
+;Close in DSL
+
 (defprotocol sendable
   (get-label [this])
   (get-content [this]))

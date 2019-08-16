@@ -521,6 +521,7 @@
     (is (= "Hi") (get-content (async/<!! c)))))
 
 (deftest send-receive-tesParallelParticipantsWithChoiceProtocol
+  (log-error :testingFAILED!!!!! "Exception in thread async-thread-macro-4 clojure.lang.ExceptionInfo: throw+: {:type :incorrect-communication, :message Atomic-send communication invalid! sender: B, receiver: A, label: 4 while active interaction is: Interaction - Action: 3, Sender: A, Receivers: [] } {:type :incorrect-communication, :message Atomic-send communication invalid! sender: B, receiver: A, label: 4 while active interaction is: Interaction - Action: 3, Sender: A, Receivers: [] }")
   (let [channels (add-infrastructure (tesParallelParticipantsWithChoiceProtocol))
         ab (get-channel "A" "B" channels)
         ac (get-channel "A" "C" channels)
@@ -534,7 +535,7 @@
                        (>!! ba (msg "2" "hi too"))
                        (<!! ab "3")
                        (>!! ba (msg "4" "hi too"))))
-        fnC (fn [] (<!! ac "3"))
+                fnC (fn [] (<!! ac "3"))
         a (clojure.core.async/thread (fnA))
         c (clojure.core.async/thread (fnC))]
     (clojure.core.async/thread (fnB))
