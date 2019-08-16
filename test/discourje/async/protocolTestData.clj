@@ -13,27 +13,27 @@
   (create-protocol [(make-interaction "1" "A" ["B" "C"])]))
 
 (def testSingleParallelProtocolControl
-  [(->interaction (uuid/v1) "1" "A" ["B" "C"] nil)])
+  [(->interaction (uuid/v1) "1" "A" ["B" "C"] false nil)])
 
 (defn testDualProtocol [include-ids]
   (if include-ids
     (create-protocol [(make-interaction "1" "A" "B")
                       (make-interaction "2" "B" "A")]))
-  (create-protocol [(->interaction nil "1" "A" "B" nil)
-                    (->interaction nil "2" "B" "A" nil)]))
+  (create-protocol [(->interaction nil "1" "A" "B" false nil)
+                    (->interaction nil "2" "B" "A" false nil)]))
 
 (def testDualProtocolControl
-  (->interaction nil "1" "A" "B"
-                 (->interaction nil "2" "B" "A" nil)))
+  (->interaction nil "1" "A" "B" false
+                 (->interaction nil "2" "B" "A" false nil)))
 
 (defn test-typed-DualProtocol [include-ids]
   (when include-ids (create-protocol [(make-interaction java.lang.String "A" "B")
                                       (make-interaction java.lang.String "B" "A")])
-                    (create-protocol [(->interaction nil java.lang.String "A" "B" nil)
-                                      (->interaction nil java.lang.String "B" "A" nil)])))
+                    (create-protocol [(->interaction nil java.lang.String "A" "B" false nil)
+                                      (->interaction nil java.lang.String "B" "A" false nil)])))
 (def test-typed-DualProtocolControl
-  (->interaction nil java.lang.String "A" "B"
-                 (->interaction nil java.lang.String "B" "A" nil)))
+  (->interaction nil java.lang.String "A" "B" false
+                 (->interaction nil java.lang.String "B" "A" false nil)))
 
 (defn testTripleProtocol [include-ids]
   (if include-ids
@@ -42,14 +42,14 @@
                       (make-interaction "2" "B" "A")
                       (make-interaction "3" "A" "C")]))
   (create-protocol [
-                    (->interaction nil "1" "A" "B" nil)
-                    (->interaction nil "2" "B" "A" nil)
-                    (->interaction nil "3" "A" "C" nil)]))
+                    (->interaction nil "1" "A" "B" false nil)
+                    (->interaction nil "2" "B" "A" false nil)
+                    (->interaction nil "3" "A" "C" false nil)]))
 
 (def testTripleProtocolControl
-  (->interaction nil "1" "A" "B"
-                 (->interaction nil "2" "B" "A"
-                                (->interaction nil "3" "A" "C" nil))))
+  (->interaction nil "1" "A" "B" false
+                 (->interaction nil "2" "B" "A" false
+                                (->interaction nil "3" "A" "C" false nil))))
 
 (defn testParallelProtocol [include-ids]
   (if include-ids (create-protocol [
@@ -58,15 +58,15 @@
                                     (make-interaction "3" "A" "C")
                                     (make-interaction "4" "C" ["A" "B"])])
                   (create-protocol [
-                                    (->interaction nil "1" "A" "B" nil)
-                                    (->interaction nil "2" "B" "A" nil)
-                                    (->interaction nil "3" "A" "C" nil)
-                                    (->interaction nil "4" "C" ["A" "B"] nil)])))
+                                    (->interaction nil "1" "A" "B" false nil)
+                                    (->interaction nil "2" "B" "A" false nil)
+                                    (->interaction nil "3" "A" "C" false nil)
+                                    (->interaction nil "4" "C" ["A" "B"] false nil)])))
 (def testParallelProtocolControl
-  (->interaction nil "1" "A" "B"
-                 (->interaction nil "2" "B" "A"
-                                (->interaction nil "3" "A" "C"
-                                               (->interaction nil "4" "C" ["A" "B"] nil)))))
+  (->interaction nil "1" "A" "B" false
+                 (->interaction nil "2" "B" "A" false
+                                (->interaction nil "3" "A" "C" false
+                                               (->interaction nil "4" "C" ["A" "B"] false nil)))))
 
 (defn testQuadProtocol [include-ids]
   (if include-ids (create-protocol [
@@ -76,17 +76,17 @@
                                     (make-interaction "3" "A" "C")
                                     (make-interaction "4" "C" ["A" "B"])])
                   (create-protocol [
-                                    (->interaction nil "start" "main" ["A" "B" "C"] nil)
-                                    (->interaction nil "1" "A" "B" nil)
-                                    (->interaction nil "2" "B" "A" nil)
-                                    (->interaction nil "3" "A" "C" nil)
-                                    (->interaction nil "4" "C" ["A" "B"] nil)])))
+                                    (->interaction nil "start" "main" ["A" "B" "C"] false nil)
+                                    (->interaction nil "1" "A" "B" false nil)
+                                    (->interaction nil "2" "B" "A" false nil)
+                                    (->interaction nil "3" "A" "C" false nil)
+                                    (->interaction nil "4" "C" ["A" "B"] false nil)])))
 (def testQuadProtocolControl
-  (->interaction nil "start" "main" ["A" "B" "C"]
-                 (->interaction nil "1" "A" "B"
-                                (->interaction nil "2" "B" "A"
-                                               (->interaction nil "3" "A" "C"
-                                                              (->interaction nil "4" "C" ["A" "B"] nil))))))
+  (->interaction nil "start" "main" ["A" "B" "C"] false
+                 (->interaction nil "1" "A" "B" false
+                                (->interaction nil "2" "B" "A" false
+                                               (->interaction nil "3" "A" "C" false
+                                                              (->interaction nil "4" "C" ["A" "B"] false nil))))))
 
 (defn tesParallelParticipantsProtocol []
   (mep (-->> "1" "A" ["B" "C"])
@@ -115,23 +115,23 @@
                                                    (make-interaction "hello" "C" "A")]]
                                                  )
                                     (make-interaction "88" "Finish" "Start")])
-                  (create-protocol [(->interaction nil "99" "Start" "Finish" nil)
+                  (create-protocol [(->interaction nil "99" "Start" "Finish" false nil)
                                     (->branch nil [
-                                                   [(->interaction nil "1" "A" "B" nil)
-                                                    (->interaction nil "bla" "B" "A" nil)]
-                                                   [(->interaction nil "2" "A" "C" nil)
-                                                    (->interaction nil "hello" "C" "A" nil)]]
+                                                   [(->interaction nil "1" "A" "B" false nil)
+                                                    (->interaction nil "bla" "B" "A" false nil)]
+                                                   [(->interaction nil "2" "A" "C" false nil)
+                                                    (->interaction nil "hello" "C" "A" false nil)]]
                                               nil)
-                                    (->interaction nil "88" "Finish" "Start" nil)])))
+                                    (->interaction nil "88" "Finish" "Start" false nil)])))
 (def single-choice-in-middle-protocolControl
-  (->interaction nil "99" "Start" "Finish"
+  (->interaction nil "99" "Start" "Finish" false
                  (->branch nil [
-                                (->interaction nil "1" "A" "B"
-                                               (->interaction nil "bla" "B" "A"
-                                                              (->interaction nil "88" "Finish" "Start" nil)))
-                                (->interaction nil "2" "A" "C"
-                                               (->interaction nil "hello" "C" "A"
-                                                              (->interaction nil "88" "Finish" "Start" nil)))]
+                                (->interaction nil "1" "A" "B" false
+                                               (->interaction nil "bla" "B" "A" false
+                                                              (->interaction nil "88" "Finish" "Start" false nil)))
+                                (->interaction nil "2" "A" "C" false
+                                               (->interaction nil "hello" "C" "A" false
+                                                              (->interaction nil "88" "Finish" "Start" false nil)))]
                            nil)))
 
 (defn single-choice-5branches-protocol [include-ids]
@@ -145,21 +145,21 @@
                                                  )
                                     (make-interaction "Done" "A" "End")])
                   (create-protocol [(->branch nil [
-                                                   [(->interaction nil "1" "A" "B" nil)]
-                                                   [(->interaction nil "1" "A" "C" nil)]
-                                                   [(->interaction nil "1" "A" "D" nil)]
-                                                   [(->interaction nil "1" "A" "E" nil)]
-                                                   [(->interaction nil "1" "A" "F" nil)]
+                                                   [(->interaction nil "1" "A" "B" false nil)]
+                                                   [(->interaction nil "1" "A" "C" false nil)]
+                                                   [(->interaction nil "1" "A" "D" false nil)]
+                                                   [(->interaction nil "1" "A" "E" false nil)]
+                                                   [(->interaction nil "1" "A" "F" false nil)]
                                                    ]
                                               nil)
-                                    (->interaction nil "Done" "A" "End" nil)])))
+                                    (->interaction nil "Done" "A" "End" false nil)])))
 (def single-choice-5branches-protocolControl
   (->branch nil [
-                 (->interaction nil "1" "A" "B" (->interaction nil "Done" "A" "End" nil))
-                 (->interaction nil "1" "A" "C" (->interaction nil "Done" "A" "End" nil))
-                 (->interaction nil "1" "A" "D" (->interaction nil "Done" "A" "End" nil))
-                 (->interaction nil "1" "A" "E" (->interaction nil "Done" "A" "End" nil))
-                 (->interaction nil "1" "A" "F" (->interaction nil "Done" "A" "End" nil))
+                 (->interaction nil "1" "A" "B" false (->interaction nil "Done" "A" "End" false nil))
+                 (->interaction nil "1" "A" "C" false (->interaction nil "Done" "A" "End" false nil))
+                 (->interaction nil "1" "A" "D" false (->interaction nil "Done" "A" "End" false nil))
+                 (->interaction nil "1" "A" "E" false (->interaction nil "Done" "A" "End" false nil))
+                 (->interaction nil "1" "A" "F" false (->interaction nil "Done" "A" "End" false nil))
                  ]
             nil))
 
@@ -174,22 +174,22 @@
                                                  )
                                     (make-interaction "Done" "A" "End")]))
   (create-protocol [(->branch nil [
-                                   [(->interaction nil "1" "A" "B" nil)]
-                                   [(->interaction nil "hi" "A" "C" nil)
+                                   [(->interaction nil "1" "A" "B" false nil)]
+                                   [(->interaction nil "hi" "A" "C" false nil )
                                     (->branch nil [
-                                                   [(->interaction nil "hiA" "C" "A" nil)]
-                                                   [(->interaction nil "hiD" "C" "D" nil)]]
+                                                   [(->interaction nil "hiA" "C" "A" false nil)]
+                                                   [(->interaction nil "hiD" "C" "D" false nil)]]
                                               nil)]]
                               nil)
-                    (->interaction nil "Done" "A" "End" nil)]))
+                    (->interaction nil "Done" "A" "End" false nil)]))
 
 (def dual-choice-protocolControl
   (->branch nil [
-                 (->interaction nil "1" "A" "B" (->interaction nil "Done" "A" "End" nil))
-                 (->interaction nil "hi" "A" "C"
+                 (->interaction nil "1" "A" "B"  false(->interaction nil "Done" "A" "End" false nil))
+                 (->interaction nil "hi" "A" "C" false
                                 (->branch nil [
-                                               (->interaction nil "hiA" "C" "A" (->interaction nil "Done" "A" "End" nil))
-                                               (->interaction nil "hiD" "C" "D" (->interaction nil "Done" "A" "End" nil))]
+                                               (->interaction nil "hiA" "C" "A" false(->interaction nil "Done" "A" "End" false nil))
+                                               (->interaction nil "hiD" "C" "D" false(->interaction nil "Done" "A" "End" false nil))]
                                           nil))]
             nil))
 
@@ -209,37 +209,37 @@
                                     (make-interaction "4" "D" "A")
                                     (make-interaction "5" "A" ["B" "C" "D"])
                                     ])
-                  (create-protocol [(->interaction nil "1" "A" "B" nil)
-                                    (->interaction nil "1" "B" "A" nil)
+                  (create-protocol [(->interaction nil "1" "A" "B" false nil)
+                                    (->interaction nil "1" "B" "A" false nil)
                                     (->branch nil [
-                                                   [(->interaction nil "2" "A" "C" nil)
-                                                    (->interaction nil "2" "C" "A" nil)
-                                                    (->interaction nil "3" "A" "C" nil)
-                                                    (->interaction nil "3" "C" "A" nil)]
-                                                   [(->interaction nil "2" "A" "B" nil)
-                                                    (->interaction nil "2" "B" "A" nil)
-                                                    (->interaction nil "3" "A" "B" nil)
-                                                    (->interaction nil "3" "B" "A" nil)]] nil)
-                                    (->interaction nil "4" "A" "D" nil)
-                                    (->interaction nil "4" "D" "A" nil)
-                                    (->interaction nil "5" "A" ["B" "C" "D"] nil)
+                                                   [(->interaction nil "2" "A" "C" false nil)
+                                                    (->interaction nil "2" "C" "A" false nil)
+                                                    (->interaction nil "3" "A" "C" false nil)
+                                                    (->interaction nil "3" "C" "A" false nil)]
+                                                   [(->interaction nil "2" "A" "B" false nil)
+                                                    (->interaction nil "2" "B" "A" false nil)
+                                                    (->interaction nil "3" "A" "B" false nil)
+                                                    (->interaction nil "3" "B" "A" false nil)]] nil)
+                                    (->interaction nil "4" "A" "D" false nil)
+                                    (->interaction nil "4" "D" "A" false nil)
+                                    (->interaction nil "5" "A" ["B" "C" "D"] false nil)
                                     ])))
 (def single-choice-multiple-interactions-protocolControl
-  (->interaction nil "1" "A" "B"
-                 (->interaction nil "1" "B" "A"
+  (->interaction nil "1" "A" "B" false
+                 (->interaction nil "1" "B" "A" false
                                 (->branch nil [
-                                               (->interaction nil "2" "A" "C"
-                                                              (->interaction nil "2" "C" "A"
-                                                                             (->interaction nil "3" "A" "C"
-                                                                                            (->interaction nil "3" "C" "A" (->interaction nil "4" "A" "D"
-                                                                                                                                          (->interaction nil "4" "D" "A"
-                                                                                                                                                         (->interaction nil "5" "A" ["B" "C" "D"] nil)))))))
-                                               (->interaction nil "2" "A" "B"
-                                                              (->interaction nil "2" "B" "A"
-                                                                             (->interaction nil "3" "A" "B"
-                                                                                            (->interaction nil "3" "B" "A" (->interaction nil "4" "A" "D"
-                                                                                                                                          (->interaction nil "4" "D" "A"
-                                                                                                                                                         (->interaction nil "5" "A" ["B" "C" "D"] nil)))))))] nil)
+                                               (->interaction nil "2" "A" "C" false
+                                                              (->interaction nil "2" "C" "A" false
+                                                                             (->interaction nil "3" "A" "C" false
+                                                                                            (->interaction nil "3" "C" "A" (->interaction nil "4" "A" "D" false
+                                                                                                                                          (->interaction nil "4" "D" "A" false
+                                                                                                                                                         (->interaction nil "5" "A" ["B" "C" "D"] false nil)))))))
+                                               (->interaction nil "2" "A" "B" false
+                                                              (->interaction nil "2" "B" "A" false
+                                                                             (->interaction nil "3" "A" "B" false
+                                                                                            (->interaction nil "3" "B" "A" (->interaction nil "4" "A" "D" false
+                                                                                                                                          (->interaction nil "4" "D" "A" false
+                                                                                                                                                         (->interaction nil "5" "A" ["B" "C" "D"] false nil)))))))] nil)
                                 )))
 
 (defn single-nested-choice-branch-protocol []
@@ -253,42 +253,42 @@
                     (make-interaction "Done" "A" "End")]))
 
 (defn multiple-nested-choice-branch-protocol [include-ids]
-  (if include-ids (create-protocol [(make-choice [;i0
-                                                  [(make-choice [;i0b00
-                                                                 [(make-interaction "1" "A" "B")] ;i0b00b00
-                                                                 [(make-interaction "2" "A" "B")]] ;i0b00b10
+  (if include-ids (create-protocol [(make-choice [
+                                                  [(make-choice [
+                                                                 [(make-interaction "1" "A" "B")]
+                                                                 [(make-interaction "2" "A" "B")]]
                                                                 )]
-                                                  [(make-choice [;i0b10
-                                                                 [(make-interaction "3" "A" "B")] ;i0b10b00
-                                                                 [(make-interaction "4" "A" "B")]] ;i0b10b10
+                                                  [(make-choice [
+                                                                 [(make-interaction "3" "A" "B")]
+                                                                 [(make-interaction "4" "A" "B")]]
                                                                 )]]
                                                  )])
                   (create-protocol [(->branch nil [
                                                    [(->branch nil [
-                                                                   [(->interaction nil "1" "A" "B" nil)]
-                                                                   [(->interaction nil "2" "A" "B" nil)]]
+                                                                   [(->interaction nil "1" "A" "B" false nil)]
+                                                                   [(->interaction nil "2" "A" "B" false nil)]]
                                                               nil)]
                                                    [(->branch nil [
-                                                                   [(->interaction nil "3" "A" "B" nil)]
-                                                                   [(->interaction nil "4" "A" "B" nil)]]
+                                                                   [(->interaction nil "3" "A" "B" false nil)]
+                                                                   [(->interaction nil "4" "A" "B" false nil)]]
                                                               nil)]]
                                               nil)])))
 (def multiple-nested-choice-branch-protocolControl
   (->branch nil [;i0
                  (->branch nil [;i0b00
-                                (->interaction nil "1" "A" "B" nil)
-                                (->interaction nil "2" "A" "B" nil)]
+                                (->interaction nil "1" "A" "B" false nil)
+                                (->interaction nil "2" "A" "B" false nil)]
                            nil)
                  (->branch nil [;i0b10
-                                (->interaction nil "3" "A" "B" nil)
-                                (->interaction nil "4" "A" "B" nil)]
+                                (->interaction nil "3" "A" "B" false nil)
+                                (->interaction nil "4" "A" "B" false nil)]
                            nil)]
             nil))
 
 (defn multiple-nested-branches-protocol [include-ids]
   (if include-ids (create-protocol [
                                     (make-choice [;i0
-                                                  [(make-choice [;i0b0
+                                                  [(make-choice [
                                                                  [(make-interaction "1" "A" "B") ;i0b0b00
                                                                   (make-interaction "2" "B" "A")] ;i0b0b01
                                                                  [(make-interaction "1" "A" "C")]] ;i0b0b10

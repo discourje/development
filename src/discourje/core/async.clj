@@ -37,7 +37,7 @@
 
 (defn make-interaction [action sender receiver]
   "Creates an interaction object specifying sending action from sender to receiver."
-  (->interaction (uuid/v1) action sender receiver nil))
+  (->interaction (uuid/v1) action sender receiver false nil))
 
 (defn make-choice
   "Create a choice interaction"
