@@ -124,21 +124,27 @@
       (reset! active-interaction (if (not= nil (get-next target-interaction))
                                    (get-next target-interaction)
                                    nil)))))
+(defn- assoc-sender-to-interaction
+  "Assoc a sender to the accepted-sends set and return in"
+  [inter sender]
+  (assoc inter :accepted-sends (conj (:accepted-sends inter) sender)))
 
 (defn- send-active-interaction-by-atomic
   "Send active interaction by atomic"
   [active-interaction target-interaction sender]
   (if (nil? sender)
-    (log-error :invalid-send (format "sender appears to be nil: %s %s" active-interaction target-interaction))
-    (swap! active-interaction (fn [inter]
-                                (if (= (get-id inter) (get-id target-interaction)) 1)
-                                (println "into sends "(assoc inter :accepted-sends (into {} (:accepted-sends inter) sender)))
-                                (assoc inter :accepted-sends (conj (:accepted-sends inter) sender))))))
+    (do (log-error :invalid-send (format "sender appears to be nil: %s %s" active-interaction target-interaction))
+        false)
+    (do (swap! active-interaction (fn [inter]
+                                    (if (= (get-id inter) (get-id target-interaction)) 1)
+                                    (println "into sends " (assoc inter :accepted-sends (into {} (:accepted-sends inter) sender)))
+                                    (assoc-sender-to-interaction inter sender))
+               true))))
 
 (defn- is-valid-interaction-for-send?
   "Check if the interaction is valid for a send operation"
   [sender receivers label active-interaction]
-  (and (is-valid-interaction? sender receivers label active-interaction) (false? (get-accepted-sends active-interaction))))
+  (and (is-valid-interaction? sender receivers label active-interaction) (false? (contains? (get-accepted-sends active-interaction) sender))))
 
 (defn- is-valid-interaction?
   "Is the given interaction valid compared to the active-interaction of the monitor"
@@ -200,13 +206,13 @@
   "Check the atomic interaction"
   [sender receiver label active-interaction]
   (flatten
-    (for [parllel (get-parallel active-interaction)]
+    (for [parallel (get-parallel active-interaction)]
       (cond
-        (satisfies? interactable parllel) (get-send-atomic-interaction sender receiver label parllel)
-        (satisfies? branchable parllel) (get-send-branch-interaction sender receiver label parllel)
-        (satisfies? parallelizable parllel) (get-send-parallel-interaction sender receiver label parllel)
-        (satisfies? recursable parllel) (get-send-recursion-interaction sender receiver label parllel)
-        :else (log-error :unsupported-operation (format "Cannot check operation on child parallel construct! %s" (interaction-to-string parllel)))))))
+        (satisfies? interactable parallel) (get-send-atomic-interaction sender receiver label parallel)
+        (satisfies? branchable parallel) (get-send-branch-interaction sender receiver label parallel)
+        (satisfies? parallelizable parallel) (get-send-parallel-interaction sender receiver label parallel)
+        (satisfies? recursable parallel) (get-send-recursion-interaction sender receiver label parallel)
+        :else (log-error :unsupported-operation (format "Cannot check operation on child parallel construct! %s" (interaction-to-string parallel)))))))
 
 (defn- get-branch-interaction
   "Check the atomic interaction"
@@ -237,6 +243,11 @@
   [sender receiver label active-interaction]
   (first (filter some? (get-parallel-interaction sender receiver label active-interaction))))
 
+(defn- get-valid-send-parallel-interaction
+  "Find the first interactable in (nested) parallel constructs."
+  [sender receiver label active-interaction]
+  (first (filter some? (get-send-parallel-interaction sender receiver label active-interaction))))
+
 (defn- get-first-valid-target-branch-interaction
   "Find the first interactable in (nested) branchable constructs."
   [sender receiver label active-interaction]
@@ -252,9 +263,7 @@
   [sender receivers label active-interaction target-interaction]
   (let [target (get-valid-send-branch-interaction sender receivers label target-interaction)]
     (log-message (format "target sender %s receivers %s action %s next %s or is identifiable-recur %s" (:sender target) (:receivers target) (:action target) (:next target) (satisfies? identifiable-recur target)))
-    (if (multiple-receivers? target)
-      (remove-receiver-from-branch active-interaction target receivers)
-      (swap! active-interaction (fn [x] (:next target))))))
+    (swap! active-interaction (fn [x] (assoc-sender-to-interaction target sender)))))
 
 (defn- swap-active-interaction-by-branch
   "Swap active interaction by branchable"
@@ -284,18 +293,12 @@
 (defn- send-active-interaction-by-parallel
   "Swap active interaction by parallel"
   [sender receivers label active-interaction target-interaction]
-  (let [target (get-first-valid-target-parallel-interaction sender receivers label target-interaction)]
+  (let [target (get-valid-send-parallel-interaction sender receivers label target-interaction)]
     (log-message (format "target sender %s receivers %s action %s next %s or is identifiable-recur %s" (:sender target) (:receivers target) (:action target) (:next target) (satisfies? identifiable-recur target)))
-    (if (multiple-receivers? target)
-      (remove-receiver-from-parallel active-interaction target receivers)
-      (swap! active-interaction
-             (fn [inter]
-               (let [parallel-with-removed-par (remove (fn [x] (= (get-id x) (get-id target))) (get-parallel inter))]
-                 (if (and (empty? parallel-with-removed-par) (nil? (get-next target)))
-                   (get-next inter)
-                   (if (nil? (get-next target))
-                     (assoc inter :parallels parallel-with-removed-par)
-                     (assoc inter :parallels (conj parallel-with-removed-par (get-next target)))))))))))
+    (swap! active-interaction
+           (fn [inter]
+             (let [parallel-with-removed-par (remove (fn [x] (= (get-id x) (get-id target))) (get-parallel inter))]
+               (assoc inter :parallels (conj parallel-with-removed-par (assoc-sender-to-interaction target sender))))))))
 
 (defn- swap-active-interaction-by-recursion
   "Swap active interaction bu recursion"
@@ -322,17 +325,11 @@
   [sender receivers label active-interaction target-interaction]
   (cond
     (satisfies? interactable target-interaction)
-    (if (nil? receivers)
-      (swap! active-interaction (fn [x] (get-next target-interaction)))
-      (if (multiple-receivers? target-interaction)
-        (remove-receiver active-interaction target-interaction receivers)
-        (swap! active-interaction (fn [x] (get-next target-interaction)))))
+    (send-active-interaction-by-atomic active-interaction target-interaction sender)
     (satisfies? branchable target-interaction)
-    (let [first-in-branch (get-first-valid-target-branch-interaction sender receivers label target-interaction)]
-      (log-message (format "first-in-branchable sender %s receivers %s action %s next %s, or is identifiable-recur %s" (:sender first-in-branch) (:receivers first-in-branch) (:action first-in-branch) (:next first-in-branch) (satisfies? identifiable-recur first-in-branch)))
-      (if (multiple-receivers? first-in-branch)
-        (remove-receiver-from-branch active-interaction first-in-branch receivers)
-        (swap! active-interaction (fn [x] (:next first-in-branch)))))
+    (send-active-interaction-by-branch sender receivers label active-interaction target-interaction)
+    (satisfies? parallelizable target-interaction)
+    (send-active-interaction-by-parallel sender receivers label active-interaction target-interaction)
     (satisfies? recursable target-interaction)
     (swap-active-interaction-by-recursion sender receivers label active-interaction (get-recursion target-interaction))
     :else (log-error :unsupported-operation (format "Cannot update the interaction, unknown type: %s!" (type target-interaction)))))
