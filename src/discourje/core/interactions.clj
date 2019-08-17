@@ -11,7 +11,7 @@
   (get-action [this])
   (get-sender [this])
   (get-receivers [this])
-  (get-is-sent [this]))
+  (get-accepted-send [this]))
 
 (defprotocol parallelizable
   (get-parallel [this]))
@@ -19,14 +19,14 @@
 (defprotocol stringify
   (to-string [this]))
 
-(defrecord interaction [id action sender receivers is-sent next]
+(defrecord interaction [id action sender receivers accepted-sends next]
   idable
   (get-id [this] id)
   interactable
   (get-action [this] action)
   (get-sender [this] sender)
   (get-receivers [this] receivers)
-  (get-is-sent [this] is-sent)
+  (get-accepted-send [this] accepted-sends)
   linkable
   (get-next [this] next)
   stringify
