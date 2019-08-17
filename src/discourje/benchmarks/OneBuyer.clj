@@ -9,7 +9,9 @@
       [(-->> "quote" "seller" "buyer")
        (-->> "order" "buyer" "seller")
        (-->> "order-ack" "seller" "buyer")]
-      [(-->> "out-of-stock" "seller" "buyer")])))
+      [(-->> "out-of-stock" "seller" "buyer")])
+    )
+  )
 
 (defn- discourje-buyer
   "Logic representing Buyer"
@@ -126,7 +128,7 @@
                    (clojure.core.async/thread (clojure-seller (get-chan b->s) (get-chan s->b) in-stock? quote order-ack out-of-stock))
                    (clojure-buyer (get-chan b->s) (get-chan s->b) quote-request order)
                    (force-monitor-reset! (get-monitor b->s)))))]
-        time))
+    time))
 ;(clojure-one-buyer 1)
 ;(clojure-one-buyer 2)
 ;(clojure-one-buyer 4)

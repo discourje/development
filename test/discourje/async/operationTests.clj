@@ -521,7 +521,6 @@
     (is (= "Hi") (get-content (async/<!! c)))))
 
 (deftest send-receive-tesParallelParticipantsWithChoiceProtocol
-  (log-error :testingFAILED!!!!! "Exception in thread async-thread-macro-4 clojure.lang.ExceptionInfo: throw+: {:type :incorrect-communication, :message Atomic-send communication invalid! sender: B, receiver: A, label: 4 while active interaction is: Interaction - Action: 3, Sender: A, Receivers: [] } {:type :incorrect-communication, :message Atomic-send communication invalid! sender: B, receiver: A, label: 4 while active interaction is: Interaction - Action: 3, Sender: A, Receivers: [] }")
   (let [channels (add-infrastructure (tesParallelParticipantsWithChoiceProtocol))
         ab (get-channel "A" "B" channels)
         ac (get-channel "A" "C" channels)
@@ -690,7 +689,7 @@
           (let [b->a6 (<!! ba 7)]
             (is (= (get-label b->a6) 7)))))))
 
-(deftest send-and-receive-parallel-after-rec-with-after-rec-test
+(deftest send-and-receive-parallel-after-rec-with-after-rec-with-recur-test
   (let [channels (add-infrastructure (parallel-after-rec-with-after-rec true))
         ab (get-channel "a" "b" channels)
         ba (get-channel "b" "a" channels)]
@@ -863,7 +862,7 @@
         (is (= (get-label (async/<!! f11)) 5))))))
 
 (deftest impossible-parallel-test
-  "This test shows an issue with parappel when both parallel branches are going to the same channel (bob-to-alice and alice to bob)
+  "This test shows an issue with parallel when both parallel branches are going to the same channel (bob-to-alice and alice to bob)
   So both sends are allowed by the monitor, but the receives could be not allowed since forexample: on the channel the order of messages in the QUEUE is
   (msg 2 2) followed by (msg 3 3) but the receive for 3 is done first. This will create a faulty receive since the 2 message is the first message in the queue of the channel!
   This test handles it by exceptions"

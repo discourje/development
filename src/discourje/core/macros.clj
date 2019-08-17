@@ -4,7 +4,7 @@
 (defmacro -->>
   "Create an Atomic-interaction"
   [action sender receiver]
-  `(->interaction (uuid/v1) ~action ~sender ~receiver nil))
+  `(->interaction (uuid/v1) ~action ~sender ~receiver false nil))
 
 (defmacro rec
   "Generate recursion"
