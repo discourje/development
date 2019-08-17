@@ -5,6 +5,14 @@
             [clojure.core.async :as async]
             [discourje.core.logging :refer :all]))
 
+(deftest add-sender
+  (let [inter (->interaction nil 1 "a" "b" #{} nil)]
+    (is (= (->interaction nil 1 "a" "b" #{"b"} nil) (assoc inter :accepted-sends (conj (:accepted-sends inter) "b"))))))
+
+(deftest check-sender
+  (let [inter (->interaction nil 1 "a" "b" #{"b"} nil)]
+    (is (true? (contains? (get-accepted-sends inter)"b" )))))
+
 (deftest send-test
   (let [channels (generate-infrastructure (testDualProtocol true))
         c (get-channel "A" "B" channels)]

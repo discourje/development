@@ -11,7 +11,7 @@
   (get-action [this])
   (get-sender [this])
   (get-receivers [this])
-  (get-accepted-send [this]))
+  (get-accepted-sends [this]))
 
 (defprotocol parallelizable
   (get-parallel [this]))
@@ -26,7 +26,7 @@
   (get-action [this] action)
   (get-sender [this] sender)
   (get-receivers [this] receivers)
-  (get-accepted-send [this] accepted-sends)
+  (get-accepted-sends [this] accepted-sends)
   linkable
   (get-next [this] next)
   stringify

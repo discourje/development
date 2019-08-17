@@ -131,13 +131,14 @@
   (if (nil? sender)
     (log-error :invalid-send (format "sender appears to be nil: %s %s" active-interaction target-interaction))
     (swap! active-interaction (fn [inter]
+                                (if (= (get-id inter) (get-id target-interaction)) 1)
                                 (println "into sends "(assoc inter :accepted-sends (into {} (:accepted-sends inter) sender)))
-                                (assoc inter :accepted-sends (into {} (:accepted-sends inter) sender))))))
+                                (assoc inter :accepted-sends (conj (:accepted-sends inter) sender))))))
 
 (defn- is-valid-interaction-for-send?
   "Check if the interaction is valid for a send operation"
   [sender receivers label active-interaction]
-  (and (is-valid-interaction? sender receivers label active-interaction) (false? (get-accepted-send active-interaction))))
+  (and (is-valid-interaction? sender receivers label active-interaction) (false? (get-accepted-sends active-interaction))))
 
 (defn- is-valid-interaction?
   "Is the given interaction valid compared to the active-interaction of the monitor"
@@ -341,6 +342,7 @@
   [rec-set rec]
   (when (nil? ((get-name rec) @rec-set))
     (swap! rec-set assoc (get-name rec) rec)))
+
 (defn- apply-send-to-mon
   "Apply new interaction"
   ([monitor sender receivers label active-interaction target-interaction]
@@ -449,7 +451,7 @@
   monitoring
   (get-monitor-id [this] id)
   (get-active-interaction [this] @active-interaction)
-  (apply-send! [this sender receivers label] (apply-receive-to-mon this sender receivers label active-interaction @active-interaction))
+  (apply-send! [this sender receivers label] (apply-send-to-mon this sender receivers label active-interaction @active-interaction))
   (apply-receive! [this sender receivers label] (apply-receive-to-mon this sender receivers label active-interaction @active-interaction))
   (valid-send? [this sender receivers label] (is-valid-send-communication? this sender receivers label @active-interaction))
   (valid-receive? [this sender receivers label] (is-valid-communication? this sender receivers label @active-interaction))
