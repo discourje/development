@@ -9,10 +9,10 @@
     (is (= "A" (get-sender inter)))
     (is (= "B" (get-receivers inter)))))
 
-(defn testSingleParallelProtocol []
+(defn testSingleMulticastProtocol []
   (create-protocol [(make-interaction "1" "A" ["B" "C"])]))
 
-(def testSingleParallelProtocolControl
+(def testSingleMulticastProtocolControl
   [(->interaction (uuid/v1) "1" "A" ["B" "C"] #{} nil)])
 
 (defn testDualProtocol [include-ids]
@@ -51,7 +51,7 @@
                  (->interaction nil "2" "B" "A" #{}
                                 (->interaction nil "3" "A" "C" #{} nil))))
 
-(defn testParallelProtocol [include-ids]
+(defn testMulticastProtocol [include-ids]
   (if include-ids (create-protocol [
                                     (make-interaction "1" "A" "B")
                                     (make-interaction "2" "B" "A")
@@ -62,7 +62,7 @@
                                     (->interaction nil "2" "B" "A" #{} nil)
                                     (->interaction nil "3" "A" "C" #{} nil)
                                     (->interaction nil "4" "C" ["A" "B"] #{} nil)])))
-(def testParallelProtocolControl
+(def testMulticastProtocolControl
   (->interaction nil "1" "A" "B" #{}
                  (->interaction nil "2" "B" "A" #{}
                                 (->interaction nil "3" "A" "C" #{}
@@ -88,11 +88,11 @@
                                                (->interaction nil "3" "A" "C" #{}
                                                               (->interaction nil "4" "C" ["A" "B"] #{} nil))))))
 
-(defn tesParallelParticipantsProtocol []
+(defn testMulticastParticipantsProtocol []
   (mep (-->> "1" "A" ["B" "C"])
        (-->> "2" "B" "A")))
 
-(defn tesParallelParticipantsWithChoiceProtocol []
+(defn testMulticastParticipantsWithChoiceProtocol []
   (mep (-->> "1" "A" "B")
        (-->> "2" "B" "A")
        (choice
@@ -287,26 +287,26 @@
 
 (defn multiple-nested-branches-protocol [include-ids]
   (if include-ids (create-protocol [
-                                    (make-choice [;i0
+                                    (make-choice [
                                                   [(make-choice [
-                                                                 [(make-interaction "1" "A" "B") ;i0b0b00
-                                                                  (make-interaction "2" "B" "A")] ;i0b0b01
-                                                                 [(make-interaction "1" "A" "C")]] ;i0b0b10
+                                                                 [(make-interaction "1" "A" "B") 0
+                                                                  (make-interaction "2" "B" "A")]
+                                                                 [(make-interaction "1" "A" "C")]]
                                                                 )]
-                                                  [(make-choice [;i0b1
-                                                                 [(make-choice [;i0b1b0
-                                                                                [(make-choice [;i0b1b0b0
-                                                                                               [(make-interaction "1" "A" "D")] ;i0b1b0b0b00
-                                                                                               [(make-interaction "1" "A" ["E" "F" "G"]) ;i0b1b0b0b10
-                                                                                                (make-interaction "3" "F" "A") ;i0b1b0b0b11
-                                                                                                (make-interaction "4" "G" "A")]] ;i0b1b0b0b12
+                                                  [(make-choice [
+                                                                 [(make-choice [
+                                                                                [(make-choice [
+                                                                                               [(make-interaction "1" "A" "D")]
+                                                                                               [(make-interaction "1" "A" ["E" "F" "G"])
+                                                                                                (make-interaction "3" "F" "A")
+                                                                                                (make-interaction "4" "G" "A")]]
                                                                                               )]
-                                                                                [(make-interaction "1" "A" "H")]] ;i0b1b0b10
+                                                                                [(make-interaction "1" "A" "H")]]
                                                                                )]
-                                                                 [(make-interaction "1" "A" "I")]] ;i0b1b11
+                                                                 [(make-interaction "1" "A" "I")]]
                                                                 )]]
                                                  )
-                                    (make-interaction "Done" "A" "End")] ;i1
+                                    (make-interaction "Done" "A" "End")]
                                    )
                   (create-protocol [
                                     (->branch nil [

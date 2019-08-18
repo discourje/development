@@ -76,8 +76,8 @@
         (is (= "Hello A" (get-content b->a)))
         ))))
 
-(deftest send-receive-parallel-protocol-test
-  (let [channels (generate-infrastructure (testParallelProtocol true))
+(deftest send-receive-multicast-protocol-test
+  (let [channels (generate-infrastructure (testMulticastProtocol true))
         ab (get-channel "A" "B" channels)
         ba (get-channel "B" "A" channels)
         ac (get-channel "A" "C" channels)
@@ -104,8 +104,8 @@
               (is (= "4" (get-label c->b)))
               (is (= "C->A-B" (get-content c->b))))))))))
 
-(deftest send-receive-parallel-wildcard-only-protocol-test
-  (let [channels (generate-infrastructure (testParallelProtocol true))
+(deftest send-receive-multicast-wildcard-only-protocol-test
+  (let [channels (generate-infrastructure (testMulticastProtocol true))
         ab (get-channel "A" "B" channels)
         ba (get-channel "B" "A" channels)
         ac (get-channel "A" "C" channels)
@@ -133,8 +133,8 @@
               (is (= "4" (get-label c->b)))
               (is (= "C->A-B" (get-content c->b))))))))))
 
-(deftest send-receive-single-parallel-test
-  (let [channels (generate-infrastructure (testSingleParallelProtocol))
+(deftest send-receive-single-multicast-test
+  (let [channels (generate-infrastructure (testSingleMulticastProtocol))
         ab (get-channel "A" "B" channels)
         ac (get-channel "A" "C" channels)
         m1 (->message "1" "Hello B and C")]
@@ -512,8 +512,8 @@
                     (reset! order-book false)))))))))))
 
 
-(deftest send-receive-tesParallelParticipantsPrototocol
-  (let [channels (add-infrastructure (tesParallelParticipantsProtocol))
+(deftest send-receive-testMulticastParticipantsPrototocol
+  (let [channels (add-infrastructure (testMulticastParticipantsProtocol))
         ab (get-channel "A" "B" channels)
         ac (get-channel "A" "C" channels)
         ba (get-channel "B" "A" channels)
@@ -528,8 +528,8 @@
     (is (= "hi too" (get-content (async/<!! a))))
     (is (= "Hi") (get-content (async/<!! c)))))
 
-(deftest send-receive-tesParallelParticipantsWithChoiceProtocol
-  (let [channels (add-infrastructure (tesParallelParticipantsWithChoiceProtocol))
+(deftest send-receive-testMulticastParticipantsWithChoiceProtocol
+  (let [channels (add-infrastructure (testMulticastParticipantsWithChoiceProtocol))
         ab (get-channel "A" "B" channels)
         ac (get-channel "A" "C" channels)
         ba (get-channel "B" "A" channels)

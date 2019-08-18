@@ -161,11 +161,11 @@
             (log-error :incorrect-communication "Trying to send in parallel, but the monitor is not correct for all channels!")
             :else
             (do (apply-send! (get-monitor (first channel)) (get-provider (first channel)) (vec (for [c channel] (get-consumer c))) (get-label m))
-                (allow-sends channel m))
+                (allow-sends channel m)))
             (if-not (valid-send? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m))
               (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) (get-label m) (to-string (get-active-interaction (get-monitor channel)))))
               (do (apply-send! (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m))
-                  (allow-send channel m))))))))
+                  (allow-send channel m)))))))
 
 (defn <!!
   "take form channel"

@@ -137,9 +137,9 @@
         false)
     (do (swap! active-interaction (fn [inter]
                                     (if (= (get-id inter) (get-id target-interaction)) 1)
-                                    (println "into sends " (assoc inter :accepted-sends (into {} (:accepted-sends inter) sender)))
-                                    (assoc-sender-to-interaction inter sender))
-               true))))
+                                    (println "into sends " (assoc inter :accepted-sends (conj (:accepted-sends inter) sender)))
+                                    (assoc-sender-to-interaction inter sender)))
+               true)))
 
 (defn- is-valid-interaction-for-send?
   "Check if the interaction is valid for a send operation"
@@ -331,7 +331,7 @@
     (satisfies? parallelizable target-interaction)
     (send-active-interaction-by-parallel sender receivers label active-interaction target-interaction)
     (satisfies? recursable target-interaction)
-    (swap-active-interaction-by-recursion sender receivers label active-interaction (get-recursion target-interaction))
+    (send-active-interaction-by-recursion sender receivers label active-interaction (get-recursion target-interaction))
     :else (log-error :unsupported-operation (format "Cannot update the interaction, unknown type: %s!" (type target-interaction)))))
 
 (defn add-rec-to-table
@@ -362,6 +362,7 @@
   "Apply new interaction"
   ([monitor sender receivers label active-interaction target-interaction]
    (log-message (format "Applying: RECEIVE label %s, receiver %s." label receivers))
+   (println "APPLY RECEIVE TARGET =-> "target-interaction)
    (cond
      (satisfies? interactable target-interaction)
      (swap-active-interaction-by-atomic active-interaction target-interaction receivers)

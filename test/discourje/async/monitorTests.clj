@@ -23,8 +23,8 @@
     (is (= (:interactions mon) testTripleProtocolControl))))
 
 (deftest parallel-protocol-ids-test
-  (let [mon (generate-monitor (testParallelProtocol false))]
-    (is (= (:interactions mon) testParallelProtocolControl))))
+  (let [mon (generate-monitor (testMulticastProtocol false))]
+    (is (= (:interactions mon) testMulticastProtocolControl))))
 
 (deftest quad-protocol-ids-test
   (let [mon (generate-monitor (testQuadProtocol false))]
