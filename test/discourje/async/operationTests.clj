@@ -905,5 +905,22 @@
     (loop [try-test (get-label (async/<!! (bob)))]
       (if-not (nil? try-test)
         (is (= try-test 5))
-        (recur (get-label (async/<!! (bob)))))
-      )))
+        (recur (get-label (async/<!! (bob))))))))
+
+(deftest send-and-receive-parallel-with-choice-test
+  (let [channels (add-infrastructure (parallel-with-choice true))
+        ab (get-channel "a" "b" channels)
+        ba (get-channel "b" "a" channels)]
+    (set-logging-exceptions)
+    ;only when sending validation for par, we need to keep track of nesting
+    (>!! ab (msg 0 0))
+    (let [a->b (<!! ab 0)]
+      (is (= (get-label a->b) 0))
+      (do (>!! ba (msg 4 4))
+          (let [b->a4 (<!! ba 4)]
+            (is (= (get-label b->a4) 4))
+            (>!! ab (msg 5 5))
+            (is (= (get-label (<!! ab 5)) 5))))
+      (do (>!! ba (msg 6 6))
+          (let [b->a6 (<!! ba 6)]
+            (is (= (get-label b->a6) 6)))))))
