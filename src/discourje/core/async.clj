@@ -36,6 +36,8 @@
       "interactions"
       "channels"
       "monitoring"
+      "validation/receivevalidation"
+      "validation/sendvalidation"
       "buffers"
       "wildcard"
       "nestedMonitorLinking")

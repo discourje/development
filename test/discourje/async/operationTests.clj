@@ -923,4 +923,5 @@
             (is (= (get-label (<!! ab 5)) 5))))
       (do (>!! ba (msg 6 6))
           (let [b->a6 (<!! ba 6)]
-            (is (= (get-label b->a6) 6)))))))
+            (is (= (get-label b->a6) 6))
+            (is (nil? (get-active-interaction (get-monitor ab)))))))))
