@@ -16,7 +16,6 @@
 (load "validation/receivevalidation"
       "validation/sendvalidation")
 
-
 (declare contains-value? is-valid-interaction?)
 
 (defn- interaction-to-string

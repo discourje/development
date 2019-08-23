@@ -111,14 +111,15 @@
 (defn- get-parallel-interaction
   "Check the atomic interaction"
   [sender receiver label active-interaction]
-  (flatten
-    (for [parallel (get-parallel active-interaction)]
-      (cond
-        (satisfies? interactable parallel) (get-atomic-interaction sender receiver label parallel)
-        (satisfies? branchable parallel) (get-branch-interaction sender receiver label parallel)
-        (satisfies? parallelizable parallel) (get-parallel-interaction sender receiver label parallel)
-        (satisfies? recursable parallel) (get-recursion-interaction sender receiver label parallel)
-        :else (log-error :unsupported-operation (format "Cannot check operation on child parallel construct! %s" (interaction-to-string parallel)))))))
+  (when-let [_ (for [parallel (get-parallel active-interaction)]
+                 (cond
+                   (satisfies? interactable parallel) (get-atomic-interaction sender receiver label parallel)
+                   (satisfies? branchable parallel) (get-branch-interaction sender receiver label parallel)
+                   (satisfies? parallelizable parallel) (get-parallel-interaction sender receiver label parallel)
+                   (satisfies? recursable parallel) (get-recursion-interaction sender receiver label parallel)
+                   :else (log-error :unsupported-operation (format "Cannot check operation on child parallel construct! %s" (interaction-to-string parallel))))
+                 )]
+    active-interaction))
 
 (defn- get-branch-interaction
   "Check the atomic interaction"
@@ -135,7 +136,7 @@
 (defn- get-first-valid-target-parallel-interaction
   "Find the first interactable in (nested) parallel constructs."
   [sender receiver label active-interaction]
-  (first (filter some? (get-parallel-interaction sender receiver label active-interaction))))
+  (get-parallel-interaction sender receiver label active-interaction))
 
 (defn- get-first-valid-target-branch-interaction
   "Find the first interactable in (nested) branchable constructs."
@@ -151,24 +152,8 @@
       (remove-receiver-from-branch active-interaction target receivers)
       (swap! active-interaction (fn [x] (:next target))))))
 
-(defn- swap-active-interaction-by-parallel
-  "Swap active interaction by parallel"
-  [sender receivers label active-interaction target-interaction]
-  (let [target (get-first-valid-target-parallel-interaction sender receivers label target-interaction)]
-    (log-message (format "target sender %s receivers %s action %s next %s or is identifiable-recur %s" (:sender target) (:receivers target) (:action target) (:next target) (satisfies? identifiable-recur target)))
-    (if (multiple-receivers? target)
-      (remove-receiver-from-parallel active-interaction target receivers)
-      (swap! active-interaction
-             (fn [inter]
-               (let [parallel-with-removed-par (remove (fn [x] (= (get-id x) (get-id target))) (get-parallel inter))]
-                 (if (and (empty? parallel-with-removed-par) (nil? (get-next target)))
-                   (get-next inter)
-                   (if (nil? (get-next target))
-                     (assoc inter :parallels parallel-with-removed-par)
-                     (assoc inter :parallels (conj parallel-with-removed-par (get-next target)))))))))))
 
 (defn- remove-from-nested-parallel [target par]
-  (println par)
   (cond
     (= (get-id par) (get-id target))
     true
@@ -179,6 +164,55 @@
     (satisfies? parallelizable par)
     (first (filter true? (for [p (get-parallel par)] (remove-from-nested-parallel target p))))
     ))
+
+(defn- remove-nested-p [sender receivers label target-interaction]
+  (let [value (cond (satisfies? parallelizable target-interaction)
+        (let [target (get-first-valid-target-parallel-interaction sender receivers label target-interaction)
+              parallel-with-removed-par (remove (fn [x] (= (remove-from-nested-parallel target x))) (get-parallel target))]
+          (if (nil? target)
+            target-interaction
+            (if (satisfies? parallelizable target)
+              (let [removed-p (for [p (get-parallel target)] (remove-nested-p sender receivers label p))]
+                (println "removed p = " removed-p)
+                removed-p)
+              (if (and (empty? parallel-with-removed-par) (nil? (get-next target)))
+                (get-next target)
+                (if (nil? (get-next target))
+                  (assoc target :parallels parallel-with-removed-par)
+                  (assoc target :parallels (conj parallel-with-removed-par (get-next target))))))))
+        (satisfies? branchable target-interaction)
+        (get-branch-interaction sender receivers label target-interaction)
+        (satisfies? interactable target-interaction)
+        (get-atomic-interaction sender receivers label target-interaction)
+        (satisfies? recursable target-interaction)
+        (get-recursion-interaction sender receivers label target-interaction)
+        )]
+    (if (nil? value)
+      target-interaction
+      value))
+  )
+
+(defn- swap-active-interaction-by-parallel
+  "Swap active interaction by parallel"
+  [sender receivers label active-interaction target-interaction]
+  (let [target (get-first-valid-target-parallel-interaction sender receivers label target-interaction)]
+    (log-message (format "target sender %s receivers %s action %s next %s or is identifiable-recur %s" (:sender target) (:receivers target) (:action target) (:next target) (satisfies? identifiable-recur target)))
+    (if (multiple-receivers? target)
+      (remove-receiver-from-parallel active-interaction target receivers)
+      (swap! active-interaction
+             (fn [inter]
+               (if (satisfies? parallelizable target)
+                 (let [removed-p (for [p (get-parallel target)] (remove-nested-p sender receivers label p))]
+                   (println removed-p)
+                   )
+                 (let [parallel-with-removed-par (remove (fn [x] (= (remove-from-nested-parallel target x))) (get-parallel inter))]
+                   (if (and (empty? parallel-with-removed-par) (nil? (get-next target)))
+                     (get-next inter)
+                     (if (nil? (get-next target))
+                       (assoc inter :parallels parallel-with-removed-par)
+                       (assoc inter :parallels (conj parallel-with-removed-par (get-next target)))))))
+               )))))
+
 
 (defn- swap-active-interaction-by-recursion
   "Swap active interaction bu recursion"

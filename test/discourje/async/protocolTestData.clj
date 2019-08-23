@@ -858,17 +858,17 @@
                                                                                                    [(make-interaction 0 "a" "b")]])]
                                                                                     [(make-interaction 4 "b" "a")
                                                                                      (make-interaction 5 "a" "b")]])]
-                                                                   [(make-interaction 0 "a" "b")]])]
-                                                    [(make-interaction 4 "b" "a")
-                                                     (make-interaction 5 "a" "b")]])
+                                                                   [(make-interaction 9 "a" "b")]])]
+                                                    [(make-interaction "hi" "b" "a")
+                                                     (make-interaction "hi" "a" "b")]])
                                     (make-interaction 6 "b" "a")])
                   (create-protocol [(->parallel nil [[(->branch nil [[(->parallel nil [[(->branch nil [[(->interaction nil 1 "a" "b" #{} nil)]
                                                                                                        [(->interaction nil 0 "a" "b" #{} nil)]] nil)]
                                                                                        [(->interaction nil 4 "b" "a" #{} nil)
                                                                                         (->interaction nil 5 "a" "b" #{} nil)]] nil)]
-                                                                     [(->interaction nil 0 "a" "b" #{} nil)]] nil)]
-                                                     [(->interaction nil 4 "b" "a" #{} nil)
-                                                      (->interaction nil 5 "a" "b" #{} nil)]] nil)
+                                                                     [(->interaction nil 9 "a" "b" #{} nil)]] nil)]
+                                                     [(->interaction nil "hi" "b" "a" #{} nil)
+                                                      (->interaction nil "hi" "a" "b" #{} nil)]] nil)
                                     (->interaction nil 6 "b" "a" #{} nil)])))
 
 (def parallel-with-choice-with-parallel-control
@@ -877,7 +877,7 @@
                                                    (->interaction nil 4 "b" "a" #{} (->interaction nil 5 "a" "b" #{} nil))
                                                    ] nil)
                                   (->interaction nil 0 "a" "b" #{} nil)] nil)
-                   (->interaction nil 4 "b" "a" #{} (->interaction nil 5 "a" "b" #{} nil))
+                   (->interaction nil "hi" "b" "a" #{} (->interaction nil "hi" "a" "b" #{} nil))
                    ] (->interaction nil 6 "b" "a" #{} nil)))
 
 (defn parallel-with-rec [include-ids]

@@ -925,3 +925,27 @@
           (let [b->a6 (<!! ba 6)]
             (is (= (get-label b->a6) 6))
             (is (nil? (get-active-interaction (get-monitor ab)))))))))
+
+(deftest send-and-receive-parallel-with-choice-with-parallel-test
+  (let [channels (add-infrastructure (parallel-with-choice-with-parallel true))
+        ab (get-channel "a" "b" channels)
+        ba (get-channel "b" "a" channels)]
+    (set-logging-exceptions)
+    ;only when sending validation for par, we need to keep track of nesting
+    (>!! ab (msg 0 0))
+    (let [a->b (<!! ab 0)]
+      (is (= (get-label a->b) 0))
+      (do (>!! ba (msg 4 4))
+          (let [b->a4 (<!! ba 4)]
+            (is (= (get-label b->a4) 4))
+            (>!! ab (msg 5 5))
+            (is (= (get-label (<!! ab 5)) 5))))
+      (do (>!! ba (msg "hi" "hi"))
+          (let [b->ahi (<!! ba "hi")]
+            (is (= (get-label b->ahi) "hi"))
+            (>!! ab (msg "hi" "hi"))
+            (is (= (get-label (<!! ab "hi")) "hi"))))
+      (do (>!! ba (msg 6 6))
+          (let [b->a6 (<!! ba 6)]
+            (is (= (get-label b->a6) 6))
+            (is (nil? (get-active-interaction (get-monitor ab)))))))))
