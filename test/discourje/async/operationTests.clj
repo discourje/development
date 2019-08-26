@@ -11,7 +11,7 @@
 
 (deftest check-sender
   (let [inter (->interaction nil 1 "a" "b" #{"b"} nil)]
-    (is (true? (contains? (get-accepted-sends inter)"b" )))))
+    (is (true? (contains? (get-accepted-sends inter) "b")))))
 
 (deftest send-test
   (let [channels (generate-infrastructure (testDualProtocol true))
@@ -542,7 +542,7 @@
                        (>!! ba (msg "2" "hi too"))
                        (<!! ab "3")
                        (>!! ba (msg "4" "hi too"))))
-                fnC (fn [] (<!! ac "3"))
+        fnC (fn [] (<!! ac "3"))
         a (clojure.core.async/thread (fnA))
         c (clojure.core.async/thread (fnC))]
     (clojure.core.async/thread (fnB))
@@ -875,10 +875,10 @@
   (msg 2 2) followed by (msg 3 3) but the receive for 3 is done first. This will create a faulty receive since the 2 message is the first message in the queue of the channel!
   This test handles it by exceptions"
   (let [mon (generate-infrastructure (mep (-->> 1 "Alice" "Bob")
-                 (par [(-->> 2 "Bob" "Alice")
-                       (-->> 3 "Alice" "Bob")]
-                      [(-->> 4 "Bob" "Alice")
-                       (-->> 5 "Alice" "Bob")])))
+                                          (par [(-->> 2 "Bob" "Alice")
+                                                (-->> 3 "Alice" "Bob")]
+                                               [(-->> 4 "Bob" "Alice")
+                                                (-->> 5 "Alice" "Bob")])))
         alice-to-bob (get-channel "Alice" "Bob" mon)
         bob-to-alice (get-channel "Bob" "Alice" mon)
         alice (fn []
@@ -931,7 +931,6 @@
         ab (get-channel "a" "b" channels)
         ba (get-channel "b" "a" channels)]
     (set-logging-exceptions)
-    ;only when sending validation for par, we need to keep track of nesting
     (>!! ab (msg 0 0))
     (let [a->b (<!! ab 0)]
       (is (= (get-label a->b) 0))
@@ -949,3 +948,27 @@
           (let [b->a6 (<!! ba 6)]
             (is (= (get-label b->a6) 6))
             (is (nil? (get-active-interaction (get-monitor ab)))))))))
+
+(deftest send-and-receive-parallel-with-rec-test
+  (let [channels (add-infrastructure (parallel-with-rec true))
+        ab (get-channel "a" "b" channels)
+        ba (get-channel "b" "a" channels)]
+    (set-logging-exceptions)
+    (loop [reps 0]
+      (if (> reps 2)
+        (do (>!! ab (msg 1 1))
+            (is (= (get-label (<!! ab 1)) 1)))
+        (do (>!! ab (msg 0 0))
+            (println reps)
+            (println "active monitor" (get-active-interaction (get-monitor ab)))
+            (is (= (get-label (<!! ab 0)) 0))
+            (recur (+ reps 1)))))
+    (do (>!! ba (msg 4 4))
+        (let [b->a4 (<!! ba 4)]
+          (is (= (get-label b->a4) 4))
+          (>!! ab (msg 5 5))
+          (is (= (get-label (<!! ab 5)) 5))))
+    (do (>!! ba (msg 6 6))
+        (let [b->a6 (<!! ba 6)]
+          (is (= (get-label b->a6) 6))
+          (is (nil? (get-active-interaction (get-monitor ab))))))))

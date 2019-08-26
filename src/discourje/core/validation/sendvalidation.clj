@@ -98,8 +98,8 @@
                      (satisfies? parallelizable p)
                      (set-send-on-par sender receivers label p)
                      (satisfies? recursable p)
-                     (let [valid-rec (get-send-recursion-interaction sender receivers label p)]
-                       (if (not (nil? valid-rec))
+                     (let [valid-rec (first (filter some? (get-send-recursion-interaction sender receivers label p)))]
+                     (if (not (nil? valid-rec))
                          (if (satisfies? parallelizable valid-rec)
                            (set-send-on-par sender receivers label valid-rec)
                            (assoc-sender-to-interaction valid-rec sender))

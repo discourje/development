@@ -881,20 +881,23 @@
                    ] (->interaction nil 6 "b" "a" #{} nil)))
 
 (defn parallel-with-rec [include-ids]
-  (if include-ids (create-protocol [(make-parallel [[(make-recursion :test [
-                                                                            (make-interaction 1 "a" "b")
-                                                                            (do-recur :test)])]
+  (if include-ids (create-protocol [(make-parallel [[(make-recursion :test [(make-choice [[(make-interaction 1 "a" "b")]
+                                                                                          [(make-interaction 0 "a" "b")
+                                                                                           (do-recur :test)]])
+                                                                            ])]
                                                     [(make-interaction 4 "b" "a")
                                                      (make-interaction 5 "a" "b")]])
                                     (make-interaction 6 "b" "a")])
-                  (create-protocol [(->parallel nil [[(->recursion nil :test [
-                                                                              (->interaction nil 1 "a" "b" #{} nil)
-                                                                              (->recur-identifier nil :test :recur nil)] nil)]
+                  (create-protocol [(->parallel nil [[(->recursion nil :test [(->branch nil [[(->interaction nil 1 "a" "b" #{} nil)]
+                                                                                             [(->interaction nil 0 "a" "b" #{} nil)
+                                                                                              (->recur-identifier nil :test :recur nil)]] nil)] nil)]
                                                      [(->interaction nil 4 "b" "a" #{} nil)
                                                       (->interaction nil 5 "a" "b" #{} nil)]] nil)
                                     (->interaction nil 6 "b" "a" #{} nil)])))
 
 (def parallel-with-rec-control
-  (->parallel nil [(->recursion nil :test [(->interaction nil 1 "a" "b" #{} (->recur-identifier nil :test :recur nil))] nil)
+  (->parallel nil [(->recursion nil :test [(->branch nil [(->interaction nil 1 "a" "b" #{} nil)
+                                                          (->interaction nil 0 "a" "b" #{}
+                                                                         (->recur-identifier nil :test :recur nil))] nil)] nil)
                    (->interaction nil 4 "b" "a" #{} (->interaction nil 5 "a" "b" #{} nil))]
               (->interaction nil 6 "b" "a" #{} nil)))
