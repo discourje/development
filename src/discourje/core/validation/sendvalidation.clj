@@ -79,9 +79,9 @@
 
 (defn- set-send-on-par
   "Assoc a sender to a nested parallel interaction"
-  [sender receivers label inter monitor]
+  [sender receivers label inter target-interaction monitor]
   (assoc inter :parallels
-               (let [pars (get-parallel inter)]
+               (let [pars (get-parallel target-interaction)]
                  (for [p pars]
                    (cond
                      (satisfies? interactable p)
@@ -92,23 +92,24 @@
                      (let [valid-branch (get-valid-send-branch-interaction sender receivers label p)]
                        (if (not (nil? valid-branch))
                          (if (satisfies? parallelizable valid-branch)
-                           (set-send-on-par sender receivers label valid-branch monitor)
+                           (set-send-on-par sender receivers label valid-branch target-interaction monitor)
                            (assoc-sender-to-interaction valid-branch sender))
                          p))
                      (satisfies? parallelizable p)
-                     (set-send-on-par sender receivers label p monitor)
+                     (set-send-on-par sender receivers label p target-interaction monitor)
                      (satisfies? recursable p)
                      (let [valid-rec (first (filter some? (get-send-recursion-interaction sender receivers label p)))]
                        (if (not (nil? valid-rec))
                          (if (satisfies? parallelizable valid-rec)
-                           (set-send-on-par sender receivers label valid-rec monitor)
+                           (set-send-on-par sender receivers label valid-rec target-interaction monitor)
                            (assoc-sender-to-interaction valid-rec sender))
                          p))
                      (satisfies? identifiable-recur p)
                      (let [valid-rec (first (filter some? (get-send-recursion-interaction sender receivers label (get-rec monitor (get-name p)))))]
+                       (println "valid rec by recuridentifier = " valid-rec)
                        (if (not (nil? valid-rec))
                          (if (satisfies? parallelizable valid-rec)
-                           (set-send-on-par sender receivers label valid-rec monitor)
+                           (set-send-on-par sender receivers label valid-rec target-interaction monitor)
                            (assoc-sender-to-interaction valid-rec sender))
                          p))
                      )))))
@@ -118,7 +119,7 @@
   [sender receivers label active-interaction target-interaction monitor]
   (swap! active-interaction
          (fn [inter]
-           (set-send-on-par sender receivers label inter monitor))))
+           (set-send-on-par sender receivers label inter target-interaction monitor))))
 
 (defn- send-active-interaction-by-recursion
   "Swap active interaction by recursion"

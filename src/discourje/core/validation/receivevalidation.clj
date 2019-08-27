@@ -183,6 +183,7 @@
     ))
 
 (defn remove-nested-parallel [sender receivers label target-interaction monitor]
+  (println "(get-parallel target-interaction)"(get-parallel target-interaction))
   (let [pars (flatten (filter some?
                               (for [par (get-parallel target-interaction)]
                                 (let [inter (cond
@@ -203,9 +204,16 @@
                                     (if (satisfies? parallelizable par)
                                       nil
                                       par)
-                                    (if (satisfies? parallelizable inter)
-                                      (remove-nested-parallel sender receivers label inter monitor)
-                                      (get-next inter)))
+                                    (do (when (instance? clojure.lang.LazySeq inter)
+                                          (println (first (filter some? inter))))
+                                        (cond
+                                          (satisfies? parallelizable inter)
+                                          (remove-nested-parallel sender receivers label inter monitor)
+                                          (satisfies? interactable inter)
+                                          (get-next inter) ;something going wrong here!
+                                          (instance? clojure.lang.LazySeq inter)
+                                          (first (filter some? inter))
+                                          )))
                                   ))))]
     (if (empty? pars)
       (get-next target-interaction)
@@ -225,7 +233,7 @@
                    par-target)
                  (let [parallel-with-removed-par (remove (fn [x] (remove-from-nested-parallel target x monitor)) (get-parallel inter))]
                    (if (and (empty? parallel-with-removed-par) (nil? (get-next target)))
-                     (do (println(get-next inter))(get-next inter))
+                     (do (println (get-next inter)) (get-next inter))
                      (if (nil? (get-next target))
                        (assoc inter :parallels parallel-with-removed-par)
                        (assoc inter :parallels (conj parallel-with-removed-par (get-next target)))))))
@@ -250,8 +258,8 @@
         (swap! active-interaction (fn [x] (:next first-in-branch)))))
     (satisfies? recursable target-interaction)
     (swap-active-interaction-by-recursion sender receivers label active-interaction (get-recursion target-interaction) monitor)
-    (satisfies? parallelizable interaction)
-    (swap-active-interaction-by-parallel sender receivers label active-interaction (get-recursion target-interaction) monitor)
+    (satisfies? parallelizable target-interaction)
+    (swap-active-interaction-by-parallel sender receivers label active-interaction target-interaction monitor)
     :else (log-error :unsupported-operation (format "Cannot update the interaction, unknown type: %s!" (type target-interaction)))))
 
 (defn is-valid-communication?

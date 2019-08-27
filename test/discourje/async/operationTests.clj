@@ -960,8 +960,6 @@
         (do (>!! ab (msg 1 1))
             (is (= (get-label (<!! ab 1)) 1)))
         (do (>!! ab (msg 0 0))
-            (println reps)
-            (println "active monitor" (get-active-interaction (get-monitor ab)))
             (is (= (get-label (<!! ab 0)) 0))
             (recur (+ reps 1)))))
     (do (>!! ba (msg 4 4))
@@ -969,6 +967,28 @@
           (is (= (get-label b->a4) 4))
           (>!! ab (msg 5 5))
           (is (= (get-label (<!! ab 5)) 5))))
+    (do (>!! ba (msg 6 6))
+        (let [b->a6 (<!! ba 6)]
+          (is (= (get-label b->a6) 6))
+          (is (nil? (get-active-interaction (get-monitor ab))))))))
+
+(deftest send-and-receive-rec-with-parallel-with-choice-test
+  (let [channels (add-infrastructure (rec-with-parallel-with-choice true))
+        ab (get-channel "a" "b" channels)
+        ba (get-channel "b" "a" channels)]
+    (set-logging-exceptions)
+    (loop [reps 0]
+      (if (> reps 2)
+        (do (>!! ab (msg 1 1))
+            (is (= (get-label (<!! ab 1)) 1))
+            (do (>!! ba (msg 4 4))
+                (let [b->a4 (<!! ba 4)]
+                  (is (= (get-label b->a4) 4))
+                  (>!! ab (msg 5 5))
+                  (is (= (get-label (<!! ab 5)) 5)))))
+        (do (>!! ab (msg 0 0))
+            (is (= (get-label (<!! ab 0)) 0))
+            (recur (+ reps 1)))))
     (do (>!! ba (msg 6 6))
         (let [b->a6 (<!! ba 6)]
           (is (= (get-label b->a6) 6))

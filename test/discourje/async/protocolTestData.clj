@@ -901,3 +901,21 @@
                                                                          (->recur-identifier nil :test :recur nil))] nil)] nil)
                    (->interaction nil 4 "b" "a" #{} (->interaction nil 5 "a" "b" #{} nil))]
               (->interaction nil 6 "b" "a" #{} nil)))
+
+(defn rec-with-parallel-with-choice [include-ids]
+  (if include-ids (create-protocol [(make-recursion :test [(make-parallel [[(make-choice [[(make-interaction 1 "a" "b")]
+                                                                                          [(make-interaction 0 "a" "b")
+                                                                                           (do-recur :test)]])]
+                                                                           [(make-interaction 4 "b" "a")
+                                                                            (make-interaction 5 "a" "b")]
+                                                                           ])
+                                                           ])
+                                    (make-interaction 6 "b" "a")])
+                  (create-protocol [(->recursion nil :test [(->parallel nil [[(->branch nil [[(->interaction nil 1 "a" "b" #{} nil)]
+                                                                                             [(->interaction nil 0 "a" "b" #{} nil)
+                                                                                              (->recur-identifier nil :test :recur nil)]] nil)]
+                                                                             [(->interaction nil 4 "b" "a" #{} nil)
+                                                                              (->interaction nil 5 "a" "b" #{} nil)]
+                                                                             ] nil)
+                                                            ] nil)
+                                    (->interaction nil 6 "b" "a" #{} nil)])))
