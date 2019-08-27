@@ -2,7 +2,7 @@
 (in-ns 'discourje.core.async)
 
 ;forward declare check-branchable-interaction to resolve undefined issue in check-recursion-interaction
-(declare check-branch-interaction get-branch-interaction get-parallel-interaction is-valid-interaction? interaction-to-string is-active-interaction-multicast? add-rec-to-table)
+(declare check-branch-interaction check-parallel-interaction get-branch-interaction get-parallel-interaction is-valid-interaction? interaction-to-string is-active-interaction-multicast? add-rec-to-table)
 
 (defn- check-recursion-interaction
   "Check the first element in a recursion interaction"
@@ -13,6 +13,7 @@
       (satisfies? interactable first-interaction) (is-valid-interaction? sender receivers label first-interaction)
       (satisfies? branchable first-interaction) (check-branch-interaction sender receivers label first-interaction)
       (satisfies? recursable first-interaction) (check-recursion-interaction sender receivers label first-interaction)
+      (satisfies? parallelizable parallel) (check-parallel-interaction sender receivers label parallel)
       :else (log-error :unsupported-operation "No correct next recursion monitor found" (interaction-to-string first-interaction)))))
 
 (defn- check-branch-interaction
@@ -25,7 +26,21 @@
                           (satisfies? interactable first-in-branch) (is-valid-interaction? sender receivers label first-in-branch)
                           (satisfies? branchable first-in-branch) (check-branch-interaction sender receivers label first-in-branch)
                           (satisfies? recursable first-in-branch) (check-recursion-interaction sender receivers label first-in-branch)
+                          (satisfies? parallelizable parallel) (check-parallel-interaction sender receivers label parallel)
                           :else (log-error :unsupported-operation "No correct next monitor found in first position of a branchable construct!" (interaction-to-string first-in-branch)))))))
+     0))
+(defn- check-parallel-interaction
+  "Check the atomic interaction"
+  [sender receivers label active-interaction]
+  (> (count (filter (fn [x] (true? x))
+                    (flatten
+                      (for [parallel (get-parallel active-interaction)]
+                        (cond
+                          (satisfies? interactable parallel) (is-valid-interaction? sender receivers label parallel)
+                          (satisfies? branchable parallel) (check-branch-interaction sender receivers label parallel)
+                          (satisfies? recursable parallel) (check-recursion-interaction sender receivers label parallel)
+                          (satisfies? parallelizable parallel) (check-parallel-interaction sender receivers label parallel)
+                          :else (log-error :unsupported-operation "No correct next monitor found in first position of a branchable construct!" (interaction-to-string parallel)))))))
      0))
 
 (defn- multiple-receivers?
@@ -207,8 +222,7 @@
              (fn [inter]
                (if (satisfies? parallelizable target)
                  (let [par-target (remove-nested-parallel sender receivers label target monitor)]
-                   par-target
-                   )
+                   par-target)
                  (let [parallel-with-removed-par (remove (fn [x] (remove-from-nested-parallel target x monitor)) (get-parallel inter))]
                    (if (and (empty? parallel-with-removed-par) (nil? (get-next target)))
                      (do (println(get-next inter))(get-next inter))
@@ -263,7 +277,6 @@
   "Apply new interaction"
   ([monitor sender receivers label active-interaction target-interaction]
    (log-message (format "Applying: RECEIVE label %s, receiver %s." label receivers))
-    ;(println "APPLY RECEIVE TARGET =-> " (type target-interaction))
    (cond
      (satisfies? interactable target-interaction)
      (swap-active-interaction-by-atomic active-interaction target-interaction receivers)

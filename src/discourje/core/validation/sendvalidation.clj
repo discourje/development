@@ -79,7 +79,7 @@
 
 (defn- set-send-on-par
   "Assoc a sender to a nested parallel interaction"
-  [sender receivers label inter]
+  [sender receivers label inter monitor]
   (assoc inter :parallels
                (let [pars (get-parallel inter)]
                  (for [p pars]
@@ -92,39 +92,46 @@
                      (let [valid-branch (get-valid-send-branch-interaction sender receivers label p)]
                        (if (not (nil? valid-branch))
                          (if (satisfies? parallelizable valid-branch)
-                           (set-send-on-par sender receivers label valid-branch)
+                           (set-send-on-par sender receivers label valid-branch monitor)
                            (assoc-sender-to-interaction valid-branch sender))
                          p))
                      (satisfies? parallelizable p)
-                     (set-send-on-par sender receivers label p)
+                     (set-send-on-par sender receivers label p monitor)
                      (satisfies? recursable p)
                      (let [valid-rec (first (filter some? (get-send-recursion-interaction sender receivers label p)))]
-                     (if (not (nil? valid-rec))
+                       (if (not (nil? valid-rec))
                          (if (satisfies? parallelizable valid-rec)
-                           (set-send-on-par sender receivers label valid-rec)
+                           (set-send-on-par sender receivers label valid-rec monitor)
                            (assoc-sender-to-interaction valid-rec sender))
-                         p)))))))
+                         p))
+                     (satisfies? identifiable-recur p)
+                     (let [valid-rec (first (filter some? (get-send-recursion-interaction sender receivers label (get-rec monitor (get-name p)))))]
+                       (if (not (nil? valid-rec))
+                         (if (satisfies? parallelizable valid-rec)
+                           (set-send-on-par sender receivers label valid-rec monitor)
+                           (assoc-sender-to-interaction valid-rec sender))
+                         p))
+                     )))))
 
 (defn- send-active-interaction-by-parallel
   "Swap active interaction by parallel"
-  [sender receivers label active-interaction target-interaction]
+  [sender receivers label active-interaction target-interaction monitor]
   (swap! active-interaction
          (fn [inter]
-           ;(println "set send in par" (set-send-on-par sender receivers label inter))
-           (set-send-on-par sender receivers label inter))))
+           (set-send-on-par sender receivers label inter monitor))))
 
 (defn- send-active-interaction-by-recursion
   "Swap active interaction by recursion"
-  [sender receivers label active-interaction target-interaction]
+  [sender receivers label active-interaction target-interaction monitor]
   (cond
     (satisfies? interactable target-interaction)
     (send-active-interaction-by-atomic active-interaction target-interaction sender)
     (satisfies? branchable target-interaction)
     (send-active-interaction-by-branch sender receivers label active-interaction target-interaction)
     (satisfies? parallelizable target-interaction)
-    (send-active-interaction-by-parallel sender receivers label active-interaction target-interaction)
+    (send-active-interaction-by-parallel sender receivers label active-interaction target-interaction monitor)
     (satisfies? recursable target-interaction)
-    (send-active-interaction-by-recursion sender receivers label active-interaction (get-recursion target-interaction))
+    (send-active-interaction-by-recursion sender receivers label active-interaction (get-recursion target-interaction) monitor)
     :else (log-error :unsupported-operation (format "Cannot update the interaction, unknown type: %s!" (type target-interaction)))))
 
 (defn- apply-send-to-mon
@@ -137,9 +144,9 @@
      (satisfies? branchable target-interaction)
      (send-active-interaction-by-branch sender receivers label active-interaction target-interaction)
      (satisfies? parallelizable target-interaction)
-     (send-active-interaction-by-parallel sender receivers label active-interaction target-interaction)
+     (send-active-interaction-by-parallel sender receivers label active-interaction target-interaction monitor)
      (satisfies? recursable target-interaction)
-     (send-active-interaction-by-recursion sender receivers label active-interaction target-interaction)
+     (send-active-interaction-by-recursion sender receivers label active-interaction target-interaction monitor)
      (satisfies? identifiable-recur target-interaction)
      (apply-send-to-mon monitor sender receivers label active-interaction (get-rec monitor (get-name target-interaction)))
      :else (log-error :unsupported-operation (format "Unsupported type of interaction to apply %s!" (type target-interaction)))

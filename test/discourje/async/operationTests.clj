@@ -901,18 +901,19 @@
                                  (<!! alice-to-bob 5))]
                 (clojure.core.async/thread (first-par))
                 (clojure.core.async/thread (second-par))))]
+    (set-logging-exceptions)
+    (set-throwing false)
     (alice)
-    (loop [try-test (get-label (async/<!! (bob)))]
+    (loop [try-test  (async/<!! (bob))]
       (if-not (nil? try-test)
-        (is (= try-test 5))
-        (recur (get-label (async/<!! (bob))))))))
+        (is (= (get-label try-test) 5))
+        (recur (<!! (bob)))))))
 
 (deftest send-and-receive-parallel-with-choice-test
   (let [channels (add-infrastructure (parallel-with-choice true))
         ab (get-channel "a" "b" channels)
         ba (get-channel "b" "a" channels)]
     (set-logging-exceptions)
-    ;only when sending validation for par, we need to keep track of nesting
     (>!! ab (msg 0 0))
     (let [a->b (<!! ab 0)]
       (is (= (get-label a->b) 0))
