@@ -904,7 +904,7 @@
     (set-logging-exceptions)
     (set-throwing false)
     (alice)
-    (loop [try-test  (async/<!! (bob))]
+    (loop [try-test (async/<!! (bob))]
       (if-not (nil? try-test)
         (is (= (get-label try-test) 5))
         (recur (<!! (bob)))))))
@@ -988,6 +988,11 @@
                   (is (= (get-label (<!! ab 5)) 5)))))
         (do (>!! ab (msg 0 0))
             (is (= (get-label (<!! ab 0)) 0))
+            (do (>!! ba (msg 4 4))
+                (let [b->a4 (<!! ba 4)]
+                  (is (= (get-label b->a4) 4))
+                  (>!! ab (msg 5 5))
+                  (is (= (get-label (<!! ab 5)) 5))))
             (recur (+ reps 1)))))
     (do (>!! ba (msg 6 6))
         (let [b->a6 (<!! ba 6)]

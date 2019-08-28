@@ -35,7 +35,7 @@
   (let [rec (get-recursion active-interaction)]
     (cond
       (satisfies? interactable rec) (get-send-atomic-interaction sender receiver label rec)
-      (satisfies? branchable rec) (get-send-branch-interaction sender receiver label rec)
+      (satisfies? branchable rec) (get-first-valid-target-branch-interaction sender receiver label rec)
       (satisfies? recursable rec) (get-send-recursion-interaction sender receiver label rec)
       (satisfies? parallelizable rec) (get-send-parallel-interaction sender receiver label rec)
       :else (log-error :unsupported-operation (format "No correct next recursion monitor found. %s" (interaction-to-string rec))))))
@@ -46,7 +46,7 @@
   (when-let [_ (for [parallel (get-parallel active-interaction)]
                  (cond
                    (satisfies? interactable parallel) (get-send-atomic-interaction sender receiver label parallel)
-                   (satisfies? branchable parallel) (get-send-branch-interaction sender receiver label parallel)
+                   (satisfies? branchable parallel) (get-first-valid-target-branch-interaction sender receiver label parallel)
                    (satisfies? parallelizable parallel) (get-send-parallel-interaction sender receiver label parallel)
                    (satisfies? recursable parallel) (get-send-recursion-interaction sender receiver label parallel)
                    :else (log-error :unsupported-operation (format "Cannot check operation on child parallel construct! %s" (interaction-to-string parallel))))
@@ -60,7 +60,7 @@
     (for [branch (:branches active-interaction)]
       (cond
         (satisfies? interactable branch) (get-send-atomic-interaction sender receiver label branch)
-        (satisfies? branchable branch) (get-send-branch-interaction sender receiver label branch)
+        (satisfies? branchable branch) (get-first-valid-target-branch-interaction sender receiver label branch)
         (satisfies? parallelizable branch) (get-send-parallel-interaction sender receiver label branch)
         (satisfies? recursable branch) (get-send-recursion-interaction sender receiver label branch)
         :else (log-error :unsupported-operation (format "Cannot check operation on child branchable construct! %s" (interaction-to-string branch)))))))
@@ -80,6 +80,7 @@
 (defn- set-send-on-par
   "Assoc a sender to a nested parallel interaction"
   [sender receivers label inter target-interaction monitor]
+  (println "setting send on par" target-interaction)
   (assoc inter :parallels
                (let [pars (get-parallel target-interaction)]
                  (for [p pars]
@@ -92,24 +93,23 @@
                      (let [valid-branch (get-valid-send-branch-interaction sender receivers label p)]
                        (if (not (nil? valid-branch))
                          (if (satisfies? parallelizable valid-branch)
-                           (set-send-on-par sender receivers label valid-branch target-interaction monitor)
+                           (set-send-on-par sender receivers label inter valid-branch monitor)
                            (assoc-sender-to-interaction valid-branch sender))
                          p))
                      (satisfies? parallelizable p)
-                     (set-send-on-par sender receivers label p target-interaction monitor)
+                     (set-send-on-par sender receivers label inter p monitor)
                      (satisfies? recursable p)
-                     (let [valid-rec (first (filter some? (get-send-recursion-interaction sender receivers label p)))]
+                     (let [valid-rec (get-send-recursion-interaction sender receivers label p)]
                        (if (not (nil? valid-rec))
                          (if (satisfies? parallelizable valid-rec)
-                           (set-send-on-par sender receivers label valid-rec target-interaction monitor)
+                           (set-send-on-par sender receivers label inter valid-rec monitor)
                            (assoc-sender-to-interaction valid-rec sender))
                          p))
                      (satisfies? identifiable-recur p)
-                     (let [valid-rec (first (filter some? (get-send-recursion-interaction sender receivers label (get-rec monitor (get-name p)))))]
-                       (println "valid rec by recuridentifier = " valid-rec)
+                     (let [valid-rec (get-send-recursion-interaction sender receivers label (get-rec monitor (get-name p)))]
                        (if (not (nil? valid-rec))
                          (if (satisfies? parallelizable valid-rec)
-                           (set-send-on-par sender receivers label valid-rec target-interaction monitor)
+                           (set-send-on-par sender receivers label inter valid-rec monitor)
                            (assoc-sender-to-interaction valid-rec sender))
                          p))
                      )))))
@@ -167,7 +167,10 @@
     (do (register-rec! monitor active-interaction)
         (is-valid-send-communication? monitor sender receivers label (get-recursion active-interaction)))
     (satisfies? identifiable-recur active-interaction)
-    (is-valid-send-communication? monitor sender receivers label (get-rec monitor (get-name active-interaction)))
+    (and (is-valid-send-communication? monitor sender receivers label (get-rec monitor (get-name active-interaction)))
+         (if (satisfies? parallelizable active-interaction)
+           (<= (count (get-parallel active-interaction)) 1)
+           true))
     :else
     (do (log-error :unsupported-operation (format "Unsupported communication type: Communication invalid, type: %s" (type active-interaction)))
         false)))

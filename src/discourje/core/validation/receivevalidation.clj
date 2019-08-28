@@ -2,7 +2,7 @@
 (in-ns 'discourje.core.async)
 
 ;forward declare check-branchable-interaction to resolve undefined issue in check-recursion-interaction
-(declare check-branch-interaction check-parallel-interaction get-branch-interaction get-parallel-interaction is-valid-interaction? interaction-to-string is-active-interaction-multicast? add-rec-to-table)
+(declare check-branch-interaction check-parallel-interaction get-branch-interaction get-first-valid-target-branch-interaction get-parallel-interaction is-valid-interaction? interaction-to-string is-active-interaction-multicast? add-rec-to-table)
 
 (defn- check-recursion-interaction
   "Check the first element in a recursion interaction"
@@ -118,7 +118,7 @@
   (let [rec (get-recursion active-interaction)]
     (cond
       (satisfies? interactable rec) (get-atomic-interaction sender receiver label rec)
-      (satisfies? branchable rec) (get-branch-interaction sender receiver label rec)
+      (satisfies? branchable rec) (get-first-valid-target-branch-interaction sender receiver label rec)
       (satisfies? recursable rec) (get-recursion-interaction sender receiver label rec)
       (satisfies? parallelizable rec) (get-parallel-interaction sender receiver label rec)
       :else (log-error :unsupported-operation (format "No correct next recursion monitor found. %s" (interaction-to-string rec))))))
@@ -129,7 +129,7 @@
   (when-let [_ (for [parallel (get-parallel active-interaction)]
                  (cond
                    (satisfies? interactable parallel) (get-atomic-interaction sender receiver label parallel)
-                   (satisfies? branchable parallel) (get-branch-interaction sender receiver label parallel)
+                   (satisfies? branchable parallel) (get-first-valid-target-branch-interaction sender receiver label parallel)
                    (satisfies? parallelizable parallel) (get-parallel-interaction sender receiver label parallel)
                    (satisfies? recursable parallel) (get-recursion-interaction sender receiver label parallel)
                    :else (log-error :unsupported-operation (format "Cannot check operation on child parallel construct! %s" (interaction-to-string parallel))))
@@ -143,7 +143,7 @@
     (for [branch (:branches active-interaction)]
       (cond
         (satisfies? interactable branch) (get-atomic-interaction sender receiver label branch)
-        (satisfies? branchable branch) (get-branch-interaction sender receiver label branch)
+        (satisfies? branchable branch) (get-first-valid-target-branch-interaction sender receiver label branch)
         (satisfies? parallelizable branch) (get-parallel-interaction sender receiver label branch)
         (satisfies? recursable branch) (get-recursion-interaction sender receiver label branch)
         :else (log-error :unsupported-operation (format "Cannot check operation on child branchable construct! %s" (interaction-to-string branch)))))))
@@ -167,7 +167,6 @@
       (remove-receiver-from-branch active-interaction target receivers)
       (swap! active-interaction (fn [x] (:next target))))))
 
-
 (defn- remove-from-nested-parallel [target par monitor]
   (cond
     (= (get-id par) (get-id target))
@@ -183,7 +182,6 @@
     ))
 
 (defn remove-nested-parallel [sender receivers label target-interaction monitor]
-  (println "(get-parallel target-interaction)"(get-parallel target-interaction))
   (let [pars (flatten (filter some?
                               (for [par (get-parallel target-interaction)]
                                 (let [inter (cond
@@ -192,11 +190,18 @@
                                               (satisfies? interactable par)
                                               (get-atomic-interaction sender receivers label par)
                                               (satisfies? branchable par)
-                                              (get-branch-interaction sender receivers label par)
+                                              (get-first-valid-target-branch-interaction sender receivers label par)
                                               (satisfies? recursable par)
                                               (get-recursion-interaction sender receivers label par)
                                               (satisfies? identifiable-recur par)
-                                              (get-recursion-interaction sender receivers label (get-rec monitor (get-name par)))
+                                              (let [recursion (get-rec monitor (get-name par))
+                                                    valid-rec (get-recursion-interaction sender receivers label recursion)]
+                                                (println "yesyesyes valid rec" valid-rec)
+                                                (println "valid rec ni?" (nil? valid-rec))
+                                                (println "vrecurs" recursion)
+                                                (if (nil? valid-rec)
+                                                  par
+                                                  recursion))
                                               :else
                                               par
                                               )]
@@ -204,17 +209,18 @@
                                     (if (satisfies? parallelizable par)
                                       nil
                                       par)
-                                    (do (when (instance? clojure.lang.LazySeq inter)
-                                          (println (first (filter some? inter))))
-                                        (cond
-                                          (satisfies? parallelizable inter)
-                                          (remove-nested-parallel sender receivers label inter monitor)
-                                          (satisfies? interactable inter)
-                                          (get-next inter) ;something going wrong here!
-                                          (instance? clojure.lang.LazySeq inter)
-                                          (first (filter some? inter))
-                                          )))
+                                    (cond
+                                      (satisfies? parallelizable inter)
+                                      (remove-nested-parallel sender receivers label inter monitor)
+                                      (satisfies? interactable inter)
+                                      (get-next inter)
+                                      (or (satisfies? recursable inter) (satisfies? branchable inter))
+                                      inter
+                                      (and (instance? clojure.lang.LazySeq inter) (not (satisfies? interactable inter)))
+                                      (first (filter some? inter))
+                                      ))
                                   ))))]
+    (println "pars will be " pars)
     (if (empty? pars)
       (get-next target-interaction)
       (assoc target-interaction :parallels pars))))
