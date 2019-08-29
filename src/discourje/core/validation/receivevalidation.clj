@@ -196,9 +196,6 @@
                                               (satisfies? identifiable-recur par)
                                               (let [recursion (get-rec monitor (get-name par))
                                                     valid-rec (get-recursion-interaction sender receivers label recursion)]
-                                                (println "yesyesyes valid rec" valid-rec)
-                                                (println "valid rec ni?" (nil? valid-rec))
-                                                (println "vrecurs" recursion)
                                                 (if (nil? valid-rec)
                                                   par
                                                   recursion))
@@ -220,7 +217,6 @@
                                       (first (filter some? inter))
                                       ))
                                   ))))]
-    (println "pars will be " pars)
     (if (empty? pars)
       (get-next target-interaction)
       (assoc target-interaction :parallels pars))))
@@ -236,10 +232,11 @@
              (fn [inter]
                (if (satisfies? parallelizable target)
                  (let [par-target (remove-nested-parallel sender receivers label target monitor)]
+                   ;(println par-target)
                    par-target)
                  (let [parallel-with-removed-par (remove (fn [x] (remove-from-nested-parallel target x monitor)) (get-parallel inter))]
                    (if (and (empty? parallel-with-removed-par) (nil? (get-next target)))
-                     (do (println (get-next inter)) (get-next inter))
+                     ;(do (println (get-next inter)) (get-next inter))
                      (if (nil? (get-next target))
                        (assoc inter :parallels parallel-with-removed-par)
                        (assoc inter :parallels (conj parallel-with-removed-par (get-next target)))))))
