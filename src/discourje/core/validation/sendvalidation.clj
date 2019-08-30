@@ -80,7 +80,6 @@
 (defn- set-send-on-par
   "Assoc a sender to a nested parallel interaction"
   [sender receivers label inter target-interaction monitor]
-  (println "setting send on par " sender receivers label)
   (let [pars (let [pars (get-parallel target-interaction)]
                (for [p pars]
                  (cond
@@ -112,18 +111,20 @@
                          (assoc-sender-to-interaction valid-rec sender))
                        p))
                    )))]
-    (println "inter = " inter)
-    (println "target interaction" target-interaction)
-  (if (satisfies? parallelizable inter)
-  (assoc inter :parallels pars)
-  (assoc target-interaction :parallels pars))))
+    (let [duplicate-par (first (filter some? (filter (fn [p] (= (get-id p) (get-id target-interaction))) pars)))]
+      (if (nil? duplicate-par)
+        (assoc target-interaction :parallels pars)
+        duplicate-par))))
 
 (defn- send-active-interaction-by-parallel
   "Swap active interaction by parallel"
   [sender receivers label active-interaction target-interaction monitor]
   (swap! active-interaction
          (fn [inter]
-           (set-send-on-par sender receivers label inter target-interaction monitor))))
+           (let [x (set-send-on-par sender receivers label inter target-interaction monitor)]
+             ;     (println "set-send-on=par fuly complete" x)
+             x
+             ))))
 
 (defn- send-active-interaction-by-recursion
   "Swap active interaction by recursion"
