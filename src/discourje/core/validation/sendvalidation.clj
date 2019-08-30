@@ -121,10 +121,11 @@
   [sender receivers label active-interaction target-interaction monitor]
   (swap! active-interaction
          (fn [inter]
-           (let [x (set-send-on-par sender receivers label inter target-interaction monitor)]
-             ;     (println "set-send-on=par fuly complete" x)
-             x
-             ))))
+           (if (= (get-id inter) (get-id target-interaction))
+             (set-send-on-par sender receivers label inter inter monitor)
+             (set-send-on-par sender receivers label inter target-interaction monitor)
+             ))
+         ))
 
 (defn- send-active-interaction-by-recursion
   "Swap active interaction by recursion"

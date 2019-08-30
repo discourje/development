@@ -822,7 +822,7 @@
           (is (= (get-label (<!! ab "a")) "a"))))))
 
 (deftest send-and-receive-after-parallel-nested-parallel-Threaded-test
-  (log-error :failed "this test can result in reacecondition whle swapping parallels")
+ ; (log-error :failed "this test can result in reacecondition whle swapping parallels")
   (let [channels (add-infrastructure (after-parallel-nested-parallel true))
         ab (get-channel "a" "b" channels)
         ba (get-channel "b" "a" channels)
