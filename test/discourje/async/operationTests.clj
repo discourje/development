@@ -102,7 +102,8 @@
               (is (= "4" (get-label c->a)))
               (is (= "C->A-B" (get-content c->a)))
               (is (= "4" (get-label c->b)))
-              (is (= "C->A-B" (get-content c->b))))))))))
+              (is (= "C->A-B" (get-content c->b)))
+              (is (nil? (get-active-interaction (get-monitor ab)))))))))))
 
 (deftest send-receive-multicast-wildcard-only-protocol-test
   (let [channels (generate-infrastructure (testMulticastProtocol true))
@@ -145,7 +146,8 @@
         (is (= "1" (get-label a->b)))
         (is (= "Hello B and C" (get-content a->b)))
         (is (= (get-label a->c) (get-label a->b)))
-        (is (= (get-content a->c) (get-content a->b)))))))
+        (is (= (get-content a->c) (get-content a->b)))
+        (is (nil? (get-active-interaction (get-monitor ab))))))))
 
 (deftest send-receive-single-Always0-choice-protocol
   (let [channels (generate-infrastructure (single-choice-protocol))
@@ -296,7 +298,8 @@
                           (is (= "5" (get-label a->c5)))
                           (is (= "bye all" (get-content a->c5)))
                           (is (= "5" (get-label a->d5)))
-                          (is (= "bye all" (get-content a->d5)))))))))))))))
+                          (is (= "bye all" (get-content a->d5)))
+                          (is (nil? (get-active-interaction (get-monitor ab))))))))))))))))
 
 (deftest send-receive-single-recur-protocol
   (let [channels (generate-infrastructure (single-recur-protocol true))
@@ -426,7 +429,8 @@
         ]
     (let [result-a (clojure.core.async/thread (fnA fnA))]
       (clojure.core.async/thread (fnB fnB))
-      (is (= (get-label (async/<!! result-a)) "3")))))
+      (is (= (get-label (async/<!! result-a)) "3"))
+      (is (nil? (get-active-interaction (get-monitor ab)))))))
 
 (deftest send-receive-one-recur-with-startchoice-and-endchoice-protocol
   (let [channels (generate-infrastructure (one-recur-with-startchoice-and-endchoice-protocol true))
@@ -526,7 +530,8 @@
         c (clojure.core.async/thread (fnC))]
     (clojure.core.async/thread (fnB))
     (is (= "hi too" (get-content (async/<!! a))))
-    (is (= "Hi") (get-content (async/<!! c)))))
+    (is (= "Hi") (get-content (async/<!! c)))
+    (is (nil? (get-active-interaction (get-monitor ab))))))
 
 (deftest send-receive-testMulticastParticipantsWithChoiceProtocol
   (let [channels (add-infrastructure (testMulticastParticipantsWithChoiceProtocol))
@@ -534,20 +539,21 @@
         ac (get-channel "A" "C" channels)
         ba (get-channel "B" "A" channels)
         fnA (fn [] (do
-                     (>!! ab (msg "1" "hi"))
+                     (>!! ab (msg "1" 1))
                      (<!! ba "2")
-                     (>!! [ab ac] (msg "3" "Hi"))
+                     (>!! [ab ac] (msg "3" 3))
                      (get-content (<!!! ba "4"))))
         fnB (fn [] (do (<!! ab "1")
-                       (>!! ba (msg "2" "hi too"))
+                       (>!! ba (msg "2" 2))
                        (<!! ab "3")
-                       (>!! ba (msg "4" "hi too"))))
+                       (>!! ba (msg "4" 4))))
         fnC (fn [] (<!! ac "3"))
         a (clojure.core.async/thread (fnA))
         c (clojure.core.async/thread (fnC))]
     (clojure.core.async/thread (fnB))
     (is (= "hi too" (async/<!! a)))
-    (is (= "Hi") (get-content (async/<!! c)))))
+    (is (= "Hi") (get-content (async/<!! c)))
+    (is (nil? (get-active-interaction (get-monitor ab))))))
 
 
 (deftest send-and-receive-parallel-after-interaction-test
@@ -610,7 +616,8 @@
         (is (= (async/<!! fn2) 5))
         (do (>!! ba (msg 6 6))
             (let [b->a6 (<!! ba 6)]
-              (is (= (get-label b->a6) 6))))))))
+              (is (= (get-label b->a6) 6))
+              (is (nil? (get-active-interaction (get-monitor ab))))))))))
 
 
 (deftest send-and-receive-parallel-after-choice-with-after-test
@@ -784,7 +791,8 @@
       (is (= (get-label (async/<!! f00)) "b"))
       (is (= (get-label (async/<!! f01)) "a"))
       (is (= (get-label (async/<!! f10)) 3))
-      (is (= (get-label (async/<!! f11)) 5)))))
+      (is (= (get-label (async/<!! f11)) 5))
+      (is (nil? (get-active-interaction (get-monitor ab)))))))
 
 (deftest send-and-receive-after-parallel-nested-parallel-test
   (let [channels (add-infrastructure (after-parallel-nested-parallel true))
@@ -822,7 +830,6 @@
           (is (= (get-label (<!! ab "a")) "a"))))))
 
 (deftest send-and-receive-after-parallel-nested-parallel-Threaded-test
- ; (log-error :failed "this test can result in reacecondition whle swapping parallels")
   (let [channels (add-infrastructure (after-parallel-nested-parallel true))
         ab (get-channel "a" "b" channels)
         ba (get-channel "b" "a" channels)
@@ -868,7 +875,8 @@
         (is (= (get-label (async/<!! f00)) "b"))
         (is (= (get-label (async/<!! f01)) "a"))
         (is (= (get-label (async/<!! f10)) 3))
-        (is (= (get-label (async/<!! f11)) 5))))))
+        (is (= (get-label (async/<!! f11)) 5))
+        (is (nil? (get-active-interaction (get-monitor ab))))))))
 
 (deftest impossible-parallel-test
   "This test shows an issue with parallel when both parallel branches are going to the same channel (bob-to-alice and alice to bob)

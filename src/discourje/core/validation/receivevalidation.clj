@@ -233,14 +233,16 @@
                (let [target (if (= (get-id inter) (get-id target-parallel-interaction))
                               (get-first-valid-target-parallel-interaction sender receivers label inter)
                               target-parallel-interaction)]
-                 (if (satisfies? parallelizable target)
-                   (let [par-target (remove-nested-parallel sender receivers label target monitor)]
-                     par-target)
-                   (let [parallel-with-removed-par (remove (fn [x] (remove-from-nested-parallel target x monitor)) (get-parallel inter))]
-                     (if (and (empty? parallel-with-removed-par) (nil? (get-next target)))
-                       (if (nil? (get-next target))
-                         (assoc inter :parallels parallel-with-removed-par)
-                         (assoc inter :parallels (conj parallel-with-removed-par (get-next target)))))))
+                 (if (nil? target)
+                   inter
+                   (if (satisfies? parallelizable target)
+                     (let [par-target (remove-nested-parallel sender receivers label target monitor)]
+                       par-target)
+                     (let [parallel-with-removed-par (remove (fn [x] (remove-from-nested-parallel target x monitor)) (get-parallel inter))]
+                       (if (and (empty? parallel-with-removed-par) (nil? (get-next target)))
+                         (if (nil? (get-next target))
+                           (assoc inter :parallels parallel-with-removed-par)
+                           (assoc inter :parallels (conj parallel-with-removed-par (get-next target))))))))
                  ))))))
 
 
