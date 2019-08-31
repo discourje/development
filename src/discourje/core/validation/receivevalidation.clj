@@ -242,8 +242,7 @@
                        (if (and (empty? parallel-with-removed-par) (nil? (get-next target)))
                          (if (nil? (get-next target))
                            (assoc inter :parallels parallel-with-removed-par)
-                           (assoc inter :parallels (conj parallel-with-removed-par (get-next target))))))))
-                 ))))))
+                           (assoc inter :parallels (conj parallel-with-removed-par (get-next target))))))))))))))
 
 
 (defn- swap-active-interaction-by-recursion

@@ -12,12 +12,14 @@
 (defn- send-active-interaction-by-atomic
   "Send active interaction by atomic"
   [active-interaction target-interaction sender]
-  (if (nil? sender)
-    (do (log-error :invalid-send (format "sender appears to be nil: %s %s" active-interaction target-interaction))
-        false)
-    (do (swap! active-interaction (fn [inter]
-                                    (assoc-sender-to-interaction inter sender)))
-        true)))
+  (let [active-interaction-before-swap @active-interaction]
+    (if (nil? sender)
+      (log-error :invalid-send (format "sender appears to be nil: %s %s" active-interaction target-interaction))
+      (swap! active-interaction (fn [inter]
+                                  (if (= (get-id inter) (get-id active-interaction-before-swap))
+                                    (assoc-sender-to-interaction inter sender)
+                                    inter)))
+      )))
 
 (defn- is-valid-interaction-for-send?
   "Check if the interaction is valid for a send operation"
@@ -73,9 +75,13 @@
 (defn- send-active-interaction-by-branch
   "Swap active interaction by branchable"
   [sender receivers label active-interaction target-interaction]
-  (let [target (get-valid-send-branch-interaction sender receivers label target-interaction)]
+  (let [active-inter-before-swap @active-interaction
+        target (get-valid-send-branch-interaction sender receivers label target-interaction)]
     (log-message (format "target sender %s receivers %s action %s next %s or is identifiable-recur %s" (:sender target) (:receivers target) (:action target) (:next target) (satisfies? identifiable-recur target)))
-    (swap! active-interaction (fn [x] (assoc-sender-to-interaction target sender)))))
+    (swap! active-interaction (fn [inter]
+                                (if (= (get-id inter) (get-id active-inter-before-swap))
+                                  (assoc-sender-to-interaction target sender)
+                                  inter)))))
 
 (defn- set-send-on-par
   "Assoc a sender to a nested parallel interaction"
@@ -123,9 +129,7 @@
          (fn [inter]
            (if (= (get-id inter) (get-id target-interaction))
              (set-send-on-par sender receivers label inter inter monitor)
-             (set-send-on-par sender receivers label inter target-interaction monitor)
-             ))
-         ))
+             (set-send-on-par sender receivers label inter target-interaction monitor)))))
 
 (defn- send-active-interaction-by-recursion
   "Swap active interaction by recursion"

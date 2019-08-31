@@ -12,7 +12,6 @@
 ;valid interaction
 ;   false = exception
 ;   true = apply, allen succees when de hudige monitor is nog steeds hetzelfde
-; keeptrack of send
 ;Close in DSL
 
 (defprotocol sendable

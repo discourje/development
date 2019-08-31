@@ -878,46 +878,6 @@
         (is (= (get-label (async/<!! f11)) 5))
         (is (nil? (get-active-interaction (get-monitor ab))))))))
 
-(deftest impossible-parallel-test
-  "This test shows an issue with parallel when both parallel branches are going to the same channel (bob-to-alice and alice to bob)
-  So both sends are allowed by the monitor, but the receives could be not allowed since forexample: on the channel the order of messages in the QUEUE is
-  (msg 2 2) followed by (msg 3 3) but the receive for 3 is done first. This will create a faulty receive since the 2 message is the first message in the queue of the channel!
-  This test handles it by exceptions"
-  (let [mon (generate-infrastructure (mep (-->> 1 "Alice" "Bob")
-                                          (par [(-->> 2 "Bob" "Alice")
-                                                (-->> 3 "Alice" "Bob")]
-                                               [(-->> 4 "Bob" "Alice")
-                                                (-->> 5 "Alice" "Bob")])))
-        alice-to-bob (get-channel "Alice" "Bob" mon)
-        bob-to-alice (get-channel "Bob" "Alice" mon)
-        alice (fn []
-                (>!! alice-to-bob (msg 1 1))
-                (let [first-par (fn []
-                                  (<!! bob-to-alice 2)
-                                  (>!! alice-to-bob (msg 3 3)))
-                      second-par (fn []
-                                   (<!! bob-to-alice 4)
-                                   (>!! alice-to-bob (msg 5 5)))]
-                  (clojure.core.async/thread (first-par))
-                  (clojure.core.async/thread (second-par))))
-        bob (fn []
-              (<!! alice-to-bob 1)
-              (let [first-par (fn []
-                                (>!! bob-to-alice (msg 2 2))
-                                (<!! alice-to-bob 3))
-                    second-par (fn []
-                                 (>!! bob-to-alice (msg 4 4))
-                                 (<!! alice-to-bob 5))]
-                (clojure.core.async/thread (first-par))
-                (clojure.core.async/thread (second-par))))]
-    (set-logging-exceptions)
-    (set-throwing false)
-    (alice)
-    (loop [try-test (async/<!! (bob))]
-      (if-not (nil? try-test)
-        (is (= (get-label try-test) 5))
-        (recur (<!! (bob)))))))
-
 (deftest send-and-receive-parallel-with-choice-test
   (let [channels (add-infrastructure (parallel-with-choice true))
         ab (get-channel "a" "b" channels)
