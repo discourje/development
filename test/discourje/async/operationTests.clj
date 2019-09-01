@@ -410,8 +410,9 @@
         ab (get-channel "A" "B" channels)
         ba (get-channel "B" "A" channels)
         fnA (fn [fnA]
-              (>!! ab (->message "1" {:threshold 5 :generatedNumber (rand-int (+ 10 10))}))
-              (let [response (<!! ba ["2" "3"])]
+              (>!! ab (->message "1" {:threshold 5 :generatedNumber 2;(rand-int (+ 10 10))
+                                      }))
+              (let [response (<!! ba ["2" "3"])]     ;this returns 2 since it is in the collection 
                 (cond
                   (= (get-label response) "2") (do
                                                  (fnA fnA))
