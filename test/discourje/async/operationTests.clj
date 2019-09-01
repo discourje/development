@@ -551,8 +551,8 @@
         a (clojure.core.async/thread (fnA))
         c (clojure.core.async/thread (fnC))]
     (clojure.core.async/thread (fnB))
-    (is (= "hi too" (async/<!! a)))
-    (is (= "Hi") (get-content (async/<!! c)))
+    (is (= 4 (async/<!! a)))
+    (is (= 3 (get-content (async/<!! c))))
     (is (nil? (get-active-interaction (get-monitor ab))))))
 
 

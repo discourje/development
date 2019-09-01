@@ -55,7 +55,7 @@
                  )]
     active-interaction))
 
-(defn- get-send-branch-interaction
+(defn- get-all-send-branch-interaction
   "Check the atomic interaction"
   [sender receiver label active-interaction]
   (flatten
@@ -70,18 +70,7 @@
 (defn- get-valid-send-branch-interaction
   "Find the first interactable in (nested) branchable constructs."
   [sender receiver label active-interaction]
-  (first (filter some? (get-send-branch-interaction sender receiver label active-interaction))))
-
-(defn- send-active-interaction-by-branch
-  "Swap active interaction by branchable"
-  [sender receivers label active-interaction target-interaction]
-  (let [active-inter-before-swap @active-interaction
-        target (get-valid-send-branch-interaction sender receivers label target-interaction)]
-    (log-message (format "target sender %s receivers %s action %s next %s or is identifiable-recur %s" (:sender target) (:receivers target) (:action target) (:next target) (satisfies? identifiable-recur target)))
-    (swap! active-interaction (fn [inter]
-                                (if (= (get-id inter) (get-id active-inter-before-swap))
-                                  (assoc-sender-to-interaction target sender)
-                                  inter)))))
+  (first (filter some? (get-all-send-branch-interaction sender receiver label active-interaction))))
 
 (defn- set-send-on-par
   "Assoc a sender to a nested parallel interaction"
@@ -131,20 +120,6 @@
              (set-send-on-par sender receivers label inter inter monitor)
              (set-send-on-par sender receivers label inter target-interaction monitor)))))
 
-(defn- send-active-interaction-by-recursion
-  "Swap active interaction by recursion"
-  [sender receivers label active-interaction target-interaction monitor]
-  (cond
-    (satisfies? interactable target-interaction)
-    (send-active-interaction-by-atomic active-interaction target-interaction sender)
-    (satisfies? branchable target-interaction)
-    (send-active-interaction-by-branch sender receivers label active-interaction target-interaction)
-    (satisfies? parallelizable target-interaction)
-    (send-active-interaction-by-parallel sender receivers label active-interaction target-interaction monitor)
-    (satisfies? recursable target-interaction)
-    (send-active-interaction-by-recursion sender receivers label active-interaction (get-recursion target-interaction) monitor)
-    :else (log-error :unsupported-operation (format "Cannot update the interaction, unknown type: %s!" (type target-interaction)))))
-
 (defn- apply-send-to-mon
   "Apply new interaction"
   ([monitor sender receivers label active-interaction target-interaction]
@@ -153,11 +128,11 @@
      (satisfies? interactable target-interaction)
      (send-active-interaction-by-atomic active-interaction target-interaction sender)
      (satisfies? branchable target-interaction)
-     (send-active-interaction-by-branch sender receivers label active-interaction target-interaction)
+     (apply-send-to-mon monitor sender receivers label active-interaction (get-valid-send-branch-interaction sender receivers label target-interaction))
      (satisfies? parallelizable target-interaction)
      (send-active-interaction-by-parallel sender receivers label active-interaction target-interaction monitor)
      (satisfies? recursable target-interaction)
-     (send-active-interaction-by-recursion sender receivers label active-interaction target-interaction monitor)
+     (apply-send-to-mon monitor sender receivers label active-interaction (get-recursion target-interaction))
      (satisfies? identifiable-recur target-interaction)
      (apply-send-to-mon monitor sender receivers label active-interaction (get-rec monitor (get-name target-interaction)))
      :else (log-error :unsupported-operation (format "Unsupported type of interaction to apply %s!" (type target-interaction)))
