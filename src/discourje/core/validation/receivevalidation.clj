@@ -85,19 +85,19 @@
 (defn- swap-active-interaction-by-atomic
   "Swap active interaction by atomic"
   [active-interaction target-interaction receiver]
-  (let [pre-swap-interaction @active-interaction]
+  (println (format "swapping %s with %s" (to-string @active-interaction) (to-string target-interaction)))
+  (let [pre-swap-interaction @active-interaction
+        swap-fn (fn [inter]
+                  (if (= (get-id inter) (get-id pre-swap-interaction))
+                    (if (not= nil (get-next target-interaction))
+                      (get-next target-interaction)
+                      nil)
+                    inter))]
     (if (nil? receiver)
-      (swap! active-interaction (fn [inter]
-                                  (if (= (get-id inter) (get-id pre-swap-interaction))
-                                    (if (not= nil (get-next target-interaction))
-                                      (get-next target-interaction)
-                                      nil)
-                                    inter)))
+      (swap! active-interaction swap-fn)
       (if (multiple-receivers? target-interaction)
         (remove-receiver active-interaction target-interaction receiver)
-        (reset! active-interaction (if (not= nil (get-next target-interaction))
-                                     (get-next target-interaction)
-                                     nil))))))
+        (swap! active-interaction swap-fn)))))
 
 
 (defn- get-atomic-interaction

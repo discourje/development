@@ -187,7 +187,7 @@
              (when-not monitor-and-label-check
                (log-error :incorrect-communication (format "Atomic-receive communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) label (to-string (get-active-interaction (get-monitor channel))))))
              (if (or (and (nil? label) (true? (get-wildcard))) (= (get-label result) label) (contains-value? (get-label result) label))
-               (do (apply-receive! (get-monitor channel) (get-provider channel) (get-consumer channel) label)
+               (do (apply-receive! (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label result))
                    (allow-receive channel)
                    result)
                (log-error :incorrect-communication (format "communication invalid! message label on channel: %s does not match the target label %s!" (get-label result) label)))))))))
