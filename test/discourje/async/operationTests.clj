@@ -3,7 +3,8 @@
             [discourje.async.protocolTestData :refer :all]
             [discourje.core.async :refer :all]
             [clojure.core.async :as async]
-            [discourje.core.logging :refer :all]))
+            [discourje.core.logging :refer :all])
+  (:use [slingshot.slingshot :only [throw+ try+]]))
 
 (deftest add-sender
   (let [inter (->interaction nil 1 "a" "b" #{} nil)]
@@ -410,9 +411,9 @@
         ab (get-channel "A" "B" channels)
         ba (get-channel "B" "A" channels)
         fnA (fn [fnA]
-              (>!! ab (->message "1" {:threshold 5 :generatedNumber 2;(rand-int (+ 10 10))
+              (>!! ab (->message "1" {:threshold 5 :generatedNumber 2 ;(rand-int (+ 10 10))
                                       }))
-              (let [response (<!! ba ["2" "3"])]     ;this returns 2 since it is in the collection 
+              (let [response (<!! ba ["2" "3"])]            ;this returns 2 since it is in the collection
                 (cond
                   (= (get-label response) "2") (do
                                                  (fnA fnA))
@@ -965,3 +966,38 @@
       (let [b->a6 (<!! ba 6)]
         (is (= (get-label b->a6) 6))
         (is (nil? (get-active-interaction (get-monitor ab))))))))
+
+(deftest send-and-receive-multiple-branches-choice-Threaded-test
+  (let [channels (add-infrastructure (multiple-branches-choice true))
+        ab (get-channel "a" "b" channels)
+        ba (get-channel "b" "a" channels)
+        fn-01 (fn []
+                (try+ (do
+                        (>!! ab (msg 0 0))
+                        (<!! ab 0)
+                        (>!! ba (msg 1 1))
+                        (<!! ba 1))
+                      (catch Object e
+                        (println (:throwable e) "unexpected error"))))
+        fn-23 (fn []
+                (try+ (do
+                        (>!! ab (msg 2 2))
+                        (<!! ab 2)
+                        (>!! ba (msg 3 3))
+                        (<!! ba 3))
+                      (catch Object e
+                        (println (:throwable e) "unexpected error"))))
+        fn-45 (fn []
+                (try+ (do
+                        (>!! ab (msg 4 4))
+                        (<!! ab 4)
+                        (>!! ba (msg 5 5))
+                        (<!! ba 5))
+                      (catch Object e
+                        (println (:throwable e) "unexpected error"))))
+        ]
+    (async/thread fn-01)
+    (async/thread fn-23)
+    (async/thread fn-45)
+    (is (nil? (get-active-interaction (get-monitor ab))))
+    ))

@@ -86,18 +86,16 @@
   "Swap active interaction by atomic"
   [active-interaction target-interaction receiver]
   (println (format "swapping %s with %s" (to-string @active-interaction) (to-string target-interaction)))
-  (let [pre-swap-interaction @active-interaction
-        swap-fn (fn [inter]
-                  (if (= (get-id inter) (get-id pre-swap-interaction))
-                    (if (not= nil (get-next target-interaction))
-                      (get-next target-interaction)
-                      nil)
-                    inter))]
-    (if (nil? receiver)
-      (swap! active-interaction swap-fn)
-      (if (multiple-receivers? target-interaction)
-        (remove-receiver active-interaction target-interaction receiver)
-        (swap! active-interaction swap-fn)))))
+  (let [pre-swap-interaction @active-interaction]
+    (if (multiple-receivers? target-interaction)
+      (remove-receiver active-interaction target-interaction receiver)
+      (= (get-id (swap! active-interaction (fn [inter]
+                                             (if (= (get-id inter) (get-id pre-swap-interaction))
+                                               (if (not= nil (get-next target-interaction))
+                                                 (get-next target-interaction)
+                                                 nil)
+                                               inter))))
+         (get-id target-interaction)))))
 
 
 (defn- get-atomic-interaction
@@ -226,7 +224,8 @@
                        (if (and (empty? parallel-with-removed-par) (nil? (get-next target)))
                          (if (nil? (get-next target))
                            (assoc inter :parallels parallel-with-removed-par)
-                           (assoc inter :parallels (conj parallel-with-removed-par (get-next target))))))))))))))
+                           (assoc inter :parallels (conj parallel-with-removed-par (get-next target))))))))))))
+    true))
 
 
 (defn is-valid-communication?

@@ -15,11 +15,11 @@
   (let [active-interaction-before-swap @active-interaction]
     (if (nil? sender)
       (log-error :invalid-send (format "sender appears to be nil: %s %s" active-interaction target-interaction))
-      (swap! active-interaction (fn [inter]
+      (= (get-id (swap! active-interaction (fn [inter]
                                   (if (= (get-id inter) (get-id active-interaction-before-swap))
                                     (assoc-sender-to-interaction inter sender)
-                                    inter)))
-      )))
+                                    inter))))
+         (get-id target-interaction)))))
 
 (defn- is-valid-interaction-for-send?
   "Check if the interaction is valid for a send operation"
@@ -118,7 +118,8 @@
          (fn [inter]
            (if (= (get-id inter) (get-id target-interaction))
              (set-send-on-par sender receivers label inter inter monitor)
-             (set-send-on-par sender receivers label inter target-interaction monitor)))))
+             (set-send-on-par sender receivers label inter target-interaction monitor))))
+  true)
 
 (defn- apply-send-to-mon
   "Apply new interaction"

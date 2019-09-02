@@ -919,3 +919,22 @@
                                                                              ] nil)
                                                             ] nil)
                                     (->interaction nil 6 "b" "a" #{} nil)])))
+
+(defn multiple-branches-choice [include-ids]
+  (if include-ids (create-protocol [(make-choice [
+                                                  [(make-interaction 0 "a" "b")
+                                                   (make-interaction 1 "b" "a")]
+                                                  [(make-interaction 2 "a" "b")
+                                                   (make-interaction 3 "b" "a")]
+                                                  [(make-interaction 4 "a" "b")
+                                                   (make-interaction 5 "b" "a")]
+                                                  ])
+                  ])
+                  (create-protocol [(->branch nil [
+                                                   [(->interaction nil 0 "a" "b"#{} nil)
+                                                    (->interaction nil 1 "b" "a"#{} nil)]
+                                                   [(->interaction nil 2 "a" "b"#{} nil)
+                                                    (->interaction nil 3 "b" "a"#{} nil)]
+                                                   [(->interaction nil 4 "a" "b"#{} nil)
+                                                    (->interaction nil 5 "b" "a"#{} nil)]
+                                                   ] nil)])))
