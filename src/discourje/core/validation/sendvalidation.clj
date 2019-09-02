@@ -19,7 +19,9 @@
                                   (if (= (get-id inter) (get-id active-interaction-before-swap))
                                     (assoc-sender-to-interaction inter sender)
                                     inter))))
-         (get-id target-interaction)))))
+         (if (nil? target-interaction)
+           "discourje"
+           (get-id target-interaction))))))
 
 (defn- is-valid-interaction-for-send?
   "Check if the interaction is valid for a send operation"

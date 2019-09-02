@@ -95,7 +95,9 @@
                                                  (get-next target-interaction)
                                                  nil)
                                                inter))))
-         (get-id target-interaction)))))
+         (if (nil? target-interaction)
+           "discourje"
+           (get-id target-interaction))))))
 
 
 (defn- get-atomic-interaction

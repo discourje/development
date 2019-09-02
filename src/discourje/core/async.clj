@@ -147,22 +147,37 @@
         (when (can-put? channel) (recur)))
       (let [m (if (satisfies? sendable message)
                 message
-                (->message (type message) message))]
-        (if (vector? channel)
-          (cond
-            (false? (equal-senders? channel))
-            (log-error :invalid-parallel-channels "Trying to send in parallel, but the sender of the channels is not the same!")
-            (false? (equal-monitors? channel))
-            (log-error :monitor-mismatch "Trying to send in parallel, but the channels do not share the same monitor!")
-            (false? (all-valid-channels? channel m))
-            (log-error :incorrect-communication "Trying to send in parallel, but the monitor is not correct for all channels!")
-            :else
-            (do (apply-send! (get-monitor (first channel)) (get-provider (first channel)) (vec (for [c channel] (get-consumer c))) (get-label m))
-                (allow-sends channel m)))
-            (if-not (valid-send? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m))
-              (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) (get-label m) (to-string (get-active-interaction (get-monitor channel)))))
-              (do (apply-send! (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m))
-                  (allow-send channel m)))))))
+                (->message (type message) message))
+            send-fn (fn [] (if (vector? channel)
+                             (cond
+                               (false? (equal-senders? channel))
+                               (log-error :invalid-parallel-channels "Trying to send in parallel, but the sender of the channels is not the same!")
+                               (false? (equal-monitors? channel))
+                               (log-error :monitor-mismatch "Trying to send in parallel, but the channels do not share the same monitor!")
+                               (false? (all-valid-channels? channel m))
+                               (log-error :incorrect-communication "Trying to send in parallel, but the monitor is not correct for all channels!")
+                               :else
+                               (do (apply-send! (get-monitor (first channel)) (get-provider (first channel)) (vec (for [c channel] (get-consumer c))) (get-label m))
+                                   ;(allow-sends channel m)
+                                   ))
+                             (if-not (valid-send? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m))
+                               (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) (get-label m) (to-string (get-active-interaction (get-monitor channel)))))
+                               (do (apply-send! (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m))
+                                   ;(allow-send channel m)
+                                   ))))
+            send-fn-result (send-fn)]
+        (if (or (nil? send-fn-result) (true? send-fn-result))
+          (if (vector? channel)
+            (allow-sends channel m)
+            (allow-send channel m))
+          (let [s (send-fn)]
+            (if (and (nil? send-fn-result) (true? send-fn-result))
+              (if (vector? channel)
+                (allow-sends channel m)
+                (allow-send channel m))
+              s)
+            )
+          ))))
 
 (defn <!!
   "take form channel"
