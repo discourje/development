@@ -83,21 +83,22 @@
       (log-error :unsupported-operation (format "Cannot remove-receiver from interaction of type: %s, it should be atomic! Interaction = %s" (type current-interaction) (interaction-to-string current-interaction))))))
 
 (defn- swap-active-interaction-by-atomic
-  "Swap active interaction by atomic"
+  "Swap active interaction by atomic
+  The end-protocol comparison indicates the protocol is terminated."
   [active-interaction target-interaction receiver]
-  (println (format "swapping %s with %s" (to-string @active-interaction) (to-string target-interaction)))
   (let [pre-swap-interaction @active-interaction]
     (if (multiple-receivers? target-interaction)
       (remove-receiver active-interaction target-interaction receiver)
-      (= (get-id (swap! active-interaction (fn [inter]
-                                             (if (= (get-id inter) (get-id pre-swap-interaction))
-                                               (if (not= nil (get-next target-interaction))
-                                                 (get-next target-interaction)
-                                                 nil)
-                                               inter))))
-         (if (nil? target-interaction)
-           "discourje"
-           (get-id target-interaction))))))
+      (let [swapped (swap! active-interaction (fn [inter]
+                                                (if (= (get-id inter) (get-id pre-swap-interaction))
+                                                  (if (not= nil (get-next target-interaction))
+                                                    (get-next target-interaction)
+                                                    nil)
+                                                  inter)))]
+        (= (if (nil? swapped) "end-protocol" (get-id swapped))
+           (if (or (nil? target-interaction) (nil? (get-next target-interaction)))
+             "end-protocol"
+             (get-id (get-next target-interaction))))))))
 
 
 (defn- get-atomic-interaction
