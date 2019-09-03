@@ -185,8 +185,7 @@
                                                   par
                                                   recursion))
                                               :else
-                                              par
-                                              )]
+                                              par)]
                                   (if (nil? inter)
                                     (if (satisfies? parallelizable par)
                                       nil
@@ -195,13 +194,13 @@
                                       (satisfies? parallelizable inter)
                                       (remove-nested-parallel sender receivers label inter monitor)
                                       (satisfies? interactable inter)
-                                      (get-next inter)
+                                      (if (multiple-receivers? inter)
+                                        (assoc inter :receivers (vec (remove #{receivers} (:receivers inter))))
+                                        (get-next inter))
                                       (or (satisfies? recursable inter) (satisfies? branchable inter))
                                       inter
                                       (and (instance? clojure.lang.LazySeq inter) (not (satisfies? interactable inter)))
-                                      (first (filter some? inter))
-                                      ))
-                                  ))))]
+                                      (first (filter some? inter))))))))]
     (if (empty? pars)
       (get-next target-interaction)
       (assoc target-interaction :parallels pars))))
@@ -210,7 +209,6 @@
   "Swap active interaction by parallel"
   [sender receivers label active-interaction target-interaction monitor]
   (let [target-parallel-interaction (get-first-valid-target-parallel-interaction sender receivers label target-interaction)]
-    (log-message (format "target sender %s receivers %s action %s next %s or is identifiable-recur %s" (:sender target-parallel-interaction) (:receivers target-parallel-interaction) (:action target-parallel-interaction) (:next target-parallel-interaction) (satisfies? identifiable-recur target-parallel-interaction)))
     (if (multiple-receivers? target-parallel-interaction)
       (remove-receiver-from-parallel active-interaction target-parallel-interaction receivers)
       (swap! active-interaction
@@ -218,6 +216,7 @@
                (let [target (if (= (get-id inter) (get-id target-parallel-interaction))
                               (get-first-valid-target-parallel-interaction sender receivers label inter)
                               target-parallel-interaction)]
+                 (println "target is" target)
                  (if (nil? target)
                    inter
                    (if (satisfies? parallelizable target)
@@ -227,8 +226,12 @@
                        (if (and (empty? parallel-with-removed-par) (nil? (get-next target)))
                          (if (nil? (get-next target))
                            (assoc inter :parallels parallel-with-removed-par)
-                           (assoc inter :parallels (conj parallel-with-removed-par (get-next target))))))))))))
-    true))
+                           (if (multiple-receivers? target)
+                             (assoc inter :parallels (conj parallel-with-removed-par
+                                                           (assoc target :receivers (vec (remove #{receivers} (:receivers target))))))
+                             (assoc inter :parallels (conj parallel-with-removed-par (get-next target))))
+                           ))))))))))
+  true)
 
 
 (defn is-valid-communication?

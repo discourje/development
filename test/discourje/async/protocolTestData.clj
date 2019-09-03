@@ -938,3 +938,27 @@
                                                    [(->interaction nil 4 "a" "b"#{} nil)
                                                     (->interaction nil 5 "b" "a"#{} nil)]
                                                    ] nil)])))
+
+(defn parallel-after-interaction-multicast [include-ids]
+  (if include-ids (create-protocol [(-->> 1 "a" "b")
+                                    (make-parallel [[(make-interaction 2 "b" ["a" "c"])
+                                                     (make-interaction 3 "a" ["b" "c"])]
+                                                    [(make-interaction 4 "b" "a")
+                                                     (make-interaction 5 "a" "b")]
+                                                    ])
+                                    (make-interaction 6 "b" ["a" "c"])])
+                  (create-protocol [(->interaction nil 1 "a" "b" #{} nil)
+                                    (->parallel nil [[(->interaction nil 2 "b" ["a" "c"] #{} nil)
+                                                      (->interaction nil 3 "a" ["b" "c"] #{} nil)]
+                                                     [(->interaction nil 4 "b" "a" #{} nil)
+                                                      (->interaction nil 5 "a" "b" #{} nil)]
+                                                     ] nil)
+                                    (make-interaction 6 "b" ["a" "c"])])))
+
+(def parallel-after-interaction-multicastControl
+  (->interaction nil 1 "a" "b" #{}
+                 (->parallel nil [(->interaction nil 2 "b" ["a" "c"] #{}
+                                                 (->interaction nil 3 "a" ["b" "c"] #{} nil))
+                                  (->interaction nil 4 "b" "a" #{}
+                                                 (->interaction nil 5 "a" "b" #{} nil))
+                                  ] (->interaction nil 6 "b" ["a" "c"] #{} nil))))
