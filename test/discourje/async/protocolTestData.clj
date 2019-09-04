@@ -962,3 +962,47 @@
                                   (->interaction nil 4 "b" "a" #{}
                                                  (->interaction nil 5 "a" "b" #{} nil))
                                   ] (->interaction nil 6 "b" ["a" "c"] #{} nil))))
+
+(defn parallel-after-choice-with-after-choice-multicast [include-ids]
+  (if include-ids (create-protocol [(make-interaction 1 "a" "b")
+                                    (make-parallel [[(make-interaction 2 "b" ["a" "c"])
+                                                     (make-interaction 3 "a" ["b" "c"])]
+                                                    [(make-interaction 4 "b" "a")
+                                                     (make-interaction 5 "a" "b")]])
+                                    (make-choice [[(make-interaction 6 "b" ["a" "c"])]
+                                                  [(make-interaction 7 "b" "a")]])])
+                  (create-protocol [(->interaction nil 1 "a" "b" #{} nil)
+                                    (->parallel nil [[(->interaction nil 2 "b" ["a" "c"] #{} nil)
+                                                      (->interaction nil 3 "a" ["b" "c"] #{} nil)]
+                                                     [(->interaction nil 4 "b" "a" #{} nil)
+                                                      (->interaction nil 5 "a" "b" #{} nil)]
+                                                     ] nil)
+                                    (->branch nil [[(->interaction nil 6 "b" ["a" "c"] #{} nil)]
+                                                   [(->interaction nil 7 "b" "a" #{} nil)]] nil)])))
+
+(defn parallel-after-rec-with-after-rec-multicasts [include-ids]
+  (if include-ids (create-protocol [(make-recursion :test [
+                                                           (make-choice [[(make-interaction 1 "a" "b")
+                                                                          (do-recur :test)]
+                                                                         [(make-interaction 0 "a" "b")]])])
+                                    (make-parallel [[(make-interaction 2 "b" ["a" "c"])
+                                                     (make-interaction 3 "a" ["b" "c"])]
+                                                    [(make-interaction 4 "b" "a")
+                                                     (make-interaction 5 "a" "b")]])
+                                    (make-recursion :test2 [
+                                                            (make-choice [[(make-interaction 6 "b" ["a" "c"])
+                                                                           (do-recur :test2)]
+                                                                          [(make-interaction 7 "b" "a")]])])])
+                  (create-protocol [(->recursion nil :test
+                                                 [(->branch nil [[(->interaction nil 1 "a" "b" #{} nil)
+                                                                  (->recur-identifier nil :test :recur nil)]
+                                                                 [(->interaction nil 0 "a" "b" #{} nil)]] nil)] nil)
+                                    (->parallel nil [[(->interaction nil 2 "b" ["a" "c"] #{} nil)
+                                                      (->interaction nil 3 "a" ["b" "c"] #{} nil)]
+                                                     [(->interaction nil 4 "b" "a" #{} nil)
+                                                      (->interaction nil 5 "a" "b" #{} nil)]
+                                                     ] nil)
+                                    (->recursion nil :test2
+                                                 [(->branch nil [[(->interaction nil 6 "b" ["a" "c"] #{} nil)
+                                                                  (->recur-identifier nil :test2 :recur nil)]
+                                                                 [(->interaction nil 7 "b" "a" #{} nil)]] nil)] nil)])))

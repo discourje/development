@@ -2,7 +2,7 @@
 (in-ns 'discourje.core.async)
 
 ;forward declare check-branchable-interaction to resolve undefined issue in check-recursion-interaction
-(declare check-branch-interaction check-parallel-interaction get-branch-interaction get-first-valid-target-branch-interaction get-parallel-interaction is-valid-interaction? interaction-to-string is-active-interaction-multicast? add-rec-to-table)
+(declare check-branch-interaction check-parallel-interaction get-branch-interaction get-parallel-interaction is-valid-interaction? interaction-to-string is-active-interaction-multicast? add-rec-to-table)
 
 (defn- check-recursion-interaction
   "Check the first element in a recursion interaction"
@@ -52,34 +52,22 @@
                        (and (instance? Seqable (:receivers active-interaction)) (> (count (:receivers active-interaction)) 1))))
   (and (instance? Seqable (:receivers active-interaction)) (> (count (:receivers active-interaction)) 1)))
 
-
-(defn- remove-receiver-from-parallel
-  "Remove a receiver from the active monitor when in first position of a branchable"
-  [active-interaction target-interaction receiver]
-  (let [recv (:receivers target-interaction)
-        newRecv (vec (remove #{receiver} recv))]
-    (log-message (format "IN-PARALLEL!! removing receiver %s, new receivers collection: %s" receiver newRecv))
-    (swap! active-interaction
-           (fn [inter]
-             (log-message (format "STILL HAS MULTIPLE RECEIVERS In First Of Branch? %s | %s && ID = SAME %s? Active: %s, Current: %s" (multiple-receivers? inter) (multiple-receivers? target-interaction) (= (get-id inter) (get-id target-interaction)) inter target-interaction))
-             (if (or (satisfies? identifiable-recur inter) (satisfies? branchable inter) (and (multiple-receivers? inter) (= (get-id inter) (get-id target-interaction))))
-               (->interaction (:id target-interaction) (:action target-interaction) (:sender target-interaction) (vec (remove #{receiver} (:receivers inter))) (:accepted-sends target-interaction) (:next target-interaction))
-               (get-next target-interaction))))))
-
 (defn- remove-receiver
   "Remove a receiver from the active monitor"
   [active-interaction current-interaction receiver]
+  (println (format "removing receivers %s when active interaction is %s and target is %s" receiver (to-string @active-interaction) (to-string current-interaction)))
   (let [recv (:receivers current-interaction)
         newRecv (vec (remove #{receiver} recv))]
     (log-message (format "removing receiver %s, new receivers collection: %s" receiver newRecv))
     (if (satisfies? interactable current-interaction)
       (swap! active-interaction (fn [inter]
-                                  (log-message (format "STILL HAS MULTIPLE RECEIVERS? %s | %s && ID = SAME %s? Active: %s, Current: %s" (multiple-receivers? inter) (multiple-receivers? current-interaction) (= (get-id inter) (get-id current-interaction)) inter current-interaction))
-                                  (if (or (satisfies? identifiable-recur inter) (and (multiple-receivers? inter) (= (get-id inter) (get-id current-interaction))))
-                                    (->interaction (:id current-interaction) (:action current-interaction) (:sender current-interaction) (vec (remove #{receiver} (:receivers inter))) (:accepted-sends current-interaction) (:next current-interaction))
-                                    (if (not= nil (get-next current-interaction))
-                                      (get-next current-interaction)
-                                      nil))))
+                                  (if (= (get-id inter) (get-id current-interaction))
+                                    (if (multiple-receivers? inter)
+                                      (assoc inter :receivers (vec (remove #{receiver} (:receivers inter))))
+                                      (if (not= nil (get-next current-interaction))
+                                        (get-next current-interaction)
+                                        nil))
+                                    (assoc current-interaction :receivers (vec (remove #{receiver} (:receivers current-interaction)))))))
       (log-error :unsupported-operation (format "Cannot remove-receiver from interaction of type: %s, it should be atomic! Interaction = %s" (type current-interaction) (interaction-to-string current-interaction))))))
 
 (defn- swap-active-interaction-by-atomic
@@ -112,7 +100,7 @@
   (let [rec (get-recursion active-interaction)]
     (cond
       (satisfies? interactable rec) (get-atomic-interaction sender receiver label rec)
-      (satisfies? branchable rec) (get-first-valid-target-branch-interaction sender receiver label rec)
+      (satisfies? branchable rec) (get-branch-interaction sender receiver label rec)
       (satisfies? recursable rec) (get-recursion-interaction sender receiver label rec)
       (satisfies? parallelizable rec) (get-parallel-interaction sender receiver label rec)
       :else (log-error :unsupported-operation (format "No correct next recursion monitor found. %s" (interaction-to-string rec))))))
@@ -123,7 +111,7 @@
   (when-let [_ (for [parallel (get-parallel active-interaction)]
                  (cond
                    (satisfies? interactable parallel) (get-atomic-interaction sender receiver label parallel)
-                   (satisfies? branchable parallel) (get-first-valid-target-branch-interaction sender receiver label parallel)
+                   (satisfies? branchable parallel) (get-branch-interaction sender receiver label parallel)
                    (satisfies? parallelizable parallel) (get-parallel-interaction sender receiver label parallel)
                    (satisfies? recursable parallel) (get-recursion-interaction sender receiver label parallel)
                    :else (log-error :unsupported-operation (format "Cannot check operation on child parallel construct! %s" (interaction-to-string parallel))))
@@ -133,49 +121,27 @@
 (defn- get-branch-interaction
   "Check the atomic interaction"
   [sender receiver label active-interaction]
-  (flatten
-    (for [branch (:branches active-interaction)]
-      (cond
-        (satisfies? interactable branch) (get-atomic-interaction sender receiver label branch)
-        (satisfies? branchable branch) (get-first-valid-target-branch-interaction sender receiver label branch)
-        (satisfies? parallelizable branch) (get-parallel-interaction sender receiver label branch)
-        (satisfies? recursable branch) (get-recursion-interaction sender receiver label branch)
-        :else (log-error :unsupported-operation (format "Cannot check operation on child branchable construct! %s" (interaction-to-string branch)))))))
+  (first (filter some? (flatten
+                         (for [branch (:branches active-interaction)]
+                           (cond
+                             (satisfies? interactable branch) (get-atomic-interaction sender receiver label branch)
+                             (satisfies? branchable branch) (get-branch-interaction sender receiver label branch)
+                             (satisfies? parallelizable branch) (get-parallel-interaction sender receiver label branch)
+                             (satisfies? recursable branch) (get-recursion-interaction sender receiver label branch)
+                             :else (log-error :unsupported-operation (format "Cannot check operation on child branchable construct! %s" (interaction-to-string branch)))))))))
 
-(defn- get-first-valid-target-parallel-interaction
-  "Find the first interactable in (nested) parallel constructs."
-  [sender receiver label active-interaction]
-  (get-parallel-interaction sender receiver label active-interaction))
-
-(defn- get-first-valid-target-branch-interaction
-  "Find the first interactable in (nested) branchable constructs."
-  [sender receiver label active-interaction]
-  (first (filter some? (get-branch-interaction sender receiver label active-interaction))))
-
-(defn- remove-from-nested-parallel [target par monitor]
-  (cond
-    (= (get-id par) (get-id target))
-    true
-    (satisfies? branchable par)
-    (first (filter true? (for [b (get-branches par)] (remove-from-nested-parallel target b monitor))))
-    (satisfies? recursable par)
-    (remove-from-nested-parallel target (get-recursion par) monitor)
-    (satisfies? parallelizable par)
-    (first (filter true? (for [p (get-parallel par)] (remove-from-nested-parallel target p monitor))))
-    (satisfies? identifiable-recur par)
-    (remove-from-nested-parallel target (get-rec monitor (get-name par)) monitor)
-    ))
-
-(defn remove-nested-parallel [sender receivers label target-interaction monitor]
+(defn remove-from-parallel
+  "Remove an interaction from a parallel in a recursive fashion."
+  [sender receivers label target-interaction monitor]
   (let [pars (flatten (filter some?
                               (for [par (get-parallel target-interaction)]
                                 (let [inter (cond
                                               (satisfies? parallelizable par)
-                                              (remove-nested-parallel sender receivers label par monitor)
+                                              (remove-from-parallel sender receivers label par monitor)
                                               (satisfies? interactable par)
                                               (get-atomic-interaction sender receivers label par)
                                               (satisfies? branchable par)
-                                              (get-first-valid-target-branch-interaction sender receivers label par)
+                                              (get-branch-interaction sender receivers label par)
                                               (satisfies? recursable par)
                                               (get-recursion-interaction sender receivers label par)
                                               (satisfies? identifiable-recur par)
@@ -192,7 +158,7 @@
                                       par)
                                     (cond
                                       (satisfies? parallelizable inter)
-                                      (remove-nested-parallel sender receivers label inter monitor)
+                                      (remove-from-parallel sender receivers label inter monitor)
                                       (satisfies? interactable inter)
                                       (if (multiple-receivers? inter)
                                         (assoc inter :receivers (vec (remove #{receivers} (:receivers inter))))
@@ -208,29 +174,15 @@
 (defn- swap-active-interaction-by-parallel
   "Swap active interaction by parallel"
   [sender receivers label active-interaction target-interaction monitor]
-  (let [target-parallel-interaction (get-first-valid-target-parallel-interaction sender receivers label target-interaction)]
-    (if (multiple-receivers? target-parallel-interaction)
-      (remove-receiver-from-parallel active-interaction target-parallel-interaction receivers)
-      (swap! active-interaction
-             (fn [inter]
-               (let [target (if (= (get-id inter) (get-id target-parallel-interaction))
-                              (get-first-valid-target-parallel-interaction sender receivers label inter)
-                              target-parallel-interaction)]
-                 (println "target is" target)
-                 (if (nil? target)
-                   inter
-                   (if (satisfies? parallelizable target)
-                     (let [par-target (remove-nested-parallel sender receivers label target monitor)]
-                       par-target)
-                     (let [parallel-with-removed-par (remove (fn [x] (remove-from-nested-parallel target x monitor)) (get-parallel inter))]
-                       (if (and (empty? parallel-with-removed-par) (nil? (get-next target)))
-                         (if (nil? (get-next target))
-                           (assoc inter :parallels parallel-with-removed-par)
-                           (if (multiple-receivers? target)
-                             (assoc inter :parallels (conj parallel-with-removed-par
-                                                           (assoc target :receivers (vec (remove #{receivers} (:receivers target))))))
-                             (assoc inter :parallels (conj parallel-with-removed-par (get-next target))))
-                           ))))))))))
+  (let [target-parallel-interaction (get-parallel-interaction sender receivers label target-interaction)]
+    (swap! active-interaction
+           (fn [inter]
+             (let [target (if (= (get-id inter) (get-id target-parallel-interaction))
+                            (get-parallel-interaction sender receivers label inter)
+                            target-parallel-interaction)]
+               (if (nil? target)
+                 inter
+                 (remove-from-parallel sender receivers label target monitor))))))
   true)
 
 
@@ -261,7 +213,7 @@
      (satisfies? interactable target-interaction)
      (swap-active-interaction-by-atomic active-interaction target-interaction receivers)
      (satisfies? branchable target-interaction)
-     (apply-receive-to-mon monitor sender receivers label active-interaction (get-first-valid-target-branch-interaction sender receivers label target-interaction))
+     (apply-receive-to-mon monitor sender receivers label active-interaction (get-branch-interaction sender receivers label target-interaction))
      (satisfies? parallelizable target-interaction)
      (swap-active-interaction-by-parallel sender receivers label active-interaction target-interaction monitor)
      (satisfies? recursable target-interaction)
