@@ -6,7 +6,6 @@
   (:import (clojure.lang Seqable, Atom)))
 
 ;Close in DSL
-;multicast in parallels!
 
 (defprotocol sendable
   (get-label [this])
