@@ -920,6 +920,41 @@
             (is (= (get-label b->a6) 6))
             (is (nil? (get-active-interaction (get-monitor ab)))))))))
 
+(deftest send-and-receive-parallel-with-choice-with-parallel-multicasts-test
+  (let [channels (add-infrastructure (parallel-with-choice-with-parallel true))
+        ab (get-channel "a" "b" channels)
+        ac (get-channel "a" "c" channels)
+        ba (get-channel "b" "a" channels)
+        bc (get-channel "b" "c" channels)]
+    (set-logging-exceptions)
+    (>!! [ab ac] (msg 0 0))
+    (let [a->b (<!! ab 0)
+          a->c (<!! ac 0)]
+      (is (= (get-label a->b) 0))
+      (is (= (get-label a->c) 0))
+      (do (>!! [ba bc] (msg 4 4))
+          (let [b->a4 (<!! ba 4)
+                b->c4 (<!! bc 4)]
+            (is (= (get-label b->a4) 4))
+            (is (= (get-label b->c4) 4))
+            (>!! [ab ac] (msg 5 5))
+            (is (= (get-label (<!! ab 5)) 5))
+            (is (= (get-label (<!! ac 5)) 5))))
+      (do (>!! [ba bc] (msg "hi" "hi"))
+          (let [b->ahi (<!! ba "hi")
+                b->chi (<!! bc "hi")]
+            (is (= (get-label b->ahi) "hi"))
+            (is (= (get-label b->chi) "hi"))
+            (>!! [ab ac] (msg "hi" "hi"))
+            (is (= (get-label (<!! ab "hi")) "hi"))
+            (is (= (get-label (<!! ac "hi")) "hi"))))
+      (do (>!! [ba bc] (msg 6 6))
+          (let [b->a6 (<!! ba 6)
+                b->c6 (<!! bc 6)]
+            (is (= (get-label b->a6) 6))
+            (is (= (get-label b->c6) 6))
+            (is (nil? (get-active-interaction (get-monitor ab)))))))))
+
 (deftest send-and-receive-parallel-with-rec-test
   (let [channels (add-infrastructure (parallel-with-rec true))
         ab (get-channel "a" "b" channels)
@@ -957,13 +992,46 @@
             (do (>!! ba (msg 4 4))
                 (let [b->a4 (<!! ba 4)]
                   (is (= (get-label b->a4) 4))
-                  (>!! ab (msg 5 5))
+                  (>!! ab(msg 5 5))
                   (is (= (get-label (<!! ab 5)) 5))))
             (recur (+ reps 1)))))
     (do
       (>!! ba (msg 6 6))
       (let [b->a6 (<!! ba 6)]
         (is (= (get-label b->a6) 6))
+        (is (nil? (get-active-interaction (get-monitor ab))))))))
+
+(deftest send-and-receive-rec-with-parallel-with-choice-multicast-test
+  (let [channels (add-infrastructure (rec-with-parallel-with-choice-multicast true))
+        ab (get-channel "a" "b" channels)
+        ac (get-channel "a" "c" channels)
+        ba (get-channel "b" "a" channels)
+        bc (get-channel "b" "c" channels)]
+    (set-logging-exceptions)
+    (loop [reps 0]
+      (if (> reps 2)
+        (do
+          (>!! [ab ac] (msg 1 1))
+          (is (= (get-label (<!! ab 1)) 1))
+          (is (= (get-label (<!! ac 1)) 1)))
+        (do (>!! [ab ac] (msg 0 0))
+            (is (= (get-label (<!! ab 0)) 0))
+            (is (= (get-label (<!! ac 0)) 0))
+            (do (>!! [ba bc] (msg 4 4))
+                (let [b->a4 (<!! ba 4)
+                      b->c4 (<!! bc 4)]
+                  (is (= (get-label b->a4) 4))
+                  (is (= (get-label b->c4) 4))
+                  (>!! [ab ac](msg 5 5))
+                  (is (= (get-label (<!! ab 5)) 5))
+                  (is (= (get-label (<!! ac 5)) 5))))
+            (recur (+ reps 1)))))
+    (do
+      (>!! [ba bc] (msg 6 6))
+      (let [b->a6 (<!! ba 6)
+            b->c6 (<!! bc 6)]
+        (is (= (get-label b->a6) 6))
+        (is (= (get-label b->c6) 6))
         (is (nil? (get-active-interaction (get-monitor ab))))))))
 
 (deftest send-and-receive-multiple-branches-choice-Threaded-test

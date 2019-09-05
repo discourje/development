@@ -55,7 +55,6 @@
 (defn- remove-receiver
   "Remove a receiver from the active monitor"
   [active-interaction current-interaction receiver]
-  (println (format "removing receivers %s when active interaction is %s and target is %s" receiver (to-string @active-interaction) (to-string current-interaction)))
   (let [recv (:receivers current-interaction)
         newRecv (vec (remove #{receiver} recv))]
     (log-message (format "removing receiver %s, new receivers collection: %s" receiver newRecv))

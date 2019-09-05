@@ -871,6 +871,26 @@
                                                       (->interaction nil "hi" "a" "b" #{} nil)]] nil)
                                     (->interaction nil 6 "b" "a" #{} nil)])))
 
+(defn parallel-with-choice-with-parallel [include-ids]
+  (if include-ids (create-protocol [(make-parallel [[(make-choice [
+                                                                   [(make-parallel [
+                                                                                    [(make-choice [[(make-interaction 1 "a" ["b" "c"])]
+                                                                                                   [(make-interaction 0 "a" ["b" "c"])]])]
+                                                                                    [(make-interaction 4 "b" ["a" "c"])
+                                                                                     (make-interaction 5 "a" ["b" "c"])]])]
+                                                                   [(make-interaction 9 "a" ["b" "c"])]])]
+                                                    [(make-interaction "hi" "b" ["a" "c"])
+                                                     (make-interaction "hi" "a" ["b" "c"])]])
+                                    (make-interaction 6 "b" ["a" "c"])])
+                  (create-protocol [(->parallel nil [[(->branch nil [[(->parallel nil [[(->branch nil [[(->interaction nil 1 "a" "b" #{} nil)]
+                                                                                                       [(->interaction nil 0 "a" "b" #{} nil)]] nil)]
+                                                                                       [(->interaction nil 4 "b" "a" #{} nil)
+                                                                                        (->interaction nil 5 "a" "b" #{} nil)]] nil)]
+                                                                     [(->interaction nil 9 "a" "b" #{} nil)]] nil)]
+                                                     [(->interaction nil "hi" "b" "a" #{} nil)
+                                                      (->interaction nil "hi" "a" "b" #{} nil)]] nil)
+                                    (->interaction nil 6 "b" "a" #{} nil)])))
+
 (def parallel-with-choice-with-parallel-control
   (->parallel nil [(->branch nil [(->parallel nil [(->branch nil [(->interaction nil 1 "a" "b" #{} nil)
                                                                   (->interaction nil 0 "a" "b" #{} nil)] nil)
@@ -919,6 +939,24 @@
                                                                              ] nil)
                                                             ] nil)
                                     (->interaction nil 6 "b" "a" #{} nil)])))
+
+(defn rec-with-parallel-with-choice-multicast [include-ids]
+  (if include-ids (create-protocol [(make-recursion :test [(make-parallel [[(make-choice [[(make-interaction 1 "a" ["b" "c"])]
+                                                                                          [(make-interaction 0 "a" ["b" "c"])
+                                                                                           (do-recur :test)]])]
+                                                                           [(make-interaction 4 "b" ["a" "c"])
+                                                                            (make-interaction 5 "a" ["b" "c"])]
+                                                                           ])
+                                                           ])
+                                    (make-interaction 6 "b" ["a" "c"])])
+                  (create-protocol [(->recursion nil :test [(->parallel nil [[(->branch nil [[(->interaction nil 1 "a" ["b" "c"] #{} nil)]
+                                                                                             [(->interaction nil 0 "a" ["b" "c"] #{} nil)
+                                                                                              (->recur-identifier nil :test :recur nil)]] nil)]
+                                                                             [(->interaction nil 4 "b" ["a" "c"] #{} nil)
+                                                                              (->interaction nil 5 "a" ["b" "c"] #{} nil)]
+                                                                             ] nil)
+                                                            ] nil)
+                                    (->interaction nil 6 "b" ["a" "c"] #{} nil)])))
 
 (defn multiple-branches-choice [include-ids]
   (if include-ids (create-protocol [(make-choice [
