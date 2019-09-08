@@ -10,7 +10,7 @@
   (is (= 3 (count (get-distinct-roles (get-interactions (testTripleProtocol true)))))))
 
 (deftest unique3-parallel-roles-test
-  (is (= 3 (count (get-distinct-roles (get-interactions (testParallelProtocol true)))))))
+  (is (= 3 (count (get-distinct-roles (get-interactions (testMulticastProtocol true)))))))
 
 (deftest unique4-parallel-roles-test
   (is (= 4 (count (get-distinct-roles (get-interactions (testQuadProtocol true)))))))

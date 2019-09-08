@@ -1,9 +1,9 @@
-(ns discourje.examples.parallelisation
+(ns discourje.examples.multicast
   (require [discourje.core.async :refer :all]
            [discourje.core.logging :refer :all]))
 
 ; This function will generate a vector with 1 interaction to send and receive the greet message.
-;  Notice how receivers are defined as a vector in order to allow for parallelisation!
+;  Notice how receivers are defined as a vector in order to allow for multicast!
 (def message-exchange-pattern
   (mep (-->> "greet" "alice" ["bob" "carol"])))
 

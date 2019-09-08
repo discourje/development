@@ -4,7 +4,7 @@
 (defmacro -->>
   "Create an Atomic-interaction"
   [action sender receiver]
-  `(->interaction (uuid/v1) ~action ~sender ~receiver nil))
+  `(->interaction (uuid/v1) ~action ~sender ~receiver #{} nil))
 
 (defmacro rec
   "Generate recursion"
@@ -20,6 +20,11 @@
   "Generate choice"
   [branch & more]
   `(->branch (uuid/v1) [~branch ~@more] nil))
+
+(defmacro par
+  "Generate parallel"
+  [parallels & more]
+  `(->parallel (uuid/v1) [~parallels ~@more] nil))
 
 (defmacro mep
   "Generate message exchange pattern aka protocol"

@@ -14,7 +14,7 @@
   )
 
 (deftest single-parallel-infra-test
-  (let [channels (generate-infrastructure (testSingleParallelProtocol))]
+  (let [channels (generate-infrastructure (testSingleMulticastProtocol))]
     (println channels)
     (is (= 2 (count channels)))))
 

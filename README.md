@@ -17,13 +17,14 @@ Communication is blocking when desired (configure logging levels) and order amon
 <b>Current supported functionality:</b>
 - 
 - [Sequencing](src/discourje/examples/sequencing.clj)
-- [Parallelisation](src/discourje/examples/parallelisation.clj)
+- [Parallelisation](src/discourje/examples/parallelization.clj)
+- [Multicast](src/discourje/examples/multicast.clj)
 - [Branching](src/discourje/examples/branching.clj)
 - [Recursion](src/discourje/examples/recursion.clj)
 - [Custom Channels](src/discourje/examples/customChannels.clj)
 - [Typed Messages](src/discourje/examples/typedMessages.clj)
 - [Logging Levels](src/discourje/examples/logging.clj)
-- Nesting: Recursion and Branching constructs support nesting!
+- Nesting: Parallelism, Recursion and Branching constructs support nesting!
 
 <i>See examples for each function for more info.</i>
 
