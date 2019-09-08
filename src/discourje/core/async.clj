@@ -58,6 +58,11 @@
   [name]
   (->recur-identifier (uuid/v1) name :recur nil))
 
+(defn make-closer
+  "Create a closer to close the channel with given sender and receiver pair."
+  [sender receiver]
+  (->closer (uuid/v1) sender receiver nil))
+
 (defn make-parallel
   "Generate parallel construct"
   [parallels]
@@ -162,7 +167,7 @@
               (allow-send channel m))
             (if (> i 0)
               send-fn-result
-            (recur 1 (send-fn))))))))
+              (recur 1 (send-fn))))))))
 
 (defn <!!
   "take form channel"

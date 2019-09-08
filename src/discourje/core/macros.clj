@@ -6,6 +6,11 @@
   [action sender receiver]
   `(->interaction (uuid/v1) ~action ~sender ~receiver #{} nil))
 
+(defmacro close
+  "Close channel pair"
+  [sender receiver]
+  `(->closer(uuid/v1) ~sender ~receiver nil))
+
 (defmacro rec
   "Generate recursion"
   [name interaction & more]

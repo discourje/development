@@ -45,7 +45,7 @@
   linkable
   (get-next [this] next)
   stringify
-  (to-string [this] (format "Closer from Sender: %s to Receiver: %s" sender receivers)))
+  (to-string [this] (format "Closer from Sender: %s to Receiver: %s" sender receiver)))
 
 (defprotocol branchable
   (get-branches [this]))
