@@ -967,14 +967,14 @@
                                                   [(make-interaction 4 "a" "b")
                                                    (make-interaction 5 "b" "a")]
                                                   ])
-                  ])
+                                    ])
                   (create-protocol [(->branch nil [
-                                                   [(->interaction nil 0 "a" "b"#{} nil)
-                                                    (->interaction nil 1 "b" "a"#{} nil)]
-                                                   [(->interaction nil 2 "a" "b"#{} nil)
-                                                    (->interaction nil 3 "b" "a"#{} nil)]
-                                                   [(->interaction nil 4 "a" "b"#{} nil)
-                                                    (->interaction nil 5 "b" "a"#{} nil)]
+                                                   [(->interaction nil 0 "a" "b" #{} nil)
+                                                    (->interaction nil 1 "b" "a" #{} nil)]
+                                                   [(->interaction nil 2 "a" "b" #{} nil)
+                                                    (->interaction nil 3 "b" "a" #{} nil)]
+                                                   [(->interaction nil 4 "a" "b" #{} nil)
+                                                    (->interaction nil 5 "b" "a" #{} nil)]
                                                    ] nil)])))
 
 (defn parallel-after-interaction-multicast [include-ids]
@@ -1074,3 +1074,25 @@
                                     (->closer nil "b" "c" nil)
                                     (->closer nil "c" "a" nil)
                                     (->closer nil "c" "b" nil)])))
+
+(def rec-with-parallel-with-choice-multicast-and-closeControl
+  (->recursion nil :test [(->parallel nil [(->branch nil [(->interaction nil 1 "a" ["b" "c"] #{} nil)
+                                                          (->interaction nil 0 "a" ["b" "c"] #{}
+                                                                         (->recur-identifier nil :test :recur nil))] nil)
+                                           (->interaction nil 4 "b" ["a" "c"] #{}
+                                                          (->interaction nil 5 "a" ["b" "c"] #{} nil))
+                                           ]
+                                      (->closer nil "a" "b"
+                                                (->closer nil "a" "c"
+                                                          (->interaction nil 6 "b" ["a" "c"] #{}
+                                                                         (->closer nil "b" "a"
+                                                                                   (->closer nil "b" "c"
+                                                                                             (->closer nil "c" "a"
+                                                                                                       (->closer nil "c" "b" nil))))))))
+
+                          ] nil))
+
+
+
+
+] )

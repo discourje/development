@@ -6,6 +6,7 @@
   (:import (clojure.lang Seqable, Atom)))
 
 ;Close in DSL
+; Closables are not taken into consideration when infra structure is generated to reduce the chance unused channels!
 
 (defprotocol sendable
   (get-label [this])

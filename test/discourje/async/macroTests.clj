@@ -5,6 +5,9 @@
 (deftest atomic-interaction-test
   (is (= (assoc (make-interaction 1 "a" "b") :id 1) (assoc (-->> 1 "a" "b") :id 1))))
 
+(deftest close-test
+  (is (= (assoc (make-closer "a" "b") :id 1) (assoc (close "a" "b") :id 1))))
+
 (deftest mep-test
   (let [interaction (-->> 1 "A" "B")]
   (is (= (mep interaction) (create-protocol [interaction])))))

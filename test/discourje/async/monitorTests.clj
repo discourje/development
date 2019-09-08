@@ -114,3 +114,7 @@
 (deftest after-parallel-nested-parallel-test
   (let [mon (generate-monitor (after-parallel-nested-parallel false))]
     (is (= (:interactions mon) after-parallel-nested-parallelControl))))
+
+(deftest rec-with-parallel-with-choice-multicast-and-close-test
+  (let [mon (generate-monitor (rec-with-parallel-with-choice-multicast-and-close false))]
+    (is (= (:interactions mon) rec-with-parallel-with-choice-multicast-and-closeControl))))
