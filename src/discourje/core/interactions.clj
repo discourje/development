@@ -17,8 +17,8 @@
   (get-parallel [this]))
 
 (defprotocol closable
-  (get-sender[this])
-  (get-receiver [this]))
+  (get-from [this])
+  (get-to [this]))
 
 (defprotocol stringify
   (to-string [this]))
@@ -40,8 +40,8 @@
   idable
   (get-id [this] id)
   closable
-  (get-sender [this] sender)
-  (get-receiver [this] receiver)
+  (get-from [this] sender)
+  (get-to [this] receiver)
   linkable
   (get-next [this] next)
   stringify
@@ -142,7 +142,13 @@
                 (let [parallel-interactions (for [p (get-parallel element)] (find-all-role-pairs p result2))]
                   (conj result2 (flatten parallel-interactions)))
                 (satisfies? discourje.core.async/interactable element)
-                (conj result2 {:sender (get-sender element) :receivers (get-receivers element)})))))))
+                (conj result2 {:sender (get-sender element) :receivers (get-receivers element)})
+                (satisfies? discourje.core.async/closable element)
+                result2
+                (satisfies? discourje.core.async/identifiable-recur element)
+                result2
+                :else
+                (log-error :invalid-communication-type "Cannot find roles pairs for type:" element)))))))
 
 (defn get-distinct-roles
   "Get all distinct senders and receivers in the protocol"

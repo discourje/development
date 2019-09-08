@@ -124,3 +124,8 @@
   (let [roles (get-distinct-role-pairs (get-interactions (parallel-after-rec-with-after-rec true)))
         channels (generate-minimum-channels roles nil 1)]
     (is (= 2 (count channels)))))
+
+(deftest rec-with-parallel-with-choice-multicast-and-close-rec-roles-test
+  (let [roles (get-distinct-role-pairs (get-interactions (rec-with-parallel-with-choice-multicast-and-close true)))
+        channels (generate-minimum-channels roles nil 1)]
+    (is (= 4 (count channels)))))
