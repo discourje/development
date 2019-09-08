@@ -11,4 +11,3 @@
 
 (defn disable-wildcard "Disable wildcard logic" []
   (reset! allow-wildcard false))
-

@@ -30,7 +30,7 @@
     (is (= 6 (count channels)))))
 
 (deftest triple-channels-roles-test
-  (let [roles (get-distinct-roles (get-interactions (testParallelProtocol true)))
+  (let [roles (get-distinct-roles (get-interactions (testMulticastProtocol true)))
         channels (generate-channels roles nil 1)]
     (is (= 6 (count channels)))))
 
@@ -109,7 +109,7 @@
         channels (generate-minimum-channels roles nil 1)]
     (is (= 5 (count channels)))))
 (deftest minimum-amount-testSingleParallelProtocol-roles-test
-  (let [roles (get-distinct-role-pairs (get-interactions (testSingleParallelProtocol)))
+  (let [roles (get-distinct-role-pairs (get-interactions (testSingleMulticastProtocol)))
         channels (generate-minimum-channels roles nil 1)]
     (println channels)
     (is (= 2 (count channels)))))
