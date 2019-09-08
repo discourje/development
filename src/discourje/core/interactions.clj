@@ -16,6 +16,10 @@
 (defprotocol parallelizable
   (get-parallel [this]))
 
+(defprotocol closable
+  (get-sender[this])
+  (get-receiver [this]))
+
 (defprotocol stringify
   (to-string [this]))
 
@@ -31,6 +35,17 @@
   (get-next [this] next)
   stringify
   (to-string [this] (format "Interaction - Action: %s, Sender: %s, Receivers: %s" action sender receivers)))
+
+(defrecord closer [id sender receiver next]
+  idable
+  (get-id [this] id)
+  closable
+  (get-sender [this] sender)
+  (get-receiver [this] receiver)
+  linkable
+  (get-next [this] next)
+  stringify
+  (to-string [this] (format "Closer from Sender: %s to Receiver: %s" sender receivers)))
 
 (defprotocol branchable
   (get-branches [this]))
