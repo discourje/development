@@ -1076,7 +1076,7 @@
                                     (->closer nil "c" "b" nil)])))
 
 (def rec-with-parallel-with-choice-multicast-and-closeControl
-  (->recursion nil :test [(->parallel nil [(->branch nil [(->interaction nil 1 "a" ["b" "c"] #{} nil)
+  (->recursion nil :test (->parallel nil [(->branch nil [(->interaction nil 1 "a" ["b" "c"] #{} nil)
                                                           (->interaction nil 0 "a" ["b" "c"] #{}
                                                                          (->recur-identifier nil :test :recur nil))] nil)
                                            (->interaction nil 4 "b" ["a" "c"] #{}
@@ -1089,10 +1089,4 @@
                                                                                    (->closer nil "b" "c"
                                                                                              (->closer nil "c" "a"
                                                                                                        (->closer nil "c" "b" nil))))))))
-
-                          ] nil))
-
-
-
-
-] )
+               nil))

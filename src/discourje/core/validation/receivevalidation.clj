@@ -200,6 +200,8 @@
         (is-valid-communication? monitor sender receivers label (get-recursion active-interaction)))
     (satisfies? identifiable-recur active-interaction)
     (is-valid-communication? monitor sender receivers label (get-rec monitor (get-name active-interaction)))
+    (satisfies? closable active-interaction)
+    (is-valid-close? sender receivers active-interaction)
     :else
     (do (log-error :unsupported-operation (format "Unsupported communication type: Communication invalid, type: %s" (type active-interaction)))
         false)))

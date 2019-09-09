@@ -8,13 +8,16 @@
   (apply-send! [this sender receivers label])
   (valid-send? [this sender receivers label])
   (valid-receive? [this sender receivers label])
+  (valid-close? [this sender receiver])
+  (apply-close! [this channel])
   (is-current-multicast? [this label])
   (register-rec! [this rec])
   (get-rec [this name]))
 
 ;load helper namespace files!
 (load "validation/receivevalidation"
-      "validation/sendvalidation")
+      "validation/sendvalidation"
+      "validation/closevalidation")
 
 (declare contains-value? is-valid-interaction?)
 
@@ -81,4 +84,6 @@
   (valid-receive? [this sender receivers label] (is-valid-communication? this sender receivers label @active-interaction))
   (is-current-multicast? [this label] (is-active-interaction-multicast? this @active-interaction label))
   (register-rec! [this rec] (add-rec-to-table recursion-set rec))
-  (get-rec [this name] (name @recursion-set)))
+  (get-rec [this name] (name @recursion-set))
+  (valid-close? [this sender receiver] (is-valid-communication? this sender receiver nil @active-interaction))
+  (apply-close! [this channel] (apply-close-to-mon this channel active-interaction @active-interaction)))

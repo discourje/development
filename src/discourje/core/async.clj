@@ -91,7 +91,7 @@
    (let [monitor (generate-monitor protocol)
          roles (get-distinct-role-pairs (get-interactions protocol))
          channels (generate-minimum-channels roles monitor 1)]
-     channels))
+     (->infrastructure channels)))
   ([protocol channels]
    (if (all-channels-implement-transportable? channels)
      (let [roles (get-distinct-role-pairs (get-interactions protocol))
@@ -99,7 +99,7 @@
            all-channels-given? (nil? (some #(false? %) (for [channel control-channels] (not (empty? (filter (fn [c] (and (= (:provider c) (:provider channel)) (= (:consumers c) (:consumers channel)))) channels))))))]
        (if all-channels-given?
          (let [monitor (generate-monitor protocol)]
-           (vec (for [c channels] (assoc c :monitor monitor))))
+           (->infrastructure (vec (for [c channels] (assoc c :monitor monitor)))))
          (log-error :invalid-channels "Cannot generate infrastructure, make sure all channels required for the protocol are given!")))
      (log-error :invalid-channels "Cannot generate infrastructure, make sure all supplied channels implement the `transportable' protocol!"))))
 
@@ -221,3 +221,19 @@
                      (when (true? par) (recur (= id (get-id (get-active-interaction (get-monitor channel)))))))
                    result)
                (log-error :incorrect-communication (format "communication invalid! message label on channel: %s does not match the target label %s!" (get-label result) label)))))))))
+
+(defn close-channel!
+  "Close a channel with the given sender and receiver"
+  [channel]
+  (cond
+    (not= (nil? channel))
+    (log-error :invalid-channel "Cannot close a channel, it's nil!")
+    (not= (nil? (get-monitor channel)))
+    (log-error :invalid-monitor (format "Cannot close the channel with pair %s %s since it has no monitor!" (get-provider channel) (get-consumer channel)))
+    (not= (nil? (get-chan channel)))
+    (log-error :invalid-channel (format "Cannot close the channel with pair %s %s since the core.async channel is nil, is it already closed!?" (get-provider channel) (get-consumer channel)))
+    (valid-close? (get-monitor channel) (get-provider channel) (get-consumer channel))
+    (apply-close! (get-monitor channel) channel)
+    :else
+    (log-error :invalid-channel "Cannot close channel %s to %s for unknown reason, please contact an admin if this problem endures!")
+    ))

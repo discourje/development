@@ -10,13 +10,13 @@
 
 (deftest mep-test
   (let [interaction (-->> 1 "A" "B")]
-  (is (= (mep interaction) (create-protocol [interaction])))))
+    (is (= (mep interaction) (create-protocol [interaction])))))
 
 (deftest choice-test
   (let [i1 (-->> 1 "A" "B")
         i2 (-->> 2 "A" "B")
         i3 (-->> 3 "A" "B")]
-    (is (= (assoc (make-choice [[i1][i2][i3]]) :id 1) (assoc (choice [i1][i2][i3]) :id 1)))))
+    (is (= (assoc (make-choice [[i1] [i2] [i3]]) :id 1) (assoc (choice [i1] [i2] [i3]) :id 1)))))
 
 (deftest continue-test
   (is (= (assoc (do-recur :test) :id 1) (assoc (continue :test) :id 1))))
@@ -31,14 +31,14 @@
   (let [i1 (-->> 1 "A" "B")
         i2 (-->> 2 "A" "B")
         i3 (-->> 3 "A" "B")]
-    (is (= (assoc (make-parallel [[i1][i2][i3]]) :id 1) (assoc (par [i1][i2][i3]) :id 1)))))
+    (is (= (assoc (make-parallel [[i1] [i2] [i3]]) :id 1) (assoc (par [i1] [i2] [i3]) :id 1)))))
 
 (deftest create-channel-test
   (let [fnChan (generate-channel "a" "b" 1)
         macroChan (chan "a" "b" 1)]
-  (is (= (get-provider fnChan) (get-provider macroChan)))
-  (is (= (get-consumer fnChan) (get-consumer macroChan)))
-  (is (= (get-buffer fnChan) (get-buffer macroChan)))))
+    (is (= (get-provider fnChan) (get-provider macroChan)))
+    (is (= (get-consumer fnChan) (get-consumer macroChan)))
+    (is (= (get-buffer fnChan) (get-buffer macroChan)))))
 
 (def api-two-buyer-protocol
   (mep
@@ -53,12 +53,12 @@
            [(-->> "quit" "Buyer2" "Seller")]))))
 
 (deftest send-receive-two-buyer-protocol-test
-  (let [channels (generate-infrastructure api-two-buyer-protocol)
-        b1s (get-channel "Buyer1" "Seller" channels)
-        sb1 (get-channel "Seller" "Buyer1" channels)
-        sb2 (get-channel "Seller" "Buyer2" channels)
-        b1b2 (get-channel "Buyer1" "Buyer2" channels)
-        b2s (get-channel "Buyer2" "Seller" channels)
+  (let [infra (generate-infrastructure api-two-buyer-protocol)
+        b1s (get-channel infra "Buyer1" "Seller")
+        sb1 (get-channel infra "Seller" "Buyer1")
+        sb2 (get-channel infra "Seller" "Buyer2")
+        b1b2 (get-channel infra "Buyer1" "Buyer2")
+        b2s (get-channel infra "Buyer2" "Seller")
         order-book (atom true)]
     (while (true? @order-book)
       (do

@@ -18,7 +18,7 @@
   ([amount]
    (let [protocol (create-protocol (vec (for [p (range amount)] (-->> 1 p (+ p 1)))))
          infra (generate-infrastructure protocol)
-         channels (vec (for [p (range amount)] (get-channel p (+ p 1) infra)))
+         channels (vec (for [p (range amount)] (get-channel infra p (+ p 1) )))
          msg (msg 1 1)
          time (custom-time
                 (loop [pipe 0]
@@ -34,7 +34,7 @@
      (discourje-pipeline amount)
      (let [protocol (create-protocol (vec (for [p (range amount)] (-->> 1 p (+ p 1)))))
            infra (generate-infrastructure protocol)
-           channels (vec (for [p (range amount)] (get-channel p (+ p 1) infra)))
+           channels (vec (for [p (range amount)] (get-channel infra p (+ p 1) )))
            msg (msg 1 1)
            time (custom-time
                   (doseq [_ (range iterations)]
@@ -64,7 +64,7 @@
   ([amount iterations]
    (let [protocol (create-protocol (vec (for [p (range (- amount 1))] (-->> 1 p (+ p 1)))))
          infra (generate-infrastructure protocol)
-         channels (vec (for [p (range (- amount 1))] (get-channel p (+ p 1) infra)))
+         channels (vec (for [p (range (- amount 1))] (get-channel infra p (+ p 1) )))
          msg (msg 1 1)
          max (- amount 2)
          time (cond
@@ -96,7 +96,7 @@
   ([amount iterations]
    (let [protocol (create-protocol (vec (for [p (range (- amount 1))] (-->> 1 p (+ p 1)))))
          infra (generate-infrastructure protocol)
-         channels (vec (for [p (range (- amount 1))] (get-channel p (+ p 1) infra)))
+         channels (vec (for [p (range (- amount 1))] (get-channel infra p (+ p 1) )))
          msg (msg 1 1)
          max (- amount 2)
          time (cond
@@ -138,7 +138,7 @@
   ([amount iterations]
    (let [protocol (create-protocol (vec (for [p (range (- amount 1))] (-->> 1 p (+ p 1)))))
          infra (generate-infrastructure protocol)
-         channels (vec (for [p (range (- amount 1))] (get-channel p (+ p 1) infra)))
+         channels (vec (for [p (range (- amount 1))] (get-channel infra p (+ p 1) )))
          msg (msg 1 1)
          max (- amount 3)
          time (cond
@@ -167,7 +167,7 @@
   ([amount iterations]
    (let [protocol (create-protocol (vec (for [p (range (- amount 1))] (-->> 1 p (+ p 1)))))
          infra (generate-infrastructure protocol)
-         channels (vec (for [p (range (- amount 1))] (get-channel p (+ p 1) infra)))
+         channels (vec (for [p (range (- amount 1))] (get-channel infra p (+ p 1) )))
          msg (msg 1 1)
          max (- amount 3)
          time (cond
@@ -211,7 +211,7 @@
      (clojure-pipeline amount)
      (let [protocol (create-protocol (vec (for [p (range amount)] (-->> 1 p (+ p 1)))))
            infra (generate-infrastructure protocol)
-           channels (vec (for [p (range amount)] (get-channel p (+ p 1) infra)))
+           channels (vec (for [p (range amount)] (get-channel infra p (+ p 1) )))
            msg (msg 1 1)
            time (custom-time
                   (doseq [_ (range iterations)]

@@ -8,7 +8,7 @@
 ;setup infrastructure, generate channels and add monitor
 (def infrastructure (add-infrastructure message-exchange-pattern))
 ;get the channel
-(def user-to-world (get-channel "user" "world" infrastructure))
+(def user-to-world (get-channel infrastructure "user" "world"))
 
 (defn- send-to-world "This function will use the protocol to send the Hello World! message to world."
   [] (>!! user-to-world (msg "helloWorld" "Hello World!")))

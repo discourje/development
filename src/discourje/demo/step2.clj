@@ -20,8 +20,8 @@
 ;generate the infrastructure
 (def infra (add-infrastructure buy-goods))
 ;query the channels, identified by sender and receiver pairs.
-(def buyer-to-seller (get-channel "buyer" "seller" infra))
-(def seller-to-buyer (get-channel "seller" "buyer" infra))
+(def buyer-to-seller (get-channel infra "buyer" "seller"))
+(def seller-to-buyer (get-channel infra "seller" "buyer"))
 
 (def product (doto (Book.) (.setName "The Joy of Clojure")))
 

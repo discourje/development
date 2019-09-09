@@ -10,8 +10,8 @@
 ;setup infrastructure, generate channels and add monitor
 (def infrastructure (add-infrastructure message-exchange-pattern))
 ;Get the channels
-(def alice-to-bob (get-channel "alice" "bob" infrastructure))
-(def alice-to-carol (get-channel "alice" "carol" infrastructure))
+(def alice-to-bob (get-channel infrastructure "alice" "bob"))
+(def alice-to-carol (get-channel infrastructure "alice" "carol"))
 
 (defn- greet-bob-and-carol
   "This function will use the protocol to send the greet message to bob and carol.

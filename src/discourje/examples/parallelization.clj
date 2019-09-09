@@ -15,10 +15,10 @@
 ;setup infrastructure, generate channels and add monitor
 (def infrastructure (add-infrastructure message-exchange-pattern))
 ;Get the channels
-(def alice-to-bob (get-channel "Alice" "Bob" infrastructure))
-(def bob-to-alice (get-channel "Bob" "Alice" infrastructure))
-(def bob-to-carol (get-channel "Bob" "Carol" infrastructure))
-(def carol-to-bob (get-channel "Carol" "Bob" infrastructure))
+(def alice-to-bob (get-channel infrastructure "Alice" "Bob"))
+(def bob-to-alice (get-channel infrastructure "Bob" "Alice"))
+(def bob-to-carol (get-channel infrastructure "Bob" "Carol"))
+(def carol-to-bob (get-channel infrastructure "Carol" "Bob"))
 
 (defn- alice
   "logic for alice"

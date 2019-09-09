@@ -22,8 +22,8 @@
 (defn buyer
   "Logic representing Buyer"
   [confirmed-callback out-of-stock-callback]
-  (let [b->s (get-channel "buyer" "seller" infra)
-        s->b (get-channel "seller" "buyer" infra)
+  (let [b->s (get-channel infra "buyer" "seller")
+        s->b (get-channel infra "seller" "buyer")
         product {:product-type "book" :content {:title "The joy of Clojure"}}]
     (>!! b->s (msg "quote-request" product))
     (if (= (get-label (<!! s->b ["quote" "out-of-stock"])) "quote")
@@ -34,8 +34,8 @@
 (defn seller
   "Logic representing the Seller"
   []
-  (let [b->s (get-channel "buyer" "seller" infra)
-        s->b (get-channel "seller" "buyer" infra)
+  (let [b->s (get-channel infra "buyer" "seller")
+        s->b (get-channel infra "seller" "buyer")
         in-stock? (fn [book] (rand-int 2))]
     (if (== 1 (in-stock? (get-content (<!! b->s "quote-request"))))
       (do

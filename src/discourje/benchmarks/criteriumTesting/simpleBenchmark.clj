@@ -25,7 +25,7 @@
     (-->> "hi" "Alice" "Bob")))
 
 (def infra (generate-infrastructure protocol))
-(def discourje-a-b (get-channel "Alice" "Bob" infra))
+(def discourje-a-b (get-channel infra "Alice" "Bob" ))
 (def m (msg "hi" "foo"))
 (set-logging-exceptions)
 (defn discourje-send []
@@ -52,7 +52,7 @@
          (continue :rec))))
 
 (def rec-infra (generate-infrastructure rec-protocol))
-(def discourje-a-b (get-channel "Alice" "Bob" rec-infra))
+(def discourje-a-b (get-channel rec-infra "Alice" "Bob" ))
 (defn discourje-rec-send []
   (>!! discourje-a-b m)
   (<!! discourje-a-b "hi"))

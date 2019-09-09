@@ -20,10 +20,10 @@
 ;generate-infrastructure will detect if all channels in the vector implement the transportable defprotocol and that all channels required for the protocol are present in the custom channel vector
 (def infrastructure (add-infrastructure message-exchange-pattern [a->b b->a a->c c->a]))
 ;Get the channels
-(def alice-to-bob (get-channel "alice" "bob" infrastructure))
-(def bob-to-alice (get-channel "bob" "alice" infrastructure))
-(def alice-to-carol (get-channel "alice" "carol" infrastructure))
-(def carol-to-alice (get-channel "carol" "alice" infrastructure))
+(def alice-to-bob (get-channel infrastructure "alice" "bob"))
+(def bob-to-alice (get-channel infrastructure "bob" "alice"))
+(def alice-to-carol (get-channel infrastructure "alice" "carol"))
+(def carol-to-alice (get-channel infrastructure "carol" "alice"))
 
 (defn- greet-bob-and-carol
   "This function will use the protocol to send the greet message to bob and carol."

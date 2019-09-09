@@ -60,11 +60,6 @@
   [body]
   `(async/thread ~body))
 
-(defmacro close!
-  "Close the channel"
-  [channel]
-  `(clojure.core.async/close! (get-chan ~channel)))
-
 (defmacro custom-time
   "Evaluates expr and prints the time it took.  Returns the value of expr."
   [expr]

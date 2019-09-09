@@ -12,8 +12,8 @@
 ;setup infrastructure, generate channels and add monitor
 (def infrastructure (add-infrastructure message-exchange-pattern))
 ;Get the channels
-(def alice-to-bob (get-channel "alice" "bob" infrastructure))
-(def bob-to-alice (get-channel "bob" "alice" infrastructure))
+(def alice-to-bob (get-channel infrastructure "alice" "bob"))
+(def bob-to-alice (get-channel infrastructure "bob" "alice"))
 
 (defn- send-number-and-await-result
   "This function will use the protocol to send the number message to bob and wait for the result to know if it is greaterThan or lessThan threshold."
