@@ -15,9 +15,9 @@
   (get-rec [this name]))
 
 ;load helper namespace files!
-(load "validation/receivevalidation"
-      "validation/sendvalidation"
-      "validation/closevalidation")
+(load "validation/closevalidation"
+      "validation/receivevalidation"
+      "validation/sendvalidation")
 
 (declare contains-value? is-valid-interaction?)
 

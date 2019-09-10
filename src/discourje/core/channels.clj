@@ -27,11 +27,13 @@
             channels)))
 
 (defprotocol infrastructurable
-  (get-channel [this provider consumer]))
+  (get-channel [this provider consumer])
+  (get-channels [this]))
 
 (defrecord infrastructure [channels]
   infrastructurable
-  (get-channel [this provider consumer] (get-infra-channel provider consumer channels)))
+  (get-channel [this provider consumer] (get-infra-channel provider consumer channels))
+  (get-channels [this] (:channels this)))
 
 (defn generate-channel
   "Function to generate a channel between sender and receiver"
