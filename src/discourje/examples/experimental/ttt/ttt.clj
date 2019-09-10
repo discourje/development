@@ -1,4 +1,4 @@
-(ns discourje.examples.ttt.ttt)
+(ns discourje.examples.experimental.ttt.ttt)
 
 (def blank " ")
 (def nought "O")
