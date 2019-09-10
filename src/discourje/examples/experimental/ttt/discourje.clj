@@ -1,5 +1,5 @@
 (ns discourje.examples.experimental.ttt.discourje
-  (require [discourje.examples.ttt.ttt :refer :all]
+  (require [discourje.examples.experimental.ttt.ttt :refer :all]
            [discourje.examples.experimental.api :refer :all]
            [discourje.examples.experimental.dsl :refer :all]))
 
