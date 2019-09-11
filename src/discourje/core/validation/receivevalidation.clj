@@ -162,7 +162,7 @@
                                       (if (multiple-receivers? inter)
                                         (assoc inter :receivers (vec (remove #{receivers} (:receivers inter))))
                                         (get-next inter))
-                                      (or (satisfies? recursable inter) (satisfies? branchable inter))
+                                      (or (satisfies? recursable inter) (satisfies? branchable inter) (satisfies? closable inter))
                                       inter
                                       (and (instance? clojure.lang.LazySeq inter) (not (satisfies? interactable inter)))
                                       (first (filter some? inter))))))))]
@@ -201,7 +201,7 @@
     (satisfies? identifiable-recur active-interaction)
     (is-valid-communication? monitor sender receivers label (get-rec monitor (get-name active-interaction)))
     (satisfies? closable active-interaction)
-    (is-valid-close? sender receivers active-interaction)
+    false
     :else
     (do (log-error :unsupported-operation (format "Unsupported communication type: Communication invalid, type: %s" (type active-interaction)))
         false)))

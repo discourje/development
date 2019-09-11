@@ -85,5 +85,5 @@
   (is-current-multicast? [this label] (is-active-interaction-multicast? this @active-interaction label))
   (register-rec! [this rec] (add-rec-to-table recursion-set rec))
   (get-rec [this name] (name @recursion-set))
-  (valid-close? [this sender receiver] (is-valid-communication? this sender receiver nil @active-interaction))
+  (valid-close? [this sender receiver] (is-valid-close-communication? this sender receiver @active-interaction))
   (apply-close! [this channel] (apply-close-to-mon this channel active-interaction @active-interaction)))

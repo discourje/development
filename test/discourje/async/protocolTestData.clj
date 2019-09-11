@@ -1118,3 +1118,20 @@
                                                     [(->branch nil [[(->closer nil "a" "b" nil)]
                                                                    [(->interaction nil 1 "a" "b" #{} nil)
                                                                     (do-recur :test)]]nil)]nil)])))
+
+(defn interaction-with-parallel-and-closer [include-ids]
+  (if include-ids (create-protocol [(make-interaction 0 "a" "b")
+                                    (make-parallel [[(make-closer "a" "b")]
+                                                  [(make-interaction 1 "a" "b")]])])
+                  (create-protocol [(->interaction nil 0 "a" "b" #{} nil)
+                                    (->parallel nil [[(->closer nil "a" "b" nil)]
+                                                   [(->interaction nil 1 "a" "b" #{} nil)]] nil)])))
+(defn interaction-with-parallel-and-closer [include-ids]
+  (if include-ids (create-protocol [(make-interaction 0 "a" "b")
+                                    (make-parallel [[(make-closer "a" "b")
+                                                     (make-interaction 2 "b" "a")
+                                                     (make-closer "b" "a")]
+                                                    [(make-interaction 1 "a" "b")]])])
+                  (create-protocol [(->interaction nil 0 "a" "b" #{} nil)
+                                    (->parallel nil [[(->closer nil "a" "b" nil)]
+                                                     [(->interaction nil 1 "a" "b" #{} nil)]] nil)])))

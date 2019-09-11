@@ -179,7 +179,7 @@
                                :else
                                (apply-send! (get-monitor (first channel)) (get-provider (first channel)) (vec (for [c channel] (get-consumer c))) (get-label m)))
                              (cond
-                               (true (channel-closed? channel))
+                               (channel-closed? channel)
                                (log-error :incorrect-communication (format "Invalid communication: you are trying to send but the channel is closed! From %s to %s" (get-provider channel) (get-consumer channel)))
                                (false? (valid-send? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m)))
                                (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) (get-label m) (to-string (get-active-interaction (get-monitor channel)))))
