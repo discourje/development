@@ -1126,7 +1126,7 @@
                   (create-protocol [(->interaction nil 0 "a" "b" #{} nil)
                                     (->parallel nil [[(->closer nil "a" "b" nil)]
                                                    [(->interaction nil 1 "a" "b" #{} nil)]] nil)])))
-(defn interaction-with-parallel-and-closer [include-ids]
+(defn interaction-with-parallel-and-closer-with-interactions-in-parallel [include-ids]
   (if include-ids (create-protocol [(make-interaction 0 "a" "b")
                                     (make-parallel [[(make-closer "a" "b")
                                                      (make-interaction 2 "b" "a")
@@ -1135,3 +1135,5 @@
                   (create-protocol [(->interaction nil 0 "a" "b" #{} nil)
                                     (->parallel nil [[(->closer nil "a" "b" nil)]
                                                      [(->interaction nil 1 "a" "b" #{} nil)]] nil)])))
+
+;deeply nested choice, with recursion and tests for nested recur etc.

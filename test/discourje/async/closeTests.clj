@@ -81,7 +81,7 @@
   )
 
 (deftest close-interaction-with-parallel-and-closer-test
-  (let [channels (add-infrastructure (interaction-with-parallel-and-closer true))
+  (let [channels (add-infrastructure (interaction-with-parallel-and-closer-with-interactions-in-parallel true))
         ab (get-channel channels "a" "b")
         ba (get-channel channels "b" "a")]
     (set-logging-exceptions)
