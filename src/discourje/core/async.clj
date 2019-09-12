@@ -268,10 +268,11 @@
      (log-error :invalid-monitor (format "Cannot close the channel with pair %s %s since it has no monitor!" (get-provider channel) (get-consumer channel)))
      (nil? (get-chan channel))
      (log-error :invalid-channel (format "Cannot close the channel with pair %s %s since the internal core.async channel is nil!" (get-provider channel) (get-consumer channel)))
-     (valid-close? (get-monitor channel) (get-provider channel) (get-consumer channel))
-     (apply-close! (get-monitor channel) channel)
      :else
-     (log-error :invalid-channel "Cannot close channel %s to %s for unknown reason, please contact an admin if this problem endures!")))
+     (if (valid-close? (get-monitor channel) (get-provider channel) (get-consumer channel))
+       (apply-close! (get-monitor channel) channel)
+       (log-error :invalid-channel (format "Cannot close the channel with pair %s %s since another interaction is active!: %s" (get-provider channel) (get-consumer channel) (interaction-to-string (get-active-interaction (get-monitor channel))))))
+     ))
   ([sender receiver infra]
    (if (not (nil? infra))
      (close-channel! (get-channel infra sender receiver))

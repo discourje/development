@@ -6,10 +6,15 @@
   [action sender receiver]
   `(->interaction (uuid/v1) ~action ~sender ~receiver #{} nil))
 
+(defmacro close
+  "Create an close construct"
+  [sender receiver]
+  `(->closer (uuid/v1) ~sender ~receiver nil))
+
 (defmacro close!
   "Close channel pair"
-  ([sender receiver]
-   `(close-channel! ~sender ~receiver nil))
+  ([sender receiver infrastructure]
+   `(close-channel! ~sender ~receiver ~infrastructure))
   ([channel]
    `(close-channel! ~channel)))
 

@@ -8,7 +8,11 @@
   (mep (-->> "greet" "alice" "bob")
        (-->> "greet" "bob" "alice")
        (-->> "greet" "alice" "carol")
-       (-->> "greet" "carol" "alice")))
+       (-->> "greet" "carol" "alice")
+       (close "alice" "bob")
+       (close "bob" "alice")
+       (close "alice" "carol")
+       (close "carol" "alice")))
 
 ;Define custom channels, which differ in buffer size (1 and 2, 3, 4)
 (def a->b (chan "alice" "bob" 1))
@@ -28,10 +32,14 @@
 (defn- greet-bob-and-carol
   "This function will use the protocol to send the greet message to bob and carol."
   []
-  (>!! alice-to-bob (msg "greet" "Greetings, from alice!"))
+  (do(>!! alice-to-bob (msg "greet" "Greetings, from alice!"))
   (log-message (get-content (<!! bob-to-alice "greet")))
   (>!! alice-to-carol (->message "greet" "Greetings, from alice!"))
-  (log-message (get-content (<!! carol-to-alice "greet"))))
+  (log-message (get-content (<!! carol-to-alice "greet")))
+  (close! a->b)
+  (close! b->a)
+  (close! a->c)
+  (close! c->a)))
 
 (defn- receive-greet
   "This function will use the protocol to listen for the greet message."

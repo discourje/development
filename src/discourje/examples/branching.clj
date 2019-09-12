@@ -7,7 +7,9 @@
 (def message-exchange-pattern
   (mep (-->> "number" "alice" "bob")
        (choice [(-->> "greaterThan" "bob" "alice")]
-               [(-->> "lessThan" "bob" "alice")])))
+               [(-->> "lessThan" "bob" "alice")])
+       (close "alice" "bob")
+       (close "bob" "alice")))
 
 ;setup infrastructure, generate channels and add monitor
 (def infrastructure (add-infrastructure message-exchange-pattern))
@@ -23,7 +25,9 @@
   (let [response (<!! bob-to-alice ["greaterThan" "lessThan"])]
     (cond
       (= (get-label response) "greaterThan") (log-message (format "greaterThan received with message: %s" (get-content response)))
-      (= (get-label response) "lessThan") (log-message (format "lessThan received with message: %s" (get-content response))))))
+      (= (get-label response) "lessThan") (log-message (format "lessThan received with message: %s" (get-content response))))
+    (close! "alice" "bob" infrastructure)
+    (close! bob-to-alice)))
 
 (defn- receive-number
   "This function will use the protocol to listen for the number message. Check the number and threshold and send result"

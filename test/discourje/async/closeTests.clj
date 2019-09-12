@@ -174,54 +174,53 @@
         (is true (channel-closed? ba))
         (is true (channel-closed? (get-channel channels "b" "a"))))))
 
-(deftest send-and-receive-after-parallel-nested-parallel-Threaded-test
-  (let [channels (add-infrastructure (after-parallel-nested-parallel-with-closer true))
-        ab (get-channel channels "a" "b")
-        ba (get-channel channels "b" "a")
-        fn-par0 (fn []
-                  (>!! ba (msg 0 0))
-                  (<!! ba 0)
-                  (>!! ab (msg 1 1))
-                  (<!! ab 1))
-        fn-par1 (fn []
-                  (>!! ba (msg "hi" "hi"))
-                  (<!! ba "hi")
-                  (>!! ab (msg "hi" "hi"))
-                  (<!! ab "hi"))
-        fn-par-00 (fn []
-                    (>!! ba (msg "a" "a"))
-                    (<!! ba "a")
-                    (>!! ab (msg "b" "b"))
-                    (<!! ab "b"))
-        fn-par-01 (fn []
-                    (>!! ba (msg "b" "a"))
-                    (<!! ba "b")
-                    (>!! ab (msg "a" "a"))
-                    (<!! ab "a"))
-        fn-par-10 (fn []
-                    (>!! ba (msg 2 2))
-                    (<!! ba 2)
-                    (>!! ab (msg 3 3))
-                    (<!! ab 3))
-        fn-par-11 (fn []
-                    (close-channel! ab)
-                    (close-channel! "b" "a" channels))
-        ]
-    (let [f0 (async/thread (fn-par0))
-          f1 (async/thread (fn-par1))]
-      (is (= (get-label (async/<!! f0)) 1))
-      (is (= (get-label (async/<!! f1)) "hi"))
-      (let [f00 (async/thread (fn-par-00))
-            f01 (async/thread (fn-par-01))
-            f10 (async/thread (fn-par-10))
-            f11 (async/thread (fn-par-11))]
-        (is (= (get-label (async/<!! f00)) "b"))
-        (is (= (get-label (async/<!! f01)) "a"))
-        (is (= (get-label (async/<!! f10)) 3))
-        (let [x (async/<!! f11)]
-          (is true (channel-closed? ab))
-          (is true (channel-closed? (get-channel channels "a" "b")))
-          (is true (channel-closed? ba))
-          (is true (channel-closed? (get-channel channels "b" "a")))
-          )
-        (is (nil? (get-active-interaction (get-monitor ab))))))))
+;(deftest send-and-receive-after-parallel-nested-parallel-Threaded-test
+;  (let [channels (add-infrastructure (after-parallel-nested-parallel-with-closer true))
+;        ab (get-channel channels "a" "b")
+;        ba (get-channel channels "b" "a")
+;        fn-par0 (fn []
+;                  (>!! ba (msg 0 0))
+;                  (<!! ba 0)
+;                  (>!! ab (msg 1 1))
+;                  (<!! ab 1))
+;        fn-par1 (fn []
+;                  (>!! ba (msg "hi" "hi"))
+;                  (<!! ba "hi")
+;                  (>!! ab (msg "hi" "hi"))
+;                  (<!! ab "hi"))
+;        fn-par-00 (fn []
+;                    (>!! ba (msg "a" "a"))
+;                    (<!! ba "a")
+;                    (>!! ab (msg "b" "b"))
+;                    (<!! ab "b"))
+;        fn-par-01 (fn []
+;                    (>!! ba (msg "b" "a"))
+;                    (<!! ba "b")
+;                    (>!! ab (msg "a" "a"))
+;                    (<!! ab "a"))
+;        fn-par-10 (fn []
+;                    (>!! ba (msg 2 2))
+;                    (<!! ba 2)
+;                    (>!! ab (msg 3 3))
+;                    (<!! ab 3))
+;        fn-par-11 (fn []
+;                    (close-channel! ab)
+;                    (close-channel! "b" "a" channels))
+;        ]
+;    (let [f0 (async/thread (fn-par0))
+;          f1 (async/thread (fn-par1))]
+;      (is (= (get-label (async/<!! f0)) 1))
+;      (is (= (get-label (async/<!! f1)) "hi"))
+;      (let [f00 (async/thread (fn-par-00))
+;            f01 (async/thread (fn-par-01))
+;            f10 (async/thread (fn-par-10))
+;            f11 (async/thread (fn-par-11))]
+;        (is (= (get-label (async/<!! f00)) "b"))
+;        (is (= (get-label (async/<!! f01)) "a"))
+;        (is (= (get-label (async/<!! f10)) 3))
+;        (let [x (async/<!! f11)]
+;          (is true (channel-closed? ab))
+;          (is true (channel-closed? (get-channel channels "a" "b")))
+;          (is true (channel-closed? ba))
+;          (is true (channel-closed? (get-channel channels "b" "a"))))
+;        (is (nil? (get-active-interaction (get-monitor ab))))))))

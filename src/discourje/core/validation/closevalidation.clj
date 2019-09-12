@@ -11,6 +11,7 @@
 (defn is-valid-close-communication?
   "Checks if communication is valid by comparing input to the active monitor"
   [monitor sender receivers active-interaction]
+  (println (format "is valid close? %s %s interaction %s" sender receivers (interaction-to-string active-interaction)))
   (cond
     (satisfies? closable active-interaction)
     (is-valid-close? sender receivers active-interaction)
