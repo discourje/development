@@ -1115,17 +1115,17 @@
                                                                     (do-recur :test)]])])])
                   (create-protocol [(->interaction nil 0 "a" "b" #{} nil)
                                     (->recursion nil :test
-                                                    [(->branch nil [[(->closer nil "a" "b" nil)]
-                                                                   [(->interaction nil 1 "a" "b" #{} nil)
-                                                                    (do-recur :test)]]nil)]nil)])))
+                                                 [(->branch nil [[(->closer nil "a" "b" nil)]
+                                                                 [(->interaction nil 1 "a" "b" #{} nil)
+                                                                  (do-recur :test)]] nil)] nil)])))
 
 (defn interaction-with-parallel-and-closer [include-ids]
   (if include-ids (create-protocol [(make-interaction 0 "a" "b")
                                     (make-parallel [[(make-closer "a" "b")]
-                                                  [(make-interaction 1 "a" "b")]])])
+                                                    [(make-interaction 1 "a" "b")]])])
                   (create-protocol [(->interaction nil 0 "a" "b" #{} nil)
                                     (->parallel nil [[(->closer nil "a" "b" nil)]
-                                                   [(->interaction nil 1 "a" "b" #{} nil)]] nil)])))
+                                                     [(->interaction nil 1 "a" "b" #{} nil)]] nil)])))
 (defn interaction-with-parallel-and-closer-with-interactions-in-parallel [include-ids]
   (if include-ids (create-protocol [(make-interaction 0 "a" "b")
                                     (make-parallel [[(make-closer "a" "b")
@@ -1137,3 +1137,36 @@
                                                      [(->interaction nil 1 "a" "b" #{} nil)]] nil)])))
 
 ;deeply nested choice, with recursion and tests for nested recur etc.
+(defn interaction-with-nested-choice-and-closer [include-ids]
+  (if include-ids (create-protocol [(make-interaction 0 "a" "b")
+                                    (make-choice [[(make-choice [[(make-interaction 1 "a" "b")]])]
+                                                  [(make-choice [[(make-closer "a" "b")]])]])])
+                  (create-protocol [(->interaction nil 0 "a" "b" #{} nil)
+                                    (->branch nil [[(->branch nil [[(->interaction nil 1 "a" "b" #{} nil)]] nil)]
+                                                   [(->branch nil [[(->closer nil "a" "b" nil)]] nil)]] nil)])))
+
+(defn after-parallel-nested-parallel-with-closer [include-ids]
+  (if include-ids (create-protocol [(make-parallel [[(make-interaction 0 "b" "a")
+                                                     (make-interaction 1 "a" "b")]
+                                                    [(make-interaction "hi" "b" "a")
+                                                     (make-interaction "hi" "a" "b")]])
+                                    (make-parallel [[(make-parallel [[(make-interaction "a" "b" "a")
+                                                                      (make-interaction "b" "a" "b")]
+                                                                     [(make-interaction "b" "b" "a")
+                                                                      (make-interaction "a" "a" "b")]])]
+                                                    [(make-parallel [[(make-interaction 2 "b" "a")
+                                                                      (make-interaction 3 "a" "b")]
+                                                                     [(make-closer "a" "b")
+                                                                      (make-closer "b" "a")]])]])])
+                  (create-protocol [(->parallel nil [[(->interaction nil 0 "b" "a" #{} nil)
+                                                      (->interaction nil 1 "a" "b" #{} nil)]
+                                                     [(->interaction nil "hi" "b" "a" #{} nil)
+                                                      (->interaction nil "hi" "a" "b" #{} nil)]] nil)
+                                    (->parallel nil [[(->parallel nil [[(->interaction nil "a" "b" "a" #{} nil)
+                                                                        (->interaction nil "b" "a" "b" #{} nil)]
+                                                                       [(->interaction nil "b" "b" "a" #{} nil)
+                                                                        (->interaction nil "a" "a" "b" #{} nil)]] nil)]
+                                                     [(->parallel nil [[(->interaction nil 2 "b" "a" #{} nil)
+                                                                        (->interaction nil 3 "a" "b" #{} nil)]
+                                                                       [(->closer nil "a" "b" nil)
+                                                                        (->closer nil"b" "a" nil)]] nil)]] nil)])))

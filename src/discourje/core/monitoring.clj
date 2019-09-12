@@ -14,6 +14,11 @@
   (register-rec! [this rec])
   (get-rec [this name]))
 
+(defn- interaction-to-string
+  "Stringify an interaction, returns empty string if the given interaction is nil"
+  [interaction]
+  (if (nil? interaction) "" (to-string interaction)))
+
 ;load helper namespace files!
 (load "validation/closevalidation"
       "validation/receivevalidation"
@@ -21,10 +26,6 @@
 
 (declare contains-value? is-valid-interaction?)
 
-(defn- interaction-to-string
-  "Stringify an interaction, returns empty string if the given interaction is nil"
-  [interaction]
-  (if (nil? interaction) "" (to-string interaction)))
 
 (defn- is-valid-interaction?
   "Is the given interaction valid compared to the active-interaction of the monitor"
