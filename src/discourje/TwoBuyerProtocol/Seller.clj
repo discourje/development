@@ -36,7 +36,13 @@
           (>!! [s-b2 s-b1] (msg "date" (get-random-date 5)))
           (order-book infra))
         (= "quit" (get-label choice-by-buyer2))
-        (end-reached "Quit!")))))
+        (do
+          (close! "buyer1" "seller" infra)
+          (close! "buyer1" "buyer2" infra)
+          (close! "seller" "buyer1" infra)
+          (close! "seller" "buyer2" infra)
+          (close! "buyer2" "seller" infra)
+          (end-reached "Quit!"))))))
 
 ;wait for title
 ;send quote to buyer1 and buyer2

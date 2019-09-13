@@ -17,7 +17,12 @@
             (-->> "address" "buyer2" "seller")
             (-->> "date" "seller" ["buyer1" "buyer2"])
             (continue :order-book)]
-           [(-->> "quit" "buyer2" "seller")]))))
+           [(-->> "quit" "buyer2" "seller")
+            (close "buyer1" "seller")
+            (close "buyer1" "buyer2")
+            (close "seller" "buyer1")
+            (close "seller" "buyer2")
+            (close "buyer2" "seller")]))))
 
 ;generate the infra structure for the protocol
 (def infrastructure (add-infrastructure two-buyer-protocol))

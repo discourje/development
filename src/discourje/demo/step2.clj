@@ -9,7 +9,9 @@
       [(-->> Quote "seller" "buyer")
        (-->> Order "buyer" "seller")
        (-->> OrderAcknowledgement "seller" "buyer")]
-      [(-->> OutOfStock "seller" "buyer")])))
+      [(-->> OutOfStock "seller" "buyer")])
+    (close "buyer" "seller")
+    (close "seller" "buyer")))
 
 ;Second step is to add infra structure to our MEP
 (def infra (add-infrastructure buy-goods))
