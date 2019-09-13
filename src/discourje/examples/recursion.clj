@@ -12,7 +12,9 @@
             (choice
               [(-->> "greaterThan" "bob" "alice")
                (continue :generate)]
-              [(-->> "lessThan" "bob" "alice")]))))
+              [(-->> "lessThan" "bob" "alice")
+               (close "alice" "bob")
+               (close "bob" "alice")]))))
 
 ;setup infrastructure, generate channels and add monitor
 (def infrastructure (add-infrastructure message-exchange-pattern))
@@ -31,7 +33,9 @@
       (do (log-message (format "greaterThan received with message: %s" (get-content response)))
           (send-number-and-await-result threshold))
       (= (get-label response) "lessThan")
-      (log-message (format "lessThan received with message: %s" (get-content response))))))
+      (do (log-message (format "lessThan received with message: %s" (get-content response)))
+          (close! alice-to-bob)
+          (close! bob-to-alice)))))
 
 (defn- receive-number
   "This function will use the protocol to listen for the number message. Check the number and threshold and send result"

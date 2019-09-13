@@ -29,17 +29,22 @@
 (def alice-to-carol (get-channel infrastructure "alice" "carol"))
 (def carol-to-alice (get-channel infrastructure "carol" "alice"))
 
+(defn- close-all
+  "This function will use the protocol to listen for the greet message."
+  []
+  (do (close! alice-to-bob)
+      (close! bob-to-alice)
+      (close! alice-to-carol)
+      (close! carol-to-alice)))
+
 (defn- greet-bob-and-carol
   "This function will use the protocol to send the greet message to bob and carol."
   []
-  (do(>!! alice-to-bob (msg "greet" "Greetings, from alice!"))
-  (log-message (get-content (<!! bob-to-alice "greet")))
-  (>!! alice-to-carol (->message "greet" "Greetings, from alice!"))
-  (log-message (get-content (<!! carol-to-alice "greet")))
-  (close! a->b)
-  (close! b->a)
-  (close! a->c)
-  (close! c->a)))
+  (do (>!! alice-to-bob (msg "greet" "Greetings, from alice!"))
+      (log-message (get-content (<!! bob-to-alice "greet")))
+      (>!! alice-to-carol (->message "greet" "Greetings, from alice!"))
+      (log-message (get-content (<!! carol-to-alice "greet")))
+      (close-all)))
 
 (defn- receive-greet
   "This function will use the protocol to listen for the greet message."

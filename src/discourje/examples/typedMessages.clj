@@ -8,7 +8,11 @@
   (mep (-->> String "alice" "bob")
        (-->> String "bob" "alice")
        (-->> String "alice" "carol")
-       (-->> String "carol" "alice")))
+       (-->> String "carol" "alice")
+       (close "alice" "bob")
+       (close "bob" "alice")
+       (close "alice" "carol")
+       (close "carol" "alice")))
 
 ;setup infrastructure, generate channels and add monitor
 (def infrastructure (add-infrastructure message-exchange-pattern))
@@ -26,7 +30,11 @@
   (>!! alice-to-bob "Greetings, from alice!")
   (log-message (get-content (<!! bob-to-alice String)))
   (>!! alice-to-carol "Greetings, from alice!")
-  (log-message (get-content (<!! carol-to-alice String))))
+  (log-message (get-content (<!! carol-to-alice String)))
+  (close! alice-to-bob)
+  (close! bob-to-alice)
+  (close! alice-to-carol)
+  (close! carol-to-alice))
 
 (defn- receive-greet
   "This function will use the protocol to listen for the greet message."
