@@ -921,7 +921,7 @@
             (is (nil? (get-active-interaction (get-monitor ab)))))))))
 
 (deftest send-and-receive-parallel-with-choice-with-parallel-multicasts-test
-  (let [channels (add-infrastructure (parallel-with-choice-with-parallel true))
+  (let [channels (add-infrastructure (parallel-with-choice-with-parallelMulticast true))
         ab (get-channel channels "a" "b")
         ac (get-channel channels "a" "c")
         ba (get-channel channels "b" "a")

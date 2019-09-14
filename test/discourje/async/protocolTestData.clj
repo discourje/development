@@ -871,7 +871,7 @@
                                                       (->interaction nil "hi" "a" "b" #{} nil)]] nil)
                                     (->interaction nil 6 "b" "a" #{} nil)])))
 
-(defn parallel-with-choice-with-parallel [include-ids]
+(defn parallel-with-choice-with-parallelMulticast [include-ids]
   (if include-ids (create-protocol [(make-parallel [[(make-choice [
                                                                    [(make-parallel [
                                                                                     [(make-choice [[(make-interaction 1 "a" ["b" "c"])]

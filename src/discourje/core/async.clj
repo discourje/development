@@ -5,8 +5,6 @@
             [clojure.core.async.impl.protocols :as bufs])
   (:import (clojure.lang Seqable, Atom)))
 
-; Should close validation include other open branches in parallels, like: send-and-receive-after-parallel-nested-parallel-Threaded-test
-;This means close cannot be called until all communications in the active parallel are done, when they use the same channel pair.
 (defprotocol sendable
   (get-label [this])
   (get-content [this]))
@@ -28,8 +26,6 @@
       "interactions"
       "channels"
       "monitoring"
-      "validation/receivevalidation"
-      "validation/sendvalidation"
       "buffers"
       "wildcard"
       "nestedMonitorLinking")
