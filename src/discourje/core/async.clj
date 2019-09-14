@@ -5,10 +5,6 @@
             [clojure.core.async.impl.protocols :as bufs])
   (:import (clojure.lang Seqable, Atom)))
 
-;Close in DSL
-; Closables are not taken into consideration when infra structure is generated to reduce the chance for unused channels!
-; must increase major version after this merge!
-;close! is done AFTER the validation has succeeded and active interaction is swapped!
 ; Should close validation include other open branches in parallels, like: send-and-receive-after-parallel-nested-parallel-Threaded-test
 ;This means close cannot be called until all communications in the active parallel are done, when they use the same channel pair.
 (defprotocol sendable

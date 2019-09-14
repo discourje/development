@@ -33,7 +33,7 @@
 (defrecord infrastructure [channels]
   infrastructurable
   (get-channel [this provider consumer] (get-infra-channel provider consumer channels))
-  (get-channels [this] (:channels this)))
+  (get-channels [this] channels))
 
 (defn generate-channel
   "Function to generate a channel between sender and receiver"
