@@ -180,15 +180,14 @@
                                :else
                                (apply-send! (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m)))))
             ]
-        (loop [i 0
-               send-fn-result (send-fn)]
-          (if send-fn-result
-            (if (vector? channel)
-              (allow-sends channel m)
-              (allow-send channel m))
-            (if (> i 0)
-              send-fn-result
-              (recur 1 (send-fn))))))))
+        (loop [send-result (send-fn)]
+          (if (nil? send-result)
+            nil
+            (if send-result
+              (if (vector? channel)
+                (allow-sends channel m)
+                (allow-send channel m))
+              (recur (send-fn))))))))
 
 (defn <!!
   "take form channel"

@@ -74,8 +74,7 @@
       (>!! ba "Hello A")
       (let [b->a (<!! ba)]
         (is (= java.lang.String (get-label b->a)))
-        (is (= "Hello A" (get-content b->a)))
-        ))))
+        (is (= "Hello A" (get-content b->a)))))))
 
 (deftest send-receive-multicast-protocol-test
   (let [channels (generate-infrastructure (testMulticastProtocol true))
