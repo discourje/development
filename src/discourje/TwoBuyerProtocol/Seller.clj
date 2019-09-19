@@ -22,10 +22,10 @@
   (log-message (format "Protocol ended with: %s" quit)))
 
 (defn order-book "Order book from seller's perspective" [infra]
-  (let [b1-s (get-channel "buyer1" "seller" infra)
-        s-b1 (get-channel "seller" "buyer1" infra)
-        s-b2 (get-channel "seller" "buyer2" infra)
-        b2-s (get-channel "buyer2" "seller" infra)
+  (let [b1-s (get-channel infra "buyer1" "seller")
+        s-b1 (get-channel infra "seller" "buyer1")
+        s-b2 (get-channel infra "seller" "buyer2")
+        b2-s (get-channel infra "buyer2" "seller")
         title(<!! b1-s "title")]
     (>!! [s-b1 s-b2] (msg "quote" (quote-book (get-content title))))
     (let [choice-by-buyer2 (<!! b2-s ["ok" "quit"])]
@@ -36,7 +36,13 @@
           (>!! [s-b2 s-b1] (msg "date" (get-random-date 5)))
           (order-book infra))
         (= "quit" (get-label choice-by-buyer2))
-        (end-reached "Quit!")))))
+        (do
+          (close! "buyer1" "seller" infra)
+          (close! "buyer1" "buyer2" infra)
+          (close! "seller" "buyer1" infra)
+          (close! "seller" "buyer2" infra)
+          (close! "buyer2" "seller" infra)
+          (end-reached "Quit!"))))))
 
 ;wait for title
 ;send quote to buyer1 and buyer2

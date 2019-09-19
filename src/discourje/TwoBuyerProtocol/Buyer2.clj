@@ -10,9 +10,9 @@
   "Open University, Valkenburgerweg 177, 6419 AT, Heerlen")
 
 (defn order-book "Order a book from buyer2's perspective" [infra]
-  (let [s-b2 (get-channel "seller" "buyer2" infra)
-        b1-b2 (get-channel "buyer1" "buyer2" infra)
-        b2-s (get-channel "buyer2" "seller" infra)
+  (let [s-b2 (get-channel infra"seller" "buyer2")
+        b1-b2 (get-channel infra "buyer1" "buyer2")
+        b2-s (get-channel infra "buyer2" "seller")
         quote (get-content (<!!! s-b2 "quote"))
         quote-div (get-content (<!! b1-b2 "quote-div"))]
     (if (contribute? quote quote-div)

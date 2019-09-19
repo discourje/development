@@ -17,13 +17,14 @@ Communication is blocking when desired (configure logging levels) and order amon
 <b>Current supported functionality:</b>
 - 
 - [Sequencing](src/discourje/examples/sequencing.clj)
-- [Parallelisation](src/discourje/examples/parallelization.clj)
+- [Parallelism](src/discourje/examples/parallelization.clj)
 - [Multicast](src/discourje/examples/multicast.clj)
 - [Branching](src/discourje/examples/branching.clj)
 - [Recursion](src/discourje/examples/recursion.clj)
 - [Custom Channels](src/discourje/examples/customChannels.clj)
 - [Typed Messages](src/discourje/examples/typedMessages.clj)
 - [Logging Levels](src/discourje/examples/logging.clj)
+- Validation on closing channels, all examples implement this!
 - Nesting: Parallelism, Recursion and Branching constructs support nesting!
 
 <i>See examples for each function for more info.</i>
@@ -47,6 +48,8 @@ Step 1: A message exchange pattern can be specified by the following constructs
 - <b>choice [branch & more]</b>: Specifies a `choice form` which validates the first monitor in all branches and continues on target branch when an action is verified. Notice it supports variadic input arguments.
 - <b>rec [name interaction & more]</b>: Specifies a `recursion form` which recurs when the protocol encounters a `continue [name]`. Recur is matched by name and also supports nesting!
 - <b>continue [name]</b>: Specifies a recursion back to the matching `rec`.
+- <b>par [parallel & more]</b>: Specifies a `parallel form` supports traversing multiple branches in parallel. Notice it supports variadic input arguments.
+- <b>close [sender receiver infrastructure]|[channel]</b>: Specifies a `close form` that validates if a channel is allowed to be closed.
 
 Step 2: Generate the infrastructure (channels)
 -
@@ -59,6 +62,7 @@ Step 3: Use Discourje put & take abstractions
 -
 - <b>>!! [channel(s) message]</b>: Put function on channel(s), channels can be a vector of channels to support parallelism (see examples!)
 - <b><!! [channel label(s)]</b>:  Take operation of channel matching label(s). When Expecting a choice to be made by sender, you can listen for multiple labels and act upon receiving a specific one.
+- <b><!!! [channel label(s)]</b>:  Take operation of channel matching label(s), when used with multicast it blocks intill all receivers in the multicast have received their values.
 
 Note: Data being send through Discourje will always be encapsulated in a message. When pure data is transmitted through Discourje a message will be generated with Data type as label, and data as content. (See typedMessages example)
 
@@ -90,9 +94,10 @@ See [Logging](src/discourje/examples/logging.clj) for an example.
 Example: Hello World
 -
 ```clojure
-;"This function will generate a mep with 1 interaction to send and receive the hello world message."
+;"This function will generate a mep with 1 interaction to send and receive the hello world message and a close."
 (def message-exchange-pattern
-  (mep (-->> "helloWorld" "user" "world")))
+  (mep (-->> "helloWorld" "user" "world")
+       (close "user" "world")))
 ```
 Then generate the infrastructure:
 ```clojure
@@ -104,14 +109,15 @@ The next step is to get the required channel for communication
 ```clojure
 (def user-to-world (get-channel "user" "world" infrastructure))
 ```
-In the following example we implemented two functions which represent user and world
+In the following example we implemented two functions which represent user and world.
 ```clojure
 (defn- send-to-world "This function will use the protocol to send the Hello World! message to world."
   [] (>!! user-to-world (msg "helloWorld" "Hello World!")))
 
 (defn- receive-from-user "This function will use the protocol to listen for the helloWorld message."
   [] (let [message (<!! user-to-world "helloWorld")]
-       (log-message "World received message: " (get-content message))))
+       (log-message "World received message: " (get-content message))
+       (close! user-to-world)))
 ```
 
 The developer is then able to communicate safely among participants.

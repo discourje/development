@@ -8,7 +8,7 @@
   (cond
     (or (nil? it) (satisfies? identifiable-recur nth-i))
     nth-i
-    (or (satisfies? interactable it) (satisfies? identifiable-recur it))
+    (or (satisfies? interactable it) (satisfies? identifiable-recur it) (satisfies? closable it))
     (assoc nth-i :next it)
     (satisfies? branchable it)
     (let [branches (for [b (get-branches it)] (nest-mep (if-not (nil? (:next it)) (conj b (:next it)) b)))]
@@ -19,7 +19,7 @@
     (satisfies? recursable it)
     (let [rec (nest-mep (if-not (nil? (:next it)) (conj (get-recursion it) (:next it)) (get-recursion it)))]
       (assoc nth-i :next (assoc (assoc it :next nil) :recursion rec)))
-    :else (log-error :invalid-communication-type (format ("Cannot link %s since this is an unknown communication type!" it)))))
+    :else (log-error :invalid-communication-type (format "Cannot link %s since this is an unknown communication type!" it))))
 
 (defn- assoc-last-interaction
   "assoc the last interaction in the list when it is of type branch parallel or recursion"
@@ -54,7 +54,7 @@
               (recur (- i 1) linked))
             interactions)))
       (cond
-        (or (satisfies? interactable (first interactions)) (satisfies? identifiable-recur (first interactions)))
+        (or (satisfies? interactable (first interactions)) (satisfies? identifiable-recur (first interactions)) (satisfies? closable (first interactions)))
         (first interactions)
         (or (satisfies? branchable (first interactions)) (satisfies? recursable (first interactions)) (satisfies? parallelizable (first interactions)))
         (assoc-last-interaction (first interactions))))))

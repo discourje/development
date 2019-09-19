@@ -28,9 +28,9 @@
                                 [(-->> 1 "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
                                 (vec (for [w (range workers)] (-->> 1 (format "w%s" w) "m")))))))) ; workers to master
          infra (generate-infrastructure workers-prot)
-         m->w (vec (for [w (range workers)] (get-channel "m" (format "w%s" w) infra)))
-         w->m (vec (for [w (range workers)] {:take (get-channel "m" (format "w%s" w) infra)
-                                             :put  (get-channel (format "w%s" w) "m" infra)}))
+         m->w (vec (for [w (range workers)] (get-channel infra "m" (format "w%s" w) )))
+         w->m (vec (for [w (range workers)] {:take (get-channel infra "m" (format "w%s" w))
+                                             :put  (get-channel infra (format "w%s" w) "m")}))
          msg (msg 1 1)
          time (custom-time
                 (do
@@ -63,9 +63,9 @@
                                   [(-->> 1 "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
                                   (vec (for [w (range workers)] (-->> 1 (format "w%s" w) "m")))))))) ; workers to master
            infra (generate-infrastructure workers-prot)
-           m->w (vec (for [w (range workers)] (get-channel "m" (format "w%s" w) infra)))
-           w->m (vec (for [w (range workers)] {:take (get-channel "m" (format "w%s" w) infra)
-                                               :put  (get-channel (format "w%s" w) "m" infra)}))
+           m->w (vec (for [w (range workers)] (get-channel infra "m" (format "w%s" w))))
+           w->m (vec (for [w (range workers)] {:take (get-channel infra "m" (format "w%s" w))
+                                               :put  (get-channel infra (format "w%s" w) "m")}))
            msg (msg 1 1)
            time (custom-time
                   (doseq [_ (range iterations)]
@@ -130,9 +130,9 @@
                                 [(-->> 1 "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
                                 (make-parallel (vec (for [w (range workers)] [(-->> 1 (format "w%s" w) "m")])))))))) ; workers to master
          infra (generate-infrastructure workers-prot)
-         m->w (vec (for [w (range workers)] (get-channel "m" (format "w%s" w) infra)))
-         w->m (vec (for [w (range workers)] {:take (get-channel "m" (format "w%s" w) infra)
-                                             :put  (get-channel (format "w%s" w) "m" infra)}))
+         m->w (vec (for [w (range workers)] (get-channel infra"m" (format "w%s" w))))
+         w->m (vec (for [w (range workers)] {:take (get-channel infra"m" (format "w%s" w))
+                                             :put  (get-channel infra (format "w%s" w) "m")}))
          msg (msg 1 1)
          time (custom-time
                 (do
@@ -160,9 +160,9 @@
                                   [(-->> 1 "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
                                   (make-parallel (vec (for [w (range workers)] [(-->> 1 (format "w%s" w) "m")])))))))) ; workers to master
            infra (generate-infrastructure workers-prot)
-           m->w (vec (for [w (range workers)] (get-channel "m" (format "w%s" w) infra)))
-           w->m (vec (for [w (range workers)] {:take (get-channel "m" (format "w%s" w) infra)
-                                               :put  (get-channel (format "w%s" w) "m" infra)}))
+           m->w (vec (for [w (range workers)] (get-channel infra"m" (format "w%s" w))))
+           w->m (vec (for [w (range workers)] {:take (get-channel infra"m" (format "w%s" w))
+                                               :put  (get-channel infra (format "w%s" w) "m")}))
            msg (msg 1 1)
            time (custom-time
                   (doseq [_ (range iterations)]
@@ -192,9 +192,9 @@
                                 [(-->> 1 "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
                                 (vec (for [w (range workers)] (-->> 1 (format "w%s" w) "m")))))))) ; workers to master
          infra (generate-infrastructure workers-prot)
-         m->w (vec (for [w (range workers)] (get-channel "m" (format "w%s" w) infra)))
-         w->m (vec (for [w (range workers)] {:take (get-channel "m" (format "w%s" w) infra)
-                                             :put  (get-channel (format "w%s" w) "m" infra)}))
+         m->w (vec (for [w (range workers)] (get-channel infra "m" (format "w%s" w))))
+         w->m (vec (for [w (range workers)] {:take (get-channel infra "m" (format "w%s" w))
+                                             :put  (get-channel infra (format "w%s" w) "m")}))
          msg (msg 1 1)
          time (custom-time
                 (do
@@ -227,9 +227,9 @@
                                   [(-->> 1 "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
                                   (vec (for [w (range workers)] (-->> 1 (format "w%s" w) "m")))))))) ; workers to master
            infra (generate-infrastructure workers-prot)
-           m->w (vec (for [w (range workers)] (get-channel "m" (format "w%s" w) infra)))
-           w->m (vec (for [w (range workers)] {:take (get-channel "m" (format "w%s" w) infra)
-                                               :put  (get-channel (format "w%s" w) "m" infra)}))
+           m->w (vec (for [w (range workers)] (get-channel infra "m" (format "w%s" w))))
+           w->m (vec (for [w (range workers)] {:take (get-channel infra "m" (format "w%s" w))
+                                               :put  (get-channel infra (format "w%s" w) "m")}))
            msg (msg 1 1)
            time (custom-time
                   (doseq [_ (range iterations)]

@@ -11,8 +11,8 @@
     (-->> "Bar" "Bob" "Alice")))
 
 (def infra (add-infrastructure foo-bar-protocol))
-(def alice-to-bob (get-channel "Alice" "Bob" infra))
-(def bob-to-alice (get-channel "Bob" "Alice" infra))
+(def alice-to-bob (get-channel infra "Alice" "Bob"))
+(def bob-to-alice (get-channel infra "Bob" "Alice"))
 
 (defn alice []
   (>!! alice-to-bob (msg "Foo" "Foo content"))
@@ -33,8 +33,8 @@
     (-->> "Quote" "Seller" "Buyer1")))
 
 (def infra (add-infrastructure protocol))
-(def buyer1-to-seller (get-channel "Buyer1" "Seller" infra))
-(def seller-to-buyer1 (get-channel "Seller" "Buyer1" infra))
+(def buyer1-to-seller (get-channel  infra "Buyer1" "Seller"))
+(def seller-to-buyer1 (get-channel  infra "Seller" "Buyer1"))
 
 (defn buyer1 []
   (println "Buyer1 to request quote for book.")
@@ -57,10 +57,10 @@
     (-->> java.lang.Integer "Carol" "Alice")))
 
 (def infra (add-infrastructure integer-protocol))
-(def alice-to-bob (get-channel "Alice" "Bob" infra))
-(def alice-to-carol (get-channel "Alice" "Carol" infra))
-(def carol-to-alice (get-channel "Carol" "Alice" infra))
-(def bob-to-alice (get-channel "Bob" "Alice" infra))
+(def alice-to-bob (get-channel infra "Alice" "Bob"))
+(def alice-to-carol (get-channel infra "Alice" "Carol"))
+(def carol-to-alice (get-channel infra"Carol" "Alice"))
+(def bob-to-alice (get-channel infra "Bob" "Alice"))
 ;------------BEFORE-----------------
 (defn alice []
   (>!! alice-to-bob (msg java.lang.Integer 1))

@@ -15,9 +15,9 @@
     randomN))
 
 (defn order-book "order a book from buyer1's perspective" [infra]
-  (let [b1-s (get-channel "buyer1" "seller" infra)
-        s-b1 (get-channel "seller" "buyer1" infra)
-        b1-b2 (get-channel "buyer1" "buyer2" infra)]
+  (let [b1-s (get-channel infra "buyer1" "seller")
+        s-b1 (get-channel infra "seller" "buyer1")
+        b1-b2 (get-channel infra "buyer1" "buyer2")]
     (>!! b1-s (msg "title" (generate-book)))
     (let [quote (<!!! s-b1 "quote")
           div (quote-div (get-content quote))]

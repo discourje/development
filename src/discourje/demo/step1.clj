@@ -13,7 +13,9 @@
       [(-->> Quote "seller" "buyer")
        (-->> Order "buyer" "seller")
        (-->> OrderAcknowledgement "seller" "buyer")]
-      [(-->> OutOfStock "seller" "buyer")])))
+      [(-->> OutOfStock "seller" "buyer")])
+    (close "buyer" "seller")
+    (close "seller" "buyer")))
 
 ;Next, lets fix those channels.
 
