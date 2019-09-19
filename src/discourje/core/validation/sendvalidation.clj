@@ -100,6 +100,8 @@
                          (set-send-on-par sender receivers label target-interaction valid-rec monitor)
                          (assoc-sender-to-interaction valid-rec sender))
                        p))
+                   (satisfies? closable p)
+                   p
                    )))]
     (let [duplicate-par (first (filter some? (filter (fn [p] (= (get-id p) (get-id target-interaction))) pars)))]
       (if (nil? duplicate-par)
@@ -152,6 +154,8 @@
          (if (satisfies? parallelizable active-interaction)
            (<= (count (get-parallel active-interaction)) 1)
            true))
+    (satisfies? closable active-interaction)
+    false
     :else
     (do (log-error :unsupported-operation (format "Unsupported communication type: Communication invalid, type: %s" (type active-interaction)))
         false)))

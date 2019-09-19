@@ -34,8 +34,8 @@
 
 (defn discourje-one-buyer [iterations]
   (let [infra (vec (for [_ (range iterations)] (add-infrastructure buy-goods)))
-        b->s (vec (for [i infra] (get-channel "buyer" "seller" i)))
-        s->b (vec (for [i infra] (get-channel "seller" "buyer" i)))
+        b->s (vec (for [i infra] (get-channel i "buyer" "seller")))
+        s->b (vec (for [i infra] (get-channel i "seller" "buyer")))
         product {:product-type "book" :content {:title "The joy of Clojure"}}
         quote-request (msg "quote-request" product)
         order (msg "order" "confirm order!")
@@ -55,8 +55,8 @@
 
 (defn discourje-one-buyer-monitor-reset [iterations]
   (let [infra (add-infrastructure buy-goods)
-        b->s (get-channel "buyer" "seller" infra)
-        s->b (get-channel "seller" "buyer" infra)
+        b->s (get-channel infra "buyer" "seller")
+        s->b (get-channel infra "seller" "buyer")
         product {:product-type "book" :content {:title "The joy of Clojure"}}
         quote-request (msg "quote-request" product)
         order (msg "order" "confirm order!")
@@ -113,8 +113,8 @@
 
 (defn clojure-one-buyer-reset [iterations]
   (let [infra (add-infrastructure buy-goods)
-        b->s (get-channel "buyer" "seller" infra)
-        s->b (get-channel "seller" "buyer" infra)
+        b->s (get-channel infra "buyer" "seller")
+        s->b (get-channel infra "seller" "buyer")
         product {:product-type "book" :content {:title "The joy of Clojure"}}
         quote-request (msg "quote-request" product)
         order (msg "order" "confirm order!")

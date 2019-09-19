@@ -8,20 +8,24 @@
   (apply-send! [this sender receivers label])
   (valid-send? [this sender receivers label])
   (valid-receive? [this sender receivers label])
+  (valid-close? [this sender receiver])
+  (apply-close! [this channel])
   (is-current-multicast? [this label])
   (register-rec! [this rec])
   (get-rec [this name]))
-
-;load helper namespace files!
-(load "validation/receivevalidation"
-      "validation/sendvalidation")
-
-(declare contains-value? is-valid-interaction?)
 
 (defn- interaction-to-string
   "Stringify an interaction, returns empty string if the given interaction is nil"
   [interaction]
   (if (nil? interaction) "" (to-string interaction)))
+
+;load helper namespace files!
+(load "validation/closevalidation"
+      "validation/receivevalidation"
+      "validation/sendvalidation")
+
+(declare contains-value? is-valid-interaction?)
+
 
 (defn- is-valid-interaction?
   "Is the given interaction valid compared to the active-interaction of the monitor"
@@ -81,4 +85,6 @@
   (valid-receive? [this sender receivers label] (is-valid-communication? this sender receivers label @active-interaction))
   (is-current-multicast? [this label] (is-active-interaction-multicast? this @active-interaction label))
   (register-rec! [this rec] (add-rec-to-table recursion-set rec))
-  (get-rec [this name] (name @recursion-set)))
+  (get-rec [this name] (name @recursion-set))
+  (valid-close? [this sender receiver] (is-valid-close-communication? this sender receiver @active-interaction))
+  (apply-close! [this channel] (apply-close-to-mon this channel active-interaction @active-interaction)))

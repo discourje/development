@@ -10,15 +10,19 @@
        (par [(-->> 2 "Bob" "Carol")
              (-->> 3 "Carol" "Bob")]
             [(-->> 4 "Bob" "Alice")
-             (-->> 5 "Alice" "Bob")])))
+             (-->> 5 "Alice" "Bob")])
+       (close "Alice" "Bob")
+       (close "Bob" "Alice")
+       (close "Bob" "Carol")
+       (close "Carol" "Bob")))
 
 ;setup infrastructure, generate channels and add monitor
 (def infrastructure (add-infrastructure message-exchange-pattern))
 ;Get the channels
-(def alice-to-bob (get-channel "Alice" "Bob" infrastructure))
-(def bob-to-alice (get-channel "Bob" "Alice" infrastructure))
-(def bob-to-carol (get-channel "Bob" "Carol" infrastructure))
-(def carol-to-bob (get-channel "Carol" "Bob" infrastructure))
+(def alice-to-bob (get-channel infrastructure "Alice" "Bob"))
+(def bob-to-alice (get-channel infrastructure "Bob" "Alice"))
+(def bob-to-carol (get-channel infrastructure "Bob" "Carol"))
+(def carol-to-bob (get-channel infrastructure "Carol" "Bob"))
 
 (defn- alice
   "logic for alice"
@@ -36,9 +40,14 @@
                     (<!! carol-to-bob 3))
         second-par (fn []
                      (>!! bob-to-alice (msg 4 4))
-                     (<!! alice-to-bob 5))]
-    (clojure.core.async/thread (first-par))
-    (clojure.core.async/thread (second-par))))
+                     (<!! alice-to-bob 5))
+        thread1 (clojure.core.async/thread (first-par))
+        thread2 (clojure.core.async/thread (second-par))]
+    (when (and (clojure.core.async/<!! thread1) (clojure.core.async/<!! thread2))
+      (close! alice-to-bob)
+      (close! bob-to-alice)
+      (close! bob-to-carol)
+      (close! carol-to-bob))))
 
 (defn- carol
   "logic for carol"

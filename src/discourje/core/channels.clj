@@ -16,7 +16,7 @@
   (get-monitor [this] monitor)
   (get-buffer [this] buffer))
 
-(defn get-channel
+(defn- get-infra-channel
   "Finds a channel based on provider and consumer"
   [provider consumer channels]
   (first
@@ -25,6 +25,15 @@
                 (= (get-provider c) provider)
                 (= (get-consumer c) consumer)))
             channels)))
+
+(defprotocol infrastructurable
+  (get-channel [this provider consumer])
+  (get-channels [this]))
+
+(defrecord infrastructure [channels]
+  infrastructurable
+  (get-channel [this provider consumer] (get-infra-channel provider consumer channels))
+  (get-channels [this] channels))
 
 (defn generate-channel
   "Function to generate a channel between sender and receiver"
@@ -58,7 +67,7 @@
     (doseq [participant participants]
       (if (instance? Seqable (:receivers participant))
         (doseq [receiver (:receivers participant)]
-          (when (empty? (distinct (filter (fn [c] (and (= (:provider c) (:sender participant)) (= (:consumers c) receiver))) @channels )))
+          (when (empty? (distinct (filter (fn [c] (and (= (:provider c) (:sender participant)) (= (:consumers c) receiver))) @channels)))
             (swap! channels conj (generate-channel (:sender participant) receiver monitor buffer))))
         (when (empty? (distinct (filter (fn [c] (and (= (:provider c) (:sender participant)) (= (:consumers c) (:receivers participant)))) @channels)))
           (swap! channels conj (generate-channel (:sender participant) (:receivers participant) monitor buffer)))))
