@@ -72,10 +72,10 @@
     (do (log-error :unsupported-operation (format "Unsupported communication type: Communication invalid, type: %s" (type active-interaction)))
         false)))
 
-(defn force-monitor-reset! "Force the monitor to go back to the first interaction." [monitor]
-  (reset! (:active-interaction monitor) (:interactions monitor)))
+(defn force-monitor-reset! "Force the monitor to go back to the first interaction." [monitor interactions]
+  (reset! (:active-interaction monitor) interactions))
 
-(defrecord monitor [id interactions active-interaction recursion-set]
+(defrecord monitor [id active-interaction recursion-set]
   monitoring
   (get-monitor-id [this] id)
   (get-active-interaction [this] @active-interaction)
