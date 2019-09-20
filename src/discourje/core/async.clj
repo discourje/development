@@ -73,7 +73,7 @@
   "Generate the monitor based on the given protocol"
   [protocol]
   (let [linked-interactions (nest-mep (get-interactions protocol))]
-    (->monitor (uuid/v1) linked-interactions (atom linked-interactions) (atom {}))))
+    (->monitor (uuid/v1) (atom linked-interactions) (atom {}))))
 
 (defn- all-channels-implement-transportable?
   "Do all custom supplied channels implement the transportable interface?"
