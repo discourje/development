@@ -36,7 +36,7 @@
         ba (get-channel channels "B" "A")
         m1 (->message "1" "Hello B")
         m2 (->message "2" "Hello A")]
-    (set-logging-exceptions)
+    (set-logging)
     (do
       (>!! ab m1)
       (let [a->b (<!! ab "1")]

@@ -134,7 +134,10 @@
 (defn all-valid-channels?
   "Do all channels comply with the monitor"
   [channels message]
-  (and (not (empty? channels)) (every? true? (for [c channels] (valid-send? (get-monitor c) (get-provider c) (get-consumer c) (get-label message))))))
+  (when (not (empty? channels))
+    (let [targets (for [c channels] (valid-send? (get-monitor c) (get-provider c) (get-consumer c) (get-label message)))]
+      (when (every? some? targets)
+        (first targets)))))
 
 (defn all-channels-open?
   "Are all channels open?"
@@ -161,33 +164,36 @@
                 message
                 (->message (type message) message))
             send-fn (fn [] (if (vector? channel)
-                             (cond
-                               (false? (equal-senders? channel))
-                               (log-error :invalid-parallel-channels "Trying to send in multicast, but the sender of the channels is not the same!")
-                               (false? (equal-monitors? channel))
-                               (log-error :monitor-mismatch "Trying to send in multicast, but the channels do not share the same monitor!")
-                               (false? (all-channels-open? channel))
-                               (log-error :incorrect-communication "Trying to send in multicast, one or more of the channels is closed!")
-                               (false? (all-valid-channels? channel m))
-                               (log-error :incorrect-communication "Trying to send in multicast, but the monitor is not correct for all channels!")
-                               :else
-                               (apply-send! (get-monitor (first channel)) (get-provider (first channel)) (vec (for [c channel] (get-consumer c))) (get-label m)))
-                             (cond
-                               (channel-closed? channel)
-                               (log-error :incorrect-communication (format "Invalid communication: you are trying to send but the channel is closed! From %s to %s" (get-provider channel) (get-consumer channel)))
-                               (false? (valid-send? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m)))
-                               (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) (get-label m) (to-string (get-active-interaction (get-monitor channel)))))
-                               :else
-                               (apply-send! (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m)))))
-            ]
-        (loop [send-result (send-fn)]
-          (if (nil? send-result)
-            nil
-            (if send-result
-              (if (vector? channel)
-                (allow-sends channel m)
-                (allow-send channel m))
-              (recur (send-fn))))))))
+                             (let [valid-interaction (cond
+                                                       (false? (equal-senders? channel))
+                                                       (log-error :invalid-parallel-channels "Trying to send in multicast, but the sender of the channels is not the same!")
+                                                       (false? (equal-monitors? channel))
+                                                       (log-error :monitor-mismatch "Trying to send in multicast, but the channels do not share the same monitor!")
+                                                       (false? (all-channels-open? channel))
+                                                       (log-error :incorrect-communication "Trying to send in multicast, one or more of the channels is closed!")
+                                                       :else
+                                                       (all-valid-channels? channel m))]
+                               (if (some? valid-interaction)
+                                 (apply-send! (get-monitor (first channel)) (get-provider (first channel)) (vec (for [c channel] (get-consumer c))) (get-label m) valid-interaction)
+                                 (log-error :incorrect-communication "Trying to send in multicast, but the monitor is not correct for all channels!")))
+                      (let [valid-interaction (cond
+                                                (channel-closed? channel)
+                                                (log-error :incorrect-communication (format "Invalid communication: you are trying to send but the channel is closed! From %s to %s" (get-provider channel) (get-consumer channel)))
+                                                :else
+                                                (valid-send? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m)))]
+                        (if (some? valid-interaction)
+                          (do (println valid-interaction) (apply-send! (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m) valid-interaction))
+                          (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) (get-label m) (to-string (get-active-interaction (get-monitor channel)))))))))
+]
+(loop [send-result (send-fn)]
+  (println send-result)
+  (if (nil? send-result)
+    nil
+    (if send-result
+      (if (vector? channel)
+        (allow-sends channel m)
+        (allow-send channel m))
+      (recur (send-fn))))) ) ) )
 
 (defn <!!
   "take form channel"
@@ -244,8 +250,6 @@
                        (when (true? par) (recur (= id (get-id (get-active-interaction (get-monitor channel)))))))
                      result)
                  (log-error :incorrect-communication (format "communication invalid! message label on channel: %s does not match the target label %s!" (get-label result) label))))))))))
-
-
 
 (defn close-channel!
   "Close a channel with the given sender and receiver"

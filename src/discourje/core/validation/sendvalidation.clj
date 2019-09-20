@@ -12,19 +12,20 @@
 (defn- send-active-interaction-by-atomic
   "Send active interaction by atomic"
   [active-interaction target-interaction sender]
-  (let [active-interaction-before-swap @active-interaction]
-    (if (nil? sender)
-      (log-error :invalid-send (format "sender appears to be nil: %s %s" active-interaction target-interaction))
-      (= (get-id (swap! active-interaction (fn [inter]
-                                             (if (= (get-id inter) (get-id active-interaction-before-swap))
-                                               (assoc-sender-to-interaction inter sender)
-                                               inter))))
-         (get-id active-interaction-before-swap)))))
+  (if (nil? sender)
+    (log-error :invalid-send (format "sender appears to be nil: %s %s" active-interaction target-interaction))
+    (= (get-id (swap! active-interaction (fn [inter]
+                                           (if (= (get-id inter) (get-id target-interaction))
+                                             (assoc-sender-to-interaction inter sender)
+                                             inter))))
+       (get-id target-interaction))))
 
 (defn- is-valid-interaction-for-send?
   "Check if the interaction is valid for a send operation"
   [sender receivers label active-interaction]
-  (and (is-valid-interaction? sender receivers label active-interaction) (false? (contains? (get-accepted-sends active-interaction) sender))))
+  (when (and (is-valid-interaction? sender receivers label active-interaction)
+             (false? (contains? (get-accepted-sends active-interaction) sender)))
+    active-interaction))
 
 (defn- get-send-atomic-interaction
   "get the atomic interaction when it is valid for send"
@@ -69,7 +70,7 @@
 
 (defn- set-send-on-par
   "Assoc a sender to a nested parallel interaction"
-  [sender receivers label inter target-interaction monitor]
+  [sender receivers label target-interaction monitor]
   (let [pars (let [pars (get-parallel target-interaction)]
                (for [p pars]
                  (cond
@@ -81,23 +82,23 @@
                    (let [valid-branch (get-send-branch-interaction sender receivers label p)]
                      (if (not (nil? valid-branch))
                        (if (satisfies? parallelizable valid-branch)
-                         (set-send-on-par sender receivers label target-interaction valid-branch monitor)
+                         (set-send-on-par sender receivers label valid-branch monitor)
                          (assoc-sender-to-interaction valid-branch sender))
                        p))
                    (satisfies? parallelizable p)
-                   (set-send-on-par sender receivers label target-interaction p monitor)
+                   (set-send-on-par sender receivers label p monitor)
                    (satisfies? recursable p)
                    (let [valid-rec (get-send-recursion-interaction sender receivers label p)]
                      (if (not (nil? valid-rec))
                        (if (satisfies? parallelizable valid-rec)
-                         (set-send-on-par sender receivers label target-interaction valid-rec monitor)
+                         (set-send-on-par sender receivers label valid-rec monitor)
                          (assoc-sender-to-interaction valid-rec sender))
                        p))
                    (satisfies? identifiable-recur p)
                    (let [valid-rec (get-send-recursion-interaction sender receivers label (get-rec monitor (get-name p)))]
                      (if (not (nil? valid-rec))
                        (if (satisfies? parallelizable valid-rec)
-                         (set-send-on-par sender receivers label target-interaction valid-rec monitor)
+                         (set-send-on-par sender receivers label valid-rec monitor)
                          (assoc-sender-to-interaction valid-rec sender))
                        p))
                    (satisfies? closable p)
@@ -114,8 +115,8 @@
   (swap! active-interaction
          (fn [inter]
            (if (= (get-id inter) (get-id target-interaction))
-             (set-send-on-par sender receivers label inter inter monitor)
-             (set-send-on-par sender receivers label inter target-interaction monitor))))
+             (set-send-on-par sender receivers label inter monitor)
+             (set-send-on-par sender receivers label target-interaction monitor))))
   true)
 
 (defn- apply-send-to-mon
@@ -143,19 +144,18 @@
     (satisfies? interactable active-interaction)
     (is-valid-interaction-for-send? sender receivers label active-interaction)
     (satisfies? branchable active-interaction)
-    (> (count (filter true? (flatten (for [b (:branches active-interaction)] (is-valid-send-communication? monitor sender receivers label b))))) 0)
+    (first (filter some? (flatten (for [b (:branches active-interaction)] (is-valid-send-communication? monitor sender receivers label b)))))
     (satisfies? parallelizable active-interaction)
-    (> (count (filter true? (flatten (for [p (get-parallel active-interaction)] (is-valid-send-communication? monitor sender receivers label p))))) 0)
+    (first (filter some? (flatten (for [p (get-parallel active-interaction)] (is-valid-send-communication? monitor sender receivers label p)))))
     (satisfies? recursable active-interaction)
     (do (register-rec! monitor active-interaction)
         (is-valid-send-communication? monitor sender receivers label (get-recursion active-interaction)))
     (satisfies? identifiable-recur active-interaction)
-    (and (is-valid-send-communication? monitor sender receivers label (get-rec monitor (get-name active-interaction)))
-         (if (satisfies? parallelizable active-interaction)
-           (<= (count (get-parallel active-interaction)) 1)
-           true))
+    (if (satisfies? parallelizable active-interaction)
+      (when (<= (count (get-parallel active-interaction)) 1)
+        (is-valid-send-communication? monitor sender receivers label (get-rec monitor (get-name active-interaction))))
+      (is-valid-send-communication? monitor sender receivers label (get-rec monitor (get-name active-interaction))))
     (satisfies? closable active-interaction)
-    false
+    nil
     :else
-    (do (log-error :unsupported-operation (format "Unsupported communication type: Communication invalid, type: %s" (type active-interaction)))
-        false)))
+    (log-error :unsupported-operation (format "Unsupported communication type: Communication invalid, type: %s" (type active-interaction)))))

@@ -5,14 +5,14 @@
   (get-monitor-id [this])
   (get-active-interaction [this])
   (apply-receive! [this sender receivers label])
-  (apply-send! [this sender receivers label])
+  (apply-send! [this sender receivers label target-interaction])
   (valid-send? [this sender receivers label])
   (valid-receive? [this sender receivers label])
   (valid-close? [this sender receiver])
   (apply-close! [this channel])
   (is-current-multicast? [this label])
   (register-rec! [this rec])
-  (get-rec [this name]))
+  (get-rec [this name])  )
 
 (defn- interaction-to-string
   "Stringify an interaction, returns empty string if the given interaction is nil"
@@ -79,7 +79,7 @@
   monitoring
   (get-monitor-id [this] id)
   (get-active-interaction [this] @active-interaction)
-  (apply-send! [this sender receivers label] (apply-send-to-mon this sender receivers label active-interaction @active-interaction))
+  (apply-send! [this sender receivers label target-interaction] (apply-send-to-mon this sender receivers label active-interaction target-interaction))
   (apply-receive! [this sender receivers label] (apply-receive-to-mon this sender receivers label active-interaction @active-interaction))
   (valid-send? [this sender receivers label] (is-valid-send-communication? this sender receivers label @active-interaction))
   (valid-receive? [this sender receivers label] (is-valid-communication? this sender receivers label @active-interaction))
