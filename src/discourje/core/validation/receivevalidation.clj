@@ -72,11 +72,11 @@
 (defn- swap-active-interaction-by-atomic
   "Swap active interaction by atomic
   The end-protocol comparison indicates the protocol is terminated."
-  [active-interaction target-interaction receiver]
+  [active-interaction pre-swap-interaction target-interaction receiver]
   (if (multiple-receivers? target-interaction)
     (remove-receiver active-interaction target-interaction receiver)
     (let [swapped (swap! active-interaction (fn [inter]
-                                              (if (= (get-id inter) (get-id target-interaction))
+                                              (if (= (get-id inter) (get-id pre-swap-interaction))
                                                 (if (not= nil (get-next target-interaction))
                                                   (get-next target-interaction)
                                                   nil)
@@ -206,18 +206,18 @@
 
 (defn- apply-receive-to-mon
   "Apply new interaction"
-  ([monitor sender receivers label active-interaction target-interaction]
+  ([monitor sender receivers label active-interaction pre-swap-interaction target-interaction]
    (log-message (format "Applying: RECEIVE label %s, receiver %s." label receivers))
    (cond
      (satisfies? interactable target-interaction)
-     (swap-active-interaction-by-atomic active-interaction target-interaction receivers)
+     (swap-active-interaction-by-atomic active-interaction pre-swap-interaction target-interaction receivers)
      (satisfies? branchable target-interaction)
-     (apply-receive-to-mon monitor sender receivers label active-interaction (get-branch-interaction sender receivers label target-interaction))
+     (apply-receive-to-mon monitor sender receivers label active-interaction pre-swap-interaction (get-branch-interaction sender receivers label target-interaction))
      (satisfies? parallelizable target-interaction)
      (swap-active-interaction-by-parallel sender receivers label active-interaction target-interaction monitor)
      (satisfies? recursable target-interaction)
-     (apply-receive-to-mon monitor sender receivers label active-interaction (get-recursion target-interaction))
+     (apply-receive-to-mon monitor sender receivers label active-interaction pre-swap-interaction (get-recursion target-interaction))
      (satisfies? identifiable-recur target-interaction)
-     (apply-receive-to-mon monitor sender receivers label active-interaction (get-rec monitor (get-name target-interaction)))
+     (apply-receive-to-mon monitor sender receivers label active-interaction pre-swap-interaction (get-rec monitor (get-name target-interaction)))
      :else (log-error :unsupported-operation (format "Unsupported type of interaction to apply %s!" (type target-interaction)))
      )))

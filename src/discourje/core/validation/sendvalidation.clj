@@ -11,27 +11,14 @@
 
 (defn- send-active-interaction-by-atomic
   "Send active interaction by atomic"
-  [active-interaction target-interaction sender]
+  [active-interaction pre-swap-interaction target-interaction sender]
   (if (nil? sender)
     (log-error :invalid-send (format "sender appears to be nil: %s %s" active-interaction target-interaction))
     (= (get-id (swap! active-interaction (fn [inter]
-                                           (cond
-                                             (satisfies? interactable inter)
-                                             (if (= (get-id inter) (get-id target-interaction))
-                                               (assoc-sender-to-interaction inter sender)
-                                               inter)
-                                             (satisfies? recursable inter)
-                                             (if (= (get-id (get-recursion inter)) (get-id target-interaction))
-                                               (assoc-sender-to-interaction (get-recursion inter) sender)
-                                               inter)
-                                             (satisfies? branchable inter)
-                                             (let [b (first some? (for [target (get-branches inter)] (= (get-id target) (get-id target-interaction))))]
-                                               )
-
-                                             )
-                                           (if (= (get-id inter) (get-id target-interaction))
-                                             (assoc-sender-to-interaction inter sender)
-                                             inter))))
+                                           (if (= (get-id inter) (get-id pre-swap-interaction))
+                                             (assoc-sender-to-interaction target-interaction sender)
+                                             inter)
+                                           )))
        (get-id target-interaction))))
 
 (defn- is-valid-interaction-for-send?
@@ -135,19 +122,21 @@
 
 (defn- apply-send-to-mon
   "Apply new interaction"
-  ([monitor sender receivers label active-interaction target-interaction]
+  ([monitor sender receivers label active-interaction pre-swap-interaction target-interaction]
+   (println pre-swap-interaction)
+   (println target-interaction)
    (log-message (format "Applying: SEND label %s, receiver %s. for active %s and target %s" label receivers (interaction-to-string @active-interaction) (interaction-to-string target-interaction)))
    (cond
      (satisfies? interactable target-interaction)
-     (send-active-interaction-by-atomic active-interaction target-interaction sender)
+     (send-active-interaction-by-atomic active-interaction pre-swap-interaction target-interaction sender)
      (satisfies? branchable target-interaction)
-     (apply-send-to-mon monitor sender receivers label active-interaction (get-send-branch-interaction sender receivers label target-interaction))
+     (apply-send-to-mon monitor sender receivers label active-interaction pre-swap-interaction (get-send-branch-interaction sender receivers label target-interaction))
      (satisfies? parallelizable target-interaction)
      (send-active-interaction-by-parallel sender receivers label active-interaction target-interaction monitor)
      (satisfies? recursable target-interaction)
-     (apply-send-to-mon monitor sender receivers label active-interaction (get-recursion target-interaction))
+     (apply-send-to-mon monitor sender receivers label active-interaction pre-swap-interaction (get-recursion target-interaction))
      (satisfies? identifiable-recur target-interaction)
-     (apply-send-to-mon monitor sender receivers label active-interaction (get-rec monitor (get-name target-interaction)))
+     (apply-send-to-mon monitor sender receivers label active-interaction pre-swap-interaction (get-rec monitor (get-name target-interaction)))
      :else (log-error :unsupported-operation (format "Unsupported type of interaction to apply %s!" (type target-interaction)))
      )))
 

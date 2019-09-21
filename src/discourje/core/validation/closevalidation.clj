@@ -35,9 +35,9 @@
 
 (defn- swap-active-interaction-by-close
   "Apply new interaction"
-  [channel active-interaction target-interaction]
+  [channel active-interaction pre-swap-interaction target-interaction]
   (log-message (format "Applying: Close sender %s, receiver %s." (get-provider channel) (get-consumer channel)))
-  (swap-active-interaction-by-atomic active-interaction target-interaction nil))
+  (swap-active-interaction-by-atomic active-interaction pre-swap-interaction target-interaction nil))
 ;------------------------------------------------------------------------------------
 (defn- get-close-recursion-interaction
   "Check the first element in a recursion interaction"
@@ -132,22 +132,22 @@
 
 (defn- apply-close-to-mon
   "Apply new interaction"
-  ([monitor channel active-interaction target-interaction]
+  ([monitor channel active-interaction pre-swap-interaction target-interaction]
    (log-message (format "Applying: CLOSE %s, receiver %s." (get-provider channel) (get-consumer channel)))
    (if
      (cond
        (satisfies? closable target-interaction)
-       (swap-active-interaction-by-close channel active-interaction target-interaction)
+       (swap-active-interaction-by-close channel active-interaction pre-swap-interaction target-interaction)
        (satisfies? interactable target-interaction)
        false
        (satisfies? branchable target-interaction)
-       (apply-close-to-mon monitor channel active-interaction (get-close-branch-interaction (get-provider channel) (get-consumer channel) target-interaction))
+       (apply-close-to-mon monitor channel active-interaction pre-swap-interaction (get-close-branch-interaction (get-provider channel) (get-consumer channel) target-interaction))
        (satisfies? parallelizable target-interaction)
        (swap-active-close-interaction-by-parallel (get-provider channel) (get-consumer channel) active-interaction target-interaction monitor)
        (satisfies? recursable target-interaction)
-       (apply-close-to-mon monitor channel active-interaction (get-recursion target-interaction))
+       (apply-close-to-mon monitor channel active-interaction pre-swap-interaction (get-recursion target-interaction))
        (satisfies? identifiable-recur target-interaction)
-       (apply-close-to-mon monitor channel active-interaction (get-rec monitor (get-name target-interaction)))
+       (apply-close-to-mon monitor channel active-interaction pre-swap-interaction (get-rec monitor (get-name target-interaction)))
        :else (do (log-error :unsupported-operation (format "Unsupported type of interaction to apply %s!" (type target-interaction)))
                  false))
      (do (clojure.core.async/close! (get-chan channel))
