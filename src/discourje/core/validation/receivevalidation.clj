@@ -30,7 +30,7 @@
                           :else (log-error :unsupported-operation "No correct next monitor found in first position of a branchable construct!" (interaction-to-string first-in-branch)))))))
      0))
 (defn- check-parallel-interaction
-  "Check the atomic interaction"
+  "Check the parallel interaction"
   [sender receivers label active-interaction]
   (> (count (filter (fn [x] (true? x))
                     (flatten
@@ -73,19 +73,18 @@
   "Swap active interaction by atomic
   The end-protocol comparison indicates the protocol is terminated."
   [active-interaction target-interaction receiver]
-  (let [pre-swap-interaction @active-interaction]
-    (if (multiple-receivers? target-interaction)
-      (remove-receiver active-interaction target-interaction receiver)
-      (let [swapped (swap! active-interaction (fn [inter]
-                                                (if (= (get-id inter) (get-id pre-swap-interaction))
-                                                  (if (not= nil (get-next target-interaction))
-                                                    (get-next target-interaction)
-                                                    nil)
-                                                  inter)))]
-        (= (if (nil? swapped) "end-protocol" (get-id swapped))
-           (if (or (nil? target-interaction) (nil? (get-next target-interaction)))
-             "end-protocol"
-             (get-id (get-next target-interaction))))))))
+  (if (multiple-receivers? target-interaction)
+    (remove-receiver active-interaction target-interaction receiver)
+    (let [swapped (swap! active-interaction (fn [inter]
+                                              (if (= (get-id inter) (get-id target-interaction))
+                                                (if (not= nil (get-next target-interaction))
+                                                  (get-next target-interaction)
+                                                  nil)
+                                                inter)))]
+      (= (if (nil? swapped) "end-protocol" (get-id swapped))
+         (if (or (nil? target-interaction) (nil? (get-next target-interaction)))
+           "end-protocol"
+           (get-id (get-next target-interaction)))))))
 
 
 (defn- get-atomic-interaction
@@ -190,21 +189,20 @@
   [monitor sender receivers label active-interaction]
   (cond
     (satisfies? interactable active-interaction)
-    (is-valid-interaction? sender receivers label active-interaction)
+    (get-atomic-interaction sender receivers label active-interaction)
     (satisfies? branchable active-interaction)
-    (> (count (filter true? (flatten (for [b (:branches active-interaction)] (is-valid-communication? monitor sender receivers label b))))) 0)
+    (first (filter some? (flatten (for [b (:branches active-interaction)] (is-valid-communication? monitor sender receivers label b)))))
     (satisfies? parallelizable active-interaction)
-    (> (count (filter true? (flatten (for [p (get-parallel active-interaction)] (is-valid-communication? monitor sender receivers label p))))) 0)
+    (first (filter some? (flatten (for [p (get-parallel active-interaction)] (is-valid-communication? monitor sender receivers label p)))))
     (satisfies? recursable active-interaction)
     (do (register-rec! monitor active-interaction)
         (is-valid-communication? monitor sender receivers label (get-recursion active-interaction)))
     (satisfies? identifiable-recur active-interaction)
     (is-valid-communication? monitor sender receivers label (get-rec monitor (get-name active-interaction)))
     (satisfies? closable active-interaction)
-    false
+    nil
     :else
-    (do (log-error :unsupported-operation (format "Unsupported communication type: Communication invalid, type: %s" (type active-interaction)))
-        false)))
+    (log-error :unsupported-operation (format "Unsupported communication type: Communication invalid, type: %s" (type active-interaction)))))
 
 (defn- apply-receive-to-mon
   "Apply new interaction"

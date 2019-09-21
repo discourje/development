@@ -4,7 +4,7 @@
 (defprotocol monitoring
   (get-monitor-id [this])
   (get-active-interaction [this])
-  (apply-receive! [this sender receivers label])
+  (apply-receive! [this sender receivers label target-interaction])
   (apply-send! [this sender receivers label target-interaction])
   (valid-send? [this sender receivers label])
   (valid-receive? [this sender receivers label])
@@ -80,7 +80,7 @@
   (get-monitor-id [this] id)
   (get-active-interaction [this] @active-interaction)
   (apply-send! [this sender receivers label target-interaction] (apply-send-to-mon this sender receivers label active-interaction target-interaction))
-  (apply-receive! [this sender receivers label] (apply-receive-to-mon this sender receivers label active-interaction @active-interaction))
+  (apply-receive! [this sender receivers label target-interaction] (apply-receive-to-mon this sender receivers label active-interaction target-interaction))
   (valid-send? [this sender receivers label] (is-valid-send-communication? this sender receivers label @active-interaction))
   (valid-receive? [this sender receivers label] (is-valid-communication? this sender receivers label @active-interaction))
   (is-current-multicast? [this label] (is-active-interaction-multicast? this @active-interaction label))
