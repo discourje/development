@@ -187,11 +187,10 @@
                                                        :else
                                                        (valid-send? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m)))]
                                (if (some? valid-interaction)
-                                 (do (println valid-interaction) (apply-send! (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m) valid-interaction))
+                                 (do (println "valid interaction is" valid-interaction) (apply-send! (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m) valid-interaction))
                                  (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) (get-label m) (to-string (get-active-interaction (get-monitor channel)))))))))
             ]
         (loop [send-result (send-fn)]
-          (println send-result)
           (if (nil? send-result)
             nil
             (if send-result
@@ -265,10 +264,10 @@
      (nil? (get-chan channel))
      (log-error :invalid-channel (format "Cannot close the channel with pair %s %s since the internal core.async channel is nil!" (get-provider channel) (get-consumer channel)))
      :else
-     (if (valid-close? (get-monitor channel) (get-provider channel) (get-consumer channel))
-       (apply-close! (get-monitor channel) channel)
-       (log-error :invalid-channel (format "Cannot close the channel with pair %s %s since another interaction is active!: %s" (get-provider channel) (get-consumer channel) (interaction-to-string (get-active-interaction (get-monitor channel))))))
-     ))
+     (let [valid-interaction (valid-close? (get-monitor channel) (get-provider channel) (get-consumer channel))]
+       (if (some? valid-interaction)
+         (apply-close! (get-monitor channel) channel valid-interaction)
+         (log-error :invalid-channel (format "Cannot close the channel with pair %s %s since another interaction is active!: %s" (get-provider channel) (get-consumer channel) (interaction-to-string (get-active-interaction (get-monitor channel)))))))))
   ([sender receiver infra]
    (if (not (nil? infra))
      (close-channel! (get-channel infra sender receiver))

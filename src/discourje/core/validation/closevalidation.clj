@@ -14,24 +14,24 @@
   (println (format "is valid close? %s %s interaction %s" sender receivers (interaction-to-string active-interaction)))
   (cond
     (satisfies? closable active-interaction)
-    (is-valid-close? sender receivers active-interaction)
+    (when (is-valid-close? sender receivers active-interaction)
+      active-interaction)
     (satisfies? interactable active-interaction)
-    false
+    nil
     (satisfies? branchable active-interaction)
-    (> (count (filter true? (flatten (for [b (:branches active-interaction)] (is-valid-close-communication? monitor sender receivers b))))) 0)
+    (first (filter some? (flatten (for [b (:branches active-interaction)] (is-valid-close-communication? monitor sender receivers b)))))
     (satisfies? parallelizable active-interaction)
-    (> (count (filter true? (flatten (for [p (get-parallel active-interaction)] (is-valid-close-communication? monitor sender receivers p))))) 0)
+    (first (filter some? (flatten (for [p (get-parallel active-interaction)] (is-valid-close-communication? monitor sender receivers p)))))
     (satisfies? recursable active-interaction)
     (do (register-rec! monitor active-interaction)
         (is-valid-close-communication? monitor sender receivers (get-recursion active-interaction)))
     (satisfies? identifiable-recur active-interaction)
-    (and (is-valid-close-communication? monitor sender receivers (get-rec monitor (get-name active-interaction)))
-         (if (satisfies? parallelizable active-interaction)
-           (<= (count (get-parallel active-interaction)) 1)
-           true))
+    (if (satisfies? parallelizable active-interaction)
+      (when (<= (count (get-parallel active-interaction)) 1)
+        (is-valid-close-communication? monitor sender receivers (get-rec monitor (get-name active-interaction))))
+      (is-valid-close-communication? monitor sender receivers (get-rec monitor (get-name active-interaction))))
     :else
-    (do (log-error :unsupported-operation (format "Unsupported communication type: Communication invalid, type: %s" (type active-interaction)))
-        false)))
+    (log-error :unsupported-operation (format "Unsupported communication type: Communication invalid, type: %s" (type active-interaction)))))
 
 (defn- swap-active-interaction-by-close
   "Apply new interaction"

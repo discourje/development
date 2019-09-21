@@ -15,6 +15,20 @@
   (if (nil? sender)
     (log-error :invalid-send (format "sender appears to be nil: %s %s" active-interaction target-interaction))
     (= (get-id (swap! active-interaction (fn [inter]
+                                           (cond
+                                             (satisfies? interactable inter)
+                                             (if (= (get-id inter) (get-id target-interaction))
+                                               (assoc-sender-to-interaction inter sender)
+                                               inter)
+                                             (satisfies? recursable inter)
+                                             (if (= (get-id (get-recursion inter)) (get-id target-interaction))
+                                               (assoc-sender-to-interaction (get-recursion inter) sender)
+                                               inter)
+                                             (satisfies? branchable inter)
+                                             (let [b (first some? (for [target (get-branches inter)] (= (get-id target) (get-id target-interaction))))]
+                                               )
+
+                                             )
                                            (if (= (get-id inter) (get-id target-interaction))
                                              (assoc-sender-to-interaction inter sender)
                                              inter))))
@@ -122,7 +136,7 @@
 (defn- apply-send-to-mon
   "Apply new interaction"
   ([monitor sender receivers label active-interaction target-interaction]
-   (log-message (format "Applying: SEND label %s, receiver %s." label receivers))
+   (log-message (format "Applying: SEND label %s, receiver %s. for active %s and target %s" label receivers (interaction-to-string @active-interaction) (interaction-to-string target-interaction)))
    (cond
      (satisfies? interactable target-interaction)
      (send-active-interaction-by-atomic active-interaction target-interaction sender)
