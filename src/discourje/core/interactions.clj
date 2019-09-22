@@ -23,6 +23,17 @@
 (defprotocol stringify
   (to-string [this]))
 
+(defprotocol swappable
+  (get-pre-swap [this])
+  (get-valid [this])
+  (is-valid-for-swap? [this]))
+
+(defrecord swappable-interaction [pre-swap valid]
+  swappable
+  (get-pre-swap [this] pre-swap)
+  (get-valid [this] valid)
+  (is-valid-for-swap? [this] (some? valid)))
+
 (defrecord interaction [id action sender receivers accepted-sends next]
   idable
   (get-id [this] id)

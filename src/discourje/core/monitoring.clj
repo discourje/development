@@ -81,15 +81,12 @@
   (apply-send! [this sender receivers label pre-swap-interaction target-interaction] (apply-send-to-mon this sender receivers label active-interaction pre-swap-interaction target-interaction))
   (apply-receive! [this sender receivers label pre-swap-interaction target-interaction] (apply-receive-to-mon this sender receivers label active-interaction pre-swap-interaction target-interaction))
   (valid-send? [this sender receivers label] (let [pre-swap @active-interaction]
-                                               {:pre-swap pre-swap
-                                                :valid    (is-valid-send-communication? this sender receivers label pre-swap)}))
+                                               (->swappable-interaction pre-swap (is-valid-send-communication? this sender receivers label pre-swap))))
   (valid-receive? [this sender receivers label] (let [pre-swap @active-interaction]
-                                                  {:pre-swap pre-swap
-                                                   :valid    (is-valid-communication? this sender receivers label pre-swap)}))
+                                                  (->swappable-interaction pre-swap (is-valid-communication? this sender receivers label pre-swap))))
   (is-current-multicast? [this label] (is-active-interaction-multicast? this @active-interaction label))
   (register-rec! [this rec] (add-rec-to-table recursion-set rec))
   (get-rec [this name] (name @recursion-set))
   (valid-close? [this sender receiver] (let [pre-swap @active-interaction]
-                                         {:pre-swap pre-swap
-                                          :valid    (is-valid-close-communication? this sender receiver pre-swap)}))
+                                         (->swappable-interaction pre-swap (is-valid-close-communication? this sender receiver pre-swap))))
   (apply-close! [this channel pre-swap-interaction target-interaction] (apply-close-to-mon this channel active-interaction pre-swap-interaction target-interaction)))
