@@ -124,7 +124,6 @@
 (defn- apply-send-to-mon
   "Apply new interaction"
   ([monitor sender receivers label active-interaction pre-swap-interaction target-interaction]
-   ;(log-message (format "Applying: SEND label %s, receiver %s. for active %s and target %s" label receivers (interaction-to-string @active-interaction) (interaction-to-string target-interaction)))
    (cond
      (satisfies? interactable target-interaction)
      (send-active-interaction-by-atomic active-interaction pre-swap-interaction target-interaction sender)

@@ -35,7 +35,6 @@
 (defn- swap-active-interaction-by-close
   "Apply new interaction"
   [channel active-interaction pre-swap-interaction target-interaction]
-  ;(log-message (format "Applying: Close sender %s, receiver %s." (get-provider channel) (get-consumer channel)))
   (swap-active-interaction-by-atomic active-interaction pre-swap-interaction target-interaction nil))
 ;------------------------------------------------------------------------------------
 (defn- get-close-recursion-interaction
@@ -132,7 +131,6 @@
 (defn- apply-close-to-mon
   "Apply new interaction"
   ([monitor channel active-interaction pre-swap-interaction target-interaction]
-   ;(log-message (format "Applying: CLOSE %s, receiver %s." (get-provider channel) (get-consumer channel)))
    (if
      (cond
        (satisfies? closable target-interaction)
