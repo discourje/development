@@ -35,38 +35,39 @@
 
 (defn- get-send-recursion-interaction
   "Check the first element in a recursion interaction"
-  [sender receiver label active-interaction]
+  [monitor sender receiver label active-interaction]
+  (register-rec! monitor active-interaction)
   (let [rec (get-recursion active-interaction)]
     (cond
       (satisfies? interactable rec) (get-send-atomic-interaction sender receiver label rec)
-      (satisfies? branchable rec) (get-send-branch-interaction sender receiver label rec)
-      (satisfies? recursable rec) (get-send-recursion-interaction sender receiver label rec)
-      (satisfies? parallelizable rec) (get-send-parallel-interaction sender receiver label rec)
+      (satisfies? branchable rec) (get-send-branch-interaction monitor sender receiver label rec)
+      (satisfies? recursable rec) (get-send-recursion-interaction monitor sender receiver label rec)
+      (satisfies? parallelizable rec) (get-send-parallel-interaction monitor sender receiver label rec)
       :else (log-error :unsupported-operation (format "No correct next recursion monitor found. %s" (interaction-to-string rec))))))
 
 (defn- get-send-parallel-interaction
   "Check the atomic interaction"
-  [sender receiver label active-interaction]
+  [monitor sender receiver label active-interaction]
   (when-let [_ (for [parallel (get-parallel active-interaction)]
                  (cond
                    (satisfies? interactable parallel) (get-send-atomic-interaction sender receiver label parallel)
-                   (satisfies? branchable parallel) (get-send-branch-interaction sender receiver label parallel)
-                   (satisfies? parallelizable parallel) (get-send-parallel-interaction sender receiver label parallel)
-                   (satisfies? recursable parallel) (get-send-recursion-interaction sender receiver label parallel)
+                   (satisfies? branchable parallel) (get-send-branch-interaction monitor sender receiver label parallel)
+                   (satisfies? parallelizable parallel) (get-send-parallel-interaction monitor sender receiver label parallel)
+                   (satisfies? recursable parallel) (get-send-recursion-interaction monitor sender receiver label parallel)
                    :else (log-error :unsupported-operation (format "Cannot check operation on child parallel construct! %s" (interaction-to-string parallel))))
                  )]
     active-interaction))
 
 (defn- get-send-branch-interaction
   "Check the atomic interaction"
-  [sender receiver label active-interaction]
+  [monitor sender receiver label active-interaction]
   (first (filter some? (flatten
                          (for [branch (:branches active-interaction)]
                            (cond
                              (satisfies? interactable branch) (get-send-atomic-interaction sender receiver label branch)
-                             (satisfies? branchable branch) (get-send-branch-interaction sender receiver label branch)
-                             (satisfies? parallelizable branch) (get-send-parallel-interaction sender receiver label branch)
-                             (satisfies? recursable branch) (get-send-recursion-interaction sender receiver label branch)
+                             (satisfies? branchable branch) (get-send-branch-interaction monitor sender receiver label branch)
+                             (satisfies? parallelizable branch) (get-send-parallel-interaction monitor sender receiver label branch)
+                             (satisfies? recursable branch) (get-send-recursion-interaction monitor sender receiver label branch)
                              :else (log-error :unsupported-operation (format "Cannot check operation on child branchable construct! %s" (interaction-to-string branch)))))))))
 
 (defn- set-send-on-par
@@ -80,7 +81,7 @@
                      (assoc-sender-to-interaction p sender)
                      p)
                    (satisfies? branchable p)
-                   (let [valid-branch (get-send-branch-interaction sender receivers label p)]
+                   (let [valid-branch (get-send-branch-interaction monitor sender receivers label p)]
                      (if (not (nil? valid-branch))
                        (if (satisfies? parallelizable valid-branch)
                          (set-send-on-par sender receivers label valid-branch monitor)
@@ -89,14 +90,14 @@
                    (satisfies? parallelizable p)
                    (set-send-on-par sender receivers label p monitor)
                    (satisfies? recursable p)
-                   (let [valid-rec (get-send-recursion-interaction sender receivers label p)]
+                   (let [valid-rec (get-send-recursion-interaction monitor sender receivers label p)]
                      (if (not (nil? valid-rec))
                        (if (satisfies? parallelizable valid-rec)
                          (set-send-on-par sender receivers label valid-rec monitor)
                          (assoc-sender-to-interaction valid-rec sender))
                        p))
                    (satisfies? identifiable-recur p)
-                   (let [valid-rec (get-send-recursion-interaction sender receivers label (get-rec monitor (get-name p)))]
+                   (let [valid-rec (get-send-recursion-interaction monitor sender receivers label (get-rec monitor (get-name p)))]
                      (if (not (nil? valid-rec))
                        (if (satisfies? parallelizable valid-rec)
                          (set-send-on-par sender receivers label valid-rec monitor)
@@ -130,7 +131,7 @@
      (satisfies? interactable target-interaction)
      (send-active-interaction-by-atomic active-interaction pre-swap-interaction target-interaction sender)
      (satisfies? branchable target-interaction)
-     (apply-send-to-mon monitor sender receivers label active-interaction pre-swap-interaction (get-send-branch-interaction sender receivers label target-interaction))
+     (apply-send-to-mon monitor sender receivers label active-interaction pre-swap-interaction (get-send-branch-interaction monitor sender receivers label target-interaction))
      (satisfies? parallelizable target-interaction)
      (send-active-interaction-by-parallel sender receivers label active-interaction target-interaction monitor)
      (satisfies? recursable target-interaction)
@@ -149,7 +150,8 @@
     (satisfies? branchable active-interaction)
     (first (filter some? (flatten (for [b (:branches active-interaction)] (is-valid-send-communication? monitor sender receivers label b)))))
     (satisfies? parallelizable active-interaction)
-    (first (filter some? (flatten (for [p (get-parallel active-interaction)] (is-valid-send-communication? monitor sender receivers label p)))))
+    (get-send-parallel-interaction monitor sender receivers label active-interaction)
+    ;(first (filter some? (flatten (for [p (get-parallel active-interaction)] (is-valid-send-communication? monitor sender receivers label p)))))
     (satisfies? recursable active-interaction)
     (do (register-rec! monitor active-interaction)
         (is-valid-send-communication? monitor sender receivers label (get-recursion active-interaction)))
