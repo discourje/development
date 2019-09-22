@@ -121,7 +121,7 @@
 (defn- allow-receive
   "Allow a receive on the channel"
   [channel]
-  (log-message "allowing receive on channel!")
+  ;(log-message "allowing receive on channel!")
   (async/<!! (get-chan channel))
   channel)
 

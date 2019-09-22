@@ -46,10 +46,10 @@
 (defn- multiple-receivers?
   "Does the monitor have multiple receivers?"
   [active-interaction]
-  (log-message (format "Checking multiple-receivers on active-interaction %s, seqable? %s, count > 1 %s"
-                       active-interaction
-                       (instance? Seqable (:receivers active-interaction))
-                       (and (instance? Seqable (:receivers active-interaction)) (> (count (:receivers active-interaction)) 1))))
+  ;(log-message (format "Checking multiple-receivers on active-interaction %s, seqable? %s, count > 1 %s"
+  ;                     active-interaction
+  ;                     (instance? Seqable (:receivers active-interaction))
+  ;                     (and (instance? Seqable (:receivers active-interaction)) (> (count (:receivers active-interaction)) 1))))
   (and (instance? Seqable (:receivers active-interaction)) (> (count (:receivers active-interaction)) 1)))
 
 (defn- remove-receiver
@@ -57,7 +57,7 @@
   [active-interaction current-interaction receiver]
   (let [recv (:receivers current-interaction)
         newRecv (vec (remove #{receiver} recv))]
-    (log-message (format "removing receiver %s, new receivers collection: %s" receiver newRecv))
+    ;(log-message (format "removing receiver %s, new receivers collection: %s" receiver newRecv))
     (if (satisfies? interactable current-interaction)
       (swap! active-interaction (fn [inter]
                                   (if (= (get-id inter) (get-id current-interaction))
@@ -207,7 +207,7 @@
 (defn- apply-receive-to-mon
   "Apply new interaction"
   ([monitor sender receivers label active-interaction pre-swap-interaction target-interaction]
-   (log-message (format "Applying: RECEIVE label %s, receiver %s." label receivers))
+   ;(log-message (format "Applying: RECEIVE label %s, receiver %s." label receivers))
    (cond
      (satisfies? interactable target-interaction)
      (swap-active-interaction-by-atomic active-interaction pre-swap-interaction target-interaction receivers)

@@ -166,6 +166,8 @@
                       (<!! (last channels) 1)
                       (force-monitor-reset! (get-monitor (first channels)) interactions)))))]
      time)))
+(set-logging-exceptions)
+(discourje-pipeline-new 2 1000)
 
 (defn clojure-pipeline-new
   ([amount iterations]

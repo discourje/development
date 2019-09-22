@@ -11,7 +11,6 @@
 (defn is-valid-close-communication?
   "Checks if communication is valid by comparing input to the active monitor"
   [monitor sender receivers active-interaction]
-  (println (format "is valid close? %s %s interaction %s" sender receivers (interaction-to-string active-interaction)))
   (cond
     (satisfies? closable active-interaction)
     (when (is-valid-close? sender receivers active-interaction)
@@ -36,7 +35,7 @@
 (defn- swap-active-interaction-by-close
   "Apply new interaction"
   [channel active-interaction pre-swap-interaction target-interaction]
-  (log-message (format "Applying: Close sender %s, receiver %s." (get-provider channel) (get-consumer channel)))
+  ;(log-message (format "Applying: Close sender %s, receiver %s." (get-provider channel) (get-consumer channel)))
   (swap-active-interaction-by-atomic active-interaction pre-swap-interaction target-interaction nil))
 ;------------------------------------------------------------------------------------
 (defn- get-close-recursion-interaction
@@ -133,7 +132,7 @@
 (defn- apply-close-to-mon
   "Apply new interaction"
   ([monitor channel active-interaction pre-swap-interaction target-interaction]
-   (log-message (format "Applying: CLOSE %s, receiver %s." (get-provider channel) (get-consumer channel)))
+   ;(log-message (format "Applying: CLOSE %s, receiver %s." (get-provider channel) (get-consumer channel)))
    (if
      (cond
        (satisfies? closable target-interaction)
