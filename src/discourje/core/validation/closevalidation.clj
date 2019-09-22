@@ -19,10 +19,8 @@
     nil
     (satisfies? branchable active-interaction)
     (first (filter #(is-valid-close-communication? monitor sender receivers %) (get-branches active-interaction)))
-    ;(first (filter some? (flatten (for [b (:branches active-interaction)] (is-valid-close-communication? monitor sender receivers b)))))
     (satisfies? parallelizable active-interaction)
     (first (filter #(is-valid-close-communication? monitor sender receivers %) (get-parallel active-interaction)))
-    ;(first (filter some? (flatten (for [p (get-parallel active-interaction)] (is-valid-close-communication? monitor sender receivers p)))))
     (satisfies? recursable active-interaction)
     (do (register-rec! monitor active-interaction)
         (is-valid-close-communication? monitor sender receivers (get-recursion active-interaction)))

@@ -1,48 +1,8 @@
 ;receivevalidation.clj
 (in-ns 'discourje.core.async)
 
-;forward declare check-branchable-interaction to resolve undefined issue in check-recursion-interaction
-;(declare check-branch-interaction check-parallel-interaction get-branch-interaction get-parallel-interaction is-valid-interaction? interaction-to-string is-active-interaction-multicast? add-rec-to-table)
+;forward declare
 (declare get-branch-interaction get-parallel-interaction is-valid-interaction? interaction-to-string is-active-interaction-multicast? add-rec-to-table)
-
-;(defn- check-recursion-interaction
-;  "Check the first element in a recursion interaction"
-;  [sender receivers label active-interaction]
-;  (let [rec (get-recursion active-interaction)
-;        first-interaction (first rec)]
-;    (cond
-;      (satisfies? interactable first-interaction) (is-valid-interaction? sender receivers label first-interaction)
-;      (satisfies? branchable first-interaction) (check-branch-interaction sender receivers label first-interaction)
-;      (satisfies? recursable first-interaction) (check-recursion-interaction sender receivers label first-interaction)
-;      (satisfies? parallelizable parallel) (check-parallel-interaction sender receivers label parallel)
-;      :else (log-error :unsupported-operation "No correct next recursion monitor found" (interaction-to-string first-interaction)))))
-
-;(defn- check-branch-interaction
-;  "Check the atomic interaction"
-;  [sender receivers label active-interaction]
-;  (> (count (filter (fn [x] (true? x))
-;                    (flatten
-;                      (for [first-in-branch (:branches active-interaction)]
-;                        (cond
-;                          (satisfies? interactable first-in-branch) (is-valid-interaction? sender receivers label first-in-branch)
-;                          (satisfies? branchable first-in-branch) (check-branch-interaction sender receivers label first-in-branch)
-;                          (satisfies? recursable first-in-branch) (check-recursion-interaction sender receivers label first-in-branch)
-;                          (satisfies? parallelizable parallel) (check-parallel-interaction sender receivers label parallel)
-;                          :else (log-error :unsupported-operation "No correct next monitor found in first position of a branchable construct!" (interaction-to-string first-in-branch)))))))
-;     0))
-;(defn- check-parallel-interaction
-;  "Check the parallel interaction"
-;  [sender receivers label active-interaction]
-;  (> (count (filter (fn [x] (true? x))
-;                    (flatten
-;                      (for [parallel (get-parallel active-interaction)]
-;                        (cond
-;                          (satisfies? interactable parallel) (is-valid-interaction? sender receivers label parallel)
-;                          (satisfies? branchable parallel) (check-branch-interaction sender receivers label parallel)
-;                          (satisfies? recursable parallel) (check-recursion-interaction sender receivers label parallel)
-;                          (satisfies? parallelizable parallel) (check-parallel-interaction sender receivers label parallel)
-;                          :else (log-error :unsupported-operation "No correct next monitor found in first position of a branchable construct!" (interaction-to-string parallel)))))))
-;     0))
 
 (defn- multiple-receivers?
   "Does the monitor have multiple receivers?"
@@ -189,7 +149,6 @@
     (get-atomic-interaction sender receivers label active-interaction)
     (satisfies? branchable active-interaction)
     (first (filter #(is-valid-communication? monitor sender receivers label %) (get-branches active-interaction)))
-    ; (first (filter some? (flatten (for [b (:branches active-interaction)] (is-valid-communication? monitor sender receivers label b)))))
     (satisfies? parallelizable active-interaction)
     (get-parallel-interaction sender receivers label active-interaction)
     (satisfies? recursable active-interaction)

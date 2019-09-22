@@ -1,7 +1,7 @@
 ;sendvalidation.clj
 (in-ns 'discourje.core.async)
 
-;forward declare check-branchable-interaction to resolve undefined issue in check-recursion-interaction
+;forward declare
 (declare get-send-branch-interaction get-send-parallel-interaction is-valid-interaction? interaction-to-string is-valid-communication? interaction-to-string is-active-interaction-multicast? add-rec-to-table)
 
 (defn- assoc-sender-to-interaction
