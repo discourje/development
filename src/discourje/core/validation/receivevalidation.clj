@@ -194,7 +194,6 @@
     (first (filter some? (flatten (for [b (:branches active-interaction)] (is-valid-communication? monitor sender receivers label b)))))
     (satisfies? parallelizable active-interaction)
     (get-parallel-interaction sender receivers label active-interaction)
-    ;(first (filter some? (flatten (for [p (get-parallel active-interaction)] (is-valid-communication? monitor sender receivers label p)))))
     (satisfies? recursable active-interaction)
     (do (register-rec! monitor active-interaction)
         (is-valid-communication? monitor sender receivers label (get-recursion active-interaction)))

@@ -124,8 +124,6 @@
 (defn- apply-send-to-mon
   "Apply new interaction"
   ([monitor sender receivers label active-interaction pre-swap-interaction target-interaction]
-   (println pre-swap-interaction)
-   (println target-interaction)
    (log-message (format "Applying: SEND label %s, receiver %s. for active %s and target %s" label receivers (interaction-to-string @active-interaction) (interaction-to-string target-interaction)))
    (cond
      (satisfies? interactable target-interaction)
@@ -151,7 +149,6 @@
     (first (filter some? (flatten (for [b (:branches active-interaction)] (is-valid-send-communication? monitor sender receivers label b)))))
     (satisfies? parallelizable active-interaction)
     (get-send-parallel-interaction monitor sender receivers label active-interaction)
-    ;(first (filter some? (flatten (for [p (get-parallel active-interaction)] (is-valid-send-communication? monitor sender receivers label p)))))
     (satisfies? recursable active-interaction)
     (do (register-rec! monitor active-interaction)
         (is-valid-send-communication? monitor sender receivers label (get-recursion active-interaction)))
