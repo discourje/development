@@ -1033,40 +1033,40 @@
         (is (= (get-label b->c6) 6))
         (is (nil? (get-active-interaction (get-monitor ab))))))))
 
-(deftest send-and-receive-multiple-branches-choice-Threaded-test
-  (let [channels (add-infrastructure (multiple-branches-choice true))
-        ab (get-channel channels "a" "b")
-        ba (get-channel channels "b" "a")
-        fn-01 (fn []
-                (try+ (do
-                        (>!! ab (msg 0 0))
-                        (<!! ab 0)
-                        (>!! ba (msg 1 1))
-                        (<!! ba 1))
-                      (catch Object e
-                        (println (:throwable e) "unexpected error"))))
-        fn-23 (fn []
-                (try+ (do
-                        (>!! ab (msg 2 2))
-                        (<!! ab 2)
-                        (>!! ba (msg 3 3))
-                        (<!! ba 3))
-                      (catch Object e
-                        (println (:throwable e) "unexpected error"))))
-        fn-45 (fn []
-                (try+ (do
-                        (>!! ab (msg 4 4))
-                        (<!! ab 4)
-                        (>!! ba (msg 5 5))
-                        (<!! ba 5))
-                      (catch Object e
-                        (println (:throwable e) "unexpected error"))))
-        ]
-    (async/thread fn-01)
-    (async/thread fn-23)
-    (async/thread fn-45)
-    (is (nil? (get-active-interaction (get-monitor ab))))
-    ))
+;(deftest send-and-receive-multiple-branches-choice-Threaded-test
+;  (let [channels (add-infrastructure (multiple-branches-choice true))
+;        ab (get-channel channels "a" "b")
+;        ba (get-channel channels "b" "a")
+;        fn-01 (fn []
+;                (try+ (do
+;                        (>!! ab (msg 0 0))
+;                        (<!! ab 0)
+;                        (>!! ba (msg 1 1))
+;                        (<!! ba 1))
+;                      (catch Object e
+;                        (println (:throwable e) "unexpected error"))))
+;        fn-23 (fn []
+;                (try+ (do
+;                        (>!! ab (msg 2 2))
+;                        (<!! ab 2)
+;                        (>!! ba (msg 3 3))
+;                        (<!! ba 3))
+;                      (catch Object e
+;                        (println (:throwable e) "unexpected error"))))
+;        fn-45 (fn []
+;                (try+ (do
+;                        (>!! ab (msg 4 4))
+;                        (<!! ab 4)
+;                        (>!! ba (msg 5 5))
+;                        (<!! ba 5))
+;                      (catch Object e
+;                        (println (:throwable e) "unexpected error"))))
+;        ]
+;    (async/thread fn-01)
+;    (async/thread fn-23)
+;    (async/thread fn-45)
+;    (is (nil? (get-active-interaction (get-monitor ab))))
+;    ))
 
 (deftest send-and-receive-parallel-after-interaction-multicast-test
   (let [channels (add-infrastructure (parallel-after-interaction-multicast true))

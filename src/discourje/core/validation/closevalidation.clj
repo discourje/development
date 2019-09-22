@@ -18,9 +18,11 @@
     (satisfies? interactable active-interaction)
     nil
     (satisfies? branchable active-interaction)
-    (first (filter some? (flatten (for [b (:branches active-interaction)] (is-valid-close-communication? monitor sender receivers b)))))
+    (first (filter #(is-valid-close-communication? monitor sender receivers %) (get-branches active-interaction)))
+    ;(first (filter some? (flatten (for [b (:branches active-interaction)] (is-valid-close-communication? monitor sender receivers b)))))
     (satisfies? parallelizable active-interaction)
-    (first (filter some? (flatten (for [p (get-parallel active-interaction)] (is-valid-close-communication? monitor sender receivers p)))))
+    (first (filter #(is-valid-close-communication? monitor sender receivers %) (get-parallel active-interaction)))
+    ;(first (filter some? (flatten (for [p (get-parallel active-interaction)] (is-valid-close-communication? monitor sender receivers p)))))
     (satisfies? recursable active-interaction)
     (do (register-rec! monitor active-interaction)
         (is-valid-close-communication? monitor sender receivers (get-recursion active-interaction)))
@@ -52,28 +54,28 @@
 (defn- get-close-parallel-interaction
   "Check the atomic interaction"
   [sender receiver active-interaction]
-  (when-let [_ (for [parallel (get-parallel active-interaction)]
-                 (cond
-                   (satisfies? closable parallel) (when (is-valid-close? sender receiver parallel) parallel)
-                   (satisfies? interactable parallel) nil
-                   (satisfies? branchable parallel) (get-close-branch-interaction sender receiver parallel)
-                   (satisfies? parallelizable parallel) (get-close-parallel-interaction sender receiver parallel)
-                   (satisfies? recursable parallel) (get-close-recursion-interaction sender receiver parallel)
-                   :else (log-error :unsupported-operation (format "Cannot check operation on child parallel construct! %s" (interaction-to-string parallel))))
-                 )]
+  (when-let [_ (first (filter
+                        #(cond
+                           (satisfies? closable %) (when (is-valid-close? sender receiver %) %)
+                           (satisfies? interactable %) nil
+                           (satisfies? branchable %) (get-close-branch-interaction sender receiver %)
+                           (satisfies? parallelizable %) (get-close-parallel-interaction sender receiver %)
+                           (satisfies? recursable %) (get-close-recursion-interaction sender receiver %)
+                           :else (log-error :unsupported-operation (format "Cannot check operation on child parallel construct! %s" (interaction-to-string %))))
+                        (get-parallel active-interaction)))]
     active-interaction))
+
 (defn- get-close-branch-interaction
   "Check the atomic interaction"
   [sender receiver active-interaction]
-  (first (filter some? (flatten
-                         (for [branch (:branches active-interaction)]
-                           (cond
-                             (satisfies? closable branch) (when (is-valid-close? sender receiver branch) branch)
-                             (satisfies? interactable branch) nil
-                             (satisfies? branchable branch) (get-close-branch-interaction sender receiver branch)
-                             (satisfies? parallelizable branch) (get-close-parallel-interaction sender receiver branch)
-                             (satisfies? recursable branch) (get-close-recursion-interaction sender receiver branch)
-                             :else (log-error :unsupported-operation (format "Cannot check operation on child branchable construct! %s" (interaction-to-string branch)))))))))
+  (first (filter #(cond
+                    (satisfies? closable %) (when (is-valid-close? sender receiver %) %)
+                    (satisfies? interactable %) nil
+                    (satisfies? branchable %) (get-close-branch-interaction sender receiver %)
+                    (satisfies? parallelizable %) (get-close-parallel-interaction sender receiver %)
+                    (satisfies? recursable %) (get-close-recursion-interaction sender receiver %)
+                    :else (log-error :unsupported-operation (format "Cannot check operation on child branchable construct! %s" (interaction-to-string %))))
+                 (get-branches active-interaction))))
 
 (defn remove-close-from-parallel
   "Remove an interaction from a parallel in a recursive fashion."
