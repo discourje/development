@@ -171,11 +171,3 @@
   "Get minimum amount of distinct sender and receivers pairs needed to implement the given protocol"
   [interactions]
   (vec (distinct (filter some? (flatten (find-all-role-pairs interactions []))))))
-
-(defn get-interactions-by-role [role protocol]
-  (vec (some? (filter
-                (fn [interaction]
-                  (when (or
-                          (= (get-sender interaction) role)
-                          (= (get-receivers interaction) role))
-                    interaction)) protocol))))

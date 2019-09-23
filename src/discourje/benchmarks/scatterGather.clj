@@ -87,7 +87,6 @@
                             (recur result))))
                       (force-monitor-reset! (get-monitor (first m->w)) interactions))))]
        time))))
-
 ;(set-logging-exceptions)
 ;(discourje-scatter-gather 2)
 ;(discourje-scatter-gather 4)

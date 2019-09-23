@@ -78,7 +78,7 @@
 (defn- all-channels-implement-transportable?
   "Do all custom supplied channels implement the transportable interface?"
   [channels]
-  (= 1 (count (distinct (for [c channels] (satisfies? transportable c))))))
+  (every? #(satisfies? transportable %) channels))
 
 (defn channel-closed?
   "check whether a channel is closed"
@@ -121,7 +121,6 @@
 (defn- allow-receive
   "Allow a receive on the channel"
   [channel]
-  ;(log-message "allowing receive on channel!")
   (async/<!! (get-chan channel))
   channel)
 
@@ -142,7 +141,7 @@
 (defn all-channels-open?
   "Are all channels open?"
   [channels]
-  (and (not (empty? channels)) (every? false? (for [c channels] (channel-closed? c)))))
+  (and (not (empty? channels)) (every? #(not (channel-closed? %)) channels)))
 
 (defn- can-put?
   "check if the buffer in full, when full wait until there is space in the buffer"
