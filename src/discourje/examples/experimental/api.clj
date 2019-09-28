@@ -1,4 +1,5 @@
-(ns discourje.examples.experimental.api)
+(ns discourje.examples.experimental.api
+  (:gen-class))
 
 ;;
 ;; Settings
@@ -19,7 +20,9 @@
 
 (defn join
   [threads]
-  (doseq [t threads] (clojure.core.async/<!! t)))
+  (if (vector? threads)
+    (doseq [t threads] (clojure.core.async/<!! t))
+    (clojure.core.async/<!! threads)))
 
 (defn chan
   [n sender receiver monitor]

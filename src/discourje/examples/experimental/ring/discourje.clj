@@ -3,12 +3,12 @@
            [discourje.examples.experimental.api :refer :all]))
 
 (defn alicefn
-  [i in out k]
+  [i in out n]
   (if (= i 0)
     ; alice 0
-    (doseq [_ (range k)] (>!! out i) (<!! in))
+    (doseq [_ (range n)] (>!! out i) (<!! in))
     ; alice 1 <= i <= k
-    (doseq [_ (range k)] (<!! in) (>!! out i))))
+    (doseq [_ (range n)] (<!! in) (>!! out i))))
 
 (defn ring-discourje
   ([time k m]
@@ -27,4 +27,4 @@
                     (--> (alice :i) (alice (inc :i)) Long))
                (fix :X))))
 
-(ring-discourje 1 2 (monitor (spec (ring 2))))
+(ring-discourje 60 2 1 (monitor (spec (ring 2))))

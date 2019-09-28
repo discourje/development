@@ -1,4 +1,5 @@
 (ns discourje.core.async
+  (:gen-class)
   (:require [clj-uuid :as uuid]
             [discourje.core.logging :refer :all]
             [clojure.core.async :as async]

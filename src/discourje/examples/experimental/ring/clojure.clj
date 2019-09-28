@@ -3,12 +3,12 @@
            [discourje.examples.experimental.api :refer [bench join forv]]))
 
 (defn alicefn
-  [i in out k]
+  [i in out n]
   (if (= i 0)
     ; alice 0
-    (doseq [_ (range k)] (>!! out i) (<!! in))
+    (doseq [_ (range n)] (>!! out i) (<!! in))
     ; alice 1 <= i <= k
-    (doseq [_ (range k)] (<!! in) (>!! out i))))
+    (doseq [_ (range n)] (<!! in) (>!! out i))))
 
 (defn ring-clojure
   ([time k]
@@ -27,4 +27,4 @@
 
 
 
-(ring-clojure 1 2)
+(ring-clojure 60 1 2)

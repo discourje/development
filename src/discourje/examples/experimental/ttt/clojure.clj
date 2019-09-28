@@ -1,5 +1,5 @@
 (ns discourje.examples.experimental.ttt.clojure
-  (require [discourje.examples.ttt.ttt :refer :all]
+  (require [discourje.examples.experimental.ttt.ttt :refer :all]
            [discourje.examples.experimental.api :refer [bench join]]
            [clojure.core.async :refer [thread chan >!! <!!]]))
 

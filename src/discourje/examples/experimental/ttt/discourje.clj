@@ -34,8 +34,8 @@
                        b (thread (bobfn board b->a a->b))]
                    (join [a b]) (monitor-reset m)))))
 
-(def ttt (fix :X (seq (--> (alice) (bob) Long)
-                      (--> (bob) (alice) Long)
-                      (fix :X))))
+(def ttt (fix :X [(--> (alice) (bob) Long)
+                  (--> (bob) (alice) Long)
+                  (fix :X)]))
 
 (ttt-discourje 5 (monitor (spec ttt)))
