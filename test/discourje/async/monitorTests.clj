@@ -78,7 +78,8 @@
 (deftest apply-atomic-test
   (let [mon (generate-monitor (testDualProtocol true))
         message (->message "1" "hello world")]
-    (apply-interaction mon "A" "B" (get-label message))
+    (apply-send! mon "A" "B" message)
+    (apply-receive! mon "A" "B" (get-label message))
     (is (= "2" (get-action (get-active-interaction mon))))
     (is (= "B" (get-sender (get-active-interaction mon))))
     (is (= "A" (get-receivers (get-active-interaction mon))))))
@@ -114,3 +115,7 @@
 (deftest after-parallel-nested-parallel-test
   (let [mon (generate-monitor (after-parallel-nested-parallel false))]
     (is (= (:interactions mon) after-parallel-nested-parallelControl))))
+
+(deftest rec-with-parallel-with-choice-multicast-and-close-test
+  (let [mon (generate-monitor (rec-with-parallel-with-choice-multicast-and-close false))]
+    (is (= (:interactions mon) rec-with-parallel-with-choice-multicast-and-closeControl))))

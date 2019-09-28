@@ -8,7 +8,11 @@
   (mep (-->> "greet" "alice" "bob")
        (-->> "greet" "bob" "alice")
        (-->> "greet" "alice" "carol")
-       (-->> "greet" "carol" "alice")))
+       (-->> "greet" "carol" "alice")
+       (close "alice" "bob")
+       (close "bob" "alice")
+       (close "alice" "carol")
+       (close "carol" "alice")))
 
 ;Define custom channels, which differ in buffer size (1 and 2, 3, 4)
 (def a->b (chan "alice" "bob" 1))
@@ -20,18 +24,27 @@
 ;generate-infrastructure will detect if all channels in the vector implement the transportable defprotocol and that all channels required for the protocol are present in the custom channel vector
 (def infrastructure (add-infrastructure message-exchange-pattern [a->b b->a a->c c->a]))
 ;Get the channels
-(def alice-to-bob (get-channel "alice" "bob" infrastructure))
-(def bob-to-alice (get-channel "bob" "alice" infrastructure))
-(def alice-to-carol (get-channel "alice" "carol" infrastructure))
-(def carol-to-alice (get-channel "carol" "alice" infrastructure))
+(def alice-to-bob (get-channel infrastructure "alice" "bob"))
+(def bob-to-alice (get-channel infrastructure "bob" "alice"))
+(def alice-to-carol (get-channel infrastructure "alice" "carol"))
+(def carol-to-alice (get-channel infrastructure "carol" "alice"))
+
+(defn- close-all
+  "This function will use the protocol to listen for the greet message."
+  []
+  (do (close! alice-to-bob)
+      (close! bob-to-alice)
+      (close! alice-to-carol)
+      (close! carol-to-alice)))
 
 (defn- greet-bob-and-carol
   "This function will use the protocol to send the greet message to bob and carol."
   []
-  (>!! alice-to-bob (msg "greet" "Greetings, from alice!"))
-  (log-message (get-content (<!! bob-to-alice "greet")))
-  (>!! alice-to-carol (->message "greet" "Greetings, from alice!"))
-  (log-message (get-content (<!! carol-to-alice "greet"))))
+  (do (>!! alice-to-bob (msg "greet" "Greetings, from alice!"))
+      (log-message (get-content (<!! bob-to-alice "greet")))
+      (>!! alice-to-carol (->message "greet" "Greetings, from alice!"))
+      (log-message (get-content (<!! carol-to-alice "greet")))
+      (close-all)))
 
 (defn- receive-greet
   "This function will use the protocol to listen for the greet message."

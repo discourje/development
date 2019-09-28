@@ -6,6 +6,25 @@
   [action sender receiver]
   `(->interaction (uuid/v1) ~action ~sender ~receiver #{} nil))
 
+(defmacro close
+  "Create an close construct"
+  [sender receiver]
+  `(->closer (uuid/v1) ~sender ~receiver nil))
+
+(defmacro close!
+  "Close channel pair"
+  ([sender receiver infrastructure]
+   `(close-channel! ~sender ~receiver ~infrastructure))
+  ([channel]
+   `(close-channel! ~channel)))
+
+(defmacro closed?
+  "Check whether a channel is closed"
+  ([sender receiver infra]
+   `(channel-closed? ~sender ~receiver ~infra))
+  ([channel]
+   `(channel-closed? ~channel)))
+
 (defmacro rec
   "Generate recursion"
   [name interaction & more]
@@ -54,11 +73,6 @@
   "Execute body on thread"
   [body]
   `(async/thread ~body))
-
-(defmacro close!
-  "Close the channel"
-  [channel]
-  `(clojure.core.async/close! (get-chan ~channel)))
 
 (defmacro custom-time
   "Evaluates expr and prints the time it took.  Returns the value of expr."

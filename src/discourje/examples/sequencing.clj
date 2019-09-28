@@ -8,15 +8,19 @@
   (mep (-->> "greet" "alice" "bob")
        (-->> "greet" "bob" "alice")
        (-->> "greet" "alice" "carol")
-       (-->> "greet" "carol" "alice")))
+       (-->> "greet" "carol" "alice")
+       (close "alice" "bob")
+       (close "bob" "alice")
+       (close "alice" "carol")
+       (close "carol" "alice")))
 
 ;setup infrastructure, generate channels and add monitor
 (def infrastructure (add-infrastructure message-exchange-pattern))
 ;Get the channels
-(def alice-to-bob (get-channel "alice" "bob" infrastructure))
-(def bob-to-alice (get-channel "bob" "alice" infrastructure))
-(def alice-to-carol (get-channel "alice" "carol" infrastructure))
-(def carol-to-alice (get-channel "carol" "alice" infrastructure))
+(def alice-to-bob (get-channel infrastructure "alice" "bob"))
+(def bob-to-alice (get-channel infrastructure "bob" "alice"))
+(def alice-to-carol (get-channel infrastructure "alice" "carol"))
+(def carol-to-alice (get-channel infrastructure "carol" "alice"))
 
 (defn- greet-bob-and-carol
   "This function will use the protocol to send the greet message to bob and carol."
@@ -24,7 +28,11 @@
   (>!! alice-to-bob (msg "greet" "Greetings, from alice!"))
   (log-message (get-content (<!! bob-to-alice "greet")))
   (>!! alice-to-carol (->message "greet" "Greetings, from alice!"))
-  (log-message (get-content (<!! carol-to-alice "greet"))))
+  (log-message (get-content (<!! carol-to-alice "greet")))
+  (close! alice-to-bob)
+  (close! bob-to-alice)
+  (close! alice-to-carol)
+  (close! carol-to-alice))
 
 (defn- receive-greet
   "This function will use the protocol to listen for the greet message."

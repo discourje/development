@@ -6,14 +6,17 @@
 (def buy-goods
   (mep
     (-->> QuoteRequest "buyer" "seller")
-    (choice [(-->> Quote "seller" "buyer")
-             (-->> Order "buyer" "seller")
-             (-->> OrderAcknowledgment "seller" "buyer")]
-            [(-->> OutOfStock "seller" "buyer")])))
+    (choice
+      [(-->> Quote "seller" "buyer")
+       (-->> Order "buyer" "seller")
+       (-->> OrderAcknowledgement "seller" "buyer")]
+      [(-->> OutOfStock "seller" "buyer")])
+    (close "buyer" "seller")
+    (close "seller" "buyer")))
 
 (def infra (add-infrastructure buy-goods))
-(def buyer-to-seller (get-channel "buyer" "seller" infra))
-(def seller-to-buyer (get-channel "seller" "buyer" infra))
+(def buyer-to-seller (get-channel infra "buyer" "seller"))
+(def seller-to-buyer (get-channel infra "seller" "buyer"))
 
 (def product (doto (Book.) (.setName "The Joy of Clojure")))
 
@@ -41,10 +44,12 @@
 (defn buyer "Logic representing Buyer" []
   (>!! buyer-to-seller (doto (QuoteRequest.) (.setProduct product)))
   (let [quote (get-content (<!! seller-to-buyer Quote))]
-    (if (.isInStock quote)
-      (do (>!! buyer-to-seller (doto (Order.) (.setProduct product) (.setQuote quote)))
-          (println (.getMessage (get-content (<!! seller-to-buyer OrderAcknowledgement)))))
-      (println "Book is out of stock!"))))
+    (do (if (.isInStock quote)
+          (do (>!! buyer-to-seller (doto (Order.) (.setProduct product) (.setQuote quote)))
+              (println (.getMessage (get-content (<!! seller-to-buyer OrderAcknowledgement)))))
+          (println "Book is out of stock!"))
+        (close! buyer-to-seller)
+        (close! seller-to-buyer))))
 
 ;define seller
 (defn seller "Logic representing the Seller" []
