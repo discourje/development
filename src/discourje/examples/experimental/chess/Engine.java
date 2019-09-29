@@ -12,9 +12,7 @@ import java.util.List;
 public class Engine {
 
     public static String STOCKFISH = "/Users/sung/Desktop/stockfish-10-64";
-
     public static long TIME = 4 * 60 * 1000;
-
     public static int MOVES_TO_GO = 40;
 
     private final Process p;

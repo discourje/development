@@ -26,8 +26,8 @@
 
 (defn chan
   [n sender receiver monitor]
-  (discourje.core.async/->channel sender
-                                  receiver
+  (discourje.core.async/->channel (if (fn? sender) (sender) sender)
+                                  (if (fn? receiver) (receiver) receiver)
                                   (clojure.core.async/chan n)
                                   n
                                   monitor))
@@ -41,6 +41,10 @@
   (let [message (discourje.core.async/<!! chan)
         content (discourje.core.async/get-content message)]
     content))
+
+(defn close!
+  [chan]
+  (discourje.core.async/close! chan))
 
 ;;
 ;; Misc
