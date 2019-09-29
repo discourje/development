@@ -4,12 +4,12 @@
 (defprotocol monitoring
   (get-monitor-id [this])
   (get-active-interaction [this])
-  (apply-receive! [this sender receivers label])
-  (apply-send! [this sender receivers label])
+  (apply-receive! [this sender receivers label pre-swap-interaction target-interaction])
+  (apply-send! [this sender receivers label pre-swap-interaction target-interaction])
   (valid-send? [this sender receivers label])
   (valid-receive? [this sender receivers label])
   (valid-close? [this sender receiver])
-  (apply-close! [this channel])
+  (apply-close! [this channel pre-swap-interaction target-interaction])
   (is-current-multicast? [this label])
   (register-rec! [this rec])
   (get-rec [this name]))
@@ -25,7 +25,6 @@
       "validation/sendvalidation")
 
 (declare contains-value? is-valid-interaction?)
-
 
 (defn- is-valid-interaction?
   "Is the given interaction valid compared to the active-interaction of the monitor"
@@ -61,9 +60,9 @@
     (satisfies? interactable active-interaction)
     (and (or (nil? label) (= (get-action active-interaction) label) (contains-value? (get-action active-interaction) label)) (instance? Seqable (get-receivers active-interaction)))
     (satisfies? branchable active-interaction)
-    (> (count (filter true? (flatten (for [b (:branches active-interaction)] (is-active-interaction-multicast? monitor b label))))) 0)
+    (first (filter #(is-active-interaction-multicast? monitor % label) (get-branches active-interaction)))
     (satisfies? parallelizable active-interaction)
-    (> (count (filter true? (flatten (for [p (get-parallel active-interaction)] (is-active-interaction-multicast? monitor p label))))) 0)
+    (first (filter #(is-active-interaction-multicast? monitor % label) (get-parallel active-interaction)))
     (satisfies? recursable active-interaction)
     (is-active-interaction-multicast? monitor (get-recursion active-interaction) label)
     (satisfies? identifiable-recur active-interaction)
@@ -79,12 +78,15 @@
   monitoring
   (get-monitor-id [this] id)
   (get-active-interaction [this] @active-interaction)
-  (apply-send! [this sender receivers label] (apply-send-to-mon this sender receivers label active-interaction @active-interaction))
-  (apply-receive! [this sender receivers label] (apply-receive-to-mon this sender receivers label active-interaction @active-interaction))
-  (valid-send? [this sender receivers label] (is-valid-send-communication? this sender receivers label @active-interaction))
-  (valid-receive? [this sender receivers label] (is-valid-communication? this sender receivers label @active-interaction))
+  (apply-send! [this sender receivers label pre-swap-interaction target-interaction] (apply-send-to-mon this sender receivers label active-interaction pre-swap-interaction target-interaction))
+  (apply-receive! [this sender receivers label pre-swap-interaction target-interaction] (apply-receive-to-mon this sender receivers label active-interaction pre-swap-interaction target-interaction))
+  (valid-send? [this sender receivers label] (let [pre-swap @active-interaction]
+                                               (->swappable-interaction pre-swap (is-valid-send-communication? this sender receivers label pre-swap))))
+  (valid-receive? [this sender receivers label] (let [pre-swap @active-interaction]
+                                                  (->swappable-interaction pre-swap (is-valid-communication? this sender receivers label pre-swap))))
   (is-current-multicast? [this label] (is-active-interaction-multicast? this @active-interaction label))
   (register-rec! [this rec] (add-rec-to-table recursion-set rec))
   (get-rec [this name] (name @recursion-set))
-  (valid-close? [this sender receiver] (is-valid-close-communication? this sender receiver @active-interaction))
-  (apply-close! [this channel] (apply-close-to-mon this channel active-interaction @active-interaction)))
+  (valid-close? [this sender receiver] (let [pre-swap @active-interaction]
+                                         (->swappable-interaction pre-swap (is-valid-close-communication? this sender receiver pre-swap))))
+  (apply-close! [this channel pre-swap-interaction target-interaction] (apply-close-to-mon this channel active-interaction pre-swap-interaction target-interaction)))

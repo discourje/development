@@ -31,7 +31,7 @@
   (let [i1 (-->> 1 "A" "B")
         i2 (-->> 2 "A" "B")
         i3 (-->> 3 "A" "B")]
-    (is (= (assoc (make-parallel [[i1] [i2] [i3]]) :id 1) (assoc (par [i1] [i2] [i3]) :id 1)))))
+    (is (= (assoc (make-parallel [[i1] [i2] [i3]]) :id 1) (assoc (parallel [i1] [i2] [i3]) :id 1)))))
 
 (deftest create-channel-test
   (let [fnChan (generate-channel "a" "b" 1)

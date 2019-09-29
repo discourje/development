@@ -87,6 +87,7 @@
                    (discourje-buyer2 s-b2 b1-b2 b2-s ok address)
                    (force-monitor-reset! (get-monitor b1-s) interactions))))]
      time))
+
 (defn- clojure-buyer2 "Order a book from buyer2's perspective"
   [s-b2 b1-b2 b2-s ok address]
   (do
