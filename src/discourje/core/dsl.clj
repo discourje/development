@@ -10,7 +10,7 @@
 
 ;; TODO - The following unmaps aren't very elegant...
 ;(ns-unmap 'discourje.examples.experimental.dsl 'seq)
-(ns-unmap 'discourje.examples.experimental.dsl 'par)
+;(ns-unmap 'discourje.examples.experimental.dsl 'par)
 
 (defmacro -->
   ([sender receiver]
@@ -53,8 +53,8 @@
 (defn monitor [spec]
   (generate-monitor spec))
 
-(defn monitor-reset [monitor]
-  (force-monitor-reset! monitor))
+(defn monitor-reset [monitor interactions]
+  (force-monitor-reset! monitor interactions))
 
 ;;
 ;; Functions
@@ -90,28 +90,28 @@
                               (cons first rest))))
             nil))
 
-;(defn seqfn
-;  ([] [])
-;  ([first & rest] (into (if (vector? first) first [first])
-;                        (apply seqfn rest))))
+(defn seqfn
+  ([] [])
+  ([first & rest] (into (if (vector? first) first [first])
+                        (apply seqfn rest))))
 
 (defn parfn
   [first & rest]
-  (->parallel (next-id)
-              (vec (mapcat identity
-                           (map #(if (vector? %)
-                                   [%]
-                                   (if (satisfies? parallelizable %)
-                                     (get-parallel %)
-                                     [[%]]))
-                                (cons first rest))))
-              nil))
+  (->lateral (next-id)
+             (vec (mapcat identity
+                          (map #(if (vector? %)
+                                  [%]
+                                  (if (satisfies? parallelizable %)
+                                    (get-parallel %)
+                                    [[%]]))
+                               (cons first rest))))
+             nil))
 
 (defn fixfn
   ([var]
    (->recur-identifier (next-id) var :recur nil))
   ([var body]
-   (->recursion (next-id) var (if (vector? body) body [body]) nil)))
+   (->recursion (next-id) var (if (vector? body) (vec (flatten body)) [body]) nil)))
 
 (def alice (role "alice"))
 (def bob (role "bob"))
