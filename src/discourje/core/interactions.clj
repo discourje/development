@@ -71,7 +71,7 @@
   stringify
   (to-string [this] (format "Branching with branches - %s" (apply str (for [b branches] (format "[ %s ]" (to-string b)))))))
 
-(defrecord parallel [id parallels next]
+(defrecord lateral [id parallels next]
   idable
   (get-id [this] id)
   parallelizable

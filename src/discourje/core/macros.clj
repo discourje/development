@@ -43,7 +43,7 @@
 (defmacro parallel
   "Generate parallel"
   [parallels & more]
-  `(->parallel (uuid/v1) [~parallels ~@more] nil))
+  `(->lateral (uuid/v1) [~parallels ~@more] nil))
 
 (defmacro mep
   "Generate message exchange pattern aka protocol"
