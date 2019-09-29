@@ -1,16 +1,9 @@
-(ns discourje.examples.experimental.dsl
-  (:gen-class)
-  (require [clojure.walk :refer :all]
-           [clojure.pprint :refer :all]
-           [discourje.core.async :refer :all]))
+;dsl.clj
+(in-ns 'discourje.core.async)
 
 ;;
 ;; Macros
 ;;
-
-;; TODO - The following unmaps aren't very elegant...
-;(ns-unmap 'discourje.examples.experimental.dsl 'seq)
-;(ns-unmap 'discourje.examples.experimental.dsl 'par)
 
 (defmacro -->
   ([sender receiver]
@@ -47,10 +40,8 @@
   ([sp]
    `(let [s# (eval ~sp)]
       (->protocol (if (vector? s#) s# [s#])))))
-;([smap sp]
-; `(spec (eval (prewalk-replace '~smap '~sp)))))
 
-(defn monitor [spec]
+(defn mon [spec]
   (generate-monitor spec))
 
 (defn monitor-reset [monitor interactions]
@@ -112,9 +103,6 @@
    (->recur-identifier (next-id) var :recur nil))
   ([var body]
    (->recursion (next-id) var (if (vector? body) (vec (flatten body)) [body]) nil)))
-
-(def alice (role "alice"))
-(def bob (role "bob"))
 
 ;;;
 ;;; "Tests" (inspect output manually...)

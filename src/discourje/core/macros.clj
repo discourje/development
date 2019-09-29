@@ -57,12 +57,14 @@
   ([message-exchange-pattern custom-channels]
    `(generate-infrastructure ~message-exchange-pattern ~custom-channels)))
 
-(defmacro chan
-  "create a custom channel"
-  [sender receiver buffer]
-  `(if (nil? ~buffer)
-     (->channel ~sender ~receiver (clojure.core.async/chan) nil nil)
-     (->channel ~sender ~receiver (clojure.core.async/chan ~buffer) ~buffer nil)))
+; Sung: Changed this macro into a function and moved to async.clj
+;
+;(defmacro chan
+;  "create a custom channel"
+;  [sender receiver buffer]
+;  `(if (nil? ~buffer)
+;     (->channel ~sender ~receiver (clojure.core.async/chan) nil nil)
+;     (->channel ~sender ~receiver (clojure.core.async/chan ~buffer) ~buffer nil)))
 
 (defmacro msg
   "Generate a message"

@@ -1,22 +1,21 @@
-(ns discourje.examples.experimental.api
-  (:gen-class))
+(ns discourje.examples.experimental.api)
 
 ;;
 ;; Settings
 ;;
 
 (discourje.core.async/enable-wildcard)
-
 (discourje.core.logging/set-logging-exceptions)
 (discourje.core.logging/set-throwing true)
+(reset! discourje.core.async/<!!-unwrap true)
 
 ;;
-;; Api
+;; Misc
 ;;
 
-(defmacro thread
-  [body]
-  `(discourje.core.async/thread ~body))
+;(defmacro thread
+;  [body]
+;  `(discourje.core.async/thread ~body))
 
 (defn join
   [threads]
@@ -24,27 +23,27 @@
     (doseq [t threads] (clojure.core.async/<!! t))
     (clojure.core.async/<!! threads)))
 
-(defn chan
-  [n sender receiver monitor]
-  (discourje.core.async/->channel (if (fn? sender) (sender) sender)
-                                  (if (fn? receiver) (receiver) receiver)
-                                  (clojure.core.async/chan n)
-                                  n
-                                  monitor))
+;(defn chan
+;  [n sender receiver monitor]
+;  (discourje.core.async/->channel (if (fn? sender) (sender) sender)
+;                                  (if (fn? receiver) (receiver) receiver)
+;                                  (clojure.core.async/chan n)
+;                                  n
+;                                  monitor))
+;
+;(defn >!!
+;  [chan content]
+;  (discourje.core.async/>!! chan content))
 
-(defn >!!
-  [chan content]
-  (discourje.core.async/>!! chan content))
+;(defn <!!
+;  [chan]
+;  (let [message (discourje.core.async/<!! chan)
+;        content (discourje.core.async/get-content message)]
+;    content))
 
-(defn <!!
-  [chan]
-  (let [message (discourje.core.async/<!! chan)
-        content (discourje.core.async/get-content message)]
-    content))
-
-(defn close!
-  [chan]
-  (discourje.core.async/close! chan))
+;(defn close!
+;  [chan]
+;  (discourje.core.async/close! chan))
 
 ;;
 ;; Misc
@@ -67,5 +66,5 @@
         (if (< end deadline)
           (recur n')
           (println (- end begin) "ns,"
-                   n' "run,"
+                   n' "runs,"
                    (quot (- end begin) n') "ns/run"))))))

@@ -1,6 +1,6 @@
 (ns discourje.examples.experimental.ring.clojure
   (require [clojure.core.async :refer [>!! <!! chan thread]]
-           [discourje.examples.experimental.api :refer [bench join forv]]))
+           [discourje.examples.experimental.api :refer :all]))
 
 (defn alicefn
   [i in out n]

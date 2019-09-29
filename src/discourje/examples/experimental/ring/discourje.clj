@@ -1,6 +1,9 @@
 (ns discourje.examples.experimental.ring.discourje
-  (require [discourje.examples.experimental.dsl :refer :all]
+  (require [discourje.core.async :refer :all]
            [discourje.examples.experimental.api :refer :all]))
+
+(def alice (role "alice"))
+(def bob (role "bob"))
 
 (defn alicefn
   [i in out n]
@@ -27,4 +30,4 @@
                 (--> (alice i) (alice (inc i)) Long))
            (fix :X)]))
 
-(ring-discourje 5 2 1 (monitor (spec (ring 2))))
+(ring-discourje 5 2 1 (mon (spec (ring 2))))

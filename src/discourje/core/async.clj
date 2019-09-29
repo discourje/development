@@ -2,6 +2,7 @@
   (:gen-class)
   (:require [clj-uuid :as uuid]
             [discourje.core.logging :refer :all]
+            [clojure.walk :refer :all]
             [clojure.core.async :as async]
             [clojure.core.async.impl.protocols :as bufs])
   (:import (clojure.lang Seqable, Atom)))
@@ -199,6 +200,13 @@
                 (allow-send channel m))
               (recur (send-fn))))))))
 
+;; Global flag to configure whether to auto-unwrap
+;; (i.e., call get-content on messages in <!!).
+;; This probably hurts performance, because of the
+;; extra check in <!!, so at some point we should
+;; optimize this in some way.
+(def <!!-unwrap (atom false))
+
 (defn <!!
   "take form channel"
   ([channel]
@@ -221,7 +229,9 @@
                  (log-error :incorrect-communication (format "Atomic-receive communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) label (to-string (get-active-interaction (get-monitor channel)))))
                  (do (apply-receive! (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label result) (get-pre-swap valid-interaction) (get-valid valid-interaction))
                      (allow-receive channel)
-                     result)))))))))
+                     (if @<!!-unwrap
+                       (get-content result)
+                       result))))))))))
 
 (defn <!!!
   "take form channel peeking, and delay receive when parallel"
@@ -272,3 +282,19 @@
    (if (not (nil? infra))
      (close-channel! (get-channel infra sender receiver))
      (log-error :invalid-channel (format "You are trying to close a channel from %s to %s but there is no infrastructure!" sender receiver)))))
+
+(defn chan
+  "create a custom channel"
+  ([sender receiver buffer]
+   (if (nil? buffer)
+     (->channel sender receiver (clojure.core.async/chan) nil nil)
+     (->channel sender receiver (clojure.core.async/chan buffer) buffer nil)))
+  ([n sender receiver monitor]
+   (->channel (if (fn? sender) (sender) sender)
+              (if (fn? receiver) (receiver) receiver)
+              (clojure.core.async/chan n)
+              n
+              monitor)))
+
+;; Load at the end, because it depends on definitions in this file
+(load "dsl")
