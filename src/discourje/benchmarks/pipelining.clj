@@ -35,6 +35,7 @@
      (let [protocol (create-protocol (vec (for [p (range amount)] (-->> 1 p (+ p 1)))))
            infra (generate-infrastructure protocol)
            channels (vec (for [p (range amount)] (get-channel infra p (+ p 1) )))
+           interactions (get-active-interaction (get-monitor (first channels)))
            msg (msg 1 1)
            time (custom-time
                   (doseq [_ (range iterations)]
@@ -44,7 +45,7 @@
                             (<!! (nth channels pipe) 1)
                             (when (true? (< pipe (- amount 1)))
                               (recur (+ 1 pipe)))))
-                        (force-monitor-reset! (get-monitor (first channels)))
+                        (force-monitor-reset! (get-monitor (first channels)) interactions)
                         )))]
        time))))
 
@@ -65,6 +66,7 @@
    (let [protocol (create-protocol (vec (for [p (range (- amount 1))] (-->> 1 p (+ p 1)))))
          infra (generate-infrastructure protocol)
          channels (vec (for [p (range (- amount 1))] (get-channel infra p (+ p 1) )))
+         interactions (get-active-interaction (get-monitor (first channels)))
          msg (msg 1 1)
          max (- amount 2)
          time (cond
@@ -74,7 +76,7 @@
                                   (do
                                     (do (thread (do (>!! (first channels) msg)))
                                         (<!! (first channels) 1))
-                                    (force-monitor-reset! (get-monitor (first channels))))))
+                                    (force-monitor-reset! (get-monitor (first channels)) interactions))))
                 :else
                 (custom-time
                   (doseq [_ (range iterations)]
@@ -87,7 +89,7 @@
                         (when (< 0 element)
                           (recur (- element 1))))
                       (<!! (last channels) 1)
-                      (force-monitor-reset! (get-monitor (first channels)))))))]
+                      (force-monitor-reset! (get-monitor (first channels)) interactions)))))]
      time)))
 ;(set-logging-exceptions)
 ;(discourje-pipeline-new-reverse 32 1)
@@ -97,6 +99,7 @@
    (let [protocol (create-protocol (vec (for [p (range (- amount 1))] (-->> 1 p (+ p 1)))))
          infra (generate-infrastructure protocol)
          channels (vec (for [p (range (- amount 1))] (get-channel infra p (+ p 1) )))
+         interactions (get-active-interaction (get-monitor (first channels)))
          msg (msg 1 1)
          max (- amount 2)
          time (cond
@@ -106,7 +109,7 @@
                                   (do
                                     (do (thread (do (clojure.core.async/>!! (get-chan (first channels)) msg)))
                                         (clojure.core.async/<!! (get-chan (first channels))))
-                                    (force-monitor-reset! (get-monitor (first channels))))))
+                                    (force-monitor-reset! (get-monitor (first channels)) interactions))))
                 :else
                 (custom-time
                   (doseq [_ (range iterations)]
@@ -119,7 +122,7 @@
                         (when (< 0 element)
                           (recur (- element 1))))
                       (clojure.core.async/<!! (get-chan (last channels)))
-                      (force-monitor-reset! (get-monitor (first channels)))))))]
+                      (force-monitor-reset! (get-monitor (first channels)) interactions)))))]
      time)))
 
 (defn discourje-pipeline-new
@@ -139,6 +142,7 @@
    (let [protocol (create-protocol (vec (for [p (range (- amount 1))] (-->> 1 p (+ p 1)))))
          infra (generate-infrastructure protocol)
          channels (vec (for [p (range (- amount 1))] (get-channel infra p (+ p 1) )))
+         interactions (get-active-interaction (get-monitor (first channels)))
          msg (msg 1 1)
          max (- amount 3)
          time (cond
@@ -148,7 +152,7 @@
                                   (do
                                     (do (thread (do (>!! (first channels) msg)))
                                         (<!! (first channels) 1))
-                                    (force-monitor-reset! (get-monitor (first channels))))))
+                                    (force-monitor-reset! (get-monitor (first channels)) interactions))))
                 :else
                 (custom-time
                   (doseq [_ (range iterations)]
@@ -160,7 +164,7 @@
                         (when (< element max)
                           (recur (+ 1 element))))
                       (<!! (last channels) 1)
-                      (force-monitor-reset! (get-monitor (first channels)))))))]
+                      (force-monitor-reset! (get-monitor (first channels)) interactions)))))]
      time)))
 
 (defn clojure-pipeline-new
@@ -168,6 +172,7 @@
    (let [protocol (create-protocol (vec (for [p (range (- amount 1))] (-->> 1 p (+ p 1)))))
          infra (generate-infrastructure protocol)
          channels (vec (for [p (range (- amount 1))] (get-channel infra p (+ p 1) )))
+         interactions (get-active-interaction (get-monitor (first channels)))
          msg (msg 1 1)
          max (- amount 3)
          time (cond
@@ -177,7 +182,7 @@
                                   (do
                                     (do (thread (do (clojure.core.async/>!! (get-chan (first channels)) msg)))
                                         (clojure.core.async/<!! (get-chan (first channels))))
-                                    (force-monitor-reset! (get-monitor (first channels))))))
+                                    (force-monitor-reset! (get-monitor (first channels)) interactions))))
                 :else
                 (custom-time
                   (doseq [_ (range iterations)]
@@ -190,7 +195,7 @@
                           (recur (+ 1 element))))
 
                       (clojure.core.async/<!! (get-chan (last channels)))
-                      (force-monitor-reset! (get-monitor (first channels)))))))]
+                      (force-monitor-reset! (get-monitor (first channels)) interactions)))))]
      time)))
 
 (defn clojure-pipeline
@@ -212,6 +217,7 @@
      (let [protocol (create-protocol (vec (for [p (range amount)] (-->> 1 p (+ p 1)))))
            infra (generate-infrastructure protocol)
            channels (vec (for [p (range amount)] (get-channel infra p (+ p 1) )))
+           interactions (get-active-interaction (get-monitor (first channels)))
            msg (msg 1 1)
            time (custom-time
                   (doseq [_ (range iterations)]
@@ -221,6 +227,6 @@
                             (clojure.core.async/<!! (get-chan (nth channels pipe)))
                             (when (true? (< pipe (- amount 1)))
                               (recur (+ 1 pipe)))))
-                        (force-monitor-reset! (get-monitor (first channels))))))]
+                        (force-monitor-reset! (get-monitor (first channels)) interactions))))]
 
        time))))

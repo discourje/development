@@ -23,6 +23,17 @@
 (defprotocol stringify
   (to-string [this]))
 
+(defprotocol swappable
+  (get-pre-swap [this])
+  (get-valid [this])
+  (is-valid-for-swap? [this]))
+
+(defrecord swappable-interaction [pre-swap valid]
+  swappable
+  (get-pre-swap [this] pre-swap)
+  (get-valid [this] valid)
+  (is-valid-for-swap? [this] (some? valid)))
+
 (defrecord interaction [id action sender receivers accepted-sends next]
   idable
   (get-id [this] id)
@@ -60,7 +71,7 @@
   stringify
   (to-string [this] (format "Branching with branches - %s" (apply str (for [b branches] (format "[ %s ]" (to-string b)))))))
 
-(defrecord parallel [id parallels next]
+(defrecord lateral [id parallels next]
   idable
   (get-id [this] id)
   parallelizable
@@ -160,11 +171,3 @@
   "Get minimum amount of distinct sender and receivers pairs needed to implement the given protocol"
   [interactions]
   (vec (distinct (filter some? (flatten (find-all-role-pairs interactions []))))))
-
-(defn get-interactions-by-role [role protocol]
-  (vec (some? (filter
-                (fn [interaction]
-                  (when (or
-                          (= (get-sender interaction) role)
-                          (= (get-receivers interaction) role))
-                    interaction)) protocol))))

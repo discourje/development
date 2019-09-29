@@ -63,7 +63,7 @@
         (is true (channel-closed? ab))))
     (is (nil? (get-active-interaction (get-monitor ab))))))
 
-(deftest close-interaction-with-parallel-and-closer-test
+(deftest close-interaction-with-parallel-and-closer-with-interactions-in-parallel-test
   (let [channels (add-infrastructure (interaction-with-parallel-and-closer-with-interactions-in-parallel true))
         ab (get-channel channels "a" "b")
         ba (get-channel channels "b" "a")]

@@ -67,6 +67,7 @@
            w->m (vec (for [w (range workers)] {:take (get-channel infra "m" (format "w%s" w))
                                                :put  (get-channel infra (format "w%s" w) "m")}))
            msg (msg 1 1)
+           interactions (get-active-interaction (get-monitor (first m->w)))
            time (custom-time
                   (doseq [_ (range iterations)]
                     (do
@@ -84,9 +85,8 @@
                                        (+ worker-id 1))]
                           (when (< result workers)
                             (recur result))))
-                      (force-monitor-reset! (get-monitor (first m->w))))))]
+                      (force-monitor-reset! (get-monitor (first m->w)) interactions))))]
        time))))
-
 ;(set-logging-exceptions)
 ;(discourje-scatter-gather 2)
 ;(discourje-scatter-gather 4)
@@ -163,6 +163,7 @@
            m->w (vec (for [w (range workers)] (get-channel infra"m" (format "w%s" w))))
            w->m (vec (for [w (range workers)] {:take (get-channel infra"m" (format "w%s" w))
                                                :put  (get-channel infra (format "w%s" w) "m")}))
+           interactions (get-active-interaction (get-monitor (first m->w)))
            msg (msg 1 1)
            time (custom-time
                   (doseq [_ (range iterations)]
@@ -179,7 +180,7 @@
                                        (+ worker-id 1))]
                           (when (< result workers)
                             (recur result))))
-                      (force-monitor-reset! (get-monitor (first m->w))))))]
+                      (force-monitor-reset! (get-monitor (first m->w)) interactions))))]
        time))))
 
 (defn clojure-scatter-gather
@@ -230,6 +231,7 @@
            m->w (vec (for [w (range workers)] (get-channel infra "m" (format "w%s" w))))
            w->m (vec (for [w (range workers)] {:take (get-channel infra "m" (format "w%s" w))
                                                :put  (get-channel infra (format "w%s" w) "m")}))
+           interactions (get-active-interaction (get-monitor (first m->w)))
            msg (msg 1 1)
            time (custom-time
                   (doseq [_ (range iterations)]
@@ -248,7 +250,7 @@
                                        (+ worker-id 1))]
                           (when (< result workers)
                             (recur result))))
-                      (force-monitor-reset! (get-monitor (first m->w))))))]
+                      (force-monitor-reset! (get-monitor (first m->w)) interactions))))]
        time))))
 
 ;(clojure-scatter-gather 16 16)

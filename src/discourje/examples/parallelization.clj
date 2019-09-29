@@ -7,9 +7,9 @@
 ; Alose, Alice will be able to respond to Bob with message 3 and 5 at the `same' time.
 (def message-exchange-pattern
   (mep (-->> 1 "Alice" "Bob")
-       (par [(-->> 2 "Bob" "Carol")
+       (parallel [(-->> 2 "Bob" "Carol")
              (-->> 3 "Carol" "Bob")]
-            [(-->> 4 "Bob" "Alice")
+                 [(-->> 4 "Bob" "Alice")
              (-->> 5 "Alice" "Bob")])
        (close "Alice" "Bob")
        (close "Bob" "Alice")
