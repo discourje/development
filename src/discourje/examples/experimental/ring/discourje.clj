@@ -14,17 +14,17 @@
   ([time k m]
    (ring-discourje time k 1000 m))
   ([time k n m]
-   (let [chans (forv [i (range k)] (chan 1 (alice i) (alice (+ i 1)) m))]
+   (let [chans (forv [i (range k)] (chan 1 (alice i) (alice (inc i)) m))]
      (bench time #(let [aaa (forv [i (range k)]
                                   (thread (alicefn i
                                                    (get chans (mod (- i 1) k))
                                                    (get chans i)
                                                    n)))]
-                    (join aaa) (monitor-reset m))))))
+                    (join aaa))))))
 
 (defn ring [k]
-  (fix :X (seq (rep seq [:i (range k)]
-                    (--> (alice :i) (alice (inc :i)) Long))
-               (fix :X))))
+  (fix :X [(rep seq [i (range k)]
+                (--> (alice i) (alice (inc i)) Long))
+           (fix :X)]))
 
-(ring-discourje 60 2 1 (monitor (spec (ring 2))))
+(ring-discourje 5 2 1 (monitor (spec (ring 2))))
