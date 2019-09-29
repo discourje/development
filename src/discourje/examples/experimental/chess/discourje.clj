@@ -5,12 +5,16 @@
 (def white (role "white"))
 (def black (role "black"))
 
-(def chess-close (--> white black Long))
+;(def chess-close (--> white black Long))
+;(def chess (fix :X [(--> white black String)
+;                    (alt chess-close
+;                         [(--> black white String)
+;                          (alt chess-close
+;                               (fix :X))])]))
+
 (def chess (fix :X [(--> white black String)
-                    (alt chess-close
-                         [(--> black white String)
-                          (alt chess-close
-                               (fix :X))])]))
+                    (--> black white String)
+                    (fix :X)]))
 
 (def m (monitor (spec chess)))
 

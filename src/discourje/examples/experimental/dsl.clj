@@ -47,8 +47,8 @@
   ([sp]
    `(let [s# (eval ~sp)]
       (->protocol (if (vector? s#) s# [s#])))))
-  ;([smap sp]
-  ; `(spec (eval (prewalk-replace '~smap '~sp)))))
+;([smap sp]
+; `(spec (eval (prewalk-replace '~smap '~sp)))))
 
 (defn monitor [spec]
   (generate-monitor spec))
