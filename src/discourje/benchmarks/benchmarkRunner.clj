@@ -24,7 +24,7 @@
   (discourje.benchmarks.pipelining/clojure-pipeline-new-reverse amount iterations))
 
 (defn start-discourje-scattergather [workers iterations]
-  (discourje.benchmarks.scatterGather/discourje-scatter-gather workers iterations))
+  (discourje.benchmarks.scatterGather/discourje-scatter-gather-parallel workers iterations))
 
 (defn start-clojure-scattergather [workers iterations]
   (discourje.benchmarks.scatterGather/clojure-scatter-gather workers iterations))

@@ -20,10 +20,8 @@
   "Finds a channel based on provider and consumer"
   [provider consumer channels]
   (first
-    (filter (fn [c]
-              (and
-                (= (get-provider c) provider)
-                (= (get-consumer c) consumer)))
+    (filter #(and (= (get-provider %) provider)
+                  (= (get-consumer %) consumer))
             channels)))
 
 (defprotocol infrastructurable

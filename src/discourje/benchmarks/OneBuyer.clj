@@ -57,6 +57,7 @@
   (let [infra (add-infrastructure buy-goods)
         b->s (get-channel infra "buyer" "seller")
         s->b (get-channel infra "seller" "buyer")
+        interactions (get-active-interaction (get-monitor b->s))
         product {:product-type "book" :content {:title "The joy of Clojure"}}
         quote-request (msg "quote-request" product)
         order (msg "order" "confirm order!")
@@ -69,7 +70,7 @@
                  (do
                    (clojure.core.async/thread (discourje-seller b->s s->b in-stock? quote order-ack out-of-stock))
                    (discourje-buyer b->s s->b quote-request order)
-                   (force-monitor-reset! (get-monitor b->s)))))]
+                   (force-monitor-reset! (get-monitor b->s) interactions))))]
 
     time))
 
@@ -115,6 +116,7 @@
   (let [infra (add-infrastructure buy-goods)
         b->s (get-channel infra "buyer" "seller")
         s->b (get-channel infra "seller" "buyer")
+        interactions (get-active-interaction (get-monitor b->s))
         product {:product-type "book" :content {:title "The joy of Clojure"}}
         quote-request (msg "quote-request" product)
         order (msg "order" "confirm order!")
@@ -127,7 +129,7 @@
                  (do
                    (clojure.core.async/thread (clojure-seller (get-chan b->s) (get-chan s->b) in-stock? quote order-ack out-of-stock))
                    (clojure-buyer (get-chan b->s) (get-chan s->b) quote-request order)
-                   (force-monitor-reset! (get-monitor b->s)))))]
+                   (force-monitor-reset! (get-monitor b->s) interactions))))]
     time))
 ;(clojure-one-buyer 1)
 ;(clojure-one-buyer 2)

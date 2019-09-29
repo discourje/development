@@ -73,6 +73,7 @@
         s-b2 (get-channel infra "seller" "buyer2")
         b2-s (get-channel infra "buyer2" "seller")
         title (msg "title" "The Joy of Clojure")
+         interactions (get-active-interaction (get-monitor b1-s))
         div (msg "quote-div" 16)
         ok (msg "ok" "ok")
         address (msg "address" "Open University, Valkenburgerweg 177, 6419 AT, Heerlen")
@@ -84,8 +85,9 @@
                    (thread (discourje-buyer1 b1-s s-b1 b1-b2 title div))
                    (thread (discourje-seller b1-s s-b1 s-b2 b2-s  quote date))
                    (discourje-buyer2 s-b2 b1-b2 b2-s ok address)
-                   (force-monitor-reset! (get-monitor b1-s )))))]
+                   (force-monitor-reset! (get-monitor b1-s) interactions))))]
      time))
+
 (defn- clojure-buyer2 "Order a book from buyer2's perspective"
   [s-b2 b1-b2 b2-s ok address]
   (do
@@ -151,6 +153,7 @@
         s-b2 (get-channel infra "seller" "buyer2")
         b2-s (get-channel infra "buyer2" "seller")
         title (msg "title" "The Joy of Clojure")
+        interactions (get-active-interaction (get-monitor b1-s))
         div (msg "quote-div" 16)
         ok (msg "ok" "ok")
         address (msg "address" "Open University, Valkenburgerweg 177, 6419 AT, Heerlen")
@@ -162,5 +165,5 @@
                    (clojure.core.async/thread (clojure-buyer1 (get-chan b1-s) (get-chan s-b1) (get-chan b1-b2) title div))
                    (clojure.core.async/thread (clojure-seller (get-chan b1-s) (get-chan s-b1) (get-chan s-b2) (get-chan b2-s) quote date))
                    (clojure-buyer2 (get-chan s-b2) (get-chan b1-b2) (get-chan b2-s) ok address)
-                   (force-monitor-reset! (get-monitor b1-s)))))]
+                   (force-monitor-reset! (get-monitor b1-s) interactions))))]
     time))
