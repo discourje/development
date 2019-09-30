@@ -20,7 +20,7 @@
         b1-b2 (get-channel infra "buyer1" "buyer2")]
     (>!! b1-s (msg "title" (generate-book)))
     (let [quote (<!!! s-b1 "quote")
-          div (quote-div (get-content quote))]
+          div (quote-div quote)]
       (do
         (>!! b1-b2 (msg "quote-div" div))
         (when (<!!! s-b1 "date")

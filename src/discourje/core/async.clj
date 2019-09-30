@@ -220,7 +220,7 @@
                  (log-error :incorrect-communication (format "Atomic-receive communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) label (to-string (get-active-interaction (get-monitor channel)))))
                  (do (apply-receive! (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label result) (get-pre-swap valid-interaction) (get-valid valid-interaction))
                      (allow-receive channel)
-                     result)))))))))
+                     (get-content result))))))))))
 
 (defn <!!!
   "take form channel peeking, and delay receive when parallel"
@@ -248,7 +248,7 @@
                      (allow-receive channel)
                      (loop [par isParallel]
                        (when (true? par) (recur (= id (get-id (get-active-interaction (get-monitor channel)))))))
-                     result)))))))))
+                     (get-content result))))))))))
 
 (defn close-channel!
   "Close a channel with the given sender and receiver"

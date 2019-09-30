@@ -13,15 +13,15 @@
   (let [s-b2 (get-channel infra"seller" "buyer2")
         b1-b2 (get-channel infra "buyer1" "buyer2")
         b2-s (get-channel infra "buyer2" "seller")
-        quote (get-content (<!!! s-b2 "quote"))
-        quote-div (get-content (<!! b1-b2 "quote-div"))]
+        quote  (<!!! s-b2 "quote")
+        quote-div  (<!! b1-b2 "quote-div")]
     (if (contribute? quote quote-div)
-      (do (>!! b2-s (msg "ok" "ok"))
+      (do (>!! b2-s (msg "ok" {:choice "ok"}))
           (>!! b2-s (msg "address" (generate-address)))
           (let [date (<!!! s-b2 "date")]
-            (log-message (format "Thank you, I will put %s in my agenda!" (get-content date)))
+            (log-message (format "Thank you, I will put %s in my agenda!"  date))
             (order-book infra)))
-      (>!! b2-s (msg "quit" "Price to high!")))))
+      (>!! b2-s (msg "quit" {:choice "quit"})))))
 
 ;wait for quote
 ;wait for quote div
