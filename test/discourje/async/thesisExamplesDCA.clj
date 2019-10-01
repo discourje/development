@@ -16,10 +16,10 @@
 
 (defn alice []
   (>!! alice-to-bob (msg "Foo" "Foo content"))
-  (println "Alice received: " (get-content (<!! bob-to-alice "Bar"))))
+  (println "Alice received: " (<!! bob-to-alice "Bar")))
 
 (defn bob []
-  (println "Bob received: " (get-content (<!! alice-to-bob "Foo")))
+  (println "Bob received: " (<!! alice-to-bob "Foo"))
   (>!! bob-to-alice (msg "Bar" "Bar content")))
 
 (thread (alice))
@@ -39,10 +39,10 @@
 (defn buyer1 []
   (println "Buyer1 to request quote for book.")
   (>!! buyer1-to-seller (msg "Title" "The Joy of Clojure"))
-  (println "The quote for the book is: " (get-content (<!! seller-to-buyer1 "Quote"))))
+  (println "The quote for the book is: " (<!! seller-to-buyer1 "Quote")))
 
 (defn seller []
-  (let [book (get-content (<!! buyer1-to-seller "Title"))]
+  (let [book (<!! buyer1-to-seller "Title")]
     (println (format "Received book: %s, returning price." book))
     (>!! seller-to-buyer1 (msg "Quote" "$40.00"))))
 
@@ -64,31 +64,31 @@
 ;------------BEFORE-----------------
 (defn alice []
   (>!! alice-to-bob (msg java.lang.Integer 1))
-  (println "Alice received: " (get-content (<!! bob-to-alice java.lang.Integer)))
+  (println "Alice received: " (<!! bob-to-alice java.lang.Integer))
   (>!! alice-to-carol (msg java.lang.Integer 3))
-  (println "Alice received: " (get-content (<!! carol-to-alice java.lang.Integer))))
+  (println "Alice received: " (<!! carol-to-alice java.lang.Integer)))
 
 (defn bob []
-  (println "Bob received: " (get-content (<!! alice-to-bob java.lang.Integer)))
+  (println "Bob received: " (<!! alice-to-bob java.lang.Integer))
   (>!! bob-to-alice (msg java.lang.Integer 2)))
 
 (defn carol []
-  (println "Carol received: " (get-content (<!! alice-to-carol java.lang.Integer)))
+  (println "Carol received: " (<!! alice-to-carol java.lang.Integer))
   (>!! carol-to-alice (msg java.lang.Integer 4)))
 ;------------AFTER-----------------
 (enable-wildcard)
 (defn alice []
   (>!! alice-to-bob 1)
-  (println "Alice received: " (get-content (<!! bob-to-alice)))
+  (println "Alice received: " (<!! bob-to-alice))
   (>!! alice-to-carol 3)
-  (println "Alice received: " (get-content (<!! carol-to-alice))))
+  (println "Alice received: " (<!! carol-to-alice)))
 
 (defn bob []
-  (println "Bob received: " (get-content (<!! alice-to-bob)))
+  (println "Bob received: " (<!! alice-to-bob))
   (>!! bob-to-alice 2))
 
 (defn carol []
-  (println "Carol received: " (get-content (<!! alice-to-carol)))
+  (println "Carol received: " (<!! alice-to-carol))
   (>!! carol-to-alice 4))
 
 (defn multicast [interactions]

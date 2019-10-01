@@ -64,29 +64,22 @@
       (do
         (>!! b1s (->message "title" "The Joy of Clojure"))
         (let [b1-title-s (<!! b1s "title")]
-          (is (= "title" (get-label b1-title-s)))
-          (is (= "The Joy of Clojure" (get-content b1-title-s)))
+          (is (= "The Joy of Clojure"  b1-title-s))
           (>!! [sb1 sb2] (->message "quote" (+ 1 (rand-int 20))))
           (let [s-quote-b1 (<!! sb1 "quote")
                 s-quote-b2 (<!! sb2 "quote")]
-            (is (= "quote" (get-label s-quote-b1)))
-            (is (= "quote" (get-label s-quote-b2)))
-            (>!! b1b2 (->message "quoteDiv" (rand-int (get-content s-quote-b1))))
+            (>!! b1b2 (->message "quoteDiv" (rand-int s-quote-b1)))
             (let [b1-quoteDiv-b2 (<!! b1b2 "quoteDiv")]
-              (is (= "quoteDiv" (get-label b1-quoteDiv-b2)))
-              (if (>= (* 100 (float (/ (get-content b1-quoteDiv-b2) (get-content s-quote-b2)))) 50)
+              (if (>= (* 100 (float (/ b1-quoteDiv-b2 s-quote-b2))) 50)
                 (do
                   (>!! b2s (->message "ok" "Open University, Valkenburgerweg 177, 6419 AT, Heerlen"))
                   (let [b2-ok-s (<!! b2s "ok")]
-                    (is (= "ok" (get-label b2-ok-s)))
-                    (is (= "Open University, Valkenburgerweg 177, 6419 AT, Heerlen" (get-content b2-ok-s)))
+                    (is (= "Open University, Valkenburgerweg 177, 6419 AT, Heerlen" b2-ok-s))
                     (>!! sb2 (->message "date" "09-04-2019"))
                     (let [s-date-b2 (<!! sb2 "date")]
-                      (is (= "date" (get-label s-date-b2)))
-                      (is (= "09-04-2019" (get-content s-date-b2))))))
+                      (is (= "09-04-2019" s-date-b2)))))
                 (do
                   (>!! b2s (->message "quit" "Price to high"))
                   (let [b2-quit-s (<!! b2s "quit")]
-                    (is (= "quit" (get-label b2-quit-s)))
-                    (is (= "Price to high" (get-content b2-quit-s)))
+                    (is (= "Price to high" b2-quit-s))
                     (reset! order-book false)))))))))))

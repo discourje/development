@@ -16,7 +16,7 @@
 
 (defn- receive-from-user "This function will use the protocol to listen for the helloWorld message."
   [] (let [message (<!! user-to-world "helloWorld")]
-       (log-message "World received message: " (get-content message))
+       (log-message "World received message: " message)
        (close! user-to-world)))
 
 ;start the `sendToWorld' function on thread

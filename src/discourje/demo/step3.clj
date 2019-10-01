@@ -43,10 +43,10 @@
 ;define buyer logic
 (defn buyer "Logic representing Buyer" []
   (>!! buyer-to-seller (doto (QuoteRequest.) (.setProduct product)))
-  (let [quote (get-content (<!! seller-to-buyer Quote))]
+  (let [quote (<!! seller-to-buyer Quote)]
     (do (if (.isInStock quote)
           (do (>!! buyer-to-seller (doto (Order.) (.setProduct product) (.setQuote quote)))
-              (println (.getMessage (get-content (<!! seller-to-buyer OrderAcknowledgement)))))
+              (println (.getMessage (<!! seller-to-buyer OrderAcknowledgement))))
           (println "Book is out of stock!"))
         (close! buyer-to-seller)
         (close! seller-to-buyer))))
@@ -54,9 +54,9 @@
 ;define seller
 (defn seller "Logic representing the Seller" []
   ;(>!! seller-to-buyer (msg "miscommunication" "Diverging from MEP")) ;Uncomment to introduce miscommunication
-  (if (in-stock? (get-content (<!! buyer-to-seller QuoteRequest)))
+  (if (in-stock? (<!! buyer-to-seller QuoteRequest))
     (do (>!! seller-to-buyer (doto (Quote.) (.setInStock true) (.setPrice 40.00) (.setProduct product)))
-        (let [order (get-content (<!! buyer-to-seller Order))]
+        (let [order (<!! buyer-to-seller Order)]
           (>!! seller-to-buyer
                (doto (OrderAcknowledgement.)
                  (.setOrder order)
