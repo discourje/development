@@ -1,26 +1,41 @@
 (ns discourje.examples.experimental.chess.discourje
-  (require [discourje.examples.experimental.dsl :refer :all]
-           [discourje.examples.experimental.api :refer :all]))
+  (require [discourje.core.async :refer :all]))
+
+;;
+;; Configuration
+;;
+
+(enable-wildcard)
+(discourje.core.logging/set-logging-exceptions)
+(discourje.core.logging/set-throwing true)
+(reset! <!!-unwrap true)
+
+;; Roles
 
 (def white (role "white"))
 (def black (role "black"))
 
-;(def chess-close (--> white black Long))
-;(def chess (fix :X [(--> white black String)
-;                    (alt chess-close
-;                         [(--> black white String)
-;                          (alt chess-close
-;                               (fix :X))])]))
+;; Specification
 
-(def chess (fix :X [(--> white black String)
-                    (--> black white String)
-                    (fix :X)]))
+(def chess-close (dsl (par (-## white black) (-## black white))))
 
-(def m (monitor (spec chess)))
+(def chess (dsl (fix :X [(--> white black String)
+                         (alt chess-close
+                              [(--> black white String)
+                               (alt chess-close
+                                    (fix :X))])])))
+
+;; Monitor
+
+(def m (mon (spec chess)))
+
+;; Channels
 
 (def w->b (chan 1 white black m))
 (def b->w (chan 1 black white m))
 (def b<-w w->b)
 (def w<-b b->w)
+
+;; Threads
 
 (load "threads")

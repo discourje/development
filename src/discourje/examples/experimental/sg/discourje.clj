@@ -1,6 +1,6 @@
 (ns discourje.examples.experimental.sg.discourje
   (require [discourje.examples.experimental.dsl :refer :all]
-           [discourje.examples.experimental.api :refer :all]))
+           [discourje.examples.experimental.util :refer :all]))
 
 (defn alicefn
   [outs n]

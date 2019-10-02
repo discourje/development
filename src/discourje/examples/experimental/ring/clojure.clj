@@ -1,30 +1,17 @@
 (ns discourje.examples.experimental.ring.clojure
   (require [clojure.core.async :refer [>!! <!! chan thread]]
-           [discourje.examples.experimental.api :refer :all]))
+           [discourje.examples.experimental.util :refer :all]))
 
-(defn alicefn
-  [i in out n]
-  (if (= i 0)
-    ; alice 0
-    (doseq [_ (range n)] (>!! out i) (<!! in))
-    ; alice 1 <= i <= k
-    (doseq [_ (range n)] (<!! in) (>!! out i))))
+;; Implementation
 
-(defn ring-clojure
-  ([time k]
-   (ring-clojure time k 1000))
-  ([time k n]
-   (let [chans (forv [i (range k)] (chan 1))]
-     (bench time #(let [aaa (forv [i (range k)]
-                                  (thread (alicefn i
-                                                   (get chans (mod (- i 1) k))
-                                                   (get chans i)
-                                                   n)))]
-                    (join aaa))))))
+(load "threads")
 
+;; Run
 
+(def run
+  (fn [time k n-iter]
+    (let [chans (vec (for [_ (range k)] (chan 1)))
+          threads (fn [] (vec (for [i (range k)] (thread-worker [i k] chans n-iter))))]
+      (bench time #(join (threads))))))
 
-
-
-
-(ring-clojure 5 2 1)
+(run 60 2 1)

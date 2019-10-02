@@ -1,6 +1,6 @@
 (ns discourje.examples.experimental.ttt.discourje
   (require [discourje.examples.experimental.ttt.ttt :refer :all]
-           [discourje.examples.experimental.api :refer :all]
+           [discourje.examples.experimental.util :refer :all]
            [discourje.examples.experimental.dsl :refer :all]))
 
 (defn alicefn [board a->b a<-b]

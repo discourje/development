@@ -11,10 +11,13 @@ import java.util.List;
 
 public class Engine {
 
+    public static int MAX_MOVES = 5899; // https://chess.stackexchange.com/questions/4113
+
     public static String STOCKFISH = "/Users/sung/Desktop/stockfish-10-64";
     public static long TIME = 4 * 60 * 1000;
     public static int MOVES_TO_GO = 40;
 
+    private final boolean simple;
     private final Process p;
     private final BufferedReader in;
     private final PrintWriter out;
@@ -25,8 +28,9 @@ public class Engine {
     private long time = TIME;
     private int movesToGo = MOVES_TO_GO;
 
-    public Engine() {
+    public Engine(boolean simple) {
         try {
+            this.simple = simple;
             p = Runtime.getRuntime().exec(STOCKFISH);
             out = new PrintWriter(p.getOutputStream());
             in = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -43,7 +47,7 @@ public class Engine {
 
         var tWhite = new Thread(() -> {
             //try {
-            var e = new Engine();
+            var e = new Engine(false);
             //q1.put(e.turn(null));
             c1.send(e.turn(null));
             while (true) {
@@ -66,7 +70,7 @@ public class Engine {
 
         var tBlack = new Thread(() -> {
             //try {
-            var e = new Engine();
+            var e = new Engine(true);
             while (true) {
                 //var move = q1.take();
                 var move = (String) c1.recv();
@@ -94,6 +98,10 @@ public class Engine {
     }
 
     public String turn(String opponentMove) {
+        if (moves.size() >= MAX_MOVES) {
+            return "(none)";
+        }
+
         if (opponentMove != null) {
             moves.add(opponentMove);
         }
@@ -190,9 +198,11 @@ public class Engine {
 
     private void go(boolean ponder) {
         out.print("go");
-        out.print(ponder ? " ponder" : "");
-        out.print((moves.size() % 2 == 0 ? " wtime " : " btime ") + time);
-        out.print(" movestogo " + movesToGo);
+        if (!simple) {
+            out.print(ponder ? " ponder" : "");
+            out.print((moves.size() % 2 == 0 ? " wtime " : " btime ") + time);
+            out.print(" movestogo " + movesToGo);
+        }
         out.println();
         out.flush();
     }

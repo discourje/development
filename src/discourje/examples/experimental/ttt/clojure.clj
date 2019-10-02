@@ -1,6 +1,6 @@
 (ns discourje.examples.experimental.ttt.clojure
   (require [discourje.examples.experimental.ttt.ttt :refer :all]
-           [discourje.examples.experimental.api :refer [bench join]]
+           [discourje.examples.experimental.util :refer [bench join]]
            [clojure.core.async :refer [thread chan >!! <!!]]))
 
 (defn alicefn [board a->b a<-b]

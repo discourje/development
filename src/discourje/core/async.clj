@@ -200,7 +200,7 @@
                 (allow-send channel m))
               (recur (send-fn))))))))
 
-;; Global flag to configure whether to auto-unwrap
+;; Sung: Global flag to configure whether to auto-unwrap
 ;; (i.e., call get-content on messages in <!!).
 ;; This probably hurts performance, because of the
 ;; extra check in <!!, so at some point we should
