@@ -181,8 +181,8 @@
                           (when (< result workers)
                             (recur result))))
                       (force-monitor-reset! (get-monitor (first m->w)) interactions))))]
-       time))))
 
+       time))))
 (defn clojure-scatter-gather
   ([workers]
    (let [workers-prot (create-protocol

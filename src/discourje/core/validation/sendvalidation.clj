@@ -115,7 +115,7 @@
       (if (nil? duplicate-par)
         (assoc target-interaction :parallels pars)
         duplicate-par))))
-
+(def counter (atom 0))
 (defn- send-active-interaction-by-parallel
   "Swap active interaction by parallel"
   [sender receivers label active-interaction target-interaction monitor]
