@@ -169,7 +169,7 @@
 
 (defn >!!
   "Put on channel"
-  [channel message]
+  ([channel message]
   (do (loop []
         (when (can-put? channel) (recur)))
       (let [m (if (satisfies? sendable message)
@@ -197,6 +197,8 @@
                 (allow-sends channel m)
                 (allow-send channel m))
               (recur (send-fn))))))))
+  ([channel label value]
+   (>!! channel (->message label value))))
 
 (defn <!!
   "take form channel"
