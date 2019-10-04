@@ -11,7 +11,6 @@
   (valid-close? [this sender receiver])
   (apply-close! [this channel pre-swap-interaction target-interaction])
   (is-current-multicast? [this label])
-  (register-rec! [this rec])
   (get-rec [this name]))
 
 (defn- interaction-to-string
@@ -85,8 +84,7 @@
   (valid-receive? [this sender receivers label] (let [pre-swap @active-interaction]
                                                   (->swappable-interaction pre-swap (is-valid-communication? this sender receivers label pre-swap))))
   (is-current-multicast? [this label] (is-active-interaction-multicast? this @active-interaction label))
-  (register-rec! [this rec] (add-rec-to-table recursion-set rec))
-  (get-rec [this name] (name @recursion-set))
+  (get-rec [this name] (name recursion-set))
   (valid-close? [this sender receiver] (let [pre-swap @active-interaction]
                                          (->swappable-interaction pre-swap (is-valid-close-communication? this sender receiver pre-swap))))
   (apply-close! [this channel pre-swap-interaction target-interaction] (apply-close-to-mon this channel active-interaction pre-swap-interaction target-interaction)))
