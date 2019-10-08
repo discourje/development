@@ -183,6 +183,7 @@
                       (force-monitor-reset! (get-monitor (first m->w)) interactions))))]
 
        time))))
+
 (defn clojure-scatter-gather
   ([workers]
    (let [workers-prot (create-protocol
