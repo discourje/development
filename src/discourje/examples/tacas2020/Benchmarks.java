@@ -2,12 +2,9 @@ package discourje.examples.tacas2020;
 
 public class Benchmarks {
 
-    public static int K = 2;
     public static Lib LIB = Lib.DISCOURJE;
-
-    public static void setK(int k) {
-        K = k;
-    }
+    public static int K = 2;
+    public static long TIME = 10;
 
     public static void useClojure() {
         LIB = Lib.CLOJURE;
@@ -15,6 +12,14 @@ public class Benchmarks {
 
     public static void useDiscourje() {
         LIB = Lib.DISCOURJE;
+    }
+
+    public static void setK(int k) {
+        K = k;
+    }
+
+    public static void setTime(long time) {
+        TIME = time;
     }
 
     public static void run(long time, Runnable r) {

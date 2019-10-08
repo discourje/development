@@ -21,3 +21,9 @@
             (>!! out i))))
 
       )))
+
+(defn join
+  [threads]
+  (if (vector? threads)
+    (doseq [t threads] (clojure.core.async/<!! t))
+    (clojure.core.async/<!! threads)))

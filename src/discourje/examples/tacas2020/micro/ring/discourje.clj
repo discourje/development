@@ -1,6 +1,6 @@
-(ns discourje.examples.experimental.ring.discourje
+(ns discourje.examples.tacas2020.micro.ring.discourje
   (require [discourje.core.async :refer :all]
-           [discourje.examples.experimental.util :refer :all]))
+           [discourje.examples.tacas2020.main :refer [bench]]))
 
 ;;
 ;; Configuration
@@ -18,8 +18,6 @@
 (def s (dsl :k (fix :X [(insert ring worker :k Long)
                         (fix :X)])))
 
-;(mon (spec (insert s 2)))
-
 ;; Implementation
 
 (load "threads")
@@ -27,10 +25,10 @@
 ;; Run
 
 (def run
-  (fn [time k n-iter]
-    (let [m (mon (spec (insert s k)))
+  (fn [k time n-iter]
+    (let [m (moni (spec (insert s k)))
           chans (vec (for [i (range k)] (chan 1 (worker i) (worker (mod (inc i) k)) m)))
           threads (fn [] (vec (for [i (range k)] (thread-worker [i k] chans n-iter))))]
       (bench time #(join (threads))))))
 
-(run 60 2 1)
+;(run 2 5 1)

@@ -1,6 +1,6 @@
-(ns discourje.examples.experimental.ring.clojure
-  (require [clojure.core.async :refer [>!! <!! chan thread]]
-           [discourje.examples.experimental.util :refer :all]))
+(ns discourje.examples.tacas2020.micro.ring.clojure
+  (require [clojure.core.async :refer [>!! <!! close! chan thread]]
+           [discourje.examples.tacas2020.main :refer [bench]]))
 
 ;; Implementation
 
@@ -9,9 +9,9 @@
 ;; Run
 
 (def run
-  (fn [time k n-iter]
+  (fn [k time n-iter]
     (let [chans (vec (for [_ (range k)] (chan 1)))
           threads (fn [] (vec (for [i (range k)] (thread-worker [i k] chans n-iter))))]
       (bench time #(join (threads))))))
 
-(run 60 2 1)
+;(run 2 10 1)

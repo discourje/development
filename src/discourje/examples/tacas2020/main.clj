@@ -1,8 +1,8 @@
 (ns discourje.examples.tacas2020.main
   (:gen-class))
 
-(import discourje.examples.tacas2020.clbg.spectralnorm.spectralnorm)
 (import discourje.examples.tacas2020.Benchmarks)
+(import discourje.examples.tacas2020.clbg.spectralnorm.spectralnorm)
 
 (defn bench
   [time f]
@@ -32,31 +32,63 @@
 
       (cond
         (= verify "no")
-        (Benchmarks/useClojure)
+        (do (Benchmarks/useClojure)
+            (require '[clojure.core.async :refer [<!! >!! close! chan thread]]))
         (= verify "yes")
-        (Benchmarks/useDiscourje)
+        (do (Benchmarks/useDiscourje)
+            (require '[discourje.core.async :refer :all]))
         :else
         (throw (Exception. "<language>")))
 
       (try
         (if (> (Integer/parseInt k) 0)
-          (Benchmarks/setK (Integer/parseInt k))
+          (do (Benchmarks/setK (Integer/parseInt k))
+              (def K (Benchmarks/K)))
           (throw (Exception. "<k>")))
         (catch NumberFormatException _
           (throw (Exception. "<k>"))))
 
       (try
-        (if (< (Integer/parseInt time) 0)
+        (if (> (Integer/parseInt time) 0)
+          (do (Benchmarks/setTime (Long/parseLong time))
+              (def TIME (Benchmarks/TIME)))
           (throw (Exception. "<time>")))
         (catch NumberFormatException _
           (throw (Exception. "<time>"))))
 
       (cond
-        (= program "spectral-norm")
-        (do
-          (binding [*out* *err*] (println args))
-          (bench (Integer/parseInt time)
-                 #(spectralnorm/main (into-array String [(nth args 4)]))))
+
+        ;;
+        ;; Micro benchmarks
+        ;;
+
+        (and (= program "micro/ring") (= verify "no"))
+        (do (binding [*out* *err*] (print args "-> "))
+            (require '[discourje.examples.tacas2020.micro.ring.clojure :refer :all])
+            (def n-iter (Integer/parseInt (nth args 4)))
+            (eval '(discourje.examples.tacas2020.micro.ring.clojure/run
+                     discourje.examples.tacas2020.main/K
+                     discourje.examples.tacas2020.main/TIME
+                     discourje.examples.tacas2020.main/n-iter)))
+
+        (and (= program "micro/ring") (= verify "yes"))
+        (do (binding [*out* *err*] (print args "-> "))
+            (require '[discourje.examples.tacas2020.micro.ring.discourje :refer :all])
+            (def n-iter (Integer/parseInt (nth args 4)))
+            (eval '(discourje.examples.tacas2020.micro.ring.discourje/run
+                     discourje.examples.tacas2020.main/K
+                     discourje.examples.tacas2020.main/TIME
+                     discourje.examples.tacas2020.main/n-iter)))
+
+        ;;
+        ;; CLBG benchmarks
+        ;;
+
+        (= program "clbg/spectral-norm")
+        (do (binding [*out* *err*] (print args "-> "))
+            (bench (Benchmarks/TIME)
+                   #(spectralnorm/main (into-array String [(nth args 4)]))))
+
         :else
         (throw (Exception. "<program>"))))
 
@@ -66,6 +98,7 @@
       (println "  <verify?> in {no, yes}")
       (println "  <k>       in {0, 1, 2, ...}")
       (println "  <time>    in {0, 1, 2, ...}")
-      (println "  <program> in {spectral-norm}"))))
+      (println "  <program> in {micro/ring, clbg/spectral-norm}"))))
 
+;(-main "yes" "2" "5" "ring" "1")
 ;(-main "yes" "2" "10" "spectral-norm" "5500")
