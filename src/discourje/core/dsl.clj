@@ -40,54 +40,6 @@
                (= '~op '~(quote par)) '~(quote parfn))
          (map #(prewalk-replace {'~var %} ~body) ~range)))
 
-;(defmacro spec
-;  [sp]
-;  `(let [s# (eval (eval ~sp))]
-;     (->protocol (if (vector? s#) s# [s#]))))
-
-(defn spec
-  [sp]
-  (let [s (eval (eval sp))]
-    (->protocol (if (vector? s) (vec (flatten s)) [s]))))
-
-(defn bind
-  [smap sp]
-  (prewalk-replace smap sp))
-
-(defmacro dsl
-  ([s]
-   `(eval '~s))
-  ([x s]
-   `(eval (list '~(quote fn)
-                ['~(quote y)]
-                (list '~(quote bind) {''~x '~(quote y)} ''~s))))
-  ([x1 x2 s]
-   `(eval (list '~(quote fn)
-                ['~(quote y1) '~(quote y2)]
-                (list '~(quote bind) {''~x1 '~(quote y1)
-                                      ''~x2 '~(quote y2)} ''~s))))
-  ([x1 x2 x3 s]
-   `(eval (list '~(quote fn)
-                ['~(quote y1) '~(quote y2) '~(quote y3)]
-                (list '~(quote bind) {''~x1 '~(quote y1)
-                                      ''~x2 '~(quote y2)
-                                      ''~x3 '~(quote y3)} ''~s))))
-  ([x1 x2 x3 x4 s]
-   `(eval (list '~(quote fn)
-                ['~(quote y1) '~(quote y2) '~(quote y3) '~(quote y4)]
-                (list '~(quote bind) {''~x1 '~(quote y1)
-                                      ''~x2 '~(quote y2)
-                                      ''~x3 '~(quote y3)
-                                      ''~x4 '~(quote y4)} ''~s))))
-  ([x1 x2 x3 x4 x5 s]
-   `(eval (list '~(quote fn)
-                ['~(quote y1) '~(quote y2) '~(quote y3) '~(quote y4) '~(quote y5)]
-                (list '~(quote bind) {''~x1 '~(quote y1)
-                                      ''~x2 '~(quote y2)
-                                      ''~x3 '~(quote y3)
-                                      ''~x4 '~(quote y4)
-                                      ''~x5 '~(quote y5)} ''~s)))))
-
 (defmacro quote!? [x]
   (if (contains? &env x) `~x `'~x))
 
@@ -105,16 +57,44 @@
   ([f x1 x2 x3 x4 x5 x6]
    `(eval (~f (quote!? ~x1) (quote!? ~x2) (quote!? ~x3) (quote!? ~x4) (quote!? ~x5) (quote!? ~x6)))))
 
-(defn mon [spec]
-  (generate-monitor spec))
-
-(defn monitor-reset [monitor interactions]
-  (force-monitor-reset! monitor interactions))
+(defmacro dsl
+  ([s]
+   `(eval '~s))
+  ([x s]
+   `(eval (list '~(quote fn)
+                ['~(quote y)]
+                (list 'prewalk-replace {''~x '~(quote y)} ''~s))))
+  ([x1 x2 s]
+   `(eval (list '~(quote fn)
+                ['~(quote y1) '~(quote y2)]
+                (list 'prewalk-replace {''~x1 '~(quote y1)
+                                        ''~x2 '~(quote y2)} ''~s))))
+  ([x1 x2 x3 s]
+   `(eval (list '~(quote fn)
+                ['~(quote y1) '~(quote y2) '~(quote y3)]
+                (list 'prewalk-replace {''~x1 '~(quote y1)
+                                        ''~x2 '~(quote y2)
+                                        ''~x3 '~(quote y3)} ''~s))))
+  ([x1 x2 x3 x4 s]
+   `(eval (list '~(quote fn)
+                ['~(quote y1) '~(quote y2) '~(quote y3) '~(quote y4)]
+                (list 'prewalk-replace {''~x1 '~(quote y1)
+                                        ''~x2 '~(quote y2)
+                                        ''~x3 '~(quote y3)
+                                        ''~x4 '~(quote y4)} ''~s))))
+  ([x1 x2 x3 x4 x5 s]
+   `(eval (list '~(quote fn)
+                ['~(quote y1) '~(quote y2) '~(quote y3) '~(quote y4) '~(quote y5)]
+                (list 'prewalk-replace {''~x1 '~(quote y1)
+                                        ''~x2 '~(quote y2)
+                                        ''~x3 '~(quote y3)
+                                        ''~x4 '~(quote y4)
+                                        ''~x5 '~(quote y5)} ''~s)))))
 
 ; these should be equal:
 ;(--> (worker 2) (worker 3))
 ;(dsl (--> (worker 2) (worker 3)))
-;(bind {'i 2 'j 3} (--> (worker i) (worker j)))
+;(prewalk-replace {'i 2 'j 3} (--> (worker i) (worker j)))
 
 ;;
 ;; Functions
@@ -179,6 +159,14 @@
    (->recur-identifier (next-id) var :recur nil))
   ([var body]
    (->recursion (next-id) var (if (vector? body) (vec (flatten body)) [body]) nil)))
+
+(defn spec
+  [sp]
+  (let [s (eval (eval sp))]
+    (->protocol (if (vector? s) (vec (flatten s)) [s]))))
+
+(defn moni [spec]
+  (generate-monitor spec))
 
 ;;
 ;; Patterns
