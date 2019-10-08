@@ -118,12 +118,16 @@
   "Allow send message in channel"
   [channel message]
   (async/>!! (get-chan channel) message)
+  (if use-meta-take
+    (release-take channel))
   channel)
 
 (defn- allow-receive
   "Allow a receive on the channel"
   [channel]
   (async/<!! (get-chan channel))
+  (if use-meta-put
+    (release-put channel))
   channel)
 
 (defn- allow-sends
@@ -172,8 +176,10 @@
 (defn >!!
   "Put on channel"
   [channel message]
-  (do (loop []
-        (when (can-put? channel) (recur)))
+  (do (if use-meta-put
+        (acquire-put channel)
+        (loop []
+          (when (can-put? channel) (recur))))
       (let [m (if (satisfies? sendable message)
                 message
                 (->message (type message) message))
@@ -216,8 +222,10 @@
      (log-error :wildcard-exception "Taking from a channel without specifying a label is not allowed while wildcards are disabled!")
      (if (channel-closed? channel)
        (log-error :incorrect-communication (format "Invalid communication: you are trying to receive but the channel is closed! From %s to %s" (get-provider channel) (get-consumer channel)))
-       (do (loop []
-             (when (false? (something-in-buffer? (get-chan channel))) (recur)))
+       (do (if use-meta-take
+             (acquire-take channel)
+             (loop []
+               (when (false? (something-in-buffer? (get-chan channel))) (recur))))
            (if (nil? (get-active-interaction (get-monitor channel)))
              (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
              (let [result (peek-channel (get-chan channel))
@@ -287,14 +295,14 @@
   "create a custom channel"
   ([sender receiver buffer]
    (if (nil? buffer)
-     (->channel sender receiver (clojure.core.async/chan) nil nil)
-     (->channel sender receiver (clojure.core.async/chan buffer) buffer nil)))
+     (new-channel sender receiver (clojure.core.async/chan) nil nil)
+     (new-channel sender receiver (clojure.core.async/chan buffer) buffer nil)))
   ([n sender receiver monitor]
-   (->channel (if (fn? sender) (sender) sender)
-              (if (fn? receiver) (receiver) receiver)
-              (clojure.core.async/chan n)
-              n
-              monitor)))
+   (new-channel (if (fn? sender) (sender) sender)
+                (if (fn? receiver) (receiver) receiver)
+                (clojure.core.async/chan n)
+                n
+                monitor)))
 
 ;; Load at the end, because it depends on definitions in this file
 (load "dsl")

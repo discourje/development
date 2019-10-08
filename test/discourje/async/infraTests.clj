@@ -8,7 +8,7 @@
     (is (= 2 (count channels)))))
 
 (deftest custom-channels-infra-test
-  (let [channels [(->channel "A" "B" nil 0 nil) (->channel "B" "A" nil 0 nil)]]
+  (let [channels [(new-channel "A" "B" nil 0 nil) (new-channel "B" "A" nil 0 nil)]]
     (generate-infrastructure (testDualProtocol true) channels)
     )
   )

@@ -4,15 +4,15 @@
             [discourje.core.async :refer :all]))
 
 (deftest equal-senders-test
-  (let [chans[(->channel 1 2 nil nil nil)
-         (->channel 1 3 nil nil nil)
-         (->channel 1 4 nil nil nil)]]
+  (let [chans[(new-channel 1 2 nil nil nil)
+         (new-channel 1 3 nil nil nil)
+         (new-channel 1 4 nil nil nil)]]
     (is true? (equal-senders? chans))))
 
 (deftest not-equal-senders-test
-  (let [chans[(->channel 1 2 nil nil nil)
-              (->channel 5 3 nil nil nil)
-              (->channel 1 4 nil nil nil)]]
+  (let [chans[(new-channel 1 2 nil nil nil)
+              (new-channel 5 3 nil nil nil)
+              (new-channel 1 4 nil nil nil)]]
     (is false? (equal-senders? chans))))
 
 (deftest not-equal-senders-when-empty-test
