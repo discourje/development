@@ -16,7 +16,7 @@
 (defn- interaction-to-string
   "Stringify an interaction, returns empty string if the given interaction is nil"
   [interaction]
-  (if (nil? interaction) "" (to-string interaction)))
+  (if (satisfies? stringify interaction) (to-string interaction) interaction))
 
 ;load helper namespace files!
 (load "validation/closevalidation"
@@ -84,7 +84,7 @@
   (valid-receive? [this sender receivers label] (let [pre-swap @active-interaction]
                                                   (->swappable-interaction pre-swap (is-valid-communication? this sender receivers label pre-swap))))
   (is-current-multicast? [this label] (is-active-interaction-multicast? this @active-interaction label))
-  (get-rec [this name] (name recursion-set))
+  (get-rec [this name] (name @recursion-set))
   (valid-close? [this sender receiver] (let [pre-swap @active-interaction]
                                          (->swappable-interaction pre-swap (is-valid-close-communication? this sender receiver pre-swap))))
   (apply-close! [this channel pre-swap-interaction target-interaction] (apply-close-to-mon this channel active-interaction pre-swap-interaction target-interaction)))

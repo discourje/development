@@ -74,7 +74,7 @@
   [protocol]
   (let [rec-table (atom {})
         linked-interactions (nest-mep (get-interactions protocol) rec-table)]
-    (->monitor (uuid/v1) (atom linked-interactions) @rec-table)))
+    (->monitor (uuid/v1) (atom linked-interactions) rec-table)))
 
 (defn- all-channels-implement-transportable?
   "Do all custom supplied channels implement the transportable interface?"

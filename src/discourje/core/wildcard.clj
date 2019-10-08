@@ -1,7 +1,7 @@
 ;wildcard.clj
 (in-ns 'discourje.core.async)
 
-(def ^{:private true} allow-wildcard (atom false))
+(def allow-wildcard (atom false))
 
 (defn get-wildcard "Get the wildcard value" []
   @allow-wildcard)

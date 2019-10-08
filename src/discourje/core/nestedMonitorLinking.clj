@@ -2,6 +2,15 @@
 (in-ns 'discourje.core.async)
 
 (declare nest-mep)
+
+(defn- assoc-to-rec-table [rec-table inter]
+  (when (satisfies? recursable inter)
+    (when (or (nil? ((get-name inter) @rec-table)) (empty? ((get-name inter) @rec-table)))
+      (swap! rec-table assoc (get-name inter) inter)
+      ;(reset! rec-table (assoc @rec-table (get-name inter) inter))
+      inter))
+  inter)
+
 (defn- assoc-interaction
   "assoc nth-i (index i-1) with it (index i) as next"
   [nth-i it rec-table]
@@ -17,8 +26,9 @@
     (let [parallels (for [p (get-parallel it)] (nest-mep p rec-table))]
       (assoc nth-i :next (assoc it :parallels parallels)))
     (satisfies? recursable it)
-    (let [rec (nest-mep (if-not (nil? (:next it)) (conj (get-recursion it) (:next it)) (get-recursion it)) (do (swap! rec-table assoc (get-name it) it) rec-table))]
-      (assoc nth-i :next (assoc (assoc it :next nil) :recursion rec)))
+    (let [rec (nest-mep (if-not (nil? (:next it)) (conj (get-recursion it) (:next it)) (get-recursion it)) rec-table)
+          rec-result (assoc (assoc it :next nil) :recursion rec)]
+      (assoc nth-i :next (assoc-to-rec-table rec-table rec-result)))
     :else (log-error :invalid-communication-type (format "Cannot link %s since this is an unknown communication type!" it))))
 
 (defn- assoc-last-interaction
@@ -34,8 +44,9 @@
       (let [parallels (for [p (get-parallel last)] (nest-mep p rec-table))]
         (assoc last :parallels parallels))
       (satisfies? recursable last)
-      (let [rec (nest-mep (if-not (nil? next) (conj (get-recursion last) next) (get-recursion last)) (do (swap! rec-table assoc (get-name last) last) rec-table))]
-        (assoc (assoc last :next nil) :recursion rec)))))
+      (let [rec (nest-mep (if-not (nil? next) (conj (get-recursion last) next) (get-recursion last)) rec-table)
+            result (assoc (assoc last :next nil) :recursion rec)]
+        (assoc-to-rec-table rec-table result)))))
 
 (defn nest-mep
   "assign all next keys in a given vector of interactions (note that choice, parallel and recursion make this function called recursively)"
@@ -57,4 +68,5 @@
         (or (satisfies? interactable (first interactions)) (satisfies? identifiable-recur (first interactions)) (satisfies? closable (first interactions)))
         (first interactions)
         (or (satisfies? branchable (first interactions)) (satisfies? recursable (first interactions)) (satisfies? parallelizable (first interactions)))
-        (assoc-last-interaction (first interactions) rec-table)))))
+        (assoc-last-interaction (first interactions) rec-table)
+        ))))
