@@ -296,5 +296,12 @@
               n
               monitor)))
 
+(defn join
+  "Await the completion of all threads"
+  [threads]
+  (if (vector? threads)
+    (doseq [t threads] (clojure.core.async/<!! t))
+    (clojure.core.async/<!! threads)))
+
 ;; Load at the end, because it depends on definitions in this file
 (load "dsl")
