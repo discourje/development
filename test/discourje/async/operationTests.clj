@@ -885,7 +885,6 @@
         ab (get-channel channels "a" "b")
         ba (get-channel channels "b" "a")]
     (set-logging-exceptions)
-    (println (:recursion-set (get-monitor (first (:channels channels)))))
     (loop [reps 0]
       (if (> reps 2)
         (do (>!! ab (msg 1 1))
