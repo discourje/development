@@ -40,17 +40,19 @@
                (= '~op '~(quote par)) '~(quote parfn))
          (map #(prewalk-replace {'~var %} ~body) ~range)))
 
-(defmacro spec
-  ([sp]
-   `(let [s# (eval (eval ~sp))]
-      (->protocol (if (vector? s#) s# [s#])))))
-;([smap sp]
-; `(spec (eval (prewalk-replace '~smap ~sp)))))
+;(defmacro spec
+;  [sp]
+;  `(let [s# (eval (eval ~sp))]
+;     (->protocol (if (vector? s#) s# [s#]))))
+
+(defn spec
+  [sp]
+  (let [s (eval (eval sp))]
+    (->protocol (if (vector? s) (vec (flatten s)) [s]))))
 
 (defn bind
   [smap sp]
   (prewalk-replace smap sp))
-;(eval (prewalk-replace smap sp)))
 
 (defmacro dsl
   ([s]
@@ -177,6 +179,29 @@
    (->recur-identifier (next-id) var :recur nil))
   ([var body]
    (->recursion (next-id) var (if (vector? body) (vec (flatten body)) [body]) nil)))
+
+;;
+;; Patterns
+;;
+
+(def succ-fg
+  (dsl :worker :i :type :f :g
+       (vec (remove nil? [(when (not= :f nil) :f)
+                          (--> (:worker :i) (:worker (+ :i 1)) :type)
+                          (when (not= :g nil) :g)]))))
+
+(def succ
+  (dsl :worker :i :type
+       [(--> (:worker :i) (:worker (+ :i 1)) :type)]))
+
+(def pipe
+  (dsl :worker :k :type
+       (rep seq [:i (range (- :k 1))] (insert succ :worker :i :type))))
+
+(def ring
+  (dsl :worker :k :type
+       [(insert pipe :worker :k :type)
+        (--> (:worker (- :k 1)) (:worker 0) :type)]))
 
 ;;;
 ;;; "Tests" (inspect output manually...)
