@@ -96,12 +96,12 @@
         (and (= program "misc/ttt") (= verify "no"))
         (do (binding [*out* *err*] (print args "-> "))
             (bench (Benchmarks/TIME)
-                   #(load "misc/ttt/clojure")))
+                   #(load "/discourje/examples/tacas2020/misc/ttt/clojure")))
 
         (and (= program "misc/ttt") (= verify "yes"))
         (do (binding [*out* *err*] (print args "-> "))
             (bench (Benchmarks/TIME)
-                   #(load "misc/ttt/discourje")))
+                   #(load "/discourje/examples/tacas2020/misc/ttt/discourje")))
 
         :else
         (throw (Exception. "<program>"))))
@@ -112,9 +112,8 @@
       (println "  <verify?> in {no, yes}")
       (println "  <k>       in {0, 1, 2, ...}")
       (println "  <time>    in {0, 1, 2, ...}")
-      (println "  <program> in {micro/ring, clbg/spectral-norm}"))))
-
+      (println "  <program> in {clbg/spectral-norm, micro/ring, misc/ttt}"))))
 
 ;(-main "yes" "2" "5" "clbg/spectral-norm" "5500")
 ;(-main "yes" "2" "5" "micro/ring" "1")
-(-main "no" "2" "5" "misc/ttt")
+;(-main "no" "2" "5" "misc/ttt")
