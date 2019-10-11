@@ -62,7 +62,6 @@
   (loop [g initial-grid]
     (let [i (<!! b<-a)
           g (add g i cross)]
-      (if (= i nil) (throw (Exception.)))
       (if (not-final? g)
         (let [i (get-blank g)
               g (add g i nought)]
