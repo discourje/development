@@ -14,4 +14,4 @@
           threads (fn [] (vec (for [i (range k)] (thread-worker [i k] chans n-iter))))]
       (bench time #(join (threads))))))
 
-;(run 2 10 1)
+;(run 2 60 1)

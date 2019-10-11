@@ -73,8 +73,9 @@
 
 (defmacro thread
   "Execute body on thread"
-  [body]
-  `(async/thread ~body))
+  [& body]
+  ;; copy-pasted from clojure.core.async:
+  `(clojure.core.async/thread-call (^:once fn* [] ~@body)))
 
 (defmacro custom-time
   "Evaluates expr and prints the time it took.  Returns the value of expr."

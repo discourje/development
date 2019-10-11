@@ -43,7 +43,9 @@
 (defmacro quote!? [x]
   (if (contains? &env x) `~x `'~x))
 
-(defmacro insert
+(defmacro ins
+  ([e]
+   `(eval ~e))
   ([f x1]
    `(eval (~f (quote!? ~x1))))
   ([f x1 x2]
@@ -184,11 +186,11 @@
 
 (def pipe
   (dsl :worker :k :type
-       (rep seq [:i (range (- :k 1))] (insert succ :worker :i :type))))
+       (rep seq [:i (range (- :k 1))] (ins succ :worker :i :type))))
 
 (def ring
   (dsl :worker :k :type
-       [(insert pipe :worker :k :type)
+       [(ins pipe :worker :k :type)
         (--> (:worker (- :k 1)) (:worker 0) :type)]))
 
 ;;;
