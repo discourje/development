@@ -49,7 +49,7 @@
           (throw (Exception. "<k>"))))
 
       (try
-        (if (> (Integer/parseInt time) 0)
+        (if (>= (Integer/parseInt time) 0)
           (do (Benchmarks/setTime (Long/parseLong time))
               (def TIME (Benchmarks/TIME)))
           (throw (Exception. "<time>")))
@@ -89,6 +89,20 @@
             (bench (Benchmarks/TIME)
                    #(spectralnorm/main (into-array String [(nth args 4)]))))
 
+        ;;
+        ;; Misc
+        ;;
+
+        (and (= program "misc/ttt") (= verify "no"))
+        (do (binding [*out* *err*] (print args "-> "))
+            (bench (Benchmarks/TIME)
+                   #(load "misc/ttt/clojure")))
+
+        (and (= program "misc/ttt") (= verify "yes"))
+        (do (binding [*out* *err*] (print args "-> "))
+            (bench (Benchmarks/TIME)
+                   #(load "misc/ttt/discourje")))
+
         :else
         (throw (Exception. "<program>"))))
 
@@ -100,5 +114,7 @@
       (println "  <time>    in {0, 1, 2, ...}")
       (println "  <program> in {micro/ring, clbg/spectral-norm}"))))
 
-;(-main "yes" "2" "5" "ring" "1")
-;(-main "yes" "2" "10" "spectral-norm" "5500")
+
+;(-main "yes" "2" "5" "clbg/spectral-norm" "5500")
+;(-main "yes" "2" "5" "micro/ring" "1")
+(-main "no" "2" "5" "misc/ttt")
