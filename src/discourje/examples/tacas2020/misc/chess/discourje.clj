@@ -20,9 +20,9 @@
 (def chess-close (dsl (par (-## white black) (-## black white))))
 
 (def chess (dsl (fix :X [(--> white black String)
-                         (alt chess-close
+                         (alt (ins chess-close)
                               [(--> black white String)
-                               (alt chess-close
+                               (alt (ins chess-close)
                                     (fix :X))])])))
 
 ;; Monitor
