@@ -158,9 +158,15 @@
 
 (defn fixfn
   ([var]
-   (->recur-identifier (next-id) var :recur nil))
+   (->recur-identifier (next-id)
+                       (if (vector? var) (read-string (str (nth var 0) (nth var 1))) var)
+                       :recur
+                       nil))
   ([var body]
-   (->recursion (next-id) var (if (vector? body) (vec (flatten body)) [body]) nil)))
+   (->recursion (next-id)
+                (if (vector? var) (read-string (str (nth var 0) (nth var 1))) var)
+                (if (vector? body) (vec (flatten body)) [body])
+                nil)))
 
 (defn spec
   [sp]
@@ -174,12 +180,6 @@
 ;; Patterns
 ;;
 
-(def succ-fg
-  (dsl :worker :i :type :f :g
-       (vec (remove nil? [(when (not= :f nil) :f)
-                          (--> (:worker :i) (:worker (+ :i 1)) :type)
-                          (when (not= :g nil) :g)]))))
-
 (def succ
   (dsl :worker :i :type
        [(--> (:worker :i) (:worker (+ :i 1)) :type)]))
@@ -192,6 +192,18 @@
   (dsl :worker :k :type
        [(ins pipe :worker :k :type)
         (--> (:worker (- :k 1)) (:worker 0) :type)]))
+
+(def one-all-one
+  (dsl :master :worker :k :type1 :type2
+       (rep alt [:i (range :k)]
+            [(--> :master (:worker :i) :type1)
+             (--> (:worker :i) :master :type2)])))
+
+(def one-all-one
+  (dsl :master :worker :k :type1 :type2
+       (rep par [:i (range :k)]
+            [(--> :master (:worker :i) :type1)
+             (--> (:worker :i) :master :type2)])))
 
 ;;;
 ;;; "Tests" (inspect output manually...)
