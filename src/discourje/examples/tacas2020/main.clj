@@ -3,6 +3,7 @@
 
 (import discourje.examples.tacas2020.Benchmarks)
 (import discourje.examples.tacas2020.clbg.spectralnorm.spectralnorm)
+(import discourje.examples.tacas2020.misc.chess.Engine)
 
 (defn bench
   [time f]
@@ -103,6 +104,30 @@
             (bench (Benchmarks/TIME)
                    #(load "/discourje/examples/tacas2020/misc/ttt/discourje")))
 
+        (and (= program "misc/chess") (= verify "no"))
+        (do (binding [*out* *err*] (print args "-> "))
+            (set! (. Engine STOCKFISH) (nth args 4))
+            (if (>= (count args) 6)
+              (set! (. Engine MAX_MOVES) (Integer/parseInt (nth args 5))))
+            (if (>= (count args) 7)
+              (set! (. Engine TIME) (Integer/parseInt (nth args 6))))
+            (if (>= (count args) 8)
+              (set! (. Engine MOVES_TO_GO) (Integer/parseInt (nth args 7))))
+            (bench (Benchmarks/TIME)
+                   #(load "/discourje/examples/tacas2020/misc/chess/clojure")))
+
+        (and (= program "misc/chess") (= verify "yes"))
+        (do (binding [*out* *err*] (print args "-> "))
+            (set! (. Engine STOCKFISH) (nth args 4))
+            (if (>= (count args) 6)
+              (set! (. Engine MAX_MOVES) (Integer/parseInt (nth args 5))))
+            (if (>= (count args) 7)
+              (set! (. Engine TIME) (Integer/parseInt (nth args 6))))
+            (if (>= (count args) 8)
+              (set! (. Engine MOVES_TO_GO) (Integer/parseInt (nth args 7))))
+            (bench (Benchmarks/TIME)
+                   #(load "/discourje/examples/tacas2020/misc/chess/discourje")))
+
         :else
         (throw (Exception. "<program>"))))
 
@@ -112,8 +137,15 @@
       (println "  <verify?> in {no, yes}")
       (println "  <k>       in {0, 1, 2, ...}")
       (println "  <time>    in {0, 1, 2, ...}")
-      (println "  <program> in {clbg/spectral-norm, micro/ring, misc/ttt}"))))
+      (print "  <program> in {")
+      (print "clbg/spectral-norm")
+      (print ", ")
+      (print "micro/ring")
+      (print ", ")
+      (print "misc/chess, misc/ttt")
+      (println "}"))))
 
 ;(-main "yes" "2" "5" "clbg/spectral-norm" "5500")
 ;(-main "yes" "2" "5" "micro/ring" "1")
-;(-main "no" "2" "5" "misc/ttt")
+;(-main "yes" "2" "5" "misc/ttt")
+;(-main "yes" "2" "5" "misc/chess" "/Users/sung/Desktop/stockfish-10-64" "60")

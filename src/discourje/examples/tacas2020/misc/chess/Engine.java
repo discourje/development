@@ -1,6 +1,6 @@
-package discourje.examples.experimental.chess;
+package discourje.examples.tacas2020.misc.chess;
 
-import discourje.examples.experimental.java.ClojureCoreAsync;
+import discourje.java.ClojureCoreAsync;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,9 +13,9 @@ public class Engine {
 
     public static int MAX_MOVES = 5899; // https://chess.stackexchange.com/questions/4113
 
-    public static String STOCKFISH = "/Users/sung/Desktop/stockfish-10-64";
-    public static long TIME = 4 * 60 * 1000;
-    public static int MOVES_TO_GO = 40;
+    public static String STOCKFISH = ""; // "/Users/sung/Desktop/stockfish-10-64";
+    public static long TIME = -1; //4 * 60 * 1000;
+    public static int MOVES_TO_GO = -1; //= 40;
 
     private final boolean simple;
     private final Process p;
@@ -40,53 +40,38 @@ public class Engine {
     }
 
     public static void main(String[] args) {
-        //var q1 = new LinkedBlockingQueue<String>();
-        //var q2 = new LinkedBlockingQueue<String>();
         var c1 = ClojureCoreAsync.chan(1);
         var c2 = ClojureCoreAsync.chan(1);
 
         var tWhite = new Thread(() -> {
-            //try {
             var e = new Engine(false);
-            //q1.put(e.turn(null));
             c1.send(e.turn(null));
             while (true) {
-                //var move = q2.take();
                 var move = (String) c2.recv();
                 if (move.equals("(none)")) {
                     break;
                 }
                 move = e.turn(move);
-                //q1.put(move);
                 c1.send(move);
                 if (move.equals("(none)")) {
                     break;
                 }
             }
-            //} catch (InterruptedException e) {
-            //    e.printStackTrace();
-            //}
         });
 
         var tBlack = new Thread(() -> {
-            //try {
             var e = new Engine(true);
             while (true) {
-                //var move = q1.take();
                 var move = (String) c1.recv();
                 if (move.equals("(none)")) {
                     break;
                 }
                 move = e.turn(move);
-                //q2.put(move);
                 c2.send(move);
                 if (move.equals("(none)")) {
                     break;
                 }
             }
-            //} catch (InterruptedException e) {
-            //    e.printStackTrace();
-            //}
         });
 
         tWhite.start();
@@ -200,8 +185,12 @@ public class Engine {
         out.print("go");
         if (!simple) {
             out.print(ponder ? " ponder" : "");
-            out.print((moves.size() % 2 == 0 ? " wtime " : " btime ") + time);
-            out.print(" movestogo " + movesToGo);
+            if (TIME >= 0) {
+                out.print((moves.size() % 2 == 0 ? " wtime " : " btime ") + time);
+            }
+            if (MOVES_TO_GO >= 0) {
+                out.print(" movestogo " + movesToGo);
+            }
         }
         out.println();
         out.flush();

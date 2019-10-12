@@ -1,4 +1,4 @@
-(ns discourje.examples.experimental.chess.discourje
+(ns discourje.examples.tacas2020.misc.chess.discourje
   (require [discourje.core.async :refer :all]))
 
 ;;
@@ -27,7 +27,7 @@
 
 ;; Monitor
 
-(def m (mon (spec chess)))
+(def m (moni (spec chess)))
 
 ;; Channels
 
