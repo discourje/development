@@ -181,12 +181,12 @@
 ;;
 
 (def succ
-  (dsl :worker :i :type
-       [(--> (:worker :i) (:worker (+ :i 1)) :type)]))
+  (dsl :worker :i :k :type
+       [(--> (:worker :i) (:worker (mod (+ :i 1) :k)) :type)]))
 
 (def pipe
   (dsl :worker :k :type
-       (rep seq [:i (range (- :k 1))] (ins succ :worker :i :type))))
+       (rep seq [:i (range (- :k 1))] (ins succ :worker :i :k :type))))
 
 (def ring
   (dsl :worker :k :type

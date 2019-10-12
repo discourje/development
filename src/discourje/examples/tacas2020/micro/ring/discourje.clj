@@ -11,7 +11,9 @@
 (discourje.core.logging/set-throwing true)
 (reset! <!!-unwrap true)
 
+;;
 ;; Specification
+;;
 
 (def worker (role "worker"))
 
@@ -20,11 +22,11 @@
 
 ;(def s (dsl :k (insert ring worker :k Long)))
 
+;;
 ;; Implementation
+;;
 
 (load "threads")
-
-;; Run
 
 (def run
   (fn [k time n-iter]

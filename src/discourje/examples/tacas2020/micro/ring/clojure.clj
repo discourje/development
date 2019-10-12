@@ -2,11 +2,11 @@
   (require [clojure.core.async :refer [>!! <!! close! chan thread]]
            [discourje.examples.tacas2020.main :refer [bench]]))
 
+;;
 ;; Implementation
+;;
 
 (load "threads")
-
-;; Run
 
 (def run
   (fn [k time n-iter]

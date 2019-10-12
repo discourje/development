@@ -10,12 +10,16 @@
 (discourje.core.logging/set-throwing true)
 (reset! <!!-unwrap true)
 
+;;
 ;; Roles
+;;
 
 (def white (role "white"))
 (def black (role "black"))
 
+;;
 ;; Specification
+;;
 
 (def chess-close (dsl (par (-## white black) (-## black white))))
 
@@ -25,17 +29,15 @@
                                (alt (ins chess-close)
                                     (fix :X))])])))
 
-;; Monitor
+;;
+;; Implementation
+;;
 
 (def m (moni (spec chess)))
-
-;; Channels
 
 (def w->b (chan 1 white black m))
 (def b->w (chan 1 black white m))
 (def b<-w w->b)
 (def w<-b b->w)
-
-;; Threads
 
 (load "threads")

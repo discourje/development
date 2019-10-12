@@ -60,6 +60,15 @@
       (cond
 
         ;;
+        ;; CLBG benchmarks
+        ;;
+
+        (= program "clbg/spectral-norm")
+        (do (binding [*out* *err*] (print args "-> "))
+            (bench (Benchmarks/TIME)
+                   #(spectralnorm/main (into-array String [(nth args 4)]))))
+
+        ;;
         ;; Micro benchmarks
         ;;
 
@@ -82,27 +91,8 @@
                      discourje.examples.tacas2020.main/n-iter)))
 
         ;;
-        ;; CLBG benchmarks
-        ;;
-
-        (= program "clbg/spectral-norm")
-        (do (binding [*out* *err*] (print args "-> "))
-            (bench (Benchmarks/TIME)
-                   #(spectralnorm/main (into-array String [(nth args 4)]))))
-
-        ;;
         ;; Misc
         ;;
-
-        (and (= program "misc/ttt") (= verify "no"))
-        (do (binding [*out* *err*] (print args "-> "))
-            (bench (Benchmarks/TIME)
-                   #(load "/discourje/examples/tacas2020/misc/ttt/clojure")))
-
-        (and (= program "misc/ttt") (= verify "yes"))
-        (do (binding [*out* *err*] (print args "-> "))
-            (bench (Benchmarks/TIME)
-                   #(load "/discourje/examples/tacas2020/misc/ttt/discourje")))
 
         (and (= program "misc/chess") (= verify "no"))
         (do (binding [*out* *err*] (print args "-> "))
@@ -128,6 +118,28 @@
             (bench (Benchmarks/TIME)
                    #(load "/discourje/examples/tacas2020/misc/chess/discourje")))
 
+        (and (= program "misc/go-fish") (= verify "no"))
+        (do (binding [*out* *err*] (print args "-> "))
+            (require '[discourje.examples.tacas2020.misc.gofish.clojure :refer :all])
+            (eval '(discourje.examples.tacas2020.misc.gofish.clojure/run
+                     discourje.examples.tacas2020.main/K)))
+
+        (and (= program "misc/go-fish") (= verify "yes"))
+        (do (binding [*out* *err*] (print args "-> "))
+            (require '[discourje.examples.tacas2020.misc.gofish.discourje :refer :all])
+            (eval '(discourje.examples.tacas2020.misc.gofish.discourje/run
+                     discourje.examples.tacas2020.main/K)))
+
+        (and (= program "misc/ttt") (= verify "no"))
+        (do (binding [*out* *err*] (print args "-> "))
+            (bench (Benchmarks/TIME)
+                   #(load "/discourje/examples/tacas2020/misc/ttt/clojure")))
+
+        (and (= program "misc/ttt") (= verify "yes"))
+        (do (binding [*out* *err*] (print args "-> "))
+            (bench (Benchmarks/TIME)
+                   #(load "/discourje/examples/tacas2020/misc/ttt/discourje")))
+
         :else
         (throw (Exception. "<program>"))))
 
@@ -142,10 +154,13 @@
       (print ", ")
       (print "micro/ring")
       (print ", ")
-      (print "misc/chess, misc/ttt")
+      (print "misc/chess, misc/go-fish, misc/ttt")
       (println "}"))))
 
 ;(-main "yes" "2" "5" "clbg/spectral-norm" "5500")
+
 ;(-main "yes" "2" "5" "micro/ring" "1")
-;(-main "yes" "2" "5" "misc/ttt")
+
+;(-main "yes" "4" "0" "misc/go-fish")
 ;(-main "yes" "2" "5" "misc/chess" "/Users/sung/Desktop/stockfish-10-64" "60")
+;(-main "yes" "2" "5" "misc/ttt")
