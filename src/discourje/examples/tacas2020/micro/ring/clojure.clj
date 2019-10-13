@@ -10,8 +10,8 @@
 
 (def run
   (fn [k time n-iter]
-    (let [chans (vec (for [_ (range k)] (chan 1)))
-          threads (fn [] (vec (for [i (range k)] (thread-worker [i k] chans n-iter))))]
-      (bench time #(join (threads))))))
+    (let [workers->workers (vec (for [_ (range k)] (chan 1)))
+          workers (fn [] (vec (for [i (range k)] (thread-worker [i k] workers->workers n-iter))))]
+      (bench time #(join (workers))))))
 
-;(run 2 60 1)
+;(run 2 5 1)
