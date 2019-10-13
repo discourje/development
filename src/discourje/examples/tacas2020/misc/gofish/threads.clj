@@ -1,16 +1,20 @@
 (def range-without-i (fn [k i]
                        (remove #(= i %) (range k))))
 
-(deftype Card [])
-(deftype Card? [])
-(deftype Card! [])
-(deftype Ack [])
-(deftype Turn [])
-(deftype Fish [])
-(deftype GoFish [])
+(def deftypes (fn []
+                (deftype Card [])
+                (deftype Card? [])
+                (deftype Card! [])
+                (deftype Ack [])
+                (deftype Turn [])
+                (deftype Fish [])
+                (deftype GoFish [])
+                ))
+
+(deftypes)
 
 (def thread-dealer
-  (fn [k dealer->players players->dealer]
+  (fn [k dealer->players players->dealer barrier]
     (thread (doseq [_ (range 5)]
               (doseq [i (range k)]
                 (>!! (nth dealer->players i) (->Card)))
@@ -25,11 +29,10 @@
                   (<!! (nth players->dealer i))
                   (>!! (nth dealer->players i) (->Card))
                   (recur))))
-
             )))
 
 (def thread-player
-  (fn [i k dealer->players players->dealer players->players]
+  (fn [i k dealer->players players->dealer players->players barrier]
     (thread (doseq [_ (range 5)]
               (<!! (nth dealer->players i))
               (>!! (nth players->dealer i) (->Ack)))
@@ -57,5 +60,4 @@
                           :else
                           (throw (RuntimeException. (str (type msg)))))
                     (recur)))))
-
             )))

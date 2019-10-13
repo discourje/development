@@ -9,7 +9,8 @@
 
 (def run
   (fn [k]
-    (let [dealer->players (vec (for [i (range k)] (chan 5)))
+    (let [barrier (java.util.concurrent.CyclicBarrier. (inc k))
+          dealer->players (vec (for [i (range k)] (chan 5)))
           players->dealer (vec (for [i (range k)] (chan 5)))
           players->players (to-array-2d (for [i (range k)]
                                           (for [j (range k)]
@@ -17,9 +18,10 @@
                                               (chan 1)
                                               nil))))]
 
-      (thread-dealer k dealer->players players->dealer)
+      (thread-dealer k dealer->players players->dealer barrier)
       (doseq [i (range k)]
-        (thread-player i k dealer->players players->dealer players->players)))))
+        (thread-player i k dealer->players players->dealer players->players barrier))
+      (.await barrier))))
 
 ;(try
 ;  (run 4)

@@ -157,12 +157,14 @@
         (and (= program "misc/go-fish") (= verify "no"))
         (do (binding [*out* *err*] (print args "-> "))
             (require '[discourje.examples.tacas2020.misc.gofish.clojure :refer :all])
+            (eval '(discourje.examples.tacas2020.misc.gofish.clojure/deftypes))
             (eval '(discourje.examples.tacas2020.misc.gofish.clojure/run
                      discourje.examples.tacas2020.main/K)))
 
         (and (= program "misc/go-fish") (= verify "yes"))
         (do (binding [*out* *err*] (print args "-> "))
             (require '[discourje.examples.tacas2020.misc.gofish.discourje :refer :all])
+            (eval '(discourje.examples.tacas2020.misc.gofish.discourje/deftypes))
             (eval '(discourje.examples.tacas2020.misc.gofish.discourje/run
                      discourje.examples.tacas2020.main/K)))
 
@@ -195,6 +197,8 @@
 
 ;(-main "yes" "2" "5" "clbg/spectral-norm" "5500")
 
+;(-main "yes" "2" "5" "micro/one-all-one" "1")
+;(-main "yes" "2" "5" "micro/one-one-one" "1")
 ;(-main "yes" "2" "5" "micro/ring" "1")
 
 ;(-main "yes" "4" "0" "misc/go-fish")

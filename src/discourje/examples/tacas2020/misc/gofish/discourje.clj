@@ -49,7 +49,8 @@
 
 (def run
   (fn [k]
-    (let [m (moni (spec (ins go-fish k)))
+    (let [barrier (java.util.concurrent.CyclicBarrier. (inc k))
+          m (moni (spec (ins go-fish k)))
           dealer->players (vec (for [i (range k)] (chan 5 dealer (player i) m)))
           players->dealer (vec (for [i (range k)] (chan 5 (player i) dealer m)))
           players->players (to-array-2d (for [i (range k)]
@@ -58,10 +59,11 @@
                                               (chan 1 (player i) (player j) m)
                                               nil))))]
 
-      (thread-dealer k dealer->players players->dealer)
+      (thread-dealer k dealer->players players->dealer barrier)
       (doseq [i (range k)]
-        (thread-player i k dealer->players players->dealer players->players)))))
+        (thread-player i k dealer->players players->dealer players->players barrier))
+      (.await barrier))))
 
-(try
-  (run 4)
-  (catch Exception e (.printStackTrace e)))
+;(try
+;  (run 4)
+;  (catch Exception e (.printStackTrace e)))
