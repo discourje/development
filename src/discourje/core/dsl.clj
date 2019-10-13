@@ -193,7 +193,7 @@
        [(ins pipe :worker :k :type)
         (--> (:worker (- :k 1)) (:worker 0) :type)]))
 
-(def one-all-one
+(def one-one-one
   (dsl :master :worker :k :type1 :type2
        (rep alt [:i (range :k)]
             [(--> :master (:worker :i) :type1)

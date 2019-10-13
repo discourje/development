@@ -72,6 +72,42 @@
         ;; Micro benchmarks
         ;;
 
+        (and (= program "micro/one-all-one") (= verify "no"))
+        (do (binding [*out* *err*] (print args "-> "))
+            (require '[discourje.examples.tacas2020.micro.one_all_one.clojure :refer :all])
+            (def n-iter (Integer/parseInt (nth args 4)))
+            (eval '(discourje.examples.tacas2020.micro.one_all_one.clojure/run
+                     discourje.examples.tacas2020.main/K
+                     discourje.examples.tacas2020.main/TIME
+                     discourje.examples.tacas2020.main/n-iter)))
+
+        (and (= program "micro/one-all-one") (= verify "yes"))
+        (do (binding [*out* *err*] (print args "-> "))
+            (require '[discourje.examples.tacas2020.micro.one_all_one.discourje :refer :all])
+            (def n-iter (Integer/parseInt (nth args 4)))
+            (eval '(discourje.examples.tacas2020.micro.one_all_one.discourje/run
+                     discourje.examples.tacas2020.main/K
+                     discourje.examples.tacas2020.main/TIME
+                     discourje.examples.tacas2020.main/n-iter)))
+
+        (and (= program "micro/one-one-one") (= verify "no"))
+        (do (binding [*out* *err*] (print args "-> "))
+            (require '[discourje.examples.tacas2020.micro.one_one_one.clojure :refer :all])
+            (def n-iter (Integer/parseInt (nth args 4)))
+            (eval '(discourje.examples.tacas2020.micro.one_one_one.clojure/run
+                     discourje.examples.tacas2020.main/K
+                     discourje.examples.tacas2020.main/TIME
+                     discourje.examples.tacas2020.main/n-iter)))
+
+        (and (= program "micro/one-one-one") (= verify "yes"))
+        (do (binding [*out* *err*] (print args "-> "))
+            (require '[discourje.examples.tacas2020.micro.one_one_one.discourje :refer :all])
+            (def n-iter (Integer/parseInt (nth args 4)))
+            (eval '(discourje.examples.tacas2020.micro.one_one_one.discourje/run
+                     discourje.examples.tacas2020.main/K
+                     discourje.examples.tacas2020.main/TIME
+                     discourje.examples.tacas2020.main/n-iter)))
+
         (and (= program "micro/ring") (= verify "no"))
         (do (binding [*out* *err*] (print args "-> "))
             (require '[discourje.examples.tacas2020.micro.ring.clojure :refer :all])
@@ -152,7 +188,7 @@
       (print "  <program> in {")
       (print "clbg/spectral-norm")
       (print ", ")
-      (print "micro/ring")
+      (print "micro/one-all-one, micro/one-one-one, micro/ring")
       (print ", ")
       (print "misc/chess, misc/go-fish, misc/ttt")
       (println "}"))))
