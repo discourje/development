@@ -11,7 +11,7 @@
 (def run
   (fn [k time n-iter]
     (let [workers->workers (vec (for [_ (range k)] (chan 1)))
-          workers (fn [] (vec (for [i (range k)] (thread-worker [i k] workers->workers n-iter))))]
+          workers (fn [] (vec (for [i (range k)] (thread-worker i k workers->workers n-iter))))]
       (bench time #(join (workers))))))
 
 ;(run 2 5 1)

@@ -1,5 +1,5 @@
 (def thread-worker
-  (fn [[i k] workers->workers n-iter]
+  (fn [i k workers->workers n-iter]
     (cond
 
       ;; Worker i=0

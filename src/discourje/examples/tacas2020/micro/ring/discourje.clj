@@ -30,7 +30,7 @@
   (fn [k time n-iter]
     (let [m (moni (spec (ins s k)))
           workers->workers (vec (for [i (range k)] (chan 1 (worker i) (worker (mod (inc i) k)) m)))
-          workers (fn [] (vec (for [i (range k)] (thread-worker [i k] workers->workers n-iter))))]
+          workers (fn [] (vec (for [i (range k)] (thread-worker i k workers->workers n-iter))))]
       (bench time #(join (workers))))))
 
-(run 2 5 1)
+;(run 2 5 1)
