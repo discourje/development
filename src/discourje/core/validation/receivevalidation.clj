@@ -17,9 +17,7 @@
                                 (if (= (get-id inter) (get-id current-interaction))
                                   (if (multiple-receivers? inter)
                                     (assoc inter :receivers (vec (remove #{receiver} (:receivers inter))))
-                                    (if (not= nil (get-next current-interaction))
-                                      (get-next current-interaction)
-                                      nil))
+                                    (get-next current-interaction))
                                   (assoc current-interaction :receivers (vec (remove #{receiver} (:receivers current-interaction)))))))
     (log-error :unsupported-operation (format "Cannot remove-receiver from interaction of type: %s, it should be atomic! Interaction = %s" (type current-interaction) (interaction-to-string current-interaction)))))
 
@@ -31,9 +29,7 @@
     (remove-receiver active-interaction target-interaction receiver)
     (let [swapped (swap! active-interaction (fn [inter]
                                               (if (= (get-id inter) (get-id pre-swap-interaction))
-                                                (if (not= nil (get-next target-interaction))
-                                                  (get-next target-interaction)
-                                                  nil)
+                                                (get-next target-interaction)
                                                 inter)))]
       (= (if (nil? swapped) "end-protocol" (get-id swapped))
          (if (or (nil? target-interaction) (nil? (get-next target-interaction)))
@@ -152,8 +148,7 @@
     (satisfies? parallelizable active-interaction)
     (get-parallel-interaction sender receivers label active-interaction)
     (satisfies? recursable active-interaction)
-    (do (register-rec! monitor active-interaction)
-        (is-valid-communication? monitor sender receivers label (get-recursion active-interaction)))
+    (is-valid-communication? monitor sender receivers label (get-recursion active-interaction))
     (satisfies? identifiable-recur active-interaction)
     (is-valid-communication? monitor sender receivers label (get-rec monitor (get-name active-interaction)))
     (satisfies? closable active-interaction)

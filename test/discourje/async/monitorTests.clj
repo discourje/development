@@ -13,6 +13,7 @@
 
 (deftest get-active-interaction-test
   (let [mon (generate-monitor (testDualProtocol false))]
+    (println mon)
     (is (= (get-active-interaction mon) testDualProtocolControl))
     (is (= "1" (get-action (get-active-interaction mon))))
     (is (= "A" (get-sender (get-active-interaction mon))))
@@ -56,16 +57,28 @@
 
 (deftest single-recur-protocol-ids-test
   (let [mon (generate-monitor (single-recur-protocol false))]
+    (println (:recursion-set mon))
     (is (= (get-active-interaction mon) single-recur-protocolControl))))
 
 (deftest nested-recur-protocol-ids-test
   (let [mon (generate-monitor (nested-recur-protocol false))]
+    (println (:recursion-set mon))
     (is (= (get-active-interaction mon) nested-recur-protocolControl))))
+
+(deftest parallel-with-rec-protocol-ids-test
+  (let [mon (generate-monitor (parallel-with-rec false))]
+    (is (= (get-active-interaction mon) parallel-with-rec-control))
+    (is (not-empty @(:recursion-set mon)))))
 
 (deftest one-recur-with-choice-protocol-ids-test
   (let [mon (generate-monitor (one-recur-with-choice-protocol false))]
+    (println (:recursion-set mon))
     (is (= (get-active-interaction mon)one-recur-with-choice-protocolControl))))
 
+(deftest rec-with-parallel-with-choice-multicast-ids-test
+  (let [mon (generate-monitor (rec-with-parallel-with-choice-multicast false))]
+    (println(:recursion-set mon))
+    (is (not-empty @(:recursion-set mon)))))
 (deftest one-recur-with-startchoice-and-endchoice-protocol-ids-test
   (let [mon (generate-monitor (one-recur-with-startchoice-and-endchoice-protocol false))]
     (is (= (get-active-interaction mon) one-recur-with-startchoice-and-endchoice-protocolControl))))
@@ -73,15 +86,6 @@
 (deftest two-buyer-protocol-ids-test
   (let [mon (generate-monitor (two-buyer-protocol false))]
     (is (= (get-active-interaction mon)two-buyer-protocolControl))))
-
-(deftest apply-atomic-test
-  (let [mon (generate-monitor (testDualProtocol true))
-        message (->message "1" "hello world")]
-    (apply-send! mon "A" "B" message)
-    (apply-receive! mon "A" "B" (get-label message))
-    (is (= "2" (get-action (get-active-interaction mon))))
-    (is (= "B" (get-sender (get-active-interaction mon))))
-    (is (= "A" (get-receivers (get-active-interaction mon))))))
 
 (deftest parallel-after-interaction-test
   (let [mon (generate-monitor (parallel-after-interaction false))]
@@ -117,4 +121,5 @@
 
 (deftest rec-with-parallel-with-choice-multicast-and-close-test
   (let [mon (generate-monitor (rec-with-parallel-with-choice-multicast-and-close false))]
+    (is (not-empty @(:recursion-set mon)))
     (is (= (get-active-interaction mon) rec-with-parallel-with-choice-multicast-and-closeControl))))

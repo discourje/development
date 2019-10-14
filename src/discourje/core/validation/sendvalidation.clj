@@ -36,7 +36,6 @@
 (defn- get-send-recursion-interaction
   "Check the first element in a recursion interaction"
   [monitor sender receiver label active-interaction]
-  (register-rec! monitor active-interaction)
   (let [rec (get-recursion active-interaction)]
     (cond
       (satisfies? interactable rec) (get-send-atomic-interaction sender receiver label rec)
@@ -154,8 +153,7 @@
     (satisfies? parallelizable active-interaction)
     (get-send-parallel-interaction monitor sender receivers label active-interaction)
     (satisfies? recursable active-interaction)
-    (do (register-rec! monitor active-interaction)
-        (is-valid-send-communication? monitor sender receivers label (get-recursion active-interaction)))
+    (is-valid-send-communication? monitor sender receivers label (get-recursion active-interaction))
     (satisfies? identifiable-recur active-interaction)
     (if (satisfies? parallelizable active-interaction)
       (when (<= (count (get-parallel active-interaction)) 1)
