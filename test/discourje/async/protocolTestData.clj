@@ -916,9 +916,9 @@
                                     (->interaction nil 6 "b" "a" #{} nil)])))
 
 (def parallel-with-rec-control
-  (->lateral nil [(->recursion nil :test [(->branch nil [(->interaction nil 1 "a" "b" #{} nil)
+  (->lateral nil [(->recursion nil :test (->branch nil [(->interaction nil 1 "a" "b" #{} nil)
                                                           (->interaction nil 0 "a" "b" #{}
-                                                                         (->recur-identifier nil :test :recur nil))] nil)] nil)
+                                                                         (->recur-identifier nil :test :recur nil))] nil) nil)
                    (->interaction nil 4 "b" "a" #{} (->interaction nil 5 "a" "b" #{} nil))]
              (->interaction nil 6 "b" "a" #{} nil)))
 

@@ -32,7 +32,7 @@
   "This function will use the protocol to listen for the greet message."
   [channel return-channel]
   (let [message (<!!! channel "greet")]
-    (log-message (format "Received message: %s by %s" (get-content message) (get-consumer channel)))
+    (log-message (format "Received message: %s by %s" message (get-consumer channel)))
     (when (not= (nil?(>!! return-channel (msg "greet" "Hi Alice!")))))))
 
 ;start the `greet-bob-and-carol' function on thread
