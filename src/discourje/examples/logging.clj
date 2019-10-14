@@ -21,15 +21,15 @@
   "This function will use the protocol to send the greet message to bob and carol."
   []
   (>!! alice-to-carol (msg "greet" "Greetings, from alice!"))
-  (log-message (get-content (<!! alice-to-carol "greet")))
+  (log-message (<!! alice-to-carol "greet"))
   (>!! alice-to-bob (->message "greet" "Greetings, from alice!"))
-  (log-message (get-content (<!! bob-to-alice "greet"))))
+  (log-message (<!! bob-to-alice "greet")))
 
 (defn- receive-greet
   "This function will use the protocol to listen for the greet message."
   [input-channel output-channel]
   (let [message (<!! input-channel "greet")]
-    (log-message (format "Received message: %s to %s" (get-content message) (get-consumer input-channel)))
+    (log-message (format "Received message: %s to %s"  message (get-consumer input-channel)))
     (>!! output-channel (msg "greet" "Hi to you too!"))))
 
 "***BY DEFAULT EXCEPTION LOGGING IS ENABLED!***"

@@ -36,11 +36,11 @@
     (>!! [s-b1 s-b2] quote)
     (let [choice-by-buyer2 (<!! b2-s ["ok" "quit"])]
       (cond
-        (= "ok" (get-label choice-by-buyer2))
+        (= "ok" (:choice choice-by-buyer2))
         (do
           (<!! b2-s "address")
           (>!! s-b2 date))
-        (= "quit" (get-label choice-by-buyer2))
+        (= "quit" (:choice choice-by-buyer2))
         "Quit!"))))
 
 (defn discourje-two-buyer [iterations]
@@ -52,7 +52,7 @@
         b2-s (vec (for [i infra] (get-channel i "buyer2" "seller")))
         title (msg "title" "The Joy of Clojure")
         div (msg "quote-div" 16)
-        ok (msg "ok" "ok")
+        ok (msg "ok" {:choice "ok" :content "ok"})
         address (msg "address" "Open University, Valkenburgerweg 177, 6419 AT, Heerlen")
         quote (msg "quote" 15)
         date (msg "date" 1)
@@ -75,7 +75,7 @@
         title (msg "title" "The Joy of Clojure")
          interactions (get-active-interaction (get-monitor b1-s))
         div (msg "quote-div" 16)
-        ok (msg "ok" "ok")
+        ok (msg "ok" {:choice "ok" :content"ok"})
         address (msg "address" "Open University, Valkenburgerweg 177, 6419 AT, Heerlen")
         quote (msg "quote" 15)
         date (msg "date" 1)

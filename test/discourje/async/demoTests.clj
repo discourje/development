@@ -26,7 +26,7 @@
         s->b (get-channel infra "seller" "buyer")
         product {:product-type "book" :content {:title "The joy of Clojure"}}]
     (>!! b->s (msg "quote-request" product))
-    (if (= (get-label (<!! s->b ["quote" "out-of-stock"])) "quote")
+    (if (= (:choice (<!! s->b ["quote" "out-of-stock"])) "quote")
       (do (>!! b->s (msg "order" "confirm order!"))
           (confirmed-callback (<!! s->b "order-ack")))
       (out-of-stock-callback "Book is out of stock!"))))
@@ -37,15 +37,15 @@
   (let [b->s (get-channel infra "buyer" "seller")
         s->b (get-channel infra "seller" "buyer")
         in-stock? (fn [book] (rand-int 2))]
-    (if (== 1 (in-stock? (get-content (<!! b->s "quote-request"))))
+    (if (== 1 (in-stock? (<!! b->s "quote-request")))
       (do
-        (>!! s->b (msg "quote" "$40,00"))
+        (>!! s->b (msg "quote" {:choice "quote" :content"$40,00"}))
         (let [order (<!! b->s "order")]
-          (println (get-content order))
+          (println order)
           (>!! s->b (msg "order-ack" "order-ack confirmed!"))))
-      (>!! s->b (msg "out-of-stock" "Product out of stock!")))))
+      (>!! s->b (msg "out-of-stock" {:choice"out-of-stock" :content "Product out of stock!"})))))
 
-(clojure.core.async/thread (buyer (fn [m] (println (get-content m))) (fn [m] (println m))))
+(clojure.core.async/thread (buyer (fn [m] (println m)) (fn [m] (println m))))
 (clojure.core.async/thread (seller))
 
 (def Q&A
