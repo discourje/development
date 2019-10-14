@@ -9,7 +9,6 @@
 (enable-wildcard)
 (discourje.core.logging/set-logging-exceptions)
 (discourje.core.logging/set-throwing true)
-(reset! <!!-unwrap true)
 
 ;;
 ;; Specification

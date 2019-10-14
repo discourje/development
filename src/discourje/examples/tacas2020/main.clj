@@ -195,12 +195,15 @@
       (print "misc/chess, misc/go-fish, misc/ttt")
       (println "}"))))
 
-;(-main "yes" "2" "5" "clbg/spectral-norm" "5500")
+(try
+  ;(-main "yes" "2" "5" "clbg/spectral-norm" "5500")
 
-;(-main "yes" "2" "5" "micro/one-all-one" "1")
-;(-main "yes" "2" "5" "micro/one-one-one" "1")
-;(-main "yes" "2" "5" "micro/ring" "1")
+  ;(-main "yes" "2" "5" "micro/one-all-one" "1")
+  ;(-main "yes" "2" "5" "micro/one-one-one" "1")
+  ;(-main "yes" "2" "5" "micro/ring" "1")
 
-;(-main "yes" "4" "0" "misc/go-fish")
-;(-main "yes" "2" "5" "misc/chess" "/Users/sung/Desktop/stockfish-10-64" "60")
-;(-main "yes" "2" "5" "misc/ttt")
+  ;(-main "yes" "4" "0" "misc/go-fish")
+  ;(-main "yes" "2" "5" "misc/chess" "/Users/sung/Desktop/stockfish-10-64" "60")
+  ;(-main "yes" "2" "5" "misc/ttt")
+
+  (catch Exception e (.printStackTrace e)))

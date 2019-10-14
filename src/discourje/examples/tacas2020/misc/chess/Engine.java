@@ -11,9 +11,8 @@ import java.util.List;
 
 public class Engine {
 
+    public static String STOCKFISH = "";
     public static int MAX_MOVES = 5899; // https://chess.stackexchange.com/questions/4113
-
-    public static String STOCKFISH = ""; // "/Users/sung/Desktop/stockfish-10-64";
     public static long TIME = -1; //4 * 60 * 1000;
     public static int MOVES_TO_GO = -1; //= 40;
 
