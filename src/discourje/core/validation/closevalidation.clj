@@ -21,8 +21,6 @@
     (first (filter #(is-valid-close-communication? monitor sender receivers %) (get-branches active-interaction)))
     (satisfies? parallelizable active-interaction)
     (first (filter #(is-valid-close-communication? monitor sender receivers %) (get-parallel active-interaction)))
-    (satisfies? recursable active-interaction)
-    (is-valid-close-communication? monitor sender receivers (get-recursion active-interaction))
     (satisfies? identifiable-recur active-interaction)
     (if (satisfies? parallelizable active-interaction)
       (when (<= (count (get-parallel active-interaction)) 1)
@@ -33,20 +31,18 @@
 
 (defn- swap-active-interaction-by-close
   "Apply new interaction"
-  [channel active-interaction pre-swap-interaction target-interaction]
+  [active-interaction pre-swap-interaction target-interaction]
   (swap-active-interaction-by-atomic active-interaction pre-swap-interaction target-interaction nil))
 ;------------------------------------------------------------------------------------
-(defn- get-close-recursion-interaction
+(defn- get-close-recur-Identifier-interaction
   "Check the first element in a recursion interaction"
-  [sender receiver active-interaction]
-  (let [rec (get-recursion active-interaction)]
-    (cond
-      (satisfies? closable rec) (when (is-valid-close? sender receiver rec) rec)
-      (satisfies? interactable rec) nil
-      (satisfies? branchable rec) (get-close-branch-interaction sender receiver rec)
-      (satisfies? recursable rec) (get-close-recursion-interaction sender receiver rec)
-      (satisfies? parallelizable rec) (get-close-parallel-interaction sender receiver rec)
-      :else (log-error :unsupported-operation (format "No correct next recursion monitor found. %s" (interaction-to-string rec))))))
+  [sender receiver rec]
+  (cond
+    (satisfies? closable rec) (when (is-valid-close? sender receiver rec) rec)
+    (satisfies? interactable rec) nil
+    (satisfies? branchable rec) (get-close-branch-interaction sender receiver rec)
+    (satisfies? parallelizable rec) (get-close-parallel-interaction sender receiver rec)
+    :else (log-error :unsupported-operation (format "No correct next recursion monitor found. %s" (interaction-to-string rec)))))
 
 (defn- get-close-parallel-interaction
   "Check the atomic interaction"
@@ -57,7 +53,6 @@
                            (satisfies? interactable %) nil
                            (satisfies? branchable %) (get-close-branch-interaction sender receiver %)
                            (satisfies? parallelizable %) (get-close-parallel-interaction sender receiver %)
-                           (satisfies? recursable %) (get-close-recursion-interaction sender receiver %)
                            :else (log-error :unsupported-operation (format "Cannot check operation on child parallel construct! %s" (interaction-to-string %))))
                         (get-parallel active-interaction)))]
     active-interaction))
@@ -70,7 +65,6 @@
                     (satisfies? interactable %) nil
                     (satisfies? branchable %) (get-close-branch-interaction sender receiver %)
                     (satisfies? parallelizable %) (get-close-parallel-interaction sender receiver %)
-                    (satisfies? recursable %) (get-close-recursion-interaction sender receiver %)
                     :else (log-error :unsupported-operation (format "Cannot check operation on child branchable construct! %s" (interaction-to-string %))))
                  (get-branches active-interaction))))
 
@@ -86,11 +80,9 @@
                                               (when (is-valid-close? sender receivers par) par)
                                               (satisfies? branchable par)
                                               (get-close-branch-interaction sender receivers par)
-                                              (satisfies? recursable par)
-                                              (get-close-recursion-interaction sender receivers par)
                                               (satisfies? identifiable-recur par)
                                               (let [recursion (get-rec monitor (get-name par))
-                                                    valid-rec (get-close-recursion-interaction sender receivers recursion)]
+                                                    valid-rec (get-close-recur-Identifier-interaction sender receivers recursion)]
                                                 (if (nil? valid-rec)
                                                   par
                                                   recursion))
@@ -105,7 +97,7 @@
                                       (remove-close-from-parallel sender receivers inter monitor)
                                       (satisfies? closable inter)
                                       (get-next inter)
-                                      (or (satisfies? recursable inter) (satisfies? branchable inter) (satisfies? interactable inter))
+                                      (or (satisfies? branchable inter) (satisfies? interactable inter))
                                       inter
                                       (and (instance? clojure.lang.LazySeq inter) (not (satisfies? interactable inter)))
                                       (first (filter some? inter))))))))]
@@ -133,15 +125,13 @@
    (if
      (cond
        (satisfies? closable target-interaction)
-       (swap-active-interaction-by-close channel active-interaction pre-swap-interaction target-interaction)
+       (swap-active-interaction-by-close active-interaction pre-swap-interaction target-interaction)
        (satisfies? interactable target-interaction)
        false
        (satisfies? branchable target-interaction)
        (apply-close-to-mon monitor channel active-interaction pre-swap-interaction (get-close-branch-interaction (get-provider channel) (get-consumer channel) target-interaction))
        (satisfies? parallelizable target-interaction)
        (swap-active-close-interaction-by-parallel (get-provider channel) (get-consumer channel) active-interaction target-interaction monitor)
-       (satisfies? recursable target-interaction)
-       (apply-close-to-mon monitor channel active-interaction pre-swap-interaction (get-recursion target-interaction))
        (satisfies? identifiable-recur target-interaction)
        (apply-close-to-mon monitor channel active-interaction pre-swap-interaction (get-rec monitor (get-name target-interaction)))
        :else (do (log-error :unsupported-operation (format "Unsupported type of interaction to apply %s!" (type target-interaction)))

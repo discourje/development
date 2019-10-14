@@ -6,9 +6,8 @@
 (defn- assoc-to-rec-table [rec-table inter]
   (when (satisfies? recursable inter)
     (when (or (nil? ((get-name inter) @rec-table)) (empty? ((get-name inter) @rec-table)))
-      (swap! rec-table assoc (get-name inter) inter)
-      ;(reset! rec-table (assoc @rec-table (get-name inter) inter))
-      inter))
+      (swap! rec-table assoc (get-name inter) (get-recursion inter))
+      (get-recursion inter)))
   inter)
 
 (defn- assoc-interaction
@@ -51,22 +50,24 @@
 (defn nest-mep
   "assign all next keys in a given vector of interactions (note that choice, parallel and recursion make this function called recursively)"
   [interactions rec-table]
-  (when-not (nil? interactions)
-    (if (>= (count interactions) 2)
-      (loop [i (- (count interactions) 2)
-             it (last interactions)]
-        (if (== 0 i)
-          (let [link (assoc-interaction (nth interactions i) it rec-table)]
-            (if (or (satisfies? branchable link) (satisfies? recursable link) (satisfies? parallelizable link))
-              (assoc-last-interaction link rec-table)
-              link))
-          (if (vector? interactions)
-            (let [linked (assoc-interaction (nth interactions i) it rec-table)]
-              (recur (- i 1) linked))
-            interactions)))
-      (cond
-        (or (satisfies? interactable (first interactions)) (satisfies? identifiable-recur (first interactions)) (satisfies? closable (first interactions)))
-        (first interactions)
-        (or (satisfies? branchable (first interactions)) (satisfies? recursable (first interactions)) (satisfies? parallelizable (first interactions)))
-        (assoc-last-interaction (first interactions) rec-table)
-        ))))
+  (let [inter (when-not (nil? interactions)
+                (if (>= (count interactions) 2)
+                  (loop [i (- (count interactions) 2)
+                         it (last interactions)]
+                    (if (== 0 i)
+                      (let [link (assoc-interaction (nth interactions i) it rec-table)]
+                        (if (or (satisfies? branchable link) (satisfies? recursable link) (satisfies? parallelizable link))
+                          (assoc-last-interaction link rec-table)
+                          link))
+                      (if (vector? interactions)
+                        (let [linked (assoc-interaction (nth interactions i) it rec-table)]
+                          (recur (- i 1) linked))
+                        interactions)))
+                  (cond
+                    (or (satisfies? interactable (first interactions)) (satisfies? identifiable-recur (first interactions)) (satisfies? closable (first interactions)))
+                    (first interactions)
+                    (or (satisfies? branchable (first interactions)) (satisfies? recursable (first interactions)) (satisfies? parallelizable (first interactions)))
+                    (assoc-last-interaction (first interactions) rec-table)
+                    )))]
+    (assoc-to-rec-table rec-table inter)
+    ))

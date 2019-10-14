@@ -42,17 +42,16 @@
   [sender receiver label active-interaction]
   (when (is-valid-interaction? sender receiver label active-interaction) active-interaction))
 
-(defn- get-recursion-interaction
+(defn- get-recur-identifier-interaction
   "Check the first element in a recursion interaction"
-  [sender receiver label active-interaction]
-  (let [rec (get-recursion active-interaction)]
-    (cond
-      (satisfies? interactable rec) (get-atomic-interaction sender receiver label rec)
-      (satisfies? branchable rec) (get-branch-interaction sender receiver label rec)
-      (satisfies? recursable rec) (get-recursion-interaction sender receiver label rec)
-      (satisfies? parallelizable rec) (get-parallel-interaction sender receiver label rec)
-      (satisfies? closable rec) nil
-      :else (log-error :unsupported-operation (format "No correct next recursion monitor found. %s" (interaction-to-string rec))))))
+  [sender receiver label rec]
+  (cond
+    (satisfies? interactable rec) (get-atomic-interaction sender receiver label rec)
+    (satisfies? branchable rec) (get-branch-interaction sender receiver label rec)
+    (satisfies? recursable rec) (get-recur-identifier-interaction sender receiver label rec)
+    (satisfies? parallelizable rec) (get-parallel-interaction sender receiver label rec)
+    (satisfies? closable rec) nil
+    :else (log-error :unsupported-operation (format "No correct next recursion monitor found. %s" (interaction-to-string rec)))))
 
 (defn- get-parallel-interaction
   "Check the atomic interaction"
@@ -62,7 +61,6 @@
                            (satisfies? interactable %) (get-atomic-interaction sender receiver label %)
                            (satisfies? branchable %) (get-branch-interaction sender receiver label %)
                            (satisfies? parallelizable %) (get-parallel-interaction sender receiver label %)
-                           (satisfies? recursable %) (get-recursion-interaction sender receiver label %)
                            (satisfies? closable %) nil
                            :else (log-error :unsupported-operation (format "Cannot check operation on child parallel construct! %s" (interaction-to-string %))))
                         (get-parallel active-interaction))
@@ -76,7 +74,6 @@
                     (satisfies? interactable %) (get-atomic-interaction sender receiver label %)
                     (satisfies? branchable %) (get-branch-interaction sender receiver label %)
                     (satisfies? parallelizable %) (get-parallel-interaction sender receiver label %)
-                    (satisfies? recursable %) (get-recursion-interaction sender receiver label %)
                     (satisfies? closable %) nil
                     :else (log-error :unsupported-operation (format "Cannot check operation on child branchable construct! %s" (interaction-to-string %))))
                  (get-branches active-interaction))))
@@ -93,11 +90,9 @@
                                               (get-atomic-interaction sender receivers label par)
                                               (satisfies? branchable par)
                                               (get-branch-interaction sender receivers label par)
-                                              (satisfies? recursable par)
-                                              (get-recursion-interaction sender receivers label par)
                                               (satisfies? identifiable-recur par)
                                               (let [recursion (get-rec monitor (get-name par))
-                                                    valid-rec (get-recursion-interaction sender receivers label recursion)]
+                                                    valid-rec (get-recur-identifier-interaction sender receivers label recursion)]
                                                 (if (nil? valid-rec)
                                                   par
                                                   recursion))
@@ -114,7 +109,7 @@
                                       (if (multiple-receivers? inter)
                                         (assoc inter :receivers (vec (remove #{receivers} (:receivers inter))))
                                         (get-next inter))
-                                      (or (satisfies? recursable inter) (satisfies? branchable inter) (satisfies? closable inter))
+                                      (or (satisfies? branchable inter) (satisfies? closable inter))
                                       inter
                                       (and (instance? clojure.lang.LazySeq inter) (not (satisfies? interactable inter)))
                                       (first (filter some? inter))))))))]
@@ -147,8 +142,6 @@
     (first (filter #(is-valid-communication? monitor sender receivers label %) (get-branches active-interaction)))
     (satisfies? parallelizable active-interaction)
     (get-parallel-interaction sender receivers label active-interaction)
-    (satisfies? recursable active-interaction)
-    (is-valid-communication? monitor sender receivers label (get-recursion active-interaction))
     (satisfies? identifiable-recur active-interaction)
     (is-valid-communication? monitor sender receivers label (get-rec monitor (get-name active-interaction)))
     (satisfies? closable active-interaction)
@@ -166,8 +159,6 @@
      (apply-receive-to-mon monitor sender receivers label active-interaction pre-swap-interaction (get-branch-interaction sender receivers label target-interaction))
      (satisfies? parallelizable target-interaction)
      (swap-active-interaction-by-parallel sender receivers label active-interaction target-interaction monitor)
-     (satisfies? recursable target-interaction)
-     (apply-receive-to-mon monitor sender receivers label active-interaction pre-swap-interaction (get-recursion target-interaction))
      (satisfies? identifiable-recur target-interaction)
      (apply-receive-to-mon monitor sender receivers label active-interaction pre-swap-interaction (get-rec monitor (get-name target-interaction)))
      :else (log-error :unsupported-operation (format "Unsupported type of interaction to apply %s!" (type target-interaction)))
