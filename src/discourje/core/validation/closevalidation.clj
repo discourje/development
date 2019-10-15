@@ -36,53 +36,55 @@
 ;------------------------------------------------------------------------------------
 (defn- get-close-recur-Identifier-interaction
   "Check the first element in a recursion interaction"
-  [sender receiver rec]
+  [monitor sender receiver rec]
   (cond
     (satisfies? closable rec) (when (is-valid-close? sender receiver rec) rec)
     (satisfies? interactable rec) nil
-    (satisfies? branchable rec) (get-close-branch-interaction sender receiver rec)
-    (satisfies? parallelizable rec) (get-close-parallel-interaction sender receiver rec)
+    (satisfies? branchable rec) (get-close-branch-interaction monitor sender receiver rec)
+    (satisfies? parallelizable rec) (get-close-parallel-interaction monitor sender receiver rec)
     :else (log-error :unsupported-operation (format "No correct next recursion monitor found. %s" (interaction-to-string rec)))))
 
 (defn- get-close-parallel-interaction
   "Check the atomic interaction"
-  [sender receiver active-interaction]
+  [monitor sender receiver active-interaction]
   (when-let [_ (first (filter
                         #(cond
                            (satisfies? closable %) (when (is-valid-close? sender receiver %) %)
                            (satisfies? interactable %) nil
-                           (satisfies? branchable %) (get-close-branch-interaction sender receiver %)
-                           (satisfies? parallelizable %) (get-close-parallel-interaction sender receiver %)
+                           (satisfies? branchable %) (get-close-branch-interaction monitor sender receiver %)
+                           (satisfies? parallelizable %) (get-close-parallel-interaction monitor sender receiver %)
+                           (satisfies? identifiable-recur %) (get-close-recur-Identifier-interaction monitor sender receiver (get-rec monitor (get-name %)))
                            :else (log-error :unsupported-operation (format "Cannot check operation on child parallel construct! %s" (interaction-to-string %))))
                         (get-parallel active-interaction)))]
     active-interaction))
 
 (defn- get-close-branch-interaction
   "Check the atomic interaction"
-  [sender receiver active-interaction]
+  [monitor sender receiver active-interaction]
   (first (filter #(cond
                     (satisfies? closable %) (when (is-valid-close? sender receiver %) %)
                     (satisfies? interactable %) nil
-                    (satisfies? branchable %) (get-close-branch-interaction sender receiver %)
-                    (satisfies? parallelizable %) (get-close-parallel-interaction sender receiver %)
+                    (satisfies? branchable %) (get-close-branch-interaction monitor sender receiver %)
+                    (satisfies? parallelizable %) (get-close-parallel-interaction monitor sender receiver %)
+                    (satisfies? identifiable-recur %) (get-close-recur-Identifier-interaction monitor sender receiver (get-rec monitor (get-name %)))
                     :else (log-error :unsupported-operation (format "Cannot check operation on child branchable construct! %s" (interaction-to-string %))))
                  (get-branches active-interaction))))
 
 (defn remove-close-from-parallel
   "Remove an interaction from a parallel in a recursive fashion."
-  [sender receivers target-interaction monitor]
+  [monitor sender receivers target-interaction monitor]
   (let [pars (flatten (filter some?
                               (for [par (get-parallel target-interaction)]
                                 (let [inter (cond
                                               (satisfies? parallelizable par)
-                                              (remove-close-from-parallel sender receivers par monitor)
+                                              (remove-close-from-parallel monitor sender receivers par monitor)
                                               (satisfies? closable par)
                                               (when (is-valid-close? sender receivers par) par)
                                               (satisfies? branchable par)
-                                              (get-close-branch-interaction sender receivers par)
+                                              (get-close-branch-interaction monitor sender receivers par)
                                               (satisfies? identifiable-recur par)
                                               (let [recursion (get-rec monitor (get-name par))
-                                                    valid-rec (get-close-recur-Identifier-interaction sender receivers recursion)]
+                                                    valid-rec (get-close-recur-Identifier-interaction monitor sender receivers recursion)]
                                                 (if (nil? valid-rec)
                                                   par
                                                   recursion))
@@ -94,7 +96,7 @@
                                       par)
                                     (cond
                                       (satisfies? parallelizable inter)
-                                      (remove-close-from-parallel sender receivers inter monitor)
+                                      (remove-close-from-parallel monitor sender receivers inter monitor)
                                       (satisfies? closable inter)
                                       (get-next inter)
                                       (or (satisfies? branchable inter) (satisfies? interactable inter))
@@ -108,15 +110,15 @@
 (defn- swap-active-close-interaction-by-parallel
   "Swap active interaction by parallel"
   [sender receivers active-interaction target-interaction monitor]
-  (let [target-parallel-interaction (get-close-parallel-interaction sender receivers target-interaction)]
+  (let [target-parallel-interaction (get-close-parallel-interaction monitor sender receivers target-interaction)]
     (swap! active-interaction
            (fn [inter]
              (let [target (if (= (get-id inter) (get-id target-parallel-interaction))
-                            (get-close-parallel-interaction sender receivers inter)
+                            (get-close-parallel-interaction monitor sender receivers inter)
                             target-parallel-interaction)]
                (if (nil? target)
                  inter
-                 (remove-close-from-parallel sender receivers target monitor))))))
+                 (remove-close-from-parallel monitor sender receivers target monitor))))))
   true)
 
 (defn- apply-close-to-mon
@@ -129,7 +131,7 @@
        (satisfies? interactable target-interaction)
        false
        (satisfies? branchable target-interaction)
-       (apply-close-to-mon monitor channel active-interaction pre-swap-interaction (get-close-branch-interaction (get-provider channel) (get-consumer channel) target-interaction))
+       (apply-close-to-mon monitor channel active-interaction pre-swap-interaction (get-close-branch-interaction monitor (get-provider channel) (get-consumer channel) target-interaction))
        (satisfies? parallelizable target-interaction)
        (swap-active-close-interaction-by-parallel (get-provider channel) (get-consumer channel) active-interaction target-interaction monitor)
        (satisfies? identifiable-recur target-interaction)
