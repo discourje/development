@@ -16,6 +16,7 @@ import discourje.java.DiscourjeCoreAsync;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+//import java.util.concurrent.CyclicBarrier;
 
 public class spectralnorm {
     private static final NumberFormat formatter = new DecimalFormat("#.000000000");
@@ -26,7 +27,6 @@ public class spectralnorm {
 
         System.out.println(formatter.format(spectralnormGame(n)));
     }
-
 
     private static final double spectralnormGame(int n) {
         // create unit vector
@@ -43,7 +43,7 @@ public class spectralnorm {
         int nthread = Benchmarks.K;
         Approximate.chans = new Chan[nthread];
 
-        DiscourjeCoreAsync.Monitor m = null;
+        DiscourjeCoreAsync.Monitor m;
         switch (Benchmarks.LIB) {
             case CLOJURE:
                 m = null;
@@ -93,7 +93,6 @@ public class spectralnorm {
 
         return Math.sqrt(vBv / vv);
     }
-
 
     private static class Approximate extends Thread {
         //private static CyclicBarrier barrier;

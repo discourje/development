@@ -25,10 +25,13 @@
 
             (doseq [i (range k)]
               (thread
-                (loop []
+                (loop [deck (- 52 (* k 5))]
+                  (when (<= deck 0)
+                    (binding [*out* *err*] (println "exit"))
+                    (System/exit 0))
                   (<!! (nth players->dealer i))
                   (>!! (nth dealer->players i) (->Card))
-                  (recur))))
+                  (recur (dec deck)))))
             )))
 
 (def thread-player
@@ -44,8 +47,8 @@
             (doseq [j (range-without-i k i)]
               (thread
                 (loop []
-                  (let [msg (<!! (aget players->players j i))
-                        _ (println j "-->" i ":" (type msg))]
+                  (let [msg (<!! (aget players->players j i))]
+                    (println j "-->" i ":" (type msg))
                     (cond (= (type msg) Card?)
                           (do
                             (>!! (aget players->players i j) (if (= (rand-int 2) 0) (->Card!) (->GoFish))))
