@@ -48,7 +48,7 @@
   (cond
     (satisfies? interactable rec) (get-atomic-interaction sender receiver label rec)
     (satisfies? branchable rec) (get-branch-interaction monitor sender receiver label rec)
-    (satisfies? recursable rec) (get-recur-identifier-interaction monitor sender receiver label rec)
+    (satisfies? identifiable-recur rec) (get-recur-identifier-interaction monitor sender receiver label rec)
     (satisfies? parallelizable rec) (get-parallel-interaction monitor sender receiver label rec)
     (satisfies? closable rec) nil
     :else (log-error :unsupported-operation (format "No correct next recursion monitor found. %s" (interaction-to-string rec)))))
