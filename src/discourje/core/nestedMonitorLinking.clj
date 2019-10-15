@@ -4,11 +4,11 @@
 (declare nest-mep)
 
 (defn- assoc-to-rec-table [rec-table inter]
-  (when (satisfies? recursable inter)
+  (if (satisfies? recursable inter)
     (when (or (nil? ((get-name inter) @rec-table)) (empty? ((get-name inter) @rec-table)))
       (swap! rec-table assoc (get-name inter) (get-recursion inter))
-      (get-recursion inter)))
-  inter)
+      (get-recursion inter))
+    inter))
 
 (defn- assoc-interaction
   "assoc nth-i (index i-1) with it (index i) as next"

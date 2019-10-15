@@ -381,7 +381,6 @@
                                     ])))
 (def single-recur-protocolControl
   (->interaction nil "1" "A" "B" #{}
-                 (->recursion nil :test
                               (->interaction nil "1" "B" "A" #{}
                                              (->branch nil [
                                                             (->interaction nil "2" "A" "C" #{}
@@ -390,7 +389,7 @@
                                                             (->interaction nil "3" "A" "B" #{} (->interaction nil "end" "A" ["B" "C"] #{} nil))
 
                                                             ] nil))
-                              nil))
+                              )
   )
 
 (defn single-recur-one-choice-protocol []
