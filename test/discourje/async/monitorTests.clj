@@ -4,13 +4,6 @@
             [discourje.core.async :refer :all])
   (:import (clojure.lang Atom)))
 
-(defn nth-next [root index]
-  (loop [node (if (and (not= nil root) (instance? Atom root)) @root root)
-         value 0]
-    (if (== value index)
-      node
-      (recur @(get-next node) (+ value 1)))))
-
 (deftest get-active-interaction-test
   (let [mon (generate-monitor (testDualProtocol false))]
     (println mon)
@@ -54,11 +47,6 @@
 (deftest multiple-nested-branches-protocol-ids-test
   (let [mon (generate-monitor (multiple-nested-branches-protocol false))]
     (is (= (get-active-interaction mon) multiple-nested-branches-protocolControl))))
-
-(deftest single-recur-protocol-ids-test
-  (let [mon (generate-monitor (single-recur-protocol false))]
-    (println (:recursion-set mon))
-    (is (= (get-active-interaction mon) single-recur-protocolControl))))
 
 (deftest nested-recur-protocol-ids-test
   (let [mon (generate-monitor (nested-recur-protocol false))]

@@ -381,16 +381,15 @@
                                     ])))
 (def single-recur-protocolControl
   (->interaction nil "1" "A" "B" #{}
-                 (->recursion nil :test
-                              (->interaction nil "1" "B" "A" #{}
-                                             (->branch nil [
-                                                            (->interaction nil "2" "A" "C" #{}
-                                                                           (->interaction nil "2" "C" "A" #{}
-                                                                                          (->recur-identifier nil :test :recur nil)))
-                                                            (->interaction nil "3" "A" "B" #{} (->interaction nil "end" "A" ["B" "C"] #{} nil))
+                 (->interaction nil "1" "B" "A" #{}
+                                (->branch nil [
+                                               (->interaction nil "2" "A" "C" #{}
+                                                              (->interaction nil "2" "C" "A" #{}
+                                                                             (->recur-identifier nil :test :recur nil)))
+                                               (->interaction nil "3" "A" "B" #{} (->interaction nil "end" "A" ["B" "C"] #{} nil))
 
-                                                            ] nil))
-                              nil))
+                                               ] nil))
+                 )
   )
 
 (defn single-recur-one-choice-protocol []
@@ -425,13 +424,11 @@
                                     ])
                   ))
 (def one-recur-with-choice-protocolControl
-  (->recursion nil :test
-               (->branch nil [
-                              (->interaction nil "2" "A" "C" #{}
-                                             (->recur-identifier nil :test :recur nil))
-                              (->interaction nil "3" "A" "B" #{} nil)
-                              ] nil)
-               nil))
+  (->branch nil [
+                 (->interaction nil "2" "A" "C" #{}
+                                (->recur-identifier nil :test :recur nil))
+                 (->interaction nil "3" "A" "B" #{} nil)
+                 ] nil))
 
 (defn one-recur-with-startchoice-and-endchoice-protocol [include-ids]
   (if include-ids (create-protocol [(make-choice [
@@ -462,14 +459,10 @@
                                     ])))
 
 (def one-recur-with-startchoice-and-endchoice-protocolControl
-  (->branch nil [
-                 (->recursion nil :test
-                              (->branch nil [
-                                             (->interaction nil "2" "A" "C" #{}
-                                                            (->recur-identifier nil :test :recur nil))
-                                             (->interaction nil "3" "A" "B" #{} nil)
-                                             ] nil)
-                              nil)
+  (->branch nil [(->branch nil [(->interaction nil "2" "A" "C" #{}
+                                               (->recur-identifier nil :test :recur nil))
+                                (->interaction nil "3" "A" "B" #{} nil)
+                                ] nil)
                  (->interaction nil "2" "A" "C" #{} nil)
                  ] nil))
 
@@ -515,24 +508,18 @@
                                                  nil)
                                     (->interaction nil "end" "A" ["B" "C"] #{} nil)])))
 (def nested-recur-protocolControl
-  (->recursion nil :test
-               (->recursion nil :nested
-                            (->interaction nil "1" "B" "A" #{}
-                                           (->branch nil [
-                                                          (->interaction nil "2" "A" "C" #{}
-                                                                         (->interaction nil "2" "C" "A" #{}
-                                                                                        (->recur-identifier nil :nested :recur nil)))
-                                                          (->interaction nil "3" "A" "B" #{} (->branch nil [
-                                                                                                            (->interaction nil "2" "A" "C" #{}
-                                                                                                                           (->interaction nil "2" "C" "D" #{}
-                                                                                                                                          (->recur-identifier nil :test :recur nil)))
-                                                                                                            (->interaction nil "3" "A" "E" #{} (->interaction nil "end" "A" ["B" "C"] #{} nil))
-                                                                                                            ] nil))
-                                                          ] nil))
-
-                            nil)
-
-               nil)
+  (->interaction nil "1" "B" "A" #{}
+                 (->branch nil [
+                                (->interaction nil "2" "A" "C" #{}
+                                               (->interaction nil "2" "C" "A" #{}
+                                                              (->recur-identifier nil :nested :recur nil)))
+                                (->interaction nil "3" "A" "B" #{} (->branch nil [
+                                                                                  (->interaction nil "2" "A" "C" #{}
+                                                                                                 (->interaction nil "2" "C" "D" #{}
+                                                                                                                (->recur-identifier nil :test :recur nil)))
+                                                                                  (->interaction nil "3" "A" "E" #{} (->interaction nil "end" "A" ["B" "C"] #{} nil))
+                                                                                  ] nil))
+                                ] nil))
   )
 
 (defn multiple-nested-recur-protocol []
@@ -580,16 +567,14 @@
                                                                                  [(->interaction nil "quit" "Buyer2" "Seller" #{} nil)]] nil)] nil)
                                     ])))
 (def two-buyer-protocolControl
-  (->recursion nil :order-book
-               (->interaction nil "title" "Buyer1" "Seller" #{}
-                              (->interaction nil "quote" "Seller" ["Buyer1" "Buyer2"] #{}
-                                             (->interaction nil "quoteDiv" "Buyer1" "Buyer2" #{}
-                                                            (->branch nil [
-                                                                           (->interaction nil "ok" "Buyer2" "Seller" #{}
-                                                                                          (->interaction nil "date" "Seller" "Buyer2" #{}
-                                                                                                         (->recur-identifier nil :order-book :recur nil)))
-                                                                           (->interaction nil "quit" "Buyer2" "Seller" #{} nil)] nil))))
-               nil))
+  (->interaction nil "title" "Buyer1" "Seller" #{}
+                 (->interaction nil "quote" "Seller" ["Buyer1" "Buyer2"] #{}
+                                (->interaction nil "quoteDiv" "Buyer1" "Buyer2" #{}
+                                               (->branch nil [
+                                                              (->interaction nil "ok" "Buyer2" "Seller" #{}
+                                                                             (->interaction nil "date" "Seller" "Buyer2" #{}
+                                                                                            (->recur-identifier nil :order-book :recur nil)))
+                                                              (->interaction nil "quit" "Buyer2" "Seller" #{} nil)] nil)))))
 (defn parallel-after-interaction [include-ids]
   (if include-ids (create-protocol [(-->> 1 "a" "b")
                                     (make-parallel [[(make-interaction 2 "b" "a")
@@ -599,18 +584,18 @@
                                                     ])])
                   (create-protocol [(->interaction nil 1 "a" "b" #{} nil)
                                     (->lateral nil [[(->interaction nil 2 "b" "a" #{} nil)
-                                                      (->interaction nil 3 "a" "b" #{} nil)]
-                                                     [(->interaction nil 4 "b" "a" #{} nil)
-                                                      (->interaction nil 5 "a" "b" #{} nil)]
-                                                     ] nil)])))
+                                                     (->interaction nil 3 "a" "b" #{} nil)]
+                                                    [(->interaction nil 4 "b" "a" #{} nil)
+                                                     (->interaction nil 5 "a" "b" #{} nil)]
+                                                    ] nil)])))
 
 (def parallel-after-interactionControl
   (->interaction nil 1 "a" "b" #{}
                  (->lateral nil [(->interaction nil 2 "b" "a" #{}
                                                 (->interaction nil 3 "a" "b" #{} nil))
-                                  (->interaction nil 4 "b" "a" #{}
-                                                 (->interaction nil 5 "a" "b" #{} nil))
-                                  ] nil)))
+                                 (->interaction nil 4 "b" "a" #{}
+                                                (->interaction nil 5 "a" "b" #{} nil))
+                                 ] nil)))
 
 (defn parallel-after-interaction-with-after [include-ids]
   (if include-ids (create-protocol [(make-interaction 1 "a" "b")
@@ -622,19 +607,19 @@
                                     (make-interaction 6 "b" "a")])
                   (create-protocol [(->interaction nil 1 "a" "b" #{} nil)
                                     (->lateral nil [[(->interaction nil 2 "b" "a" #{} nil)
-                                                      (->interaction nil 3 "a" "b" #{} nil)]
-                                                     [(->interaction nil 4 "b" "a" #{} nil)
-                                                      (->interaction nil 5 "a" "b" #{} nil)]
-                                                     ] nil)
+                                                     (->interaction nil 3 "a" "b" #{} nil)]
+                                                    [(->interaction nil 4 "b" "a" #{} nil)
+                                                     (->interaction nil 5 "a" "b" #{} nil)]
+                                                    ] nil)
                                     (->interaction nil 6 "b" "a" #{} nil)])))
 
 (def parallel-after-interaction-with-afterControl
   (->interaction nil 1 "a" "b" #{}
                  (->lateral nil [(->interaction nil 2 "b" "a" #{}
                                                 (->interaction nil 3 "a" "b" #{} nil))
-                                  (->interaction nil 4 "b" "a" #{}
-                                                 (->interaction nil 5 "a" "b" #{} nil))
-                                  ] (->interaction nil 6 "b" "a" #{} nil))))
+                                 (->interaction nil 4 "b" "a" #{}
+                                                (->interaction nil 5 "a" "b" #{} nil))
+                                 ] (->interaction nil 6 "b" "a" #{} nil))))
 
 (defn parallel-after-choice-with-after [include-ids]
   (if include-ids (create-protocol [(make-choice [[(make-interaction 1 "a" "b")]
@@ -647,23 +632,23 @@
                   (create-protocol [(->branch nil [[(->interaction nil 1 "a" "b" #{} nil)]
                                                    [(->interaction nil 0 "a" "b" #{} nil)]] nil)
                                     (->lateral nil [[(->interaction nil 2 "b" "a" #{} nil)
-                                                      (->interaction nil 3 "a" "b" #{} nil)]
-                                                     [(->interaction nil 4 "b" "a" #{} nil)
-                                                      (->interaction nil 5 "a" "b" #{} nil)]
-                                                     ] nil)
+                                                     (->interaction nil 3 "a" "b" #{} nil)]
+                                                    [(->interaction nil 4 "b" "a" #{} nil)
+                                                     (->interaction nil 5 "a" "b" #{} nil)]
+                                                    ] nil)
                                     (->interaction nil 6 "b" "a" #{} nil)])))
 
 (def parallel-after-choice-with-afterControl
   (->branch nil [(->interaction nil 1 "a" "b" #{} (->lateral nil [(->interaction nil 2 "b" "a" #{}
                                                                                  (->interaction nil 3 "a" "b" #{} nil))
-                                                                   (->interaction nil 4 "b" "a" #{}
-                                                                                  (->interaction nil 5 "a" "b" #{} nil))
-                                                                   ] (->interaction nil 6 "b" "a" #{} nil)))
+                                                                  (->interaction nil 4 "b" "a" #{}
+                                                                                 (->interaction nil 5 "a" "b" #{} nil))
+                                                                  ] (->interaction nil 6 "b" "a" #{} nil)))
                  (->interaction nil 0 "a" "b" #{} (->lateral nil [(->interaction nil 2 "b" "a" #{}
                                                                                  (->interaction nil 3 "a" "b" #{} nil))
-                                                                   (->interaction nil 4 "b" "a" #{}
-                                                                                  (->interaction nil 5 "a" "b" #{} nil))
-                                                                   ] (->interaction nil 6 "b" "a" #{} nil)))] nil))
+                                                                  (->interaction nil 4 "b" "a" #{}
+                                                                                 (->interaction nil 5 "a" "b" #{} nil))
+                                                                  ] (->interaction nil 6 "b" "a" #{} nil)))] nil))
 
 (defn parallel-after-choice-with-after-choice [include-ids]
   (if include-ids (create-protocol [(make-choice [[(make-interaction 1 "a" "b")]
@@ -677,25 +662,25 @@
                   (create-protocol [(->branch nil [[(->interaction nil 1 "a" "b" #{} nil)]
                                                    [(->interaction nil 0 "a" "b" #{} nil)]] nil)
                                     (->lateral nil [[(->interaction nil 2 "b" "a" #{} nil)
-                                                      (->interaction nil 3 "a" "b" #{} nil)]
-                                                     [(->interaction nil 4 "b" "a" #{} nil)
-                                                      (->interaction nil 5 "a" "b" #{} nil)]
-                                                     ] nil)
+                                                     (->interaction nil 3 "a" "b" #{} nil)]
+                                                    [(->interaction nil 4 "b" "a" #{} nil)
+                                                     (->interaction nil 5 "a" "b" #{} nil)]
+                                                    ] nil)
                                     (->branch nil [[(->interaction nil 6 "b" "a" #{} nil)]
                                                    [(->interaction nil 7 "b" "a" #{} nil)]] nil)])))
 (def parallel-after-choice-with-after-choiceControl
   (->branch nil [(->interaction nil 1 "a" "b" #{} (->lateral nil [(->interaction nil 2 "b" "a" #{}
                                                                                  (->interaction nil 3 "a" "b" #{} nil))
-                                                                   (->interaction nil 4 "b" "a" #{}
-                                                                                  (->interaction nil 5 "a" "b" #{} nil))
-                                                                   ] (->branch nil [(->interaction nil 6 "b" "a" #{} nil)
-                                                                                    (->interaction nil 7 "b" "a" #{} nil)] nil)))
+                                                                  (->interaction nil 4 "b" "a" #{}
+                                                                                 (->interaction nil 5 "a" "b" #{} nil))
+                                                                  ] (->branch nil [(->interaction nil 6 "b" "a" #{} nil)
+                                                                                   (->interaction nil 7 "b" "a" #{} nil)] nil)))
                  (->interaction nil 0 "a" "b" #{} (->lateral nil [(->interaction nil 2 "b" "a" #{}
                                                                                  (->interaction nil 3 "a" "b" #{} nil))
-                                                                   (->interaction nil 4 "b" "a" #{}
-                                                                                  (->interaction nil 5 "a" "b" #{} nil))
-                                                                   ] (->branch nil [(->interaction nil 6 "b" "a" #{} nil)
-                                                                                    (->interaction nil 7 "b" "a" #{} nil)] nil)))] nil))
+                                                                  (->interaction nil 4 "b" "a" #{}
+                                                                                 (->interaction nil 5 "a" "b" #{} nil))
+                                                                  ] (->branch nil [(->interaction nil 6 "b" "a" #{} nil)
+                                                                                   (->interaction nil 7 "b" "a" #{} nil)] nil)))] nil))
 
 (defn parallel-after-rec-with-after [include-ids]
   (if include-ids (create-protocol [(make-recursion :test [
@@ -713,20 +698,20 @@
                                                                   (->recur-identifier nil :test :recur nil)]
                                                                  [(->interaction nil 0 "a" "b" #{} nil)]] nil)] nil)
                                     (->lateral nil [[(->interaction nil 2 "b" "a" #{} nil)
-                                                      (->interaction nil 3 "a" "b" #{} nil)]
-                                                     [(->interaction nil 4 "b" "a" #{} nil)
-                                                      (->interaction nil 5 "a" "b" #{} nil)]
-                                                     ] nil)
+                                                     (->interaction nil 3 "a" "b" #{} nil)]
+                                                    [(->interaction nil 4 "b" "a" #{} nil)
+                                                     (->interaction nil 5 "a" "b" #{} nil)]
+                                                    ] nil)
                                     (->branch nil [[(->interaction nil 6 "b" "a" #{} nil)]
                                                    [(->interaction nil 7 "b" "a" #{} nil)]] nil)])))
 (def parallel-after-rec-with-afterControl
-  (->recursion nil :test (->branch nil [(->interaction nil 1 "a" "b" #{} (->recur-identifier nil :test :recur nil))
-                                        (->interaction nil 0 "a" "b" #{} (->lateral nil [(->interaction nil 2 "b" "a" #{}
-                                                                                                        (->interaction nil 3 "a" "b" #{} nil))
-                                                                                          (->interaction nil 4 "b" "a" #{}
-                                                                                                         (->interaction nil 5 "a" "b" #{} nil))
-                                                                                          ] (->branch nil [(->interaction nil 6 "b" "a" #{} nil)
-                                                                                                           (->interaction nil 7 "b" "a" #{} nil)] nil)))] nil) nil))
+  (->branch nil [(->interaction nil 1 "a" "b" #{} (->recur-identifier nil :test :recur nil))
+                 (->interaction nil 0 "a" "b" #{} (->lateral nil [(->interaction nil 2 "b" "a" #{}
+                                                                                 (->interaction nil 3 "a" "b" #{} nil))
+                                                                  (->interaction nil 4 "b" "a" #{}
+                                                                                 (->interaction nil 5 "a" "b" #{} nil))
+                                                                  ] (->branch nil [(->interaction nil 6 "b" "a" #{} nil)
+                                                                                   (->interaction nil 7 "b" "a" #{} nil)] nil)))] nil))
 
 (defn parallel-after-rec-with-after-rec [include-ids]
   (if include-ids (create-protocol [(make-recursion :test [
@@ -746,25 +731,25 @@
                                                                   (->recur-identifier nil :test :recur nil)]
                                                                  [(->interaction nil 0 "a" "b" #{} nil)]] nil)] nil)
                                     (->lateral nil [[(->interaction nil 2 "b" "a" #{} nil)
-                                                      (->interaction nil 3 "a" "b" #{} nil)]
-                                                     [(->interaction nil 4 "b" "a" #{} nil)
-                                                      (->interaction nil 5 "a" "b" #{} nil)]
-                                                     ] nil)
+                                                     (->interaction nil 3 "a" "b" #{} nil)]
+                                                    [(->interaction nil 4 "b" "a" #{} nil)
+                                                     (->interaction nil 5 "a" "b" #{} nil)]
+                                                    ] nil)
                                     (->recursion nil :test2
                                                  [(->branch nil [[(->interaction nil 6 "b" "a" #{} nil)
                                                                   (->recur-identifier nil :test2 :recur nil)]
                                                                  [(->interaction nil 7 "b" "a" #{} nil)]] nil)] nil)])))
 
 (def parallel-after-rec-with-after-recControl
-  (->recursion nil :test (->branch nil [(->interaction nil 1 "a" "b" #{} (->recur-identifier nil :test :recur nil))
-                                        (->interaction nil 0 "a" "b" #{} (->lateral nil [(->interaction nil 2 "b" "a" #{}
-                                                                                                        (->interaction nil 3 "a" "b" #{} nil))
-                                                                                          (->interaction nil 4 "b" "a" #{}
-                                                                                                         (->interaction nil 5 "a" "b" #{} nil))
-                                                                                          ] (->recursion nil :test2
-                                                                                                         (->branch nil [(->interaction nil 6 "b" "a" #{}
-                                                                                                                                       (->recur-identifier nil :test2 :recur nil))
-                                                                                                                        (->interaction nil 7 "b" "a" #{} nil)] nil) nil)))] nil) nil))
+  (->branch nil [(->interaction nil 1 "a" "b" #{} (->recur-identifier nil :test :recur nil))
+                 (->interaction nil 0 "a" "b" #{} (->lateral nil [(->interaction nil 2 "b" "a" #{}
+                                                                                 (->interaction nil 3 "a" "b" #{} nil))
+                                                                  (->interaction nil 4 "b" "a" #{}
+                                                                                 (->interaction nil 5 "a" "b" #{} nil))
+                                                                  ]
+                                                             (->branch nil [(->interaction nil 6 "b" "a" #{}
+                                                                                           (->recur-identifier nil :test2 :recur nil))
+                                                                            (->interaction nil 7 "b" "a" #{} nil)] nil)))] nil))
 (defn nested-parallel [include-ids]
   (if include-ids (create-protocol [(make-interaction 1 "a" "b")
                                     (make-parallel [[(make-parallel [[(make-interaction "a" "b" "a")
@@ -777,23 +762,23 @@
                                                                       (make-interaction 5 "a" "b")]])]])])
                   (create-protocol [(->interaction nil 1 "a" "b" #{} nil)
                                     (->lateral nil [[(->lateral nil [[(->interaction nil "a" "b" "a" #{} nil)
-                                                                        (->interaction nil "b" "a" "b" #{} nil)]
-                                                                       [(->interaction nil "b" "b" "a" #{} nil)
-                                                                        (->interaction nil "a" "a" "b" #{} nil)]] nil)]
-                                                     [(->lateral nil [[(->interaction nil 2 "b" "a" #{} nil)
-                                                                        (->interaction nil 3 "a" "b" #{} nil)]
-                                                                       [(->interaction nil 4 "b" "a" #{} nil)
-                                                                        (->interaction nil 5 "a" "b" #{} nil)]] nil)]] nil)])))
+                                                                      (->interaction nil "b" "a" "b" #{} nil)]
+                                                                     [(->interaction nil "b" "b" "a" #{} nil)
+                                                                      (->interaction nil "a" "a" "b" #{} nil)]] nil)]
+                                                    [(->lateral nil [[(->interaction nil 2 "b" "a" #{} nil)
+                                                                      (->interaction nil 3 "a" "b" #{} nil)]
+                                                                     [(->interaction nil 4 "b" "a" #{} nil)
+                                                                      (->interaction nil 5 "a" "b" #{} nil)]] nil)]] nil)])))
 
 (def nested-parallelControl (->interaction nil 1 "a" "b" #{}
                                            (->lateral nil [(->lateral nil [(->interaction nil "a" "b" "a" #{}
                                                                                           (->interaction nil "b" "a" "b" #{} nil))
-                                                                             (->interaction nil "b" "b" "a" #{}
-                                                                                            (->interaction nil "a" "a" "b" #{} nil))] nil)
-                                                            (->lateral nil [(->interaction nil 2 "b" "a" #{}
-                                                                                           (->interaction nil 3 "a" "b" #{} nil))
-                                                                             (->interaction nil 4 "b" "a" #{}
-                                                                                            (->interaction nil 5 "a" "b" #{} nil))] nil)] nil)))
+                                                                           (->interaction nil "b" "b" "a" #{}
+                                                                                          (->interaction nil "a" "a" "b" #{} nil))] nil)
+                                                           (->lateral nil [(->interaction nil 2 "b" "a" #{}
+                                                                                          (->interaction nil 3 "a" "b" #{} nil))
+                                                                           (->interaction nil 4 "b" "a" #{}
+                                                                                          (->interaction nil 5 "a" "b" #{} nil))] nil)] nil)))
 (defn after-parallel-nested-parallel [include-ids]
   (if include-ids (create-protocol [(make-parallel [[(make-interaction 0 "b" "a")
                                                      (make-interaction 1 "a" "b")]
@@ -808,29 +793,29 @@
                                                                      [(make-interaction 4 "b" "a")
                                                                       (make-interaction 5 "a" "b")]])]])])
                   (create-protocol [(->lateral nil [[(->interaction nil 0 "b" "a" #{} nil)
-                                                      (->interaction nil 1 "a" "b" #{} nil)]
-                                                     [(->interaction nil "hi" "b" "a" #{} nil)
-                                                      (->interaction nil "hi" "a" "b" #{} nil)]] nil)
+                                                     (->interaction nil 1 "a" "b" #{} nil)]
+                                                    [(->interaction nil "hi" "b" "a" #{} nil)
+                                                     (->interaction nil "hi" "a" "b" #{} nil)]] nil)
                                     (->lateral nil [[(->lateral nil [[(->interaction nil "a" "b" "a" #{} nil)
-                                                                        (->interaction nil "b" "a" "b" #{} nil)]
-                                                                       [(->interaction nil "b" "b" "a" #{} nil)
-                                                                        (->interaction nil "a" "a" "b" #{} nil)]] nil)]
-                                                     [(->lateral nil [[(->interaction nil 2 "b" "a" #{} nil)
-                                                                        (->interaction nil 3 "a" "b" #{} nil)]
-                                                                       [(->interaction nil 4 "b" "a" #{} nil)
-                                                                        (->interaction nil 5 "a" "b" #{} nil)]] nil)]] nil)])))
+                                                                      (->interaction nil "b" "a" "b" #{} nil)]
+                                                                     [(->interaction nil "b" "b" "a" #{} nil)
+                                                                      (->interaction nil "a" "a" "b" #{} nil)]] nil)]
+                                                    [(->lateral nil [[(->interaction nil 2 "b" "a" #{} nil)
+                                                                      (->interaction nil 3 "a" "b" #{} nil)]
+                                                                     [(->interaction nil 4 "b" "a" #{} nil)
+                                                                      (->interaction nil 5 "a" "b" #{} nil)]] nil)]] nil)])))
 (def after-parallel-nested-parallelControl (->lateral nil [(->interaction nil 0 "b" "a" #{}
                                                                           (->interaction nil 1 "a" "b" #{} nil))
-                                                            (->interaction nil "hi" "b" "a" #{}
-                                                                           (->interaction nil "hi" "a" "b" #{} nil))]
+                                                           (->interaction nil "hi" "b" "a" #{}
+                                                                          (->interaction nil "hi" "a" "b" #{} nil))]
                                                       (->lateral nil [(->lateral nil [(->interaction nil "a" "b" "a" #{}
                                                                                                      (->interaction nil "b" "a" "b" #{} nil))
-                                                                                         (->interaction nil "b" "b" "a" #{}
-                                                                                                        (->interaction nil "a" "a" "b" #{} nil))] nil)
-                                                                        (->lateral nil [(->interaction nil 2 "b" "a" #{}
-                                                                                                       (->interaction nil 3 "a" "b" #{} nil))
-                                                                                         (->interaction nil 4 "b" "a" #{}
-                                                                                                        (->interaction nil 5 "a" "b" #{} nil))] nil)] nil)))
+                                                                                      (->interaction nil "b" "b" "a" #{}
+                                                                                                     (->interaction nil "a" "a" "b" #{} nil))] nil)
+                                                                      (->lateral nil [(->interaction nil 2 "b" "a" #{}
+                                                                                                     (->interaction nil 3 "a" "b" #{} nil))
+                                                                                      (->interaction nil 4 "b" "a" #{}
+                                                                                                     (->interaction nil 5 "a" "b" #{} nil))] nil)] nil)))
 
 (defn parallel-with-choice [include-ids]
   (if include-ids (create-protocol [(make-parallel [[(make-choice [[(make-interaction 1 "a" "b")]
@@ -839,16 +824,16 @@
                                                      (make-interaction 5 "a" "b")]])
                                     (make-interaction 6 "b" "a")])
                   (create-protocol [(->lateral nil [[(->branch nil [[(->interaction nil 1 "a" "b" #{} nil)]
-                                                                     [(->interaction nil 0 "a" "b" #{} nil)]] nil)]
-                                                     [(->interaction nil 4 "b" "a" #{} nil)
-                                                      (->interaction nil 5 "a" "b" #{} nil)]] nil)
+                                                                    [(->interaction nil 0 "a" "b" #{} nil)]] nil)]
+                                                    [(->interaction nil 4 "b" "a" #{} nil)
+                                                     (->interaction nil 5 "a" "b" #{} nil)]] nil)
                                     (->interaction nil 6 "b" "a" #{} nil)])))
 
 (def parallel-with-choice-control
   (->lateral nil [(->branch nil [(->interaction nil 1 "a" "b" #{} nil)
-                                  (->interaction nil 0 "a" "b" #{} nil)] nil)
-                   (->interaction nil 4 "b" "a" #{} (->interaction nil 5 "a" "b" #{} nil))
-                   ]
+                                 (->interaction nil 0 "a" "b" #{} nil)] nil)
+                  (->interaction nil 4 "b" "a" #{} (->interaction nil 5 "a" "b" #{} nil))
+                  ]
              (->interaction nil 6 "b" "a" #{} nil)))
 
 (defn parallel-with-choice-with-parallel [include-ids]
@@ -863,12 +848,12 @@
                                                      (make-interaction "hi" "a" "b")]])
                                     (make-interaction 6 "b" "a")])
                   (create-protocol [(->lateral nil [[(->branch nil [[(->lateral nil [[(->branch nil [[(->interaction nil 1 "a" "b" #{} nil)]
-                                                                                                       [(->interaction nil 0 "a" "b" #{} nil)]] nil)]
-                                                                                       [(->interaction nil 4 "b" "a" #{} nil)
-                                                                                        (->interaction nil 5 "a" "b" #{} nil)]] nil)]
-                                                                     [(->interaction nil 9 "a" "b" #{} nil)]] nil)]
-                                                     [(->interaction nil "hi" "b" "a" #{} nil)
-                                                      (->interaction nil "hi" "a" "b" #{} nil)]] nil)
+                                                                                                     [(->interaction nil 0 "a" "b" #{} nil)]] nil)]
+                                                                                     [(->interaction nil 4 "b" "a" #{} nil)
+                                                                                      (->interaction nil 5 "a" "b" #{} nil)]] nil)]
+                                                                    [(->interaction nil 9 "a" "b" #{} nil)]] nil)]
+                                                    [(->interaction nil "hi" "b" "a" #{} nil)
+                                                     (->interaction nil "hi" "a" "b" #{} nil)]] nil)
                                     (->interaction nil 6 "b" "a" #{} nil)])))
 
 (defn parallel-with-choice-with-parallelMulticast [include-ids]
@@ -883,22 +868,22 @@
                                                      (make-interaction "hi" "a" ["b" "c"])]])
                                     (make-interaction 6 "b" ["a" "c"])])
                   (create-protocol [(->lateral nil [[(->branch nil [[(->lateral nil [[(->branch nil [[(->interaction nil 1 "a" "b" #{} nil)]
-                                                                                                       [(->interaction nil 0 "a" "b" #{} nil)]] nil)]
-                                                                                       [(->interaction nil 4 "b" "a" #{} nil)
-                                                                                        (->interaction nil 5 "a" "b" #{} nil)]] nil)]
-                                                                     [(->interaction nil 9 "a" "b" #{} nil)]] nil)]
-                                                     [(->interaction nil "hi" "b" "a" #{} nil)
-                                                      (->interaction nil "hi" "a" "b" #{} nil)]] nil)
+                                                                                                     [(->interaction nil 0 "a" "b" #{} nil)]] nil)]
+                                                                                     [(->interaction nil 4 "b" "a" #{} nil)
+                                                                                      (->interaction nil 5 "a" "b" #{} nil)]] nil)]
+                                                                    [(->interaction nil 9 "a" "b" #{} nil)]] nil)]
+                                                    [(->interaction nil "hi" "b" "a" #{} nil)
+                                                     (->interaction nil "hi" "a" "b" #{} nil)]] nil)
                                     (->interaction nil 6 "b" "a" #{} nil)])))
 
 (def parallel-with-choice-with-parallel-control
   (->lateral nil [(->branch nil [(->lateral nil [(->branch nil [(->interaction nil 1 "a" "b" #{} nil)
-                                                                  (->interaction nil 0 "a" "b" #{} nil)] nil)
-                                                   (->interaction nil 4 "b" "a" #{} (->interaction nil 5 "a" "b" #{} nil))
-                                                   ] nil)
-                                  (->interaction nil 0 "a" "b" #{} nil)] nil)
-                   (->interaction nil "hi" "b" "a" #{} (->interaction nil "hi" "a" "b" #{} nil))
-                   ] (->interaction nil 6 "b" "a" #{} nil)))
+                                                                (->interaction nil 0 "a" "b" #{} nil)] nil)
+                                                 (->interaction nil 4 "b" "a" #{} (->interaction nil 5 "a" "b" #{} nil))
+                                                 ] nil)
+                                 (->interaction nil 0 "a" "b" #{} nil)] nil)
+                  (->interaction nil "hi" "b" "a" #{} (->interaction nil "hi" "a" "b" #{} nil))
+                  ] (->interaction nil 6 "b" "a" #{} nil)))
 
 (defn parallel-with-rec [include-ids]
   (if include-ids (create-protocol [(make-parallel [[(make-recursion :test [(make-choice [[(make-interaction 1 "a" "b")]
@@ -909,17 +894,17 @@
                                                      (make-interaction 5 "a" "b")]])
                                     (make-interaction 6 "b" "a")])
                   (create-protocol [(->lateral nil [[(->recursion nil :test [(->branch nil [[(->interaction nil 1 "a" "b" #{} nil)]
-                                                                                             [(->interaction nil 0 "a" "b" #{} nil)
-                                                                                              (->recur-identifier nil :test :recur nil)]] nil)] nil)]
-                                                     [(->interaction nil 4 "b" "a" #{} nil)
-                                                      (->interaction nil 5 "a" "b" #{} nil)]] nil)
+                                                                                            [(->interaction nil 0 "a" "b" #{} nil)
+                                                                                             (->recur-identifier nil :test :recur nil)]] nil)] nil)]
+                                                    [(->interaction nil 4 "b" "a" #{} nil)
+                                                     (->interaction nil 5 "a" "b" #{} nil)]] nil)
                                     (->interaction nil 6 "b" "a" #{} nil)])))
 
 (def parallel-with-rec-control
-  (->lateral nil [(->recursion nil :test (->branch nil [(->interaction nil 1 "a" "b" #{} nil)
-                                                          (->interaction nil 0 "a" "b" #{}
-                                                                         (->recur-identifier nil :test :recur nil))] nil) nil)
-                   (->interaction nil 4 "b" "a" #{} (->interaction nil 5 "a" "b" #{} nil))]
+  (->lateral nil [(->branch nil [(->interaction nil 1 "a" "b" #{} nil)
+                                 (->interaction nil 0 "a" "b" #{}
+                                                (->recur-identifier nil :test :recur nil))] nil)
+                  (->interaction nil 4 "b" "a" #{} (->interaction nil 5 "a" "b" #{} nil))]
              (->interaction nil 6 "b" "a" #{} nil)))
 
 (defn rec-with-parallel-with-choice [include-ids]
@@ -932,11 +917,11 @@
                                                            ])
                                     (make-interaction 6 "b" "a")])
                   (create-protocol [(->recursion nil :test [(->lateral nil [[(->branch nil [[(->interaction nil 1 "a" "b" #{} nil)]
-                                                                                             [(->interaction nil 0 "a" "b" #{} nil)
-                                                                                              (->recur-identifier nil :test :recur nil)]] nil)]
-                                                                             [(->interaction nil 4 "b" "a" #{} nil)
-                                                                              (->interaction nil 5 "a" "b" #{} nil)]
-                                                                             ] nil)
+                                                                                            [(->interaction nil 0 "a" "b" #{} nil)
+                                                                                             (->recur-identifier nil :test :recur nil)]] nil)]
+                                                                            [(->interaction nil 4 "b" "a" #{} nil)
+                                                                             (->interaction nil 5 "a" "b" #{} nil)]
+                                                                            ] nil)
                                                             ] nil)
                                     (->interaction nil 6 "b" "a" #{} nil)])))
 
@@ -950,11 +935,11 @@
                                                            ])
                                     (make-interaction 6 "b" ["a" "c"])])
                   (create-protocol [(->recursion nil :test [(->lateral nil [[(->branch nil [[(->interaction nil 1 "a" ["b" "c"] #{} nil)]
-                                                                                             [(->interaction nil 0 "a" ["b" "c"] #{} nil)
-                                                                                              (->recur-identifier nil :test :recur nil)]] nil)]
-                                                                             [(->interaction nil 4 "b" ["a" "c"] #{} nil)
-                                                                              (->interaction nil 5 "a" ["b" "c"] #{} nil)]
-                                                                             ] nil)
+                                                                                            [(->interaction nil 0 "a" ["b" "c"] #{} nil)
+                                                                                             (->recur-identifier nil :test :recur nil)]] nil)]
+                                                                            [(->interaction nil 4 "b" ["a" "c"] #{} nil)
+                                                                             (->interaction nil 5 "a" ["b" "c"] #{} nil)]
+                                                                            ] nil)
                                                             ] nil)
                                     (->interaction nil 6 "b" ["a" "c"] #{} nil)])))
 
@@ -987,19 +972,19 @@
                                     (make-interaction 6 "b" ["a" "c"])])
                   (create-protocol [(->interaction nil 1 "a" "b" #{} nil)
                                     (->lateral nil [[(->interaction nil 2 "b" ["a" "c"] #{} nil)
-                                                      (->interaction nil 3 "a" ["b" "c"] #{} nil)]
-                                                     [(->interaction nil 4 "b" "a" #{} nil)
-                                                      (->interaction nil 5 "a" "b" #{} nil)]
-                                                     ] nil)
+                                                     (->interaction nil 3 "a" ["b" "c"] #{} nil)]
+                                                    [(->interaction nil 4 "b" "a" #{} nil)
+                                                     (->interaction nil 5 "a" "b" #{} nil)]
+                                                    ] nil)
                                     (make-interaction 6 "b" ["a" "c"])])))
 
 (def parallel-after-interaction-multicastControl
   (->interaction nil 1 "a" "b" #{}
                  (->lateral nil [(->interaction nil 2 "b" ["a" "c"] #{}
                                                 (->interaction nil 3 "a" ["b" "c"] #{} nil))
-                                  (->interaction nil 4 "b" "a" #{}
-                                                 (->interaction nil 5 "a" "b" #{} nil))
-                                  ] (->interaction nil 6 "b" ["a" "c"] #{} nil))))
+                                 (->interaction nil 4 "b" "a" #{}
+                                                (->interaction nil 5 "a" "b" #{} nil))
+                                 ] (->interaction nil 6 "b" ["a" "c"] #{} nil))))
 
 (defn parallel-after-choice-with-after-choice-multicast [include-ids]
   (if include-ids (create-protocol [(make-interaction 1 "a" "b")
@@ -1011,10 +996,10 @@
                                                   [(make-interaction 7 "b" "a")]])])
                   (create-protocol [(->interaction nil 1 "a" "b" #{} nil)
                                     (->lateral nil [[(->interaction nil 2 "b" ["a" "c"] #{} nil)
-                                                      (->interaction nil 3 "a" ["b" "c"] #{} nil)]
-                                                     [(->interaction nil 4 "b" "a" #{} nil)
-                                                      (->interaction nil 5 "a" "b" #{} nil)]
-                                                     ] nil)
+                                                     (->interaction nil 3 "a" ["b" "c"] #{} nil)]
+                                                    [(->interaction nil 4 "b" "a" #{} nil)
+                                                     (->interaction nil 5 "a" "b" #{} nil)]
+                                                    ] nil)
                                     (->branch nil [[(->interaction nil 6 "b" ["a" "c"] #{} nil)]
                                                    [(->interaction nil 7 "b" "a" #{} nil)]] nil)])))
 
@@ -1036,10 +1021,10 @@
                                                                   (->recur-identifier nil :test :recur nil)]
                                                                  [(->interaction nil 0 "a" "b" #{} nil)]] nil)] nil)
                                     (->lateral nil [[(->interaction nil 2 "b" ["a" "c"] #{} nil)
-                                                      (->interaction nil 3 "a" ["b" "c"] #{} nil)]
-                                                     [(->interaction nil 4 "b" "a" #{} nil)
-                                                      (->interaction nil 5 "a" "b" #{} nil)]
-                                                     ] nil)
+                                                     (->interaction nil 3 "a" ["b" "c"] #{} nil)]
+                                                    [(->interaction nil 4 "b" "a" #{} nil)
+                                                     (->interaction nil 5 "a" "b" #{} nil)]
+                                                    ] nil)
                                     (->recursion nil :test2
                                                  [(->branch nil [[(->interaction nil 6 "b" ["a" "c"] #{} nil)
                                                                   (->recur-identifier nil :test2 :recur nil)]
@@ -1059,11 +1044,11 @@
                                     (make-closer "b" "a")
                                     (make-closer "b" "c")])
                   (create-protocol [(->recursion nil :test [(->lateral nil [[(->branch nil [[(->interaction nil 1 "a" ["b" "c"] #{} nil)]
-                                                                                             [(->interaction nil 0 "a" ["b" "c"] #{} nil)
-                                                                                              (->recur-identifier nil :test :recur nil)]] nil)]
-                                                                             [(->interaction nil 4 "b" ["a" "c"] #{} nil)
-                                                                              (->interaction nil 5 "a" ["b" "c"] #{} nil)]
-                                                                             ] nil)
+                                                                                            [(->interaction nil 0 "a" ["b" "c"] #{} nil)
+                                                                                             (->recur-identifier nil :test :recur nil)]] nil)]
+                                                                            [(->interaction nil 4 "b" ["a" "c"] #{} nil)
+                                                                             (->interaction nil 5 "a" ["b" "c"] #{} nil)]
+                                                                            ] nil)
                                                             ] nil)
                                     (->closer nil "a" "b" nil)
                                     (->closer nil "a" "c" nil)
@@ -1072,18 +1057,17 @@
                                     (->closer nil "b" "c" nil)])))
 
 (def rec-with-parallel-with-choice-multicast-and-closeControl
-  (->recursion nil :test (->lateral nil [(->branch nil [(->interaction nil 1 "a" ["b" "c"] #{} nil)
-                                                         (->interaction nil 0 "a" ["b" "c"] #{}
-                                                                        (->recur-identifier nil :test :recur nil))] nil)
-                                          (->interaction nil 4 "b" ["a" "c"] #{}
-                                                         (->interaction nil 5 "a" ["b" "c"] #{} nil))
-                                          ]
-                                    (->closer nil "a" "b"
-                                               (->closer nil "a" "c"
-                                                         (->interaction nil 6 "b" ["a" "c"] #{}
-                                                                        (->closer nil "b" "a"
-                                                                                  (->closer nil "b" "c" nil))))))
-               nil))
+  (->lateral nil [(->branch nil [(->interaction nil 1 "a" ["b" "c"] #{} nil)
+                                 (->interaction nil 0 "a" ["b" "c"] #{}
+                                                (->recur-identifier nil :test :recur nil))] nil)
+                  (->interaction nil 4 "b" ["a" "c"] #{}
+                                 (->interaction nil 5 "a" ["b" "c"] #{} nil))
+                  ]
+             (->closer nil "a" "b"
+                       (->closer nil "a" "c"
+                                 (->interaction nil 6 "b" ["a" "c"] #{}
+                                                (->closer nil "b" "a"
+                                                          (->closer nil "b" "c" nil)))))))
 
 (defn interaction-with-closer [include-ids]
   (if include-ids (create-protocol [(make-interaction 0 "a" "b")
@@ -1125,7 +1109,7 @@
                                                     [(make-interaction 1 "a" "b")]])])
                   (create-protocol [(->interaction nil 0 "a" "b" #{} nil)
                                     (->lateral nil [[(->closer nil "a" "b" nil)]
-                                                     [(->interaction nil 1 "a" "b" #{} nil)]] nil)])))
+                                                    [(->interaction nil 1 "a" "b" #{} nil)]] nil)])))
 (defn interaction-with-parallel-and-closer-with-interactions-in-parallel [include-ids]
   (if include-ids (create-protocol [(make-interaction 0 "a" "b")
                                     (make-parallel [[(make-closer "a" "b")
@@ -1134,7 +1118,7 @@
                                                     [(make-interaction 1 "a" "b")]])])
                   (create-protocol [(->interaction nil 0 "a" "b" #{} nil)
                                     (->lateral nil [[(->closer nil "a" "b" nil)]
-                                                     [(->interaction nil 1 "a" "b" #{} nil)]] nil)])))
+                                                    [(->interaction nil 1 "a" "b" #{} nil)]] nil)])))
 
 ;deeply nested choice, with recursion and tests for nested recur etc.
 (defn interaction-with-nested-choice-and-closer [include-ids]
@@ -1159,14 +1143,14 @@
                                                                      [(make-closer "a" "b")
                                                                       (make-closer "b" "a")]])]])])
                   (create-protocol [(->lateral nil [[(->interaction nil 0 "b" "a" #{} nil)
-                                                      (->interaction nil 1 "a" "b" #{} nil)]
-                                                     [(->interaction nil "hi" "b" "a" #{} nil)
-                                                      (->interaction nil "hi" "a" "b" #{} nil)]] nil)
+                                                     (->interaction nil 1 "a" "b" #{} nil)]
+                                                    [(->interaction nil "hi" "b" "a" #{} nil)
+                                                     (->interaction nil "hi" "a" "b" #{} nil)]] nil)
                                     (->lateral nil [[(->lateral nil [[(->interaction nil "a" "b" "a" #{} nil)
-                                                                        (->interaction nil "b" "a" "b" #{} nil)]
-                                                                       [(->interaction nil "b" "b" "a" #{} nil)
-                                                                        (->interaction nil "a" "a" "b" #{} nil)]] nil)]
-                                                     [(->lateral nil [[(->interaction nil 2 "b" "a" #{} nil)
-                                                                        (->interaction nil 3 "a" "b" #{} nil)]
-                                                                       [(->closer nil "a" "b" nil)
-                                                                        (->closer nil"b" "a" nil)]] nil)]] nil)])))
+                                                                      (->interaction nil "b" "a" "b" #{} nil)]
+                                                                     [(->interaction nil "b" "b" "a" #{} nil)
+                                                                      (->interaction nil "a" "a" "b" #{} nil)]] nil)]
+                                                    [(->lateral nil [[(->interaction nil 2 "b" "a" #{} nil)
+                                                                      (->interaction nil 3 "a" "b" #{} nil)]
+                                                                     [(->closer nil "a" "b" nil)
+                                                                      (->closer nil "b" "a" nil)]] nil)]] nil)])))

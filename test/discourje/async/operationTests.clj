@@ -884,6 +884,7 @@
   (let [channels (add-infrastructure (parallel-with-rec true))
         ab (get-channel channels "a" "b")
         ba (get-channel channels "b" "a")]
+    (println (get-active-interaction (get-monitor ab)))
     (set-logging-exceptions)
     (loop [reps 0]
       (if (> reps 2)
