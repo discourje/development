@@ -184,7 +184,6 @@
             (allow-sends channels m)
             (recur (send-fn)))))))
 
-
 (defn >!!
   "Put on channel"
   ([channel label value]
