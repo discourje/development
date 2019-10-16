@@ -1,6 +1,8 @@
 (ns discourje.core.async
+  (:gen-class)
   (:require [clj-uuid :as uuid]
             [discourje.core.logging :refer :all]
+            [clojure.walk :refer :all]
             [clojure.core.async :as async]
             [clojure.core.async.impl.protocols :as bufs])
   (:import (clojure.lang Seqable, Atom)))
@@ -117,12 +119,16 @@
   "Allow send message in channel"
   [channel message]
   (async/>!! (get-chan channel) message)
+  (if use-meta-take
+    (release-take channel))
   channel)
 
 (defn- allow-receive
   "Allow a receive on the channel"
   [channel]
   (async/<!! (get-chan channel))
+  (if use-meta-put
+    (release-put channel))
   channel)
 
 (defn- allow-sends
@@ -201,12 +207,14 @@
                            (valid-send? (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m)))]
                      (if (is-valid-for-swap? valid-interaction)
                        (apply-send! (get-monitor channel) (get-provider channel) (get-consumer channel) (get-label m) (get-pre-swap valid-interaction) (get-valid valid-interaction))
-                       (log-error :incorrect-communication (format "Atomic-send communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) (get-label m) (to-string (get-active-interaction (get-monitor channel))))))))
+                       (log-error :incorrect-communication (format "Atomic-send communication invalid! message: %s, sender: %s, receiver: %s, label: %s while active interaction is: %s" message (get-provider channel) (get-consumer channel) (get-label m) (to-string (get-active-interaction (get-monitor channel))))))))
          ]
      (if (vector? channel)
        (>E channel m)
-       (do (loop []
-             (when (can-put? channel) (recur)))
+       (do (if use-meta-put
+             (acquire-put channel)
+             (loop []
+               (when (can-put? channel) (recur))))
            (loop [send-result (send-fn)]
              (if send-result
                (allow-send channel m)
@@ -221,8 +229,10 @@
      (log-error :wildcard-exception "Taking from a channel without specifying a label is not allowed while wildcards are disabled!")
      (if (channel-closed? channel)
        (log-error :incorrect-communication (format "Invalid communication: you are trying to receive but the channel is closed! From %s to %s" (get-provider channel) (get-consumer channel)))
-       (do (loop []
-             (when (false? (something-in-buffer? (get-chan channel))) (recur)))
+       (do (if use-meta-take
+             (acquire-take channel)
+             (loop []
+               (when (false? (something-in-buffer? (get-chan channel))) (recur))))
            (if (nil? (get-active-interaction (get-monitor channel)))
              (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
              (let [result (peek-channel (get-chan channel))
@@ -285,3 +295,19 @@
    (if (not (nil? infra))
      (close-channel! (get-channel infra sender receiver))
      (log-error :invalid-channel (format "You are trying to close a channel from %s to %s but there is no infrastructure!" sender receiver)))))
+
+(defn chan
+  "create a custom channel"
+  ([sender receiver buffer]
+   (if (nil? buffer)
+     (new-channel sender receiver (clojure.core.async/chan) nil nil)
+     (new-channel sender receiver (clojure.core.async/chan buffer) buffer nil)))
+  ([n sender receiver monitor]
+   (new-channel (if (fn? sender) (sender) sender)
+                (if (fn? receiver) (receiver) receiver)
+                (clojure.core.async/chan n)
+                n
+                monitor)))
+
+;; Load at the end, because it depends on definitions in this file
+(load "dsl")

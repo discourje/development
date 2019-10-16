@@ -8,13 +8,33 @@
   (get-monitor [this])
   (get-buffer [this]))
 
-(defrecord channel [provider consumers chan buffer monitor]
+(defrecord channel [provider consumers chan buffer monitor meta-put meta-take]
   transportable
   (get-provider [this] provider)
   (get-consumer [this] consumers)
   (get-chan [this] chan)
   (get-monitor [this] monitor)
   (get-buffer [this] buffer))
+
+(defn new-channel [provider consumers chan buffer monitor]
+  (->channel provider consumers chan buffer monitor
+             (new java.util.concurrent.Semaphore buffer)
+             (new java.util.concurrent.Semaphore 0)))
+
+(def use-meta-put true)
+(def use-meta-take true)
+
+(defn acquire-put [channel]
+  (.acquire (:meta-put channel)))
+
+(defn release-put [channel]
+  (.release (:meta-put channel)))
+
+(defn acquire-take [channel]
+  (.acquire (:meta-take channel)))
+
+(defn release-take [channel]
+  (.release (:meta-take channel)))
 
 (defn- get-infra-channel
   "Finds a channel based on provider and consumer"
@@ -37,12 +57,12 @@
   "Function to generate a channel between sender and receiver"
   ([sender receiver monitor buffer]
    (if (nil? buffer)
-     (->channel sender receiver (clojure.core.async/chan) nil monitor)
-     (->channel sender receiver (clojure.core.async/chan buffer) buffer monitor)))
+     (new-channel sender receiver (clojure.core.async/chan) nil monitor)
+     (new-channel sender receiver (clojure.core.async/chan buffer) buffer monitor)))
   ([sender receiver buffer]
    (if (nil? buffer)
-     (->channel sender receiver (clojure.core.async/chan) nil nil)
-     (->channel sender receiver (clojure.core.async/chan buffer) buffer nil))))
+     (new-channel sender receiver (clojure.core.async/chan) nil nil)
+     (new-channel sender receiver (clojure.core.async/chan buffer) buffer nil))))
 
 (defn unique-cartesian-product
   "Generate channels between all participants and filters out duplicates e.g.: A<->A"

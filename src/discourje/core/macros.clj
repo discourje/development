@@ -57,12 +57,14 @@
   ([message-exchange-pattern custom-channels]
    `(generate-infrastructure ~message-exchange-pattern ~custom-channels)))
 
-(defmacro chan
-  "create a custom channel"
-  [sender receiver buffer]
-  `(if (nil? ~buffer)
-     (->channel ~sender ~receiver (clojure.core.async/chan) nil nil)
-     (->channel ~sender ~receiver (clojure.core.async/chan ~buffer) ~buffer nil)))
+; Sung: Changed this macro into a function and moved to async.clj
+;
+;(defmacro chan
+;  "create a custom channel"
+;  [sender receiver buffer]
+;  `(if (nil? ~buffer)
+;     (->channel ~sender ~receiver (clojure.core.async/chan) nil nil)
+;     (->channel ~sender ~receiver (clojure.core.async/chan ~buffer) ~buffer nil)))
 
 (defmacro msg
   "Generate a message"
@@ -71,8 +73,9 @@
 
 (defmacro thread
   "Execute body on thread"
-  [body]
-  `(async/thread ~body))
+  [& body]
+  ;; copy-pasted from clojure.core.async:
+  `(clojure.core.async/thread-call (^:once fn* [] ~@body)))
 
 (defmacro custom-time
   "Evaluates expr and prints the time it took.  Returns the value of expr."
