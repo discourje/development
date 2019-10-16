@@ -27,21 +27,15 @@
 
 (defn- is-valid-interaction?
   "Is the given interaction valid compared to the active-interaction of the monitor"
-  [sender receivers label active-interaction]
+  [sender receivers message active-interaction]
   (and
     (= sender (:sender active-interaction))
-    (and (if (instance? Seqable label)
-           (or (contains-value? (:action active-interaction) label) (= label (:action active-interaction)))
-           (or (nil? label) (= label (:action active-interaction)) (contains-value? label (:action active-interaction)))))
+    (and (if (callable? (get-action active-interaction))
+           ((get-action active-interaction) message)
+           (or (nil? (get-action active-interaction)) (= (type message) (get-action active-interaction)))))
     (and (if (instance? Seqable (:receivers active-interaction))
            (or (contains-value? receivers (:receivers active-interaction)) (= receivers (:receivers active-interaction)))
            (or (= receivers (:receivers active-interaction)) (contains-value? (:receivers active-interaction) receivers))))))
-
-(defn add-rec-to-table
-  "Add a recursion to rec-table for continues to query"
-  [rec-set rec]
-  (when (nil? ((get-name rec) @rec-set))
-    (swap! rec-set assoc (get-name rec) rec)))
 
 (defn- contains-value?
   "Does the vector contain a value?"

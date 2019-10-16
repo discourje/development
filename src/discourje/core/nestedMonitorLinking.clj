@@ -13,7 +13,6 @@
 (defn- assoc-interaction
   "assoc nth-i (index i-1) with it (index i) as next"
   [nth-i it rec-table]
-  ; (println "assoc interaction")
   (cond
     (or (nil? it) (satisfies? identifiable-recur nth-i))
     nth-i
@@ -35,7 +34,6 @@
 (defn- assoc-last-interaction
   "assoc the last interaction in the list when it is of type branch parallel or recursion"
   [nth-i rec-table]
-  ; (println "assoc-last")
   (let [last nth-i
         next (:next nth-i)]
     (cond
@@ -54,7 +52,6 @@
 (defn nest-mep
   "assign all next keys in a given vector of interactions (note that choice, parallel and recursion make this function called recursively)"
   [interactions rec-table]
-  ;(println "nestmep")
   (let [inter (when-not (nil? interactions)
                 (if (>= (count interactions) 2)
                   (loop [i (- (count interactions) 2)

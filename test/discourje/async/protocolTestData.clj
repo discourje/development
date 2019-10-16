@@ -1120,7 +1120,6 @@
                                     (->lateral nil [[(->closer nil "a" "b" nil)]
                                                     [(->interaction nil 1 "a" "b" #{} nil)]] nil)])))
 
-;deeply nested choice, with recursion and tests for nested recur etc.
 (defn interaction-with-nested-choice-and-closer [include-ids]
   (if include-ids (create-protocol [(make-interaction 0 "a" "b")
                                     (make-choice [[(make-choice [[(make-interaction 1 "a" "b")]])]

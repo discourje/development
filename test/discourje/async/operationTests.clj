@@ -61,7 +61,6 @@
         ab (get-channel channels "A" "B")
         ba (get-channel channels "B" "A")]
     (do
-      (enable-wildcard)
       (>!! ab "Hello B")
       (let [a->b (<!! ab)]
         (is (= "Hello B" a->b)))
@@ -101,7 +100,6 @@
         ca (get-channel channels "C" "A")
         cb (get-channel channels "C" "B")]
     (do
-      (enable-wildcard)
       (>!! ab (->message "1" "A->B"))
       (let [a->b (<!! ab)]
         (is (= "A->B" a->b))
@@ -301,7 +299,6 @@
         ca (get-channel channels "C" "A")
         flag (atom false)]
     (do
-      (enable-wildcard)
       (>!! ab (->message "1" "AB"))
       (let [a->b (<!! ab)]
         (is (= "AB" a->b))
