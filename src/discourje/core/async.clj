@@ -196,7 +196,7 @@
                           (valid-send? (get-monitor channel) (get-provider channel) (get-consumer channel) message))]
                     (if (is-valid-for-swap? valid-interaction)
                       (apply-send! (get-monitor channel) (get-provider channel) (get-consumer channel) message (get-pre-swap valid-interaction) (get-valid valid-interaction))
-                      (log-error :incorrect-communication (format "Atomic-send communication invalid! message: %s, sender: %s, receiver: %s, label: %s while active interaction is: %s" message (get-provider channel) (get-consumer channel) message (to-string (get-active-interaction (get-monitor channel))))))))
+                      (log-error :incorrect-communication (format "Atomic-send communication invalid! message: %s, sender: %s, receiver: %s, while active interaction is: %s" message (get-provider channel) (get-consumer channel) (to-string (get-active-interaction (get-monitor channel))))))))
         ]
     (if (vector? channel)
       (>E channel message)
@@ -223,11 +223,8 @@
          (if (nil? (get-active-interaction (get-monitor channel)))
            (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
            (let [result (peek-channel (get-chan channel))
-                 label-check true
-                 ;(or ;(= (get-label result) label)
-                 ;                (contains-value? (get-label result) label))
                  valid-interaction (valid-receive? (get-monitor channel) (get-provider channel) (get-consumer channel) label)]
-             (if-not (and label-check (is-valid-for-swap? valid-interaction))
+             (if-not (is-valid-for-swap? valid-interaction)
                (log-error :incorrect-communication (format "Atomic-receive communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) label (to-string (get-active-interaction (get-monitor channel)))))
                (do (apply-receive! (get-monitor channel) (get-provider channel) (get-consumer channel) result (get-pre-swap valid-interaction) (get-valid valid-interaction))
                    (allow-receive channel)
@@ -247,11 +244,8 @@
            (let [result (peek-channel (get-chan channel))
                  isParallel (is-current-multicast? (get-monitor channel) label)
                  id (get-id (get-active-interaction (get-monitor channel)))
-                 label-check true
-                 ;(or (= (get-label result) label)
-                 ;                (contains-value? (get-label result) label))
                  valid-interaction (valid-receive? (get-monitor channel) (get-provider channel) (get-consumer channel) label)]
-             (if-not (and label-check (is-valid-for-swap? valid-interaction))
+             (if-not (is-valid-for-swap? valid-interaction)
                (log-error :incorrect-communication (format "Atomic-receive communication invalid! sender: %s, receiver: %s, label: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) label (to-string (get-active-interaction (get-monitor channel)))))
                (do (apply-receive! (get-monitor channel) (get-provider channel) (get-consumer channel) result (get-pre-swap valid-interaction) (get-valid valid-interaction))
                    (allow-receive channel)

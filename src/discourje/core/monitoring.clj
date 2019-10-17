@@ -4,13 +4,13 @@
 (defprotocol monitoring
   (get-monitor-id [this])
   (get-active-interaction [this])
-  (apply-receive! [this sender receivers label pre-swap-interaction target-interaction])
-  (apply-send! [this sender receivers label pre-swap-interaction target-interaction])
-  (valid-send? [this sender receivers label])
-  (valid-receive? [this sender receivers label])
+  (apply-receive! [this sender receivers message pre-swap-interaction target-interaction])
+  (apply-send! [this sender receivers message pre-swap-interaction target-interaction])
+  (valid-send? [this sender receivers message])
+  (valid-receive? [this sender receivers message])
   (valid-close? [this sender receiver])
   (apply-close! [this channel pre-swap-interaction target-interaction])
-  (is-current-multicast? [this label])
+  (is-current-multicast? [this message])
   (get-rec [this name]))
 
 (defn- interaction-to-string
@@ -71,13 +71,13 @@
   monitoring
   (get-monitor-id [this] id)
   (get-active-interaction [this] @active-interaction)
-  (apply-send! [this sender receivers label pre-swap-interaction target-interaction] (apply-send-to-mon this sender receivers label active-interaction pre-swap-interaction target-interaction))
-  (apply-receive! [this sender receivers label pre-swap-interaction target-interaction] (apply-receive-to-mon this sender receivers label active-interaction pre-swap-interaction target-interaction))
-  (valid-send? [this sender receivers label] (let [pre-swap @active-interaction]
-                                               (->swappable-interaction pre-swap (is-valid-send-communication? this sender receivers label pre-swap))))
-  (valid-receive? [this sender receivers label] (let [pre-swap @active-interaction]
+  (apply-send! [this sender receivers message pre-swap-interaction target-interaction] (apply-send-to-mon this sender receivers label active-interaction pre-swap-interaction target-interaction))
+  (apply-receive! [this sender receivers message pre-swap-interaction target-interaction] (apply-receive-to-mon this sender receivers label active-interaction pre-swap-interaction target-interaction))
+  (valid-send? [this sender receivers message] (let [pre-swap @active-interaction]
+                                               (->swappable-interaction pre-swap (is-valid-send-communication? this sender receivers message pre-swap))))
+  (valid-receive? [this sender receivers message] (let [pre-swap @active-interaction]
                                                   (->swappable-interaction pre-swap (is-valid-communication? this sender receivers label pre-swap))))
-  (is-current-multicast? [this label] (is-active-interaction-multicast? this @active-interaction label))
+  (is-current-multicast? [this message] (is-active-interaction-multicast? this @active-interaction label))
   (get-rec [this name] (name @recursion-set))
   (valid-close? [this sender receiver] (let [pre-swap @active-interaction]
                                          (->swappable-interaction pre-swap (is-valid-close-communication? this sender receiver pre-swap))))
