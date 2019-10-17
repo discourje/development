@@ -242,7 +242,7 @@
          (if (nil? (get-active-interaction (get-monitor channel)))
            (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
            (let [result (peek-channel (get-chan channel))
-                 isParallel (is-current-multicast? (get-monitor channel) label)
+                 isParallel (is-current-multicast? (get-monitor channel) result label)
                  id (get-id (get-active-interaction (get-monitor channel)))
                  valid-interaction (valid-receive? (get-monitor channel) (get-provider channel) (get-consumer channel) label)]
              (if-not (is-valid-for-swap? valid-interaction)

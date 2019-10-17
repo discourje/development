@@ -10,7 +10,7 @@
   (valid-receive? [this sender receivers message])
   (valid-close? [this sender receiver])
   (apply-close! [this channel pre-swap-interaction target-interaction])
-  (is-current-multicast? [this message])
+  (is-current-multicast? [this message label])
   (get-rec [this name]))
 
 (defn- interaction-to-string
@@ -48,18 +48,19 @@
   [channels]
   (= 1 (count (distinct (for [c channels] (get-monitor-id (get-monitor c)))))))
 
-(defn- is-active-interaction-multicast? [monitor active-interaction label]
+(defn- is-active-interaction-multicast? [monitor active-interaction message label]
   (cond
     (satisfies? interactable active-interaction)
-    (and (or (nil? label) (= (get-action active-interaction) label) (contains-value? (get-action active-interaction) label)) (instance? Seqable (get-receivers active-interaction)))
+    (and (if (callable? (get-action active-interaction))
+           ((get-action active-interaction) (if (nil? label) message label))
+           (or (nil? (get-action active-interaction)) (= (type message) (get-action active-interaction))))
+         (instance? Seqable (get-receivers active-interaction)))
     (satisfies? branchable active-interaction)
-    (first (filter #(is-active-interaction-multicast? monitor % label) (get-branches active-interaction)))
+    (first (filter #(is-active-interaction-multicast? monitor % message label) (get-branches active-interaction)))
     (satisfies? parallelizable active-interaction)
-    (first (filter #(is-active-interaction-multicast? monitor % label) (get-parallel active-interaction)))
-    (satisfies? recursable active-interaction)
-    (is-active-interaction-multicast? monitor (get-recursion active-interaction) label)
+    (first (filter #(is-active-interaction-multicast? monitor % message label) (get-parallel active-interaction)))
     (satisfies? identifiable-recur active-interaction)
-    (is-active-interaction-multicast? monitor (get-rec monitor (get-name (get-next active-interaction))) label)
+    (is-active-interaction-multicast? monitor (get-rec monitor (get-name (get-next active-interaction))) message label)
     :else
     (do (log-error :unsupported-operation (format "Unsupported communication type: Communication invalid, type: %s" (type active-interaction)))
         false)))
@@ -71,13 +72,13 @@
   monitoring
   (get-monitor-id [this] id)
   (get-active-interaction [this] @active-interaction)
-  (apply-send! [this sender receivers message pre-swap-interaction target-interaction] (apply-send-to-mon this sender receivers label active-interaction pre-swap-interaction target-interaction))
-  (apply-receive! [this sender receivers message pre-swap-interaction target-interaction] (apply-receive-to-mon this sender receivers label active-interaction pre-swap-interaction target-interaction))
+  (apply-send! [this sender receivers message pre-swap-interaction target-interaction] (apply-send-to-mon this sender receivers message active-interaction pre-swap-interaction target-interaction))
+  (apply-receive! [this sender receivers message pre-swap-interaction target-interaction] (apply-receive-to-mon this sender receivers message active-interaction pre-swap-interaction target-interaction))
   (valid-send? [this sender receivers message] (let [pre-swap @active-interaction]
-                                               (->swappable-interaction pre-swap (is-valid-send-communication? this sender receivers message pre-swap))))
+                                                 (->swappable-interaction pre-swap (is-valid-send-communication? this sender receivers message pre-swap))))
   (valid-receive? [this sender receivers message] (let [pre-swap @active-interaction]
-                                                  (->swappable-interaction pre-swap (is-valid-communication? this sender receivers label pre-swap))))
-  (is-current-multicast? [this message] (is-active-interaction-multicast? this @active-interaction label))
+                                                    (->swappable-interaction pre-swap (is-valid-communication? this sender receivers message pre-swap))))
+  (is-current-multicast? [this message label] (is-active-interaction-multicast? this @active-interaction message label))
   (get-rec [this name] (name @recursion-set))
   (valid-close? [this sender receiver] (let [pre-swap @active-interaction]
                                          (->swappable-interaction pre-swap (is-valid-close-communication? this sender receiver pre-swap))))

@@ -6,6 +6,14 @@
             [discourje.core.logging :refer :all])
   (:use [slingshot.slingshot :only [throw+ try+]]))
 
+
+(defn <!!
+  "Utility method to fix all test cases"
+  ([channel] (<!! channel nil))
+  ([channel label]
+  (let [value (discourje.core.async/<!! channel label)]
+    (get-content value))))
+
 (deftest add-sender
   (let [inter (->interaction nil 1 "a" "b" #{} nil)]
     (is (= (->interaction nil 1 "a" "b" #{"b"} nil) (assoc inter :accepted-sends (conj (:accepted-sends inter) "b"))))))

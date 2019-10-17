@@ -6,6 +6,13 @@
             [discourje.core.logging :refer :all])
   (:use [slingshot.slingshot :only [throw+ try+]]))
 
+(defn <!!
+  "Utility method to fix all test cases"
+  ([channel] (<!! channel nil))
+  ([channel label]
+   (let [value (discourje.core.async/<!! channel label)]
+     (get-content value))))
+
 (deftest close-interaction-with-closer-test
   (let [channels (add-infrastructure (interaction-with-closer true))
         ab (get-channel channels "a" "b")]
