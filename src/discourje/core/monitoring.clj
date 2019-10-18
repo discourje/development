@@ -25,14 +25,19 @@
 
 (declare contains-value? is-valid-interaction?)
 
+(defn is-predicate-valid?
+  "Is the predicate in the monitor valid compared to the message or label (when given)"
+  [message label active-interaction]
+  (if (callable? (get-action active-interaction))
+    ((get-action active-interaction) (if (nil? label) message label))
+    (or (nil? (get-action active-interaction)) (= (type message) (get-action active-interaction)))))
+
 (defn- is-valid-interaction?
   "Is the given interaction valid compared to the active-interaction of the monitor"
   [sender receivers message label active-interaction]
   (and
     (= sender (:sender active-interaction))
-    (if (callable? (get-action active-interaction))
-           ((get-action active-interaction) (if (nil? label) message label))
-           (or (nil? (get-action active-interaction)) (= (type message) (get-action active-interaction))))
+    (is-predicate-valid? message label active-interaction)
     (and (if (instance? Seqable (:receivers active-interaction))
            (or (contains-value? receivers (:receivers active-interaction)) (= receivers (:receivers active-interaction)))
            (or (= receivers (:receivers active-interaction)) (contains-value? (:receivers active-interaction) receivers))))))
@@ -51,9 +56,7 @@
 (defn- is-active-interaction-multicast? [monitor active-interaction message label]
   (cond
     (satisfies? interactable active-interaction)
-    (and (if (callable? (get-action active-interaction))
-           ((get-action active-interaction) (if (nil? label) message label))
-           (or (nil? (get-action active-interaction)) (= (type message) (get-action active-interaction))))
+    (and (is-predicate-valid? message label active-interaction)
          (instance? Seqable (get-receivers active-interaction)))
     (satisfies? branchable active-interaction)
     (first (filter #(is-active-interaction-multicast? monitor % message label) (get-branches active-interaction)))
