@@ -6,9 +6,9 @@
             [discourje.core.logging :refer :all])
   (:use [slingshot.slingshot :only [throw+ try+]]))
 
-(defn <!!
+(defn <!!-test
   "Utility method to fix all test cases"
-  ([channel] (<!! channel nil))
+  ([channel] (<!!-test channel nil))
   ([channel label]
    (let [value (discourje.core.async/<!! channel label)]
      (get-content value))))
@@ -18,7 +18,7 @@
         ab (get-channel channels "a" "b")]
     (set-logging-exceptions)
     (>!! ab (msg 0 0))
-    (let [a->b (<!! ab 0)]
+    (let [a->b (<!!-test ab 0)]
       (is (= a->b 0))
       (close-channel! ab)
       (is true (channel-closed? ab)))
@@ -29,7 +29,7 @@
         ab (get-channel channels "a" "b")]
     (set-logging-exceptions)
     (>!! ab (msg 0 0))
-    (let [a->b (<!! ab 0)]
+    (let [a->b (<!!-test ab 0)]
       (is (= a->b 0))
       (close-channel! ab)
       (is true (channel-closed? ab)))
@@ -40,7 +40,7 @@
         ab (get-channel channels "a" "b")]
     (set-logging-exceptions)
     (>!! ab (msg 0 0))
-    (let [a->b (<!! ab 0)]
+    (let [a->b (<!!-test ab 0)]
       (is (= a->b 0))
       (close-channel! ab)
       (is true (channel-closed? ab)))
@@ -51,7 +51,7 @@
         ab (get-channel channels "a" "b")]
     (set-logging-exceptions)
     (>!! ab (msg 0 0))
-    (let [a->b (<!! ab 0)]
+    (let [a->b (<!!-test ab 0)]
       (is (= a->b 0))
       (close-channel! ab)
       (is true (channel-closed? ab)))
@@ -62,10 +62,10 @@
         ab (get-channel channels "a" "b")]
     (set-logging-exceptions)
     (>!! ab (msg 0 0))
-    (let [a->b (<!! ab 0)]
+    (let [a->b (<!!-test ab 0)]
       (is (=  a->b 0))
       (let [a->b1 (>!! ab (msg 1 1))]
-        (is (= (<!! ab 1)))
+        (is (= (<!!-test ab 1)))
         (close-channel! ab)
         (is true (channel-closed? ab))))
     (is (nil? (get-active-interaction (get-monitor ab))))))
@@ -76,15 +76,15 @@
         ba (get-channel channels "b" "a")]
     (set-logging-exceptions)
     (>!! ab (msg 0 0))
-    (let [a->b (<!! ab 0)]
+    (let [a->b (<!!-test ab 0)]
       (is (= a->b 0))
       (>!! ab (msg 1 1))
-      (let [a->b1 (<!! ab 1)]
+      (let [a->b1 (<!!-test ab 1)]
         (is (= a->b1 1))
         (close-channel! ab)
         (is true (channel-closed? ab))
         (>!! ba (msg 2 2))
-        (is (= (<!! ba 2) 2))
+        (is (= (<!!-test ba 2) 2))
         (close-channel! ba)
         (is true (channel-closed? ba))))
     (is (nil? (get-active-interaction (get-monitor ab))))))
@@ -94,7 +94,7 @@
         ab (get-channel channels "a" "b")]
     (set-logging-exceptions)
     (>!! ab (msg 0 0))
-    (let [a->b (<!! ab 0)]
+    (let [a->b (<!!-test ab 0)]
       (is (= a->b 0))
       (close-channel! ab)
       (is true (channel-closed? ab)))
@@ -111,19 +111,19 @@
       (if (> reps 2)
         (do
           (>!! [ab ac] (msg 1 1))
-          (is (= (<!! ab 1) 1))
-          (is (= (<!! ac 1) 1)))
+          (is (= (<!!-test ab 1) 1))
+          (is (= (<!!-test ac 1) 1)))
         (do (>!! [ab ac] (msg 0 0))
-            (is (= (<!! ab 0) 0))
-            (is (= (<!! ac 0) 0))
+            (is (= (<!!-test ab 0) 0))
+            (is (= (<!!-test ac 0) 0))
             (do (>!! [ba bc] (msg 4 4))
-                (let [b->a4 (<!! ba 4)
-                      b->c4 (<!! bc 4)]
+                (let [b->a4 (<!!-test ba 4)
+                      b->c4 (<!!-test bc 4)]
                   (is (= b->a4 4))
                   (is (= b->c4 4))
                   (>!! [ab ac] (msg 5 5))
-                  (is (= (<!! ab 5) 5))
-                  (is (= (<!! ac 5) 5))))
+                  (is (= (<!!-test ab 5) 5))
+                  (is (= (<!!-test ac 5) 5))))
             (recur (+ reps 1)))))
     (do
       (close-channel! ab)
@@ -133,8 +133,8 @@
       (is true (channel-closed? ac))
       (is true (channel-closed? (get-channel channels "a" "c")))
       (>!! [ba bc] (msg 6 6))
-      (let [b->a6 (<!! ba 6)
-            b->c6 (<!! bc 6)]
+      (let [b->a6 (<!!-test ba 6)
+            b->c6 (<!!-test bc 6)]
         (is (= b->a6 6))
         (is (= b->c6 6))
         (close-channel! ba)
@@ -151,29 +151,29 @@
         ba (get-channel channels "b" "a")]
     (do
       (>!! ba (msg 0 0))
-      (is (= (<!! ba 0) 0))
+      (is (= (<!!-test ba 0) 0))
       (>!! ab (msg 1 1))
-      (is (= (<!! ab 1) 1)))
+      (is (= (<!!-test ab 1) 1)))
     (do
       (>!! ba (msg "hi" "hi"))
-      (is (= (<!! ba "hi") "hi"))
+      (is (= (<!!-test ba "hi") "hi"))
       (>!! ab (msg "hi" "hi"))
-      (is (= (<!! ab "hi") "hi")))
+      (is (= (<!!-test ab "hi") "hi")))
     (do (>!! ba (msg "a" "a"))
-        (let [b->aA (<!! ba "a")]
+        (let [b->aA (<!!-test ba "a")]
           (is (= b->aA "a"))
           (>!! ab (msg "b" "b"))
-          (is (= (<!! ab "b") "b")))
+          (is (= (<!!-test ab "b") "b")))
         (>!! ba (msg "b" "b"))
-        (let [b->aB (<!! ba "b")]
+        (let [b->aB (<!!-test ba "b")]
           (is (= b->aB "b"))
           (>!! ab (msg "a" "a"))
-          (is (= (<!! ab "a") "a"))))
+          (is (= (<!!-test ab "a") "a"))))
     (do (>!! ba (msg 2 2))
-        (let [b->a2 (<!! ba 2)]
+        (let [b->a2 (<!!-test ba 2)]
           (is (= b->a2 2))
           (>!! ab (msg 3 3))
-          (is (= (<!! ab 3) 3)))
+          (is (= (<!!-test ab 3) 3)))
         (close-channel! ab)
         (close-channel! "b" "a" channels)
         (is true (channel-closed? ab))

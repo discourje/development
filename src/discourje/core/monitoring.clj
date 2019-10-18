@@ -4,10 +4,10 @@
 (defprotocol monitoring
   (get-monitor-id [this])
   (get-active-interaction [this])
-  (apply-receive! [this sender receivers message pre-swap-interaction target-interaction])
-  (apply-send! [this sender receivers message pre-swap-interaction target-interaction])
-  (valid-send? [this sender receivers message])
-  (valid-receive? [this sender receivers message])
+  (apply-receive! [this sender receivers message label pre-swap-interaction target-interaction])
+  (apply-send! [this sender receivers message label pre-swap-interaction target-interaction])
+  (valid-send? [this sender receivers message label])
+  (valid-receive? [this sender receivers message label])
   (valid-close? [this sender receiver])
   (apply-close! [this channel pre-swap-interaction target-interaction])
   (is-current-multicast? [this message label])
@@ -27,12 +27,12 @@
 
 (defn- is-valid-interaction?
   "Is the given interaction valid compared to the active-interaction of the monitor"
-  [sender receivers message active-interaction]
+  [sender receivers message label active-interaction]
   (and
     (= sender (:sender active-interaction))
-    (and (if (callable? (get-action active-interaction))
-           ((get-action active-interaction) message)
-           (or (nil? (get-action active-interaction)) (= (type message) (get-action active-interaction)))))
+    (if (callable? (get-action active-interaction))
+           ((get-action active-interaction) (if (nil? label) message label))
+           (or (nil? (get-action active-interaction)) (= (type message) (get-action active-interaction))))
     (and (if (instance? Seqable (:receivers active-interaction))
            (or (contains-value? receivers (:receivers active-interaction)) (= receivers (:receivers active-interaction)))
            (or (= receivers (:receivers active-interaction)) (contains-value? (:receivers active-interaction) receivers))))))
@@ -72,12 +72,12 @@
   monitoring
   (get-monitor-id [this] id)
   (get-active-interaction [this] @active-interaction)
-  (apply-send! [this sender receivers message pre-swap-interaction target-interaction] (apply-send-to-mon this sender receivers message active-interaction pre-swap-interaction target-interaction))
-  (apply-receive! [this sender receivers message pre-swap-interaction target-interaction] (apply-receive-to-mon this sender receivers message active-interaction pre-swap-interaction target-interaction))
-  (valid-send? [this sender receivers message] (let [pre-swap @active-interaction]
-                                                 (->swappable-interaction pre-swap (is-valid-send-communication? this sender receivers message pre-swap))))
-  (valid-receive? [this sender receivers message] (let [pre-swap @active-interaction]
-                                                    (->swappable-interaction pre-swap (is-valid-communication? this sender receivers message pre-swap))))
+  (apply-send! [this sender receivers message label pre-swap-interaction target-interaction] (apply-send-to-mon this sender receivers message label active-interaction pre-swap-interaction target-interaction))
+  (apply-receive! [this sender receivers message label pre-swap-interaction target-interaction] (apply-receive-to-mon this sender receivers message label active-interaction pre-swap-interaction target-interaction))
+  (valid-send? [this sender receivers message label] (let [pre-swap @active-interaction]
+                                                 (->swappable-interaction pre-swap (is-valid-send-communication? this sender receivers message label pre-swap))))
+  (valid-receive? [this sender receivers message label] (let [pre-swap @active-interaction]
+                                                    (->swappable-interaction pre-swap (is-valid-communication? this sender receivers message label pre-swap))))
   (is-current-multicast? [this message label] (is-active-interaction-multicast? this @active-interaction message label))
   (get-rec [this name] (name @recursion-set))
   (valid-close? [this sender receiver] (let [pre-swap @active-interaction]

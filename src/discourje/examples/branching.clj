@@ -21,7 +21,7 @@
   "This function will use the protocol to send the number message to bob and wait for the result to know if it is greaterThan or lessThan threshold."
   [threshold]
   ;We send a map (data structure) in order to send both the threshold and the generated number
-  (>!! alice-to-bob {msg "number" {:threshold threshold :generatedNumber (rand-int (+ threshold 10))}})
+  (>!! alice-to-bob (msg "number" {:threshold threshold :generatedNumber (rand-int (+ threshold 10))}))
   (let [response (<!! bob-to-alice ["greaterThan" "lessThan"])]
     (cond
       (= (:flag response) "greaterThan") (log-message (format "greaterThan received with message: %s"(:content response)))

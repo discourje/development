@@ -16,15 +16,15 @@
       (-->> 1 .. pn))
   "
   ([amount]
-   (let [protocol (create-protocol (vec (for [p (range amount)] (-->> 1 p (+ p 1)))))
+   (let [protocol (create-protocol (vec (for [p (range amount)] (-->> Long p (+ p 1)))))
          infra (generate-infrastructure protocol)
          channels (vec (for [p (range amount)] (get-channel infra p (+ p 1) )))
-         msg (msg 1 1)
+         msg 1
          time (custom-time
                 (loop [pipe 0]
                   (do
                     (>!! (nth channels pipe) msg)
-                    (<!!! (nth channels pipe) 1)
+                    (<!!! (nth channels pipe))
                     (when (true? (< pipe (- amount 1)))
                       (recur (+ 1 pipe))))))]
      (close-infrastructure! infra)
@@ -36,13 +36,13 @@
            infra (generate-infrastructure protocol)
            channels (vec (for [p (range amount)] (get-channel infra p (+ p 1) )))
            interactions (get-active-interaction (get-monitor (first channels)))
-           msg (msg 1 1)
+           msg 1
            time (custom-time
                   (doseq [_ (range iterations)]
                     (do (loop [pipe 0]
                           (do
                             (>!! (nth channels pipe) msg)
-                            (<!! (nth channels pipe) 1)
+                            (<!! (nth channels pipe))
                             (when (true? (< pipe (- amount 1)))
                               (recur (+ 1 pipe)))))
                         (force-monitor-reset! (get-monitor (first channels)) interactions)
@@ -63,11 +63,11 @@
       (-->> 1 .. pn))
   "
   ([amount iterations]
-   (let [protocol (create-protocol (vec (for [p (range (- amount 1))] (-->> 1 p (+ p 1)))))
+   (let [protocol (create-protocol (vec (for [p (range (- amount 1))] (-->> Long p (+ p 1)))))
          infra (generate-infrastructure protocol)
          channels (vec (for [p (range (- amount 1))] (get-channel infra p (+ p 1) )))
          interactions (get-active-interaction (get-monitor (first channels)))
-         msg (msg 1 1)
+         msg 1
          max (- amount 2)
          time (cond
                 (< amount 2) "invalid amount"
@@ -75,7 +75,7 @@
                                 (doseq [_ (range iterations)]
                                   (do
                                     (do (thread (do (>!! (first channels) msg)))
-                                        (<!! (first channels) 1))
+                                        (<!! (first channels)))
                                     (force-monitor-reset! (get-monitor (first channels)) interactions))))
                 :else
                 (custom-time
@@ -84,7 +84,7 @@
                       (loop [element max]
                         (if (== 0 element)
                           (thread (>!! (first channels) msg))
-                          (thread (do (<!! (nth channels (- element 1)) 1)
+                          (thread (do (<!! (nth channels (- element 1)))
                                       (>!! (nth channels element) msg))))
                         (when (< 0 element)
                           (recur (- element 1))))
@@ -96,11 +96,11 @@
 
 (defn clojure-pipeline-new-reverse
   ([amount iterations]
-   (let [protocol (create-protocol (vec (for [p (range (- amount 1))] (-->> 1 p (+ p 1)))))
+   (let [protocol (create-protocol (vec (for [p (range (- amount 1))] (-->> Long p (+ p 1)))))
          infra (generate-infrastructure protocol)
          channels (vec (for [p (range (- amount 1))] (get-channel infra p (+ p 1) )))
          interactions (get-active-interaction (get-monitor (first channels)))
-         msg (msg 1 1)
+         msg 1
          max (- amount 2)
          time (cond
                 (< amount 2) "invalid amount!"
@@ -139,11 +139,11 @@
       (-->> 1 .. pn))
   "
   ([amount iterations]
-   (let [protocol (create-protocol (vec (for [p (range (- amount 1))] (-->> 1 p (+ p 1)))))
+   (let [protocol (create-protocol (vec (for [p (range (- amount 1))] (-->> Long p (+ p 1)))))
          infra (generate-infrastructure protocol)
          channels (vec (for [p (range (- amount 1))] (get-channel infra p (+ p 1) )))
          interactions (get-active-interaction (get-monitor (first channels)))
-         msg (msg 1 1)
+         msg 1
          max (- amount 3)
          time (cond
                 (< amount 2) "invalid amount!"
@@ -159,7 +159,7 @@
                     (do
                       (thread (>!! (first channels) msg))
                       (loop [element 0]
-                        (thread (do (<!! (nth channels element) 1)
+                        (thread (do (<!! (nth channels element))
                                     (>!! (nth channels (+ element 1)) msg)))
                         (when (< element max)
                           (recur (+ 1 element))))
@@ -169,11 +169,11 @@
 
 (defn clojure-pipeline-new
   ([amount iterations]
-   (let [protocol (create-protocol (vec (for [p (range (- amount 1))] (-->> 1 p (+ p 1)))))
+   (let [protocol (create-protocol (vec (for [p (range (- amount 1))] (-->> Long p (+ p 1)))))
          infra (generate-infrastructure protocol)
          channels (vec (for [p (range (- amount 1))] (get-channel infra p (+ p 1) )))
          interactions (get-active-interaction (get-monitor (first channels)))
-         msg (msg 1 1)
+         msg 1
          max (- amount 3)
          time (cond
                 (< amount 2) "invalid amount!"
@@ -201,7 +201,7 @@
 (defn clojure-pipeline
   ([amount]
    (let [channels (vec (for [_ (range amount)] (clojure.core.async/chan 1)))
-         msg (msg 1 1)
+         msg 1
          time (custom-time
                 (loop [pipe 0]
                   (do
@@ -218,7 +218,7 @@
            infra (generate-infrastructure protocol)
            channels (vec (for [p (range amount)] (get-channel infra p (+ p 1) )))
            interactions (get-active-interaction (get-monitor (first channels)))
-           msg (msg 1 1)
+           msg 1
            time (custom-time
                   (doseq [_ (range iterations)]
                     (do (loop [pipe 0]

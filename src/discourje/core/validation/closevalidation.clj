@@ -1,6 +1,8 @@
 ;closevalidation.clj
 (in-ns 'discourje.core.async)
+
 (declare swap-active-interaction-by-atomic get-close-branch-interaction get-close-parallel-interaction)
+
 (defn is-valid-close?
   "Is the active interaction a valid close?"
   [sender receivers active-interaction]
@@ -72,12 +74,12 @@
 
 (defn remove-close-from-parallel
   "Remove an interaction from a parallel in a recursive fashion."
-  [monitor sender receivers target-interaction monitor]
+  [sender receivers target-interaction monitor]
   (let [pars (flatten (filter some?
                               (for [par (get-parallel target-interaction)]
                                 (let [inter (cond
                                               (satisfies? parallelizable par)
-                                              (remove-close-from-parallel monitor sender receivers par monitor)
+                                              (remove-close-from-parallel sender receivers par monitor)
                                               (satisfies? closable par)
                                               (when (is-valid-close? sender receivers par) par)
                                               (satisfies? branchable par)
@@ -96,7 +98,7 @@
                                       par)
                                     (cond
                                       (satisfies? parallelizable inter)
-                                      (remove-close-from-parallel monitor sender receivers inter monitor)
+                                      (remove-close-from-parallel sender receivers inter monitor)
                                       (satisfies? closable inter)
                                       (get-next inter)
                                       (or (satisfies? branchable inter) (satisfies? interactable inter))
@@ -118,7 +120,7 @@
                             target-parallel-interaction)]
                (if (nil? target)
                  inter
-                 (remove-close-from-parallel monitor sender receivers target monitor))))))
+                 (remove-close-from-parallel sender receivers target monitor))))))
   true)
 
 (defn- apply-close-to-mon

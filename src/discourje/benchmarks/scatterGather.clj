@@ -25,26 +25,26 @@
                           (flatten
                             (flatten
                               (conj
-                                [(-->> 1 "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
-                                (vec (for [w (range workers)] (-->> 1 (format "w%s" w) "m")))))))) ; workers to master
+                                [(-->> Long "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
+                                (vec (for [w (range workers)] (-->> Long (format "w%s" w) "m")))))))) ; workers to master
          infra (generate-infrastructure workers-prot)
          m->w (vec (for [w (range workers)] (get-channel infra "m" (format "w%s" w) )))
          w->m (vec (for [w (range workers)] {:take (get-channel infra "m" (format "w%s" w))
                                              :put  (get-channel infra (format "w%s" w) "m")}))
-         msg (msg 1 1)
+         msg 1
          time (custom-time
                 (do
                   (doseq [w w->m]
                     (thread
                       (do
-                        (<!!! (:take w) 1)
+                        (<!!! (:take w))
                         (loop []
                           (when (nil? (>!! (:put w) msg))
                             (recur))))))
                   (>!! m->w msg)
                   (loop [worker-id 0]
                     (let [result (do
-                                   (<!! (:put (nth w->m worker-id)) 1)
+                                   (<!! (:put (nth w->m worker-id)))
                                    (+ worker-id 1))]
                       (when (true? (< result workers))
                         (recur result))))))]
@@ -60,13 +60,13 @@
                             (flatten
                               (flatten
                                 (conj
-                                  [(-->> 1 "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
-                                  (vec (for [w (range workers)] (-->> 1 (format "w%s" w) "m")))))))) ; workers to master
+                                  [(-->> Long "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
+                                  (vec (for [w (range workers)] (-->> Long (format "w%s" w) "m")))))))) ; workers to master
            infra (generate-infrastructure workers-prot)
            m->w (vec (for [w (range workers)] (get-channel infra "m" (format "w%s" w))))
            w->m (vec (for [w (range workers)] {:take (get-channel infra "m" (format "w%s" w))
                                                :put  (get-channel infra (format "w%s" w) "m")}))
-           msg (msg 1 1)
+           msg 1
            interactions (get-active-interaction (get-monitor (first m->w)))
            time (custom-time
                   (doseq [_ (range iterations)]
@@ -74,14 +74,14 @@
                       (doseq [w w->m]
                         (thread
                           (do
-                            (<!!! (:take w) 1)
+                            (<!!! (:take w))
                             (loop []
                               (when (nil? (>!! (:put w) msg))
                                 (recur))))))
                       (>!! m->w msg)
                       (loop [worker-id 0]
                         (let [result (do
-                                       (<!! (:put (nth w->m worker-id)) 1)
+                                       (<!! (:put (nth w->m worker-id)))
                                        (+ worker-id 1))]
                           (when (< result workers)
                             (recur result))))
@@ -127,24 +127,24 @@
                           (flatten
                             (flatten
                               (conj
-                                [(-->> 1 "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
-                                (make-parallel (vec (for [w (range workers)] [(-->> 1 (format "w%s" w) "m")])))))))) ; workers to master
+                                [(-->> Long "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
+                                (make-parallel (vec (for [w (range workers)] [(-->> Long (format "w%s" w) "m")])))))))) ; workers to master
          infra (generate-infrastructure workers-prot)
          m->w (vec (for [w (range workers)] (get-channel infra"m" (format "w%s" w))))
          w->m (vec (for [w (range workers)] {:take (get-channel infra"m" (format "w%s" w))
                                              :put  (get-channel infra (format "w%s" w) "m")}))
-         msg (msg 1 1)
+         msg 1
          time (custom-time
                 (do
                   (doseq [w w->m]
                     (thread
                       (do
-                        (<!!! (:take w) 1)
+                        (<!!! (:take w))
                         (>!! (:put w) msg))))
                   (>!! m->w msg)
                   (loop [worker-id 0]
                     (let [result (do
-                                   (<!! (:put (nth w->m worker-id)) 1)
+                                   (<!! (:put (nth w->m worker-id)))
                                    (+ worker-id 1))]
                       (when (true? (< result workers))
                         (recur result))))))]
@@ -157,26 +157,26 @@
                             (flatten
                               (flatten
                                 (conj
-                                  [(-->> 1 "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
-                                  (make-parallel (vec (for [w (range workers)] [(-->> 1 (format "w%s" w) "m")])))))))) ; workers to master
+                                  [(-->> Long "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
+                                  (make-parallel (vec (for [w (range workers)] [(-->> Long (format "w%s" w) "m")])))))))) ; workers to master
            infra (generate-infrastructure workers-prot)
            m->w (vec (for [w (range workers)] (get-channel infra"m" (format "w%s" w))))
            w->m (vec (for [w (range workers)] {:take (get-channel infra"m" (format "w%s" w))
                                                :put  (get-channel infra (format "w%s" w) "m")}))
            interactions (get-active-interaction (get-monitor (first m->w)))
-           msg (msg 1 1)
+           msg 1
            time (custom-time
                   (doseq [_ (range iterations)]
                     (do
                       (doseq [w w->m]
                         (thread
                           (do
-                            (<!!! (:take w) 1)
+                            (<!!! (:take w))
                             (>!! (:put w) msg))))
                       (>!! m->w msg)
                       (loop [worker-id 0]
                         (let [result (do
-                                       (<!! (:put (nth w->m worker-id)) 1)
+                                       (<!! (:put (nth w->m worker-id)))
                                        (+ worker-id 1))]
                           (when (< result workers)
                             (recur result))))
@@ -191,13 +191,13 @@
                           (flatten
                             (flatten
                               (conj
-                                [(-->> 1 "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
-                                (vec (for [w (range workers)] (-->> 1 (format "w%s" w) "m")))))))) ; workers to master
+                                [(-->> Long "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
+                                (vec (for [w (range workers)] (-->> Long (format "w%s" w) "m")))))))) ; workers to master
          infra (generate-infrastructure workers-prot)
          m->w (vec (for [w (range workers)] (get-channel infra "m" (format "w%s" w))))
          w->m (vec (for [w (range workers)] {:take (get-channel infra "m" (format "w%s" w))
                                              :put  (get-channel infra (format "w%s" w) "m")}))
-         msg (msg 1 1)
+         msg 1
          time (custom-time
                 (do
                   (doseq [w w->m]
@@ -226,14 +226,14 @@
                             (flatten
                               (flatten
                                 (conj
-                                  [(-->> 1 "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
-                                  (vec (for [w (range workers)] (-->> 1 (format "w%s" w) "m")))))))) ; workers to master
+                                  [(-->> Long "m" (vec (for [w (range workers)] (format "w%s" w))))] ;master to workers
+                                  (vec (for [w (range workers)] (-->> Long (format "w%s" w) "m")))))))) ; workers to master
            infra (generate-infrastructure workers-prot)
            m->w (vec (for [w (range workers)] (get-channel infra "m" (format "w%s" w))))
            w->m (vec (for [w (range workers)] {:take (get-channel infra "m" (format "w%s" w))
                                                :put  (get-channel infra (format "w%s" w) "m")}))
            interactions (get-active-interaction (get-monitor (first m->w)))
-           msg (msg 1 1)
+           msg 1
            time (custom-time
                   (doseq [_ (range iterations)]
                     (do

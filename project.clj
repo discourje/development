@@ -1,4 +1,4 @@
-(defproject discourje "0.1.0"
+(defproject discourje "0.2.0"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   ;  :java-source-paths ["src/discourje/demo/javaObjects"]
