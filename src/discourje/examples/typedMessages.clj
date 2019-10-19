@@ -28,9 +28,9 @@
   Discourje will generate a message ->message{:label String :content Greetings, from alice!}"
   []
   (>!! alice-to-bob "Greetings, from alice!")
-  (log-message (<!! bob-to-alice String))
+  (log-message (<!! bob-to-alice))
   (>!! alice-to-carol "Greetings, from alice!")
-  (log-message (<!! carol-to-alice String))
+  (log-message (<!! carol-to-alice))
   (close! alice-to-bob)
   (close! bob-to-alice)
   (close! alice-to-carol)
@@ -39,7 +39,7 @@
 (defn- receive-greet
   "This function will use the protocol to listen for the greet message."
   [input-channel output-channel]
-  (let [message (<!! input-channel String)]
+  (let [message (<!! input-channel)]
     (log-message (format "Received message: %s to %s" message (get-consumer input-channel)))
     (>!! output-channel  "Hi to you too!")))
 

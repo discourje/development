@@ -20,17 +20,17 @@
 (defn- greet-bob-and-carol
   "This function will use the protocol to send the greet message to bob and carol."
   []
-  (>!! alice-to-carol (msg "greet" "Greetings, from alice!"))
-  (log-message (<!! alice-to-carol "greet"))
-  (>!! alice-to-bob (->message "greet" "Greetings, from alice!"))
-  (log-message (<!! bob-to-alice "greet")))
+  (>!! alice-to-carol "Greetings, from alice!")
+  (log-message (<!! alice-to-carol))
+  (>!! alice-to-bob "Greetings, from alice!")
+  (log-message (<!! bob-to-alice)))
 
 (defn- receive-greet
   "This function will use the protocol to listen for the greet message."
   [input-channel output-channel]
-  (let [message (<!! input-channel "greet")]
+  (let [message (<!! input-channel)]
     (log-message (format "Received message: %s to %s"  message (get-consumer input-channel)))
-    (>!! output-channel (msg "greet" "Hi to you too!"))))
+    (>!! output-channel "Hi to you too!")))
 
 "***BY DEFAULT EXCEPTION LOGGING IS ENABLED!***"
 

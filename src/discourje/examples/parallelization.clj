@@ -27,20 +27,20 @@
 (defn- alice
   "logic for alice"
   []
-  (>!! alice-to-bob (msg 1 1))
-  (<!! bob-to-alice 4)
-  (>!! alice-to-bob (msg 5 5)))
+  (>!! alice-to-bob 1)
+  (<!! bob-to-alice)
+  (>!! alice-to-bob  5))
 
 (defn- bob
   "logic for bob, notice how the parallel branches are started on separate threads to demonstrate both branches can be traversed at the same time"
   []
-  (<!! alice-to-bob 1)
+  (<!! alice-to-bob)
   (let [first-par (fn []
-                    (>!! bob-to-carol (msg 2 2))
-                    (<!! carol-to-bob 3))
+                    (>!! bob-to-carol 2)
+                    (<!! carol-to-bob))
         second-par (fn []
-                     (>!! bob-to-alice (msg 4 4))
-                     (<!! alice-to-bob 5))
+                     (>!! bob-to-alice 4)
+                     (<!! alice-to-bob))
         thread1 (clojure.core.async/thread (first-par))
         thread2 (clojure.core.async/thread (second-par))]
     (when (and (clojure.core.async/<!! thread1) (clojure.core.async/<!! thread2))
@@ -52,8 +52,8 @@
 (defn- carol
   "logic for carol"
   []
-  (<!! bob-to-carol 2)
-  (>!! carol-to-bob (msg 3 3)))
+  (<!! bob-to-carol)
+  (>!! carol-to-bob  3))
 
 ;start the `alice' function on thread
 (clojure.core.async/thread (alice))
