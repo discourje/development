@@ -7,9 +7,15 @@
 
 (defmacro -->
   ([sender receiver]
-   `(list '~(quote -->fn) '~sender '~receiver 'nil))
-  ([sender receiver message-type]
-   `(list '~(quote -->fn) '~sender '~receiver '~message-type)))
+   `(list '~(quote -->fn) '~sender '~receiver))
+  ([sender receiver fn-or-type]
+   `(list '~(quote -->fn)
+          '~sender
+          '~receiver
+          (if (fn? ~fn-or-type)
+            '~fn-or-type
+            (list '~(quote fn) ['~(quote x)] (list '~(quote =) (list '~(quote type) '~(quote x)) '~fn-or-type))
+            ))))
 
 (defmacro -##
   ([sender receiver]
@@ -112,13 +118,15 @@
 (defn next-id [] (swap! id inc))
 
 (defn -->fn
-  [sender receiver message-type]
-  (->interaction (next-id)
-                 message-type
-                 (if (fn? sender) (sender) sender)
-                 (if (fn? receiver) (receiver) receiver)
-                 #{}
-                 nil))
+  ([sender receiver]
+   (-->fn sender receiver (fn [x] true)))
+  ([sender receiver f]
+   (->interaction (next-id)
+                  f
+                  (if (fn? sender) (sender) sender)
+                  (if (fn? receiver) (receiver) receiver)
+                  #{}
+                  nil)))
 
 (defn -##fn
   [sender receiver]
