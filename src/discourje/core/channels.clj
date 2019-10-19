@@ -21,9 +21,6 @@
              (new java.util.concurrent.Semaphore buffer)
              (new java.util.concurrent.Semaphore 0)))
 
-(def use-meta-put true)
-(def use-meta-take true)
-
 (defn acquire-put [channel]
   (.acquire (:meta-put channel)))
 

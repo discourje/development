@@ -113,16 +113,14 @@
   "Allow send message in channel"
   [channel message]
   (async/>!! (get-chan channel) message)
-  (if use-meta-take
-    (release-take channel))
+  (release-take channel)
   channel)
 
 (defn- allow-receive
   "Allow a receive on the channel"
   [channel]
   (async/<!! (get-chan channel))
-  (if use-meta-put
-    (release-put channel))
+  (release-put channel)
   channel)
 
 (defn- allow-sends
@@ -186,67 +184,61 @@
 (defn >!!
   "Put on channel"
   [channel message]
-   (let [send-fn (fn []
-                   (let [valid-interaction
-                         (cond
-                           (channel-closed? channel)
-                           (log-error :incorrect-communication (format "Invalid communication: you are trying to send but the channel is closed! From %s to %s" (get-provider channel) (get-consumer channel)))
-                           :else
-                           (valid-send? (get-monitor channel) (get-provider channel) (get-consumer channel) message))]
-                     (if (is-valid-for-swap? valid-interaction)
-                       (apply-send! (get-monitor channel) (get-provider channel) (get-consumer channel) message (get-pre-swap valid-interaction) (get-valid valid-interaction))
-                       (log-error :incorrect-communication (format "Atomic-send communication invalid! message: %s, sender: %s, receiver: %s, while active interaction is: %s" message (get-provider channel) (get-consumer channel) (to-string (get-active-interaction (get-monitor channel))))))))
-         ]
-     (if (vector? channel)
-       (>E channel message)
-       (do (if use-meta-put
-             (acquire-put channel)
-             (loop []
-               (when (can-put? channel) (recur))))
-           (loop [send-result (send-fn)]
-             (if send-result
-               (allow-send channel message)
-               (recur (send-fn))))))))
+  (let [send-fn (fn []
+                  (let [valid-interaction
+                        (cond
+                          (channel-closed? channel)
+                          (log-error :incorrect-communication (format "Invalid communication: you are trying to send but the channel is closed! From %s to %s" (get-provider channel) (get-consumer channel)))
+                          :else
+                          (valid-send? (get-monitor channel) (get-provider channel) (get-consumer channel) message))]
+                    (if (is-valid-for-swap? valid-interaction)
+                      (apply-send! (get-monitor channel) (get-provider channel) (get-consumer channel) message (get-pre-swap valid-interaction) (get-valid valid-interaction))
+                      (log-error :incorrect-communication (format "Atomic-send communication invalid! message: %s, sender: %s, receiver: %s, while active interaction is: %s" message (get-provider channel) (get-consumer channel) (to-string (get-active-interaction (get-monitor channel))))))))
+        ]
+    (if (vector? channel)
+      (>E channel message)
+      (do (acquire-put channel)
+          (loop [send-result (send-fn)]
+            (if send-result
+              (allow-send channel message)
+              (recur (send-fn))))))))
 
 (defn <!!
   "take form channel"
   [channel]
-   (if (channel-closed? channel)
-     (log-error :incorrect-communication (format "Invalid communication: you are trying to receive but the channel is closed! From %s to %s" (get-provider channel) (get-consumer channel)))
-     (do (if use-meta-take
-           (acquire-take channel)
-           (loop []
-             (when (false? (something-in-buffer? (get-chan channel))) (recur))))
-         (if (nil? (get-active-interaction (get-monitor channel)))
-           (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
-           (let [result (peek-channel (get-chan channel))
-                 valid-interaction (valid-receive? (get-monitor channel) (get-provider channel) (get-consumer channel) result)]
-             (if-not (is-valid-for-swap? valid-interaction)
-               (log-error :incorrect-communication (format "Atomic-receive communication invalid! sender: %s, receiver: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) (to-string (get-active-interaction (get-monitor channel)))))
-               (do (apply-receive! (get-monitor channel) (get-provider channel) (get-consumer channel) result (get-pre-swap valid-interaction) (get-valid valid-interaction))
-                   (allow-receive channel)
-                   result)))))))
+  (if (channel-closed? channel)
+    (log-error :incorrect-communication (format "Invalid communication: you are trying to receive but the channel is closed! From %s to %s" (get-provider channel) (get-consumer channel)))
+    (do (acquire-take channel)
+        (if (nil? (get-active-interaction (get-monitor channel)))
+          (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
+          (let [result (peek-channel (get-chan channel))
+                valid-interaction (valid-receive? (get-monitor channel) (get-provider channel) (get-consumer channel) result)]
+            (if-not (is-valid-for-swap? valid-interaction)
+              (log-error :incorrect-communication (format "Atomic-receive communication invalid! sender: %s, receiver: %s while active interaction is: %s" (get-provider channel) (get-consumer channel) (to-string (get-active-interaction (get-monitor channel)))))
+              (do (apply-receive! (get-monitor channel) (get-provider channel) (get-consumer channel) result (get-pre-swap valid-interaction) (get-valid valid-interaction))
+                  (allow-receive channel)
+                  result)))))))
 
 (defn <!!!
   "take form channel peeking, and delay receive when parallel"
   [channel]
-   (if (channel-closed? channel)
-     (log-error :incorrect-communication (format "Invalid communication: you are trying to receive but the channel is closed! From %s to %s" (get-provider channel) (get-consumer channel)))
-     (do (loop []
-           (when (false? (something-in-buffer? (get-chan channel))) (recur)))
-         (if (nil? (get-active-interaction (get-monitor channel)))
-           (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
-           (let [result (peek-channel (get-chan channel))
-                 isParallel (is-current-multicast? (get-monitor channel) result)
-                 id (get-id (get-active-interaction (get-monitor channel)))
-                 valid-interaction (valid-receive? (get-monitor channel) (get-provider channel) (get-consumer channel) result)]
-             (if-not (is-valid-for-swap? valid-interaction)
-               (log-error :incorrect-communication (format "Atomic-receive communication invalid! sender: %s, receiver: %s, while active interaction is: %s" (get-provider channel) (get-consumer channel) (to-string (get-active-interaction (get-monitor channel)))))
-               (do (apply-receive! (get-monitor channel) (get-provider channel) (get-consumer channel) result (get-pre-swap valid-interaction) (get-valid valid-interaction))
-                   (allow-receive channel)
-                   (loop [par isParallel]
-                     (when (true? par) (recur (= id (get-id (get-active-interaction (get-monitor channel)))))))
-                   result)))))))
+  (if (channel-closed? channel)
+    (log-error :incorrect-communication (format "Invalid communication: you are trying to receive but the channel is closed! From %s to %s" (get-provider channel) (get-consumer channel)))
+    (do (loop []
+          (when (false? (something-in-buffer? (get-chan channel))) (recur)))
+        (if (nil? (get-active-interaction (get-monitor channel)))
+          (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
+          (let [result (peek-channel (get-chan channel))
+                isParallel (is-current-multicast? (get-monitor channel) result)
+                id (get-id (get-active-interaction (get-monitor channel)))
+                valid-interaction (valid-receive? (get-monitor channel) (get-provider channel) (get-consumer channel) result)]
+            (if-not (is-valid-for-swap? valid-interaction)
+              (log-error :incorrect-communication (format "Atomic-receive communication invalid! sender: %s, receiver: %s, while active interaction is: %s" (get-provider channel) (get-consumer channel) (to-string (get-active-interaction (get-monitor channel)))))
+              (do (apply-receive! (get-monitor channel) (get-provider channel) (get-consumer channel) result (get-pre-swap valid-interaction) (get-valid valid-interaction))
+                  (allow-receive channel)
+                  (loop [par isParallel]
+                    (when (true? par) (recur (= id (get-id (get-active-interaction (get-monitor channel)))))))
+                  result)))))))
 
 (defn close-channel!
   "Close a channel with the given sender and receiver"
