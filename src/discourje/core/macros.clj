@@ -3,8 +3,12 @@
 
 (defmacro -->>
   "Create an Atomic-interaction"
-  [action sender receiver]
-  `(->interaction (uuid/v1) ~action ~sender ~receiver #{} nil))
+  ([sender receiver]
+   `(->interaction (uuid/v1) (fn [~'x] true) ~sender ~receiver #{} nil))
+  ([action sender receiver]
+   `(if (fn? ~action)
+     (->interaction (uuid/v1) ~action ~sender ~receiver #{} nil)
+     (->interaction (uuid/v1) (fn [~'x] (= (type ~'x) ~action)) ~sender ~receiver #{} nil))))
 
 (defmacro close
   "Create an close construct"

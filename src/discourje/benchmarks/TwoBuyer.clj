@@ -18,28 +18,28 @@
   [b1-s s-b1 b1-b2 title div]
   (do
     (>!! b1-s title)
-    (<!!! s-b1 Long)
+    (<!!! s-b1)
     (>!! b1-b2 div)))
 
 (defn- discourje-buyer2 "Order a book from buyer2's perspective"
   [s-b2 b1-b2 b2-s ok address]
   (do
-    (<!!! s-b2 Long)
-    (<!!! b1-b2 Long)
+    (<!!! s-b2)
+    (<!!! b1-b2)
     (>!! b2-s ok)
     (>!! b2-s address)
-    (<!!! s-b2 Long)))
+    (<!!! s-b2)))
 
 (defn- discourje-seller "Order book from seller's perspective"
   [b1-s s-b1 s-b2 b2-s quote date]
   (do
-    (<!! b1-s String)
+    (<!! b1-s)
     (>!! [s-b1 s-b2] quote)
-    (let [choice-by-buyer2 (<!! b2-s PersistentArrayMap)]
+    (let [choice-by-buyer2 (<!! b2-s)]
       (cond
         (= "ok" (:choice choice-by-buyer2))
         (do
-          (<!! b2-s String)
+          (<!! b2-s)
           (>!! s-b2 date))
         (= "quit" (:choice choice-by-buyer2))
         "Quit!"))))
@@ -84,7 +84,7 @@
                (doseq [_ (range iterations)]
                  (do
                    (thread (discourje-buyer1 b1-s s-b1 b1-b2 title div))
-                   (thread (discourje-seller b1-s s-b1 s-b2 b2-s  quote date))
+                   (thread (discourje-seller b1-s s-b1 s-b2 b2-s quote date))
                    (discourje-buyer2 s-b2 b1-b2 b2-s ok address)
                    (force-monitor-reset! (get-monitor b1-s) interactions))))]
     time))

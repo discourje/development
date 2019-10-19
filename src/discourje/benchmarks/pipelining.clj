@@ -88,7 +88,7 @@
                                       (>!! (nth channels element) msg))))
                         (when (< 0 element)
                           (recur (- element 1))))
-                      (<!! (last channels) 1)
+                      (<!! (last channels))
                       (force-monitor-reset! (get-monitor (first channels)) interactions)))))]
      time)))
 ;(set-logging-exceptions)
@@ -151,7 +151,7 @@
                                 (doseq [_ (range iterations)]
                                   (do
                                     (do (thread (do (>!! (first channels) msg)))
-                                        (<!! (first channels) 1))
+                                        (<!! (first channels)))
                                     (force-monitor-reset! (get-monitor (first channels)) interactions))))
                 :else
                 (custom-time
@@ -163,7 +163,7 @@
                                     (>!! (nth channels (+ element 1)) msg)))
                         (when (< element max)
                           (recur (+ 1 element))))
-                      (<!! (last channels) 1)
+                      (<!! (last channels))
                       (force-monitor-reset! (get-monitor (first channels)) interactions)))))]
      time)))
 

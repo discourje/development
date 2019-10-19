@@ -17,18 +17,18 @@
   "Logic representing Buyer"
   [b->s s->b quote-request order]
   (>!! b->s quote-request)
-  (if (= (<!! s->b ["quote" "out-of-stock"]) "quote")
+  (if (= (<!! s->b) "quote")
     (do (>!! b->s order)
-        (<!! s->b "order-ack"))
+        (<!! s->b))
     "Book is out of stock!"))
 
 (defn- discourje-seller
   "Logic representing the Seller"
   [b->s s->b in-stock? quote order-ack out-of-stock]
-  (if (== 1 (in-stock? (<!! b->s "quote-request")))
+  (if (== 1 (in-stock? (<!! b->s)))
     (do
       (>!! s->b quote)
-      (<!! b->s "order")
+      (<!! b->s)
       (>!! s->b order-ack))
     (>!! s->b out-of-stock)))
 

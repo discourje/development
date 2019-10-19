@@ -12,10 +12,10 @@
 (def user-to-world (get-channel infrastructure "user" "world"))
 
 (defn- send-to-world "This function will use the protocol to send the Hello World! message to world."
-  [] (>!! user-to-world (msg "helloWorld" "Hello World!")))
+  [] (>!! user-to-world "Hello World!"))
 
 (defn- receive-from-user "This function will use the protocol to listen for the helloWorld message."
-  [] (let [message (<!! user-to-world "helloWorld")]
+  [] (let [message (<!! user-to-world)]
        (log-message "World received message: " message)
        (close! user-to-world)))
 
