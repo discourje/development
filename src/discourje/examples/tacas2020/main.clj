@@ -1,5 +1,6 @@
 (ns discourje.examples.tacas2020.main
-  (:gen-class))
+  (:gen-class)
+  (:require [discourje.examples.tacas2020.stat :refer :all]))
 
 (import discourje.examples.tacas2020.Benchmarks)
 (import discourje.examples.tacas2020.clbg.spectralnorm.spectralnorm)
@@ -11,18 +12,40 @@
 
 (defn bench
   [time f]
-  (let [begin (System/nanoTime)
-        deadline (+ begin (* time 1000 1000 1000))]
-    (loop [n 0]
-      (f)
-      (let [end (System/nanoTime)
-            n' (+ n 1)]
-        (if (< end deadline)
-          (recur n')
-          (binding [*out* *err*]
-            (println (- end begin) "ns,"
-                     n' "runs,"
-                     (quot (- end begin) n') "ns/run")))))))
+  (let [init (System/nanoTime)
+        deadline (+ init (* time 1000 1000 1000))]
+    (loop [measurements []]
+      (let [begin (System/nanoTime)]
+        (f)
+        (let [end (System/nanoTime)
+              measurements (conj measurements (- end begin))]
+          (if (< end deadline)
+            (recur measurements)
+            (if (= (count measurements) 1)
+              (binding [*out* *err*]
+                (println (- end init) "ns; 1 run"))
+              (let [c (count measurements)
+                    m (long (mean measurements))
+                    sd (long (standard-deviation measurements))
+                    rsd (long (* 100 (double (/ sd m))))
+                    measurements (if (> (count measurements) 100)
+                                   (nthrest measurements (- (count measurements) 100))
+                                   measurements)
+                    m100 (long (mean measurements))
+                    sd100 (long (standard-deviation measurements))
+                    rsd100 (long (* 100 (double (/ sd100 m100))))
+                    measurements (if (> (count measurements) 20)
+                                   (nthrest measurements (- (count measurements) 20))
+                                   measurements)
+                    m20 (long (mean measurements))
+                    sd20 (long (standard-deviation measurements))
+                    rsd20 (long (* 100 (double (/ sd20 m20))))]
+                (binding [*out* *err*]
+                  (println (- end init) "ns;" c "runs;"
+                           "ALL:" (str "m = " m ", sd = " sd ", rsd = " rsd "%;")
+                           "LAST-100:" (str "m = " m100 ", sd = " sd100 ", rsd = " rsd100 "%;")
+                           "LAST-020:" (str "m = " m20 ", sd = " sd20 ", rsd = " rsd20 "%;")
+                           ))))))))))
 
 (defn -main
   [& args]
@@ -189,22 +212,22 @@
         (= program "npb/cg")
         (do (binding [*out* *err*] (print args "-> "))
             (bench (Benchmarks/TIME)
-                   #(CG/main (into-array String [(str "np=" K)(str "CLASS=" (nth args 4))]))))
+                   #(CG/main (into-array String [(str "np=" K) (str "CLASS=" (nth args 4))]))))
 
         (= program "npb/ft")
         (do (binding [*out* *err*] (print args "-> "))
             (bench (Benchmarks/TIME)
-                   #(FT/main (into-array String [(str "np=" K)(str "CLASS=" (nth args 4))]))))
+                   #(FT/main (into-array String [(str "np=" K) (str "CLASS=" (nth args 4))]))))
 
         (= program "npb/is")
         (do (binding [*out* *err*] (print args "-> "))
             (bench (Benchmarks/TIME)
-                   #(IS/main (into-array String [(str "np=" K)(str "CLASS=" (nth args 4))]))))
+                   #(IS/main (into-array String [(str "np=" K) (str "CLASS=" (nth args 4))]))))
 
         (= program "npb/mg")
         (do (binding [*out* *err*] (print args "-> "))
             (bench (Benchmarks/TIME)
-                   #(MG/main (into-array String [(str "np=" K)(str "CLASS=" (nth args 4))]))))
+                   #(MG/main (into-array String [(str "np=" K) (str "CLASS=" (nth args 4))]))))
 
         :else
         (throw (Exception. "<program>"))))
@@ -230,7 +253,7 @@
 
   ;(-main "yes" "2" "5" "micro/one-all-one" "1")
   ;(-main "yes" "2" "5" "micro/one-one-one" "1")
-  ;(-main "yes" "2" "5" "micro/ring" "1")
+  ;(-main "yes" "2" "1" "micro/ring" "1")
 
   ;(-main "yes" "4" "5" "misc/go-fish")
   ;(-main "yes" "2" "5" "misc/chess" "/Users/sung/Desktop/stockfish-10-64" "60")
