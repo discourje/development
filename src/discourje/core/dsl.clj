@@ -14,8 +14,7 @@
           '~receiver
           (if (fn? ~fn-or-type)
             '~fn-or-type
-            (list '~(quote fn) ['~(quote x)] (list '~(quote =) (list '~(quote type) '~(quote x)) '~fn-or-type))
-            ))))
+            (list '~(quote fn) ['~(quote x)] (list '~(quote =) (list '~(quote type) '~(quote x)) '~fn-or-type))))))
 
 (defmacro -##
   ([sender receiver]
@@ -63,7 +62,15 @@
   ([f x1 x2 x3 x4 x5]
    `(eval (~f (quote!? ~x1) (quote!? ~x2) (quote!? ~x3) (quote!? ~x4) (quote!? ~x5))))
   ([f x1 x2 x3 x4 x5 x6]
-   `(eval (~f (quote!? ~x1) (quote!? ~x2) (quote!? ~x3) (quote!? ~x4) (quote!? ~x5) (quote!? ~x6)))))
+   `(eval (~f (quote!? ~x1) (quote!? ~x2) (quote!? ~x3) (quote!? ~x4) (quote!? ~x5) (quote!? ~x6))))
+  ([f x1 x2 x3 x4 x5 x6 x7]
+   `(eval (~f (quote!? ~x1) (quote!? ~x2) (quote!? ~x3) (quote!? ~x4) (quote!? ~x5) (quote!? ~x6) (quote!? ~x7))))
+  ([f x1 x2 x3 x4 x5 x6 x7 x8]
+   `(eval (~f (quote!? ~x1) (quote!? ~x2) (quote!? ~x3) (quote!? ~x4) (quote!? ~x5) (quote!? ~x6) (quote!? ~x7) (quote!? ~x8))))
+  ([f x1 x2 x3 x4 x5 x6 x7 x8 x9]
+   `(eval (~f (quote!? ~x1) (quote!? ~x2) (quote!? ~x3) (quote!? ~x4) (quote!? ~x5) (quote!? ~x6) (quote!? ~x7) (quote!? ~x8) (quote!? ~x9))))
+  ([f x1 x2 x3 x4 x5 x6 x7 x8 x9 x10]
+   `(eval (~f (quote!? ~x1) (quote!? ~x2) (quote!? ~x3) (quote!? ~x4) (quote!? ~x5) (quote!? ~x6) (quote!? ~x7) (quote!? ~x8) (quote!? ~x9) (quote!? ~x10)))))
 
 (defmacro dsl
   ([s]
@@ -97,12 +104,62 @@
                                         ''~x2 '~(quote y2)
                                         ''~x3 '~(quote y3)
                                         ''~x4 '~(quote y4)
-                                        ''~x5 '~(quote y5)} ''~s)))))
-
-; these should be equal:
-;(--> (worker 2) (worker 3))
-;(dsl (--> (worker 2) (worker 3)))
-;(prewalk-replace {'i 2 'j 3} (--> (worker i) (worker j)))
+                                        ''~x5 '~(quote y5)} ''~s))))
+  ([x1 x2 x3 x4 x5 x6 s]
+   `(eval (list '~(quote fn)
+                ['~(quote y1) '~(quote y2) '~(quote y3) '~(quote y4) '~(quote y5) '~(quote y6)]
+                (list 'prewalk-replace {''~x1 '~(quote y1)
+                                        ''~x2 '~(quote y2)
+                                        ''~x3 '~(quote y3)
+                                        ''~x4 '~(quote y4)
+                                        ''~x5 '~(quote y5)
+                                        ''~x6 '~(quote y6)} ''~s))))
+  ([x1 x2 x3 x4 x5 x6 x7 s]
+   `(eval (list '~(quote fn)
+                ['~(quote y1) '~(quote y2) '~(quote y3) '~(quote y4) '~(quote y5) '~(quote y6) '~(quote y7)]
+                (list 'prewalk-replace {''~x1 '~(quote y1)
+                                        ''~x2 '~(quote y2)
+                                        ''~x3 '~(quote y3)
+                                        ''~x4 '~(quote y4)
+                                        ''~x5 '~(quote y5)
+                                        ''~x6 '~(quote y6)
+                                        ''~x7 '~(quote y7)} ''~s))))
+  ([x1 x2 x3 x4 x5 x6 x7 x8 s]
+   `(eval (list '~(quote fn)
+                ['~(quote y1) '~(quote y2) '~(quote y3) '~(quote y4) '~(quote y5) '~(quote y6) '~(quote y7) '~(quote y8)]
+                (list 'prewalk-replace {''~x1 '~(quote y1)
+                                        ''~x2 '~(quote y2)
+                                        ''~x3 '~(quote y3)
+                                        ''~x4 '~(quote y4)
+                                        ''~x5 '~(quote y5)
+                                        ''~x6 '~(quote y6)
+                                        ''~x7 '~(quote y7)
+                                        ''~x8 '~(quote y8)} ''~s))))
+  ([x1 x2 x3 x4 x5 x6 x7 x8 x9 s]
+   `(eval (list '~(quote fn)
+                ['~(quote y1) '~(quote y2) '~(quote y3) '~(quote y4) '~(quote y5) '~(quote y6) '~(quote y7) '~(quote y8) '~(quote y9)]
+                (list 'prewalk-replace {''~x1 '~(quote y1)
+                                        ''~x2 '~(quote y2)
+                                        ''~x3 '~(quote y3)
+                                        ''~x4 '~(quote y4)
+                                        ''~x5 '~(quote y5)
+                                        ''~x6 '~(quote y6)
+                                        ''~x7 '~(quote y7)
+                                        ''~x8 '~(quote y8)
+                                        ''~x9 '~(quote y9)} ''~s))))
+  ([x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 s]
+   `(eval (list '~(quote fn)
+                ['~(quote y1) '~(quote y2) '~(quote y3) '~(quote y4) '~(quote y5) '~(quote y6) '~(quote y7) '~(quote y8) '~(quote y9) '~(quote y10)]
+                (list 'prewalk-replace {''~x1  '~(quote y1)
+                                        ''~x2  '~(quote y2)
+                                        ''~x3  '~(quote y3)
+                                        ''~x4  '~(quote y4)
+                                        ''~x5  '~(quote y5)
+                                        ''~x6  '~(quote y6)
+                                        ''~x7  '~(quote y7)
+                                        ''~x8  '~(quote y8)
+                                        ''~x9  '~(quote y9)
+                                        ''~x10 '~(quote y10)} ''~s)))))
 
 ;;
 ;; Functions
