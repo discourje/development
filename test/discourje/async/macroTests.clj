@@ -2,8 +2,17 @@
   (:require [clojure.test :refer :all]
             [discourje.core.async :refer :all]))
 
-(deftest atomic-interaction-test
-  (is (= (assoc (make-interaction 1 "a" "b") :id 1) (assoc (-->> 1 "a" "b") :id 1))))
+(deftest- test-->
+          (let [inter (-->> 1 "a" "b")]
+            (is (= (true? ((get-action inter) Long))))))
+
+(deftest- test-->withFunction
+          (let [inter (-->> (fn [x] (+ x 1)) "a" "b")]
+            (is (== 2 ((get-action inter) 1)))))
+
+(deftest- test-->>withWildcard
+          (let [inter (-->> "a" "b")]
+            (is (= (true? ((get-action inter) "random value"))))))
 
 (deftest close-test
   (is (= (assoc (make-closer "a" "b") :id 1) (assoc (close "a" "b") :id 1))))
@@ -52,34 +61,34 @@
             (continue :order-book)]
            [(-->> "quit" "Buyer2" "Seller")]))))
 
-(deftest send-receive-two-buyer-protocol-test
-  (let [infra (generate-infrastructure api-two-buyer-protocol)
-        b1s (get-channel infra "Buyer1" "Seller")
-        sb1 (get-channel infra "Seller" "Buyer1")
-        sb2 (get-channel infra "Seller" "Buyer2")
-        b1b2 (get-channel infra "Buyer1" "Buyer2")
-        b2s (get-channel infra "Buyer2" "Seller")
-        order-book (atom true)]
-    (while (true? @order-book)
-      (do
-        (>!! b1s (->message "title" "The Joy of Clojure"))
-        (let [b1-title-s (<!! b1s "title")]
-          (is (= "The Joy of Clojure"  b1-title-s))
-          (>!! [sb1 sb2] (->message "quote" (+ 1 (rand-int 20))))
-          (let [s-quote-b1 (<!! sb1 "quote")
-                s-quote-b2 (<!! sb2 "quote")]
-            (>!! b1b2 (->message "quoteDiv" (rand-int s-quote-b1)))
-            (let [b1-quoteDiv-b2 (<!! b1b2 "quoteDiv")]
-              (if (>= (* 100 (float (/ b1-quoteDiv-b2 s-quote-b2))) 50)
-                (do
-                  (>!! b2s (->message "ok" "Open University, Valkenburgerweg 177, 6419 AT, Heerlen"))
-                  (let [b2-ok-s (<!! b2s "ok")]
-                    (is (= "Open University, Valkenburgerweg 177, 6419 AT, Heerlen" b2-ok-s))
-                    (>!! sb2 (->message "date" "09-04-2019"))
-                    (let [s-date-b2 (<!! sb2 "date")]
-                      (is (= "09-04-2019" s-date-b2)))))
-                (do
-                  (>!! b2s (->message "quit" "Price to high"))
-                  (let [b2-quit-s (<!! b2s "quit")]
-                    (is (= "Price to high" b2-quit-s))
-                    (reset! order-book false)))))))))))
+;(deftest send-receive-two-buyer-protocol-test
+;  (let [infra (generate-infrastructure api-two-buyer-protocol)
+;        b1s (get-channel infra "Buyer1" "Seller")
+;        sb1 (get-channel infra "Seller" "Buyer1")
+;        sb2 (get-channel infra "Seller" "Buyer2")
+;        b1b2 (get-channel infra "Buyer1" "Buyer2")
+;        b2s (get-channel infra "Buyer2" "Seller")
+;        order-book (atom true)]
+;    (while (true? @order-book)
+;      (do
+;        (>!! b1s (->message "title" "The Joy of Clojure"))
+;        (let [b1-title-s (<!! b1s "title")]
+;          (is (= "The Joy of Clojure"  b1-title-s))
+;          (>!! [sb1 sb2] (->message "quote" (+ 1 (rand-int 20))))
+;          (let [s-quote-b1 (<!! sb1 "quote")
+;                s-quote-b2 (<!! sb2 "quote")]
+;            (>!! b1b2 (->message "quoteDiv" (rand-int s-quote-b1)))
+;            (let [b1-quoteDiv-b2 (<!! b1b2 "quoteDiv")]
+;              (if (>= (* 100 (float (/ b1-quoteDiv-b2 s-quote-b2))) 50)
+;                (do
+;                  (>!! b2s (->message "ok" "Open University, Valkenburgerweg 177, 6419 AT, Heerlen"))
+;                  (let [b2-ok-s (<!! b2s "ok")]
+;                    (is (= "Open University, Valkenburgerweg 177, 6419 AT, Heerlen" b2-ok-s))
+;                    (>!! sb2 (->message "date" "09-04-2019"))
+;                    (let [s-date-b2 (<!! sb2 "date")]
+;                      (is (= "09-04-2019" s-date-b2)))))
+;                (do
+;                  (>!! b2s (->message "quit" "Price to high"))
+;                  (let [b2-quit-s (<!! b2s "quit")]
+;                    (is (= "Price to high" b2-quit-s))
+;                    (reset! order-book false)))))))))))

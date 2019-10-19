@@ -1,10 +1,17 @@
 (ns discourje.async.operationTests
   (:require [clojure.test :refer :all]
-            [discourje.async.protocolTestData :refer :all]
+            [discourje.async.protocolTestData :refer :all ]
             [discourje.core.async :refer :all]
             [clojure.core.async :as async]
             [discourje.core.logging :refer :all])
   (:use [slingshot.slingshot :only [throw+ try+]]))
+
+
+(defn <!!-test
+  "Utility method to fix all test cases"
+  [channel]
+  (let [value (discourje.core.async/<!! channel)]
+    (get-content value)))
 
 (deftest add-sender
   (let [inter (->interaction nil 1 "a" "b" #{} nil)]
@@ -26,7 +33,7 @@
   (let [channels (generate-infrastructure (testDualProtocol true))
         c (get-channel channels "A" "B")]
     (async/>!! (get-chan c) (->message "1" "hello world"))
-    (let [m (<!! c "1")]
+    (let [m (<!!-test c)]
       (is (= "hello world"  m)))))
 
 (deftest send-receive-dual-test
@@ -38,10 +45,10 @@
     (set-logging)
     (do
       (>!! ab m1)
-      (let [a->b (<!! ab "1")]
+      (let [a->b (<!!-test ab)]
         (is (= "Hello B" a->b)))
       (>!! ba m2)
-      (let [b->a (<!! ba "2")]
+      (let [b->a (<!!-test ba)]
         (is (= "Hello A" b->a))))))
 
 (deftest send-receive-typed-dual-test
@@ -50,10 +57,10 @@
         ba (get-channel channels "B" "A")]
     (do
       (>!! ab "Hello B")
-      (let [a->b (<!! ab java.lang.String)]
+      (let [a->b (<!!-test ab)]
         (is (= "Hello B" a->b)))
       (>!! ba "Hello A")
-      (let [b->a (<!! ba java.lang.String)]
+      (let [b->a (<!!-test ba)]
         (is (= "Hello A" b->a))))))
 
 (deftest send-receive-wildcard-dual-test
@@ -61,12 +68,11 @@
         ab (get-channel channels "A" "B")
         ba (get-channel channels "B" "A")]
     (do
-      (enable-wildcard)
       (>!! ab "Hello B")
-      (let [a->b (<!! ab)]
+      (let [a->b (<!!-test ab)]
         (is (= "Hello B" a->b)))
       (>!! ba "Hello A")
-      (let [b->a (<!! ba)]
+      (let [b->a (<!!-test ba)]
         (is (= "Hello A" b->a))))))
 
 (deftest send-receive-multicast-protocol-test
@@ -78,17 +84,17 @@
         cb (get-channel channels "C" "B")]
     (do
       (>!! ab (->message "1" "A->B"))
-      (let [a->b (<!! ab "1")]
+      (let [a->b (<!!-test ab)]
         (is (= "A->B" a->b))
         (>!! ba (->message "2" "B->A"))
-        (let [b->a (<!! ba "2")]
+        (let [b->a (<!!-test ba)]
           (is (= "B->A" b->a))
           (>!! ac (->message "3" "A->C"))
-          (let [a->c (<!! ac "3")]
+          (let [a->c (<!!-test ac)]
             (is (= "A->C" a->c))
             (>!! [ca cb] (->message "4" "C->A-B"))
-            (let [c->a (<!! ca "4")
-                  c->b (<!! cb "4")]
+            (let [c->a (<!!-test ca)
+                  c->b (<!!-test cb)]
               (is (= "C->A-B" c->a))
               (is (= "C->A-B" c->b))
               (is (nil? (get-active-interaction (get-monitor ab)))))))))))
@@ -101,19 +107,18 @@
         ca (get-channel channels "C" "A")
         cb (get-channel channels "C" "B")]
     (do
-      (enable-wildcard)
       (>!! ab (->message "1" "A->B"))
-      (let [a->b (<!! ab)]
+      (let [a->b (<!!-test ab)]
         (is (= "A->B" a->b))
         (>!! ba (->message "2" "B->A"))
-        (let [b->a (<!! ba)]
+        (let [b->a (<!!-test ba)]
           (is (= "B->A" b->a))
           (>!! ac (->message "3" "A->C"))
-          (let [a->c (<!! ac)]
+          (let [a->c (<!!-test ac)]
             (is (= "A->C" a->c))
             (>!! [ca cb] (->message "4" "C->A-B"))
-            (let [c->a (<!! ca)
-                  c->b (<!! cb)]
+            (let [c->a (<!!-test ca)
+                  c->b (<!!-test cb)]
               (is (= "C->A-B" c->a))
               (is (= "C->A-B" c->b)))))))))
 
@@ -124,8 +129,8 @@
         m1 (->message "1" "Hello B and C")]
     (do
       (>!! [ab ac] m1)
-      (let [a->b (<!! ab "1")
-            a->c (<!! ac "1")]
+      (let [a->b (<!!-test ab)
+            a->c (<!!-test ac)]
         (is (= "Hello B and C" a->b))
         (is (= a->c a->b))
         (is (nil? (get-active-interaction (get-monitor ab))))))))
@@ -136,7 +141,7 @@
         ma (->message "1" "Hello B")]
     (do
       (>!! ab ma)
-      (let [a->b (<!! ab "1")]
+      (let [a->b (<!!-test ab)]
         (is (= "Hello B" a->b))))))
 
 (deftest send-receive-single-always1-choice-protocol
@@ -145,7 +150,7 @@
         mc (->message "hi" "Hi C")]
     (do
       (>!! ac mc)
-      (let [a->c (<!! ac "hi")]
+      (let [a->c (<!!-test ac)]
         (is (= "Hi C" a->c))))))
 
 (deftest send-receive-single-Random-choice-protocol
@@ -157,11 +162,11 @@
     (if (== 0 (rand-int 2))
       (do
         (>!! ab ma)
-        (let [a->b (<!! ab "1")]
+        (let [a->b (<!!-test ab)]
           (is (= "Hello B" a->b))))
       (do
         (>!! ac mc)
-        (let [a->c (<!! ac "hi")]
+        (let [a->c (<!!-test ac)]
           (is (= "Hi C" a->c)))))))
 
 (deftest send-receive-multiple-nested-choice-branch-protocol
@@ -171,19 +176,19 @@
     (cond
       (== n 1)
       (do (>!! ab (->message "1" "AB"))
-          (let [a->b (<!! ab "1")]
+          (let [a->b (<!!-test ab)]
             (is (= "AB" a->b))))
       (== n 2)
       (do (>!! ab (->message "2" "AB"))
-          (let [a->b (<!! ab "2")]
+          (let [a->b (<!!-test ab)]
             (is (= "AB" a->b))))
       (== n 3)
       (do (>!! ab (->message "3" "AB"))
-          (let [a->b (<!! ab "3")]
+          (let [a->b (<!!-test ab )]
             (is (= "AB" a->b))))
       (== n 4)
       (do (>!! ab (->message "4" "AB"))
-          (let [a->b (<!! ab "4")]
+          (let [a->b (<!!-test ab)]
             (is (= "AB" a->b)))))))
 
 
@@ -200,16 +205,16 @@
     (set-logging-and-exceptions)
     (do
       (>!! sf msf)
-      (let [s->f (<!! sf "99")]
+      (let [s->f (<!!-test sf)]
         (is (= "Starting!" s->f))
         (>!! ab mab)
-        (let [a->b (<!! ab "1")]
+        (let [a->b (<!!-test ab)]
           (is (= "1B" a->b))
           (>!! ba mba)
-          (let [b->a (<!! ba "bla")]
+          (let [b->a (<!!-test ba)]
             (is (= "blaA" b->a))
             (>!! fs mfs)
-            (let [f->s (<!! fs "88")]
+            (let [f->s (<!!-test fs)]
               (is (= "ending!" f->s))))
           )))))
 
@@ -227,33 +232,33 @@
         mad (->message "4" "4d")
         m5 (->message "5" "bye all")]
     (do (>!! ab mab1)
-        (let [a->b (<!! ab "1")]
+        (let [a->b (<!!-test ab)]
           (is (= "1ab" a->b))
           (>!! ba mab1)
-          (let [b->a (<!! ba "1")]
+          (let [b->a (<!!-test ba)]
             (is (= "1ab" b->a))
             (>!! ac mab-c2)
-            (let [a->c (<!! ac "2")]
+            (let [a->c (<!!-test ac)]
               (is (= "B or C" a->c))
               (>!! ca mab-c2)
-              (let [c->a (<!! ca "2")]
+              (let [c->a (<!!-test ca)]
                 (is (= "B or C" c->a))
                 (>!! ac mab-c3)
-                (let [a->c3 (<!! ac "3")]
+                (let [a->c3 (<!!-test ac)]
                   (is (= "B or C" a->c3))
                   (>!! ca mab-c3)
-                  (let [c->a3 (<!! ca "3")]
+                  (let [c->a3 (<!!-test ca)]
                     (is (= "B or C" c->a3))
                     (>!! ad mad)
-                    (let [a->d (<!! ad "4")]
+                    (let [a->d (<!!-test ad)]
                       (is (= "4d" a->d))
                       (>!! da mad)
-                      (let [d->a (<!! da "4")]
+                      (let [d->a (<!!-test da)]
                         (is (= "4d" d->a))
                         (>!! [ab ac ad] m5)
-                        (let [a->b5 (<!! ab "5")
-                              a->c5 (<!! ac "5")
-                              a->d5 (<!! ad "5")]
+                        (let [a->b5 (<!!-test ab)
+                              a->c5 (<!!-test ac)
+                              a->d5 (<!!-test ad)]
                           (is (= "bye all" a->b5))
                           (is (= "bye all" a->c5))
                           (is (= "bye all" a->d5))
@@ -268,28 +273,28 @@
         flag (atom false)]
     (set-logging-and-exceptions)
     (do (>!! ab (->message "1" "AB"))
-        (let [a->b (<!! ab "1")]
+        (let [a->b (<!!-test ab)]
           (is (= "AB" a->b))
           (while (false? @flag)
             (>!! ba (->message "1" "AB"))
-            (let [b->a (<!! ba "1")]
+            (let [b->a (<!!-test ba)]
               (is (= "AB" b->a))
               (if (== 1 (+ 1 (rand-int 2)))
                 (do
                   (>!! ac (->message "2" "AC"))
-                  (let [a->c (<!! ac "2")]
+                  (let [a->c (<!!-test ac)]
                     (is (= "AC" a->c))
                     (>!! ca (->message "2" "AC"))
-                    (let [c->a (<!! ca "2")]
+                    (let [c->a (<!!-test ca)]
                       (is (= "AC" c->a)))))
                 (do
                   (>!! ab (->message "3" "AB3"))
-                  (let [a->b3 (<!! ab "3")]
+                  (let [a->b3 (<!!-test ab)]
                     (is (= "AB3" a->b3))
                     (reset! flag true))))))
           (>!! [ab ac] (->message "end" "ending"))
-          (let [a->b-end (<!! ab "end")
-                a->c-end (<!! ac "end")]
+          (let [a->b-end (<!!-test ab)
+                a->c-end (<!!-test ac)]
             (is (= "ending" a->b-end))
             (is (= "ending" a->c-end)))))))
 
@@ -301,30 +306,29 @@
         ca (get-channel channels "C" "A")
         flag (atom false)]
     (do
-      (enable-wildcard)
       (>!! ab (->message "1" "AB"))
-      (let [a->b (<!! ab)]
+      (let [a->b (<!!-test ab)]
         (is (= "AB" a->b))
         (while (false? @flag)
           (>!! ba (->message "1" "AB"))
-          (let [b->a (<!! ba)]
+          (let [b->a (<!!-test ba)]
             (is (= "AB" b->a))
             (if (== 1 (+ 1 (rand-int 2)))
               (do
                 (>!! ac (->message "2" "AC"))
-                (let [a->c (<!! ac)]
+                (let [a->c (<!!-test ac)]
                   (is (= "AC" a->c))
                   (>!! ca (->message "2" "AC"))
-                  (let [c->a (<!! ca)]
+                  (let [c->a (<!!-test ca)]
                     (is (= "AC" c->a)))))
               (do
                 (>!! ab (->message "3" "AB3"))
-                (let [a->b3 (<!! ab)]
+                (let [a->b3 (<!!-test ab)]
                   (is (= "AB3" a->b3))
                   (reset! flag true))))))
         (>!! [ab ac] (->message "end" "ending"))
-        (let [a->b-end (<!! ab)
-              a->c-end (<!! ac)]
+        (let [a->b-end (<!!-test ab)
+              a->c-end (<!!-test ac)]
           (is (= "ending" a->b-end))
           (is (= "ending" a->c-end)))))))
 
@@ -337,11 +341,11 @@
       (if (== 1 (+ 1 (rand-int 2)))
         (do
           (>!! ac (->message "2" "AC"))
-          (let [a->c (<!! ac "2")]
+          (let [a->c (<!!-test ac)]
             (is (= "AC" a->c))))
         (do
           (>!! ab (->message "3" "AB3"))
-          (let [a->b3 (<!! ab "3")]
+          (let [a->b3 (<!!-test ab)]
             (is (= "AB3" a->b3))
             (reset! flag true)))))))
 
@@ -351,12 +355,12 @@
         ba (get-channel channels "B" "A")
         fnA (fn [fnA]
               (>!! ab (->message "1" {:threshold 5 :generatedNumber 2}))
-              (let [response (<!! ba ["2" "3"])]
+              (let [response (<!!-test ba)]
                 (cond
                   (= (:label response) "2") (do (fnA fnA))
                   (= (:label response) "3") response)))
         fnB (fn [fnB]
-              (let [numberMap (<!! ab "1")
+              (let [numberMap (<!!-test ab)
                     threshold (:threshold numberMap)
                     generated (:generatedNumber numberMap)]
                 (println numberMap)
@@ -382,16 +386,16 @@
         (if (== 1 (+ 1 (rand-int 2)))
           (do
             (>!! ac (->message "2" "AC"))
-            (let [a->c (<!! ac "2")]
+            (let [a->c (<!!-test ac)]
               (is (= "AC" a->c))))
           (do
             (>!! ab (->message "3" "AB3"))
-            (let [a->b3 (<!! ab "3")]
+            (let [a->b3 (<!!-test ab)]
               (is (= "AB3" a->b3))
               (reset! flag true)))))
       (do
         (>!! ac (->message "2" "AC"))
-        (let [a->c (<!! ac "2")]
+        (let [a->c (<!!-test ac)]
           (is (= "AC" a->c)))))))
 
 (deftest send-receive-dual-custom-channels-test
@@ -404,10 +408,10 @@
     (is (== 2 (get-buffer ba)))
     (do
       (>!! ab m1)
-      (let [a->b (<!! ab "1")]
+      (let [a->b (<!!-test ab)]
         (is (= "Hello B" a->b)))
       (>!! ba m2)
-      (let [b->a (<!! ba "2")]
+      (let [b->a (<!!-test ba)]
         (is (= "Hello A" b->a))))))
 
 (deftest send-receive-two-buyer-protocol-test
@@ -421,24 +425,24 @@
     (while (true? @order-book)
       (do
         (>!! b1s (->message "title" "The Joy of Clojure"))
-        (let [b1-title-s (<!! b1s "title")]
+        (let [b1-title-s (<!!-test b1s)]
           (is (= "The Joy of Clojure"  b1-title-s))
           (>!! [sb1 sb2] (->message "quote" (+ 1 (rand-int 20))))
-          (let [s-quote-b1 (<!! sb1 "quote")
-                s-quote-b2 (<!! sb2 "quote")]
+          (let [s-quote-b1 (<!!-test sb1)
+                s-quote-b2 (<!!-test sb2)]
             (>!! b1b2 (->message "quoteDiv" (rand-int  s-quote-b1)))
-            (let [b1-quoteDiv-b2 (<!! b1b2 "quoteDiv")]
+            (let [b1-quoteDiv-b2 (<!!-test b1b2)]
               (if (>= (* 100 (float (/  b1-quoteDiv-b2  s-quote-b2))) 50)
                 (do
                   (>!! b2s (->message "ok" "Open University, Valkenburgerweg 177, 6419 AT, Heerlen"))
-                  (let [b2-ok-s (<!! b2s "ok")]
+                  (let [b2-ok-s (<!!-test b2s)]
                     (is (= "Open University, Valkenburgerweg 177, 6419 AT, Heerlen"  b2-ok-s))
                     (>!! sb2 (->message "date" "09-04-2019"))
-                    (let [s-date-b2 (<!! sb2 "date")]
+                    (let [s-date-b2 (<!!-test sb2)]
                       (is (= "09-04-2019"  s-date-b2)))))
                 (do
                   (>!! b2s (->message "quit" "Price to high"))
-                  (let [b2-quit-s (<!! b2s "quit")]
+                  (let [b2-quit-s (<!!-test b2s)]
                     (is (= "Price to high"  b2-quit-s))
                     (reset! order-book false)))))))))))
 
@@ -449,10 +453,10 @@
         ac (get-channel channels "A" "C")
         ba (get-channel channels "B" "A")
         fnA (fn [] (do (>!! [ab ac] (msg "1" "Hi"))
-                       (<!! ba "2")))
-        fnB (fn [] (do (<!!! ab "1")
+                       (<!!-test ba)))
+        fnB (fn [] (do (<!!! ab)
                        (>!! ba (msg "2" "hi too"))))
-        fnC (fn [] (<!!! ac "1"))
+        fnC (fn [] (<!!! ac))
         a (clojure.core.async/thread (fnA))
         c (clojure.core.async/thread (fnC))]
     (clojure.core.async/thread (fnB))
@@ -467,14 +471,14 @@
         ba (get-channel channels "B" "A")
         fnA (fn [] (do
                      (>!! ab (msg "1" 1))
-                     (<!! ba "2")
+                     (<!!-test ba)
                      (>!! [ab ac] (msg "3" 3))
-                     (<!!! ba "4")))
-        fnB (fn [] (do (<!! ab "1")
+                     (<!!! ba)))
+        fnB (fn [] (do (<!!-test ab)
                        (>!! ba (msg "2" 2))
-                       (<!! ab "3")
+                       (<!!-test ab)
                        (>!! ba (msg "4" 4))))
-        fnC (fn [] (<!! ac "3"))
+        fnC (fn [] (<!!-test ac))
         a (clojure.core.async/thread (fnA))
         c (clojure.core.async/thread (fnC))]
     (clojure.core.async/thread (fnB))
@@ -487,38 +491,38 @@
         ab (get-channel channels "a" "b")
         ba (get-channel channels "b" "a")]
     (>!! ab (msg 1 1))
-    (let [a->b (<!! ab 1)]
+    (let [a->b (<!!-test ab)]
       (is (=  a->b 1))
       (do (>!! ba (msg 2 2))
-          (let [b->a2 (<!! ba 2)]
+          (let [b->a2 (<!!-test ba)]
             (is (=  b->a2 2))
             (>!! ab (msg 3 3))
-            (is (=  (<!! ab 3) 3))))
+            (is (= (<!!-test ab) 3))))
       (do (>!! ba (msg 4 4))
-          (let [b->a4 (<!! ba 4)]
+          (let [b->a4 (<!!-test ba)]
             (is (=  b->a4 4))
             (>!! ab (msg 5 5))
-            (is (=  (<!! ab 5) 5)))))))
+            (is (= (<!!-test ab) 5)))))))
 
 (deftest send-and-receive-parallel-after-interaction-with-after-test
   (let [channels (add-infrastructure (parallel-after-interaction-with-after true))
         ab (get-channel channels "a" "b")
         ba (get-channel channels "b" "a")]
     (>!! ab (msg 1 1))
-    (let [a->b (<!! ab 1)]
+    (let [a->b (<!!-test ab)]
       (is (=  a->b 1))
       (do (>!! ba (msg 2 2))
-          (let [b->a2 (<!! ba 2)]
+          (let [b->a2 (<!!-test ba)]
             (is (=  b->a2 2))
             (>!! ab (msg 3 3))
-            (is (=  (<!! ab 3) 3))))
+            (is (= (<!!-test ab) 3))))
       (do (>!! ba (msg 4 4))
-          (let [b->a4 (<!! ba 4)]
+          (let [b->a4 (<!!-test ba)]
             (is (=  b->a4 4))
             (>!! ab (msg 5 5))
-            (is (=  (<!! ab 5) 5))))
+            (is (= (<!!-test ab) 5))))
       (do (>!! ba (msg 6 6))
-          (let [b->a6 (<!! ba 6)]
+          (let [b->a6 (<!!-test ba)]
             (is (=  b->a6 6)))))))
 
 (deftest send-and-receive-parallel-after-interaction-with-after-test-THREADED
@@ -526,22 +530,22 @@
         ab (get-channel channels "a" "b")
         ba (get-channel channels "b" "a")
         fn-first-parallel (fn [] (do (>!! ba (msg 2 2))
-                                     (<!! ba 2)
+                                     (<!!-test ba)
                                      (>!! ab (msg 3 3))
-                                      (<!! ab 3)))
+                                     (<!!-test ab)))
         fn-second-parallel (fn [] (do (>!! ba (msg 4 4))
-                                      (<!! ba 4)
+                                      (<!!-test ba)
                                       (>!! ab (msg 5 5))
-                                       (<!! ab 5)))]
+                                      (<!!-test ab)))]
     (>!! ab (msg 1 1))
-    (let [a->b (<!! ab 1)]
+    (let [a->b (<!!-test ab)]
       (is (=  a->b 1))
       (let [fn1 (clojure.core.async/thread (fn-first-parallel))
             fn2 (clojure.core.async/thread (fn-second-parallel))]
         (is (= (async/<!! fn1) 3))
         (is (= (async/<!! fn2) 5))
         (do (>!! ba (msg 6 6))
-            (let [b->a6 (<!! ba 6)]
+            (let [b->a6 (<!!-test ba)]
               (is (=  b->a6 6))
               (is (nil? (get-active-interaction (get-monitor ab))))))))))
 
@@ -551,20 +555,20 @@
         ab (get-channel channels "a" "b")
         ba (get-channel channels "b" "a")]
     (>!! ab (msg 0 0))
-    (let [a->b (<!! ab 0)]
+    (let [a->b (<!!-test ab)]
       (is (=  a->b 0))
       (do (>!! ba (msg 2 2))
-          (let [b->a2 (<!! ba 2)]
+          (let [b->a2 (<!!-test ba)]
             (is (=  b->a2 2))
             (>!! ab (msg 3 3))
-            (is (=  (<!! ab 3) 3))))
+            (is (= (<!!-test ab) 3))))
       (do (>!! ba (msg 4 4))
-          (let [b->a4 (<!! ba 4)]
+          (let [b->a4 (<!!-test ba)]
             (is (=  b->a4 4))
             (>!! ab (msg 5 5))
-            (is (=  (<!! ab 5) 5))))
+            (is (= (<!!-test ab) 5))))
       (do (>!! ba (msg 6 6))
-          (let [b->a6 (<!! ba 6)]
+          (let [b->a6 (<!!-test ba)]
             (is (=  b->a6 6)))))))
 
 (deftest send-and-receive-parallel-after-choice-with-after-choice-test
@@ -572,20 +576,20 @@
         ab (get-channel channels "a" "b")
         ba (get-channel channels "b" "a")]
     (>!! ab (msg 0 0))
-    (let [a->b (<!! ab 0)]
+    (let [a->b (<!!-test ab)]
       (is (=  a->b 0))
       (do (>!! ba (msg 2 2))
-          (let [b->a2 (<!! ba 2)]
+          (let [b->a2 (<!!-test ba)]
             (is (=  b->a2 2))
             (>!! ab (msg 3 3))
-            (is (=  (<!! ab 3) 3))))
+            (is (= (<!!-test ab) 3))))
       (do (>!! ba (msg 4 4))
-          (let [b->a4 (<!! ba 4)]
+          (let [b->a4 (<!!-test ba)]
             (is (=  b->a4 4))
             (>!! ab (msg 5 5))
-            (is (=  (<!! ab 5) 5))))
+            (is (= (<!!-test ab) 5))))
       (do (>!! ba (msg 6 6))
-          (let [b->a6 (<!! ba 6)]
+          (let [b->a6 (<!!-test ba)]
             (is (=  b->a6 6)))))))
 
 (deftest send-and-receive-parallel-after-rec-with-after-test
@@ -593,20 +597,20 @@
         ab (get-channel channels "a" "b")
         ba (get-channel channels "b" "a")]
     (>!! ab (msg 0 0))
-    (let [a->b (<!! ab 0)]
+    (let [a->b (<!!-test ab)]
       (is (=  a->b 0))
       (do (>!! ba (msg 2 2))
-          (let [b->a2 (<!! ba 2)]
+          (let [b->a2 (<!!-test ba)]
             (is (=  b->a2 2))
             (>!! ab (msg 3 3))
-            (is (=  (<!! ab 3) 3))))
+            (is (= (<!!-test ab) 3))))
       (do (>!! ba (msg 4 4))
-          (let [b->a4 (<!! ba 4)]
+          (let [b->a4 (<!!-test ba)]
             (is (=  b->a4 4))
             (>!! ab (msg 5 5))
-            (is (=  (<!! ab 5) 5))))
+            (is (= (<!!-test ab) 5))))
       (do (>!! ba (msg 6 6))
-          (let [b->a6 (<!! ba 6)]
+          (let [b->a6 (<!!-test ba)]
             (is (=  b->a6 6)))))))
 
 (deftest send-and-receive-parallel-after-rec-with-after-rec-test
@@ -614,20 +618,20 @@
         ab (get-channel channels "a" "b")
         ba (get-channel channels "b" "a")]
     (>!! ab (msg 0 0))
-    (let [a->b (<!! ab 0)]
+    (let [a->b (<!!-test ab)]
       (is (=  a->b 0))
       (do (>!! ba (msg 2 2))
-          (let [b->a2 (<!! ba 2)]
+          (let [b->a2 (<!!-test ba)]
             (is (=  b->a2 2))
             (>!! ab (msg 3 3))
-            (is (=  (<!! ab 3) 3))))
+            (is (= (<!!-test ab) 3))))
       (do (>!! ba (msg 4 4))
-          (let [b->a4 (<!! ba 4)]
+          (let [b->a4 (<!!-test ba)]
             (is (=  b->a4 4))
             (>!! ab (msg 5 5))
-            (is (=  (<!! ab 5) 5))))
+            (is (= (<!!-test ab) 5))))
       (do (>!! ba (msg 7 7))
-          (let [b->a6 (<!! ba 7)]
+          (let [b->a6 (<!!-test ba)]
             (is (=  b->a6 7)))))))
 
 (deftest send-and-receive-parallel-after-rec-with-after-rec-with-recur-test
@@ -635,23 +639,23 @@
         ab (get-channel channels "a" "b")
         ba (get-channel channels "b" "a")]
     (>!! ab (msg 0 0))
-    (let [a->b (<!! ab 0)]
+    (let [a->b (<!!-test ab)]
       (is (=  a->b 0))
       (do (>!! ba (msg 2 2))
-          (let [b->a2 (<!! ba 2)]
+          (let [b->a2 (<!!-test ba)]
             (is (=  b->a2 2))
             (>!! ab (msg 3 3))
-            (is (=  (<!! ab 3) 3))))
+            (is (= (<!!-test ab) 3))))
       (do (>!! ba (msg 4 4))
-          (let [b->a4 (<!! ba 4)]
+          (let [b->a4 (<!!-test ba)]
             (is (=  b->a4 4))
             (>!! ab (msg 5 5))
-            (is (=  (<!! ab 5) 5))))
+            (is (= (<!!-test ab) 5))))
       (do (>!! ba (msg 6 6))
-          (let [b->a6 (<!! ba 6)]
+          (let [b->a6 (<!!-test ba)]
             (is (=  b->a6 6))))
       (do (>!! ba (msg 7 7))
-          (let [b->a7 (<!! ba 7)]
+          (let [b->a7 (<!!-test ba)]
             (is (=  b->a7 7)))))))
 
 (deftest send-and-receive-nested-parallel-test
@@ -659,28 +663,28 @@
         ab (get-channel channels "a" "b")
         ba (get-channel channels "b" "a")]
     (>!! ab (msg 1 1))
-    (let [a->b (<!! ab 1)]
+    (let [a->b (<!!-test ab)]
       (is (=  a->b 1))
       (do (>!! ba (msg 2 2))
-          (let [b->a2 (<!! ba 2)]
+          (let [b->a2 (<!!-test ba)]
             (is (=  b->a2 2))
             (>!! ab (msg 3 3))
-            (is (=  (<!! ab 3) 3)))
+            (is (= (<!!-test ab) 3)))
           (>!! ba (msg 4 4))
-          (let [b->a4 (<!! ba 4)]
+          (let [b->a4 (<!!-test ba)]
             (is (=  b->a4 4))
             (>!! ab (msg 5 5))
-            (is (= (<!! ab 5) 5))))
+            (is (= (<!!-test ab) 5))))
       (do (>!! ba (msg "a" "a"))
-          (let [b->aA (<!! ba "a")]
+          (let [b->aA (<!!-test ba)]
             (is (= b->aA "a"))
             (>!! ab (msg "b" "b"))
-            (is (= (<!! ab "b") "b")))
+            (is (= (<!!-test ab) "b")))
           (>!! ba (msg "b" "b"))
-          (let [b->aB (<!! ba "b")]
+          (let [b->aB (<!!-test ba)]
             (is (= b->aB "b"))
             (>!! ab (msg "a" "a"))
-            (is (= (<!! ab "a") "a")))))))
+            (is (= (<!!-test ab) "a")))))))
 
 (deftest send-and-receive-nested-parallel-Threaded-test
   (let [channels (add-infrastructure (nested-parallel true))
@@ -688,27 +692,27 @@
         ba (get-channel channels "b" "a")
         fn-par-00 (fn []
                     (>!! ba (msg "a" "a"))
-                    (<!! ba "a")
+                    (<!!-test ba)
                     (>!! ab (msg "b" "b"))
-                    (<!! ab "b"))
+                    (<!!-test ab))
         fn-par-01 (fn []
                     (>!! ba (msg "b" "b"))
-                    (<!! ba "b")
+                    (<!!-test ba)
                     (>!! ab (msg "a" "a"))
-                    (<!! ab "a"))
+                    (<!!-test ab))
         fn-par-10 (fn []
                     (>!! ba (msg 2 2))
-                    (<!! ba 2)
+                    (<!!-test ba)
                     (>!! ab (msg 3 3))
-                    (<!! ab 3))
+                    (<!!-test ab))
         fn-par-11 (fn []
                     (>!! ba (msg 4 4))
-                    (<!! ba 4)
+                    (<!!-test ba)
                     (>!! ab (msg 5 5))
-                    (<!! ab 5))
+                    (<!!-test ab))
         ]
     (>!! ab (msg 1 1))
-    (let [a->b (<!! ab 1)
+    (let [a->b (<!!-test ab)
           f00 (async/thread (fn-par-00))
           f01 (async/thread (fn-par-01))
           f10 (async/thread (fn-par-10))
@@ -726,34 +730,34 @@
         ba (get-channel channels "b" "a")]
     (do
       (>!! ba (msg 0 0))
-      (is (=  (<!! ba 0) 0))
+      (is (= (<!!-test ba) 0))
       (>!! ab (msg 1 1))
-      (is (=  (<!! ab 1) 1)))
+      (is (= (<!!-test ab) 1)))
     (do
       (>!! ba (msg "hi" "hi"))
-      (is (=  (<!! ba "hi") "hi"))
+      (is (= (<!!-test ba) "hi"))
       (>!! ab (msg "hi" "hi"))
-      (is (=  (<!! ab "hi") "hi")))
+      (is (= (<!!-test ab) "hi")))
     (do (>!! ba (msg 2 2))
-        (let [b->a2 (<!! ba 2)]
+        (let [b->a2 (<!!-test ba)]
           (is (=  b->a2 2))
           (>!! ab (msg 3 3))
-          (is (=  (<!! ab 3) 3)))
+          (is (= (<!!-test ab) 3)))
         (>!! ba (msg 4 4))
-        (let [b->a4 (<!! ba 4)]
+        (let [b->a4 (<!!-test ba)]
           (is (=  b->a4 4))
           (>!! ab (msg 5 5))
-          (is (=  (<!! ab 5) 5))))
+          (is (= (<!!-test ab) 5))))
     (do (>!! ba (msg "a" "a"))
-        (let [b->aA (<!! ba "a")]
+        (let [b->aA (<!!-test ba)]
           (is (=  b->aA "a"))
           (>!! ab (msg "b" "b"))
-          (is (=  (<!! ab "b") "b")))
+          (is (= (<!!-test ab) "b")))
         (>!! ba (msg "b" "b"))
-        (let [b->aB (<!! ba "b")]
+        (let [b->aB (<!!-test ba)]
           (is (=  b->aB "b"))
           (>!! ab (msg "a" "a"))
-          (is (=  (<!! ab "a") "a"))))))
+          (is (= (<!!-test ab) "a"))))))
 
 (deftest send-and-receive-after-parallel-nested-parallel-Threaded-test
   (let [channels (add-infrastructure (after-parallel-nested-parallel true))
@@ -761,34 +765,34 @@
         ba (get-channel channels "b" "a")
         fn-par0 (fn []
                   (>!! ba (msg 0 0))
-                  (<!! ba 0)
+                  (<!!-test ba)
                   (>!! ab (msg 1 1))
-                  (<!! ab 1))
+                  (<!!-test ab))
         fn-par1 (fn []
                   (>!! ba (msg "hi" "hi"))
-                  (<!! ba "hi")
+                  (<!!-test ba)
                   (>!! ab (msg "hi" "hi"))
-                  (<!! ab "hi"))
+                  (<!!-test ab))
         fn-par-00 (fn []
                     (>!! ba (msg "a" "a"))
-                    (<!! ba "a")
+                    (<!!-test ba)
                     (>!! ab (msg "b" "b"))
-                    (<!! ab "b"))
+                    (<!!-test ab))
         fn-par-01 (fn []
                     (>!! ba (msg "b" "n"))
-                    (<!! ba "b")
+                    (<!!-test ba)
                     (>!! ab (msg "a" "a"))
-                    (<!! ab "a"))
+                    (<!!-test ab ))
         fn-par-10 (fn []
                     (>!! ba (msg 2 2))
-                    (<!! ba 2)
+                    (<!!-test ba)
                     (>!! ab (msg 3 3))
-                    (<!! ab 3))
+                    (<!!-test ab))
         fn-par-11 (fn []
                     (>!! ba (msg 4 4))
-                    (<!! ba 4)
+                    (<!!-test ba)
                     (>!! ab (msg 5 5))
-                    (<!! ab 5))
+                    (<!!-test ab))
         ]
     (let [f0 (async/thread (fn-par0))
           f1 (async/thread (fn-par1))]
@@ -810,15 +814,15 @@
         ba (get-channel channels "b" "a")]
     (set-logging-exceptions)
     (>!! ab (msg 0 0))
-    (let [a->b (<!! ab 0)]
+    (let [a->b (<!!-test ab)]
       (is (=  a->b 0))
       (do (>!! ba (msg 4 4))
-          (let [b->a4 (<!! ba 4)]
+          (let [b->a4 (<!!-test ba)]
             (is (=  b->a4 4))
             (>!! ab (msg 5 5))
-            (is (= (<!! ab 5) 5))))
+            (is (= (<!!-test ab) 5))))
       (do (>!! ba (msg 6 6))
-          (let [b->a6 (<!! ba 6)]
+          (let [b->a6 (<!!-test ba)]
             (is (=  b->a6 6))
             (is (nil? (get-active-interaction (get-monitor ab)))))))))
 
@@ -828,20 +832,20 @@
         ba (get-channel channels "b" "a")]
     (set-logging-exceptions)
     (>!! ab (msg 0 0))
-    (let [a->b (<!! ab 0)]
+    (let [a->b (<!!-test ab)]
       (is (=  a->b 0))
       (do (>!! ba (msg 4 4))
-          (let [b->a4 (<!! ba 4)]
+          (let [b->a4 (<!!-test ba)]
             (is (= b->a4 4))
             (>!! ab (msg 5 5))
-            (is (= (<!! ab 5) 5))))
+            (is (= (<!!-test ab) 5))))
       (do (>!! ba (msg "hi" "hi"))
-          (let [b->ahi (<!! ba "hi")]
+          (let [b->ahi (<!!-test ba)]
             (is (= b->ahi "hi"))
             (>!! ab (msg "hi" "hi"))
-            (is (= (<!! ab "hi") "hi"))))
+            (is (= (<!!-test ab) "hi"))))
       (do (>!! ba (msg 6 6))
-          (let [b->a6 (<!! ba 6)]
+          (let [b->a6 (<!!-test ba)]
             (is (=  b->a6 6))
             (is (nil? (get-active-interaction (get-monitor ab)))))))))
 
@@ -853,29 +857,29 @@
         bc (get-channel channels "b" "c")]
     (set-logging-exceptions)
     (>!! [ab ac] (msg 0 0))
-    (let [a->b (<!! ab 0)
-          a->c (<!! ac 0)]
+    (let [a->b (<!!-test ab)
+          a->c (<!!-test ac)]
       (is (= a->b 0))
       (is (= a->c 0))
       (do (>!! [ba bc] (msg 4 4))
-          (let [b->a4 (<!! ba 4)
-                b->c4 (<!! bc 4)]
+          (let [b->a4 (<!!-test ba)
+                b->c4 (<!!-test bc)]
             (is (= b->a4 4))
             (is (= b->c4 4))
             (>!! [ab ac] (msg 5 5))
-            (is (= (<!! ab 5) 5))
-            (is (= (<!! ac 5) 5))))
+            (is (= (<!!-test ab) 5))
+            (is (= (<!!-test ac) 5))))
       (do (>!! [ba bc] (msg "hi" "hi"))
-          (let [b->ahi (<!! ba "hi")
-                b->chi (<!! bc "hi")]
+          (let [b->ahi (<!!-test ba )
+                b->chi (<!!-test bc )]
             (is (= b->ahi "hi"))
             (is (= b->chi "hi"))
             (>!! [ab ac] (msg "hi" "hi"))
-            (is (= (<!! ab "hi") "hi"))
-            (is (= (<!! ac "hi") "hi"))))
+            (is (= (<!!-test ab ) "hi"))
+            (is (= (<!!-test ac ) "hi"))))
       (do (>!! [ba bc] (msg 6 6))
-          (let [b->a6 (<!! ba 6)
-                b->c6 (<!! bc 6)]
+          (let [b->a6 (<!!-test ba)
+                b->c6 (<!!-test bc)]
             (is (= b->a6 6))
             (is (= b->c6 6))
             (is (nil? (get-active-interaction (get-monitor ab)))))))))
@@ -889,17 +893,17 @@
     (loop [reps 0]
       (if (> reps 2)
         (do (>!! ab (msg 1 1))
-            (is (= (<!! ab 1) 1)))
+            (is (= (<!!-test ab) 1)))
         (do (>!! ab (msg 0 0))
-            (is (= (<!! ab 0) 0))
+            (is (= (<!!-test ab) 0))
             (recur (+ reps 1)))))
     (do (>!! ba (msg 4 4))
-        (let [b->a4 (<!! ba 4)]
+        (let [b->a4 (<!!-test ba)]
           (is (= b->a4 4))
           (>!! ab (msg 5 5))
-          (is (= (<!! ab 5) 5))))
+          (is (= (<!!-test ab) 5))))
     (do (>!! ba (msg 6 6))
-        (let [b->a6 (<!! ba 6)]
+        (let [b->a6 (<!!-test ba)]
           (is (= b->a6 6))
           (is (nil? (get-active-interaction (get-monitor ab))))))))
 
@@ -912,18 +916,18 @@
       (if (> reps 2)
         (do
           (>!! ab (msg 1 1))
-          (is (= (<!! ab 1) 1)))
+          (is (= (<!!-test ab) 1)))
         (do (>!! ab (msg 0 0))
-            (is (= (<!! ab 0) 0))
+            (is (= (<!!-test ab) 0))
             (do (>!! ba (msg 4 4))
-                (let [b->a4 (<!! ba 4)]
+                (let [b->a4 (<!!-test ba)]
                   (is (= b->a4 4))
                   (>!! ab(msg 5 5))
-                  (is (= (<!! ab 5) 5))))
+                  (is (= (<!!-test ab) 5))))
             (recur (+ reps 1)))))
     (do
       (>!! ba (msg 6 6))
-      (let [b->a6 (<!! ba 6)]
+      (let [b->a6 (<!!-test ba)]
         (is (= b->a6 6))
         (is (nil? (get-active-interaction (get-monitor ab))))))))
 
@@ -938,24 +942,24 @@
       (if (> reps 2)
         (do
           (>!! [ab ac] (msg 1 1))
-          (is (= (<!! ab 1) 1))
-          (is (= (<!! ac 1) 1)))
+          (is (= (<!!-test ab) 1))
+          (is (= (<!!-test ac) 1)))
         (do (>!! [ab ac] (msg 0 0))
-            (is (= (<!! ab 0) 0))
-            (is (= (<!! ac 0) 0))
+            (is (= (<!!-test ab) 0))
+            (is (= (<!!-test ac) 0))
             (do (>!! [ba bc] (msg 4 4))
-                (let [b->a4 (<!! ba 4)
-                      b->c4 (<!! bc 4)]
+                (let [b->a4 (<!!-test ba)
+                      b->c4 (<!!-test bc)]
                   (is (= b->a4 4))
                   (is (= b->c4 4))
                   (>!! [ab ac](msg 5 5))
-                  (is (= (<!! ab 5) 5))
-                  (is (= (<!! ac 5) 5))))
+                  (is (= (<!!-test ab) 5))
+                  (is (= (<!!-test ac) 5))))
             (recur (+ reps 1)))))
     (do
       (>!! [ba bc] (msg 6 6))
-      (let [b->a6 (<!! ba 6)
-            b->c6 (<!! bc 6)]
+      (let [b->a6 (<!!-test ba)
+            b->c6 (<!!-test bc)]
         (is (= b->a6 6))
         (is (= b->c6 6))
         (is (nil? (get-active-interaction (get-monitor ab))))))))
@@ -1002,24 +1006,24 @@
         ac (get-channel channels "a" "c")
         bc (get-channel channels "b" "c")]
     (>!! ab (msg 1 1))
-    (let [a->b (<!! ab 1)]
+    (let [a->b (<!!-test ab)]
       (is (= a->b) 1)
       (do (>!! [ba bc] (msg 2 2))
-          (let [b->a2 (<!! ba 2)
-                b->c2 (<!! bc 2)]
+          (let [b->a2 (<!!-test ba)
+                b->c2 (<!!-test bc)]
             (is (= b->a2 2))
             (is (= b->c2 2))
             (>!! [ab ac] (msg 3 3))
-            (is (= (<!! ab 3) 3))
-            (is (= (<!! ac 3) 3))))
+            (is (= (<!!-test ab) 3))
+            (is (= (<!!-test ac) 3))))
       (do (>!! ba (msg 4 4))
-          (let [b->a4 (<!! ba 4)]
+          (let [b->a4 (<!!-test ba)]
             (is (= b->a4 4))
             (>!! ab (msg 5 5))
-            (is (= (<!! ab 5) 5))))
+            (is (= (<!!-test ab) 5))))
       (do (>!! [ba bc] (msg 6 6))
-          (is (= (<!! ba 6) 6))
-          (is (= (<!! bc 6) 6))
+          (is (= (<!!-test ba) 6))
+          (is (= (<!!-test bc) 6))
           (is (nil? (get-active-interaction (get-monitor ab))))))))
 
 (deftest send-and-receive-parallel-after-choice-with-after-choice-multicast-test
@@ -1030,24 +1034,24 @@
         bc (get-channel channels "b" "c")]
     (set-logging-exceptions)
     (>!! ab (msg 1 1))
-    (let [a->b (<!! ab 1)]
+    (let [a->b (<!!-test ab)]
       (is (= a->b 1))
       (do (>!! [ba bc] (msg 2 2))
-          (let [b->a2 (<!! ba 2)
-                b->c2 (<!! bc 2)]
+          (let [b->a2 (<!!-test ba)
+                b->c2 (<!!-test bc)]
             (is (= b->a2 2))
             (is (= b->c2 2))
             (>!! [ab ac] (msg 3 3))
-            (is (= (<!! ab 3) 3))
-            (is (= (<!! ac 3) 3))))
+            (is (= (<!!-test ab) 3))
+            (is (= (<!!-test ac) 3))))
       (do (>!! ba (msg 4 4))
-          (let [b->a4 (<!! ba 4)]
+          (let [b->a4 (<!!-test ba)]
             (is (= b->a4 4))
             (>!! ab (msg 5 5))
-            (is (= (<!! ab 5) 5))))
+            (is (= (<!!-test ab) 5))))
       (do (>!! [ba bc] (msg 6 6))
-          (is (= (<!! ba 6) 6))
-          (is (= (<!! bc 6) 6))
+          (is (= (<!!-test ba) 6))
+          (is (= (<!!-test bc) 6))
           (is (nil? (get-active-interaction (get-monitor ab))))))))
 
 (deftest send-and-receive-parallel-after-rec-with-after-rec--multicast-test
@@ -1058,24 +1062,24 @@
         bc (get-channel channels "b" "c")]
     (set-logging-exceptions)
     (>!! ab (msg 0 0 ))
-    (let [a->b (<!! ab 0)]
+    (let [a->b (<!!-test ab)]
       (is (= a->b 0))
       (do (>!! [ba bc] (msg 2 2))
-          (let [b->a2 (<!! ba 2)
-                b->c2 (<!! bc 2)]
+          (let [b->a2 (<!!-test ba)
+                b->c2 (<!!-test bc)]
             (is (= b->a2 2))
             (is (= b->c2 2))
             (>!! [ab ac] (msg 3 3))
-            (is (= (<!! ab 3) 3))
-            (is (= (<!! ac 3) 3))))
+            (is (= (<!!-test ab) 3))
+            (is (= (<!!-test ac) 3))))
       (do (>!! ba (msg 4 4))
-          (let [b->a4 (<!! ba 4)]
+          (let [b->a4 (<!!-test ba)]
             (is (= b->a4 4))
             (>!! ab (msg 5 5))
-            (is (= (<!! ab 5) 5))))
+            (is (= (<!!-test ab) 5))))
       (do (>!! [ba bc] (msg 6 6))
-          (is (= (<!! ba 6) 6))
-          (is (= (<!! bc 6) 6)))
+          (is (= (<!!-test ba) 6))
+          (is (= (<!!-test bc) 6)))
       (do (>!! ba (msg 7 7))
-          (is (= (<!! ba 7) 7))
+          (is (= (<!!-test ba) 7))
           (is (nil? (get-active-interaction (get-monitor ab))))))))
