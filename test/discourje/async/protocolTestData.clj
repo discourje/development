@@ -20,19 +20,19 @@
 ;;------------------------------------------------------
 
 (deftest interactableTest
-  (let [inter (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "1" ))"A" "B")]
+  (let [inter (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "1")) "A" "B")]
     (is (= "A" (get-sender inter)))
     (is (= "B" (get-receivers inter)))))
 
 (defn testSingleMulticastProtocol []
-  (create-protocol [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "1" ))"A" ["B" "C"])]))
+  (create-protocol [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "1")) "A" ["B" "C"])]))
 
 (def testSingleMulticastProtocolControl
   [(->interaction (uuid/v1) "1" "A" ["B" "C"] #{} nil)])
 
 (defn testDualProtocol [include-ids]
   (if include-ids
-    (create-protocol [(make-interaction (fn [m] (= (if (satisfies? sendable m) (if (satisfies? sendable m) (get-label m) m) m) "1"))"A" "B")
+    (create-protocol [(make-interaction (fn [m] (= (if (satisfies? sendable m) (if (satisfies? sendable m) (get-label m) m) m) "1")) "A" "B")
                       (make-interaction (fn [m] (= (if (satisfies? sendable m) (if (satisfies? sendable m) (get-label m) m) m) "2")) "B" "A")]))
   (create-protocol [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (if (satisfies? sendable m) (get-label m) m) m) "1")) "A" "B" #{} nil)
                     (->interaction nil (fn [m] (= (if (satisfies? sendable m) (if (satisfies? sendable m) (get-label m) m) m) "2")) "B" "A" #{} nil)]))
@@ -42,7 +42,7 @@
                  (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "2")) "B" "A" #{} nil)))
 
 (defn test-typed-DualProtocol [include-ids]
-  (when include-ids (create-protocol [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) java.lang.String))"A" "B")
+  (when include-ids (create-protocol [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) java.lang.String)) "A" "B")
                                       (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) java.lang.String)) "B" "A")])
                     (create-protocol [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) java.lang.String)) "A" "B" #{} nil)
                                       (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) java.lang.String)) "B" "A" #{} nil)])))
@@ -57,9 +57,9 @@
                       (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "2")) "B" "A")
                       (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "3")) "A" "C")]))
   (create-protocol [
-                    (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "1" ))"A" "B" #{} nil)
-                    (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "2" ))"B" "A" #{} nil)
-                    (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "3" ))"A" "C" #{} nil)]))
+                    (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "1")) "A" "B" #{} nil)
+                    (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "2")) "B" "A" #{} nil)
+                    (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "3")) "A" "C" #{} nil)]))
 
 (def testTripleProtocolControl
   (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "1")) "A" "B" #{}
@@ -101,7 +101,7 @@
                  (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "1")) "A" "B" #{}
                                 (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "2")) "B" "A" #{}
                                                (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "3")) "A" "C" #{}
-                                                              (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "4" ))"C" ["A" "B"] #{} nil))))))
+                                                              (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "4")) "C" ["A" "B"] #{} nil))))))
 
 (defn testMulticastParticipantsProtocol []
   (mep (-->> (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "1")) "A" ["B" "C"])
@@ -118,7 +118,7 @@
 (defn single-choice-protocol []
   (create-protocol [(make-choice [
                                   [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "1")) "A" "B")]
-                                  [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "hi" ))"A" "C")]]
+                                  [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "hi")) "A" "C")]]
                                  )]))
 
 (defn single-choice-in-middle-protocol [include-ids]
@@ -247,14 +247,14 @@
                                                               (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "2")) "C" "A" #{}
                                                                              (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "3")) "A" "C" #{}
                                                                                             (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "3")) "C" "A" #{} (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "4")) "A" "D" #{}
-                                                                                                                                              (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "4")) "D" "A" #{}
-                                                                                                                                                             (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "5")) "A" ["B" "C" "D"] #{} nil)))))))
+                                                                                                                                                                                                        (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "4")) "D" "A" #{}
+                                                                                                                                                                                                                       (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "5")) "A" ["B" "C" "D"] #{} nil)))))))
                                                (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "2")) "A" "B" #{}
                                                               (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "2")) "B" "A" #{}
                                                                              (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "3")) "A" "B" #{}
                                                                                             (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "3")) "B" "A" #{} (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "4")) "A" "D" #{}
-                                                                                                                                              (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "4")) "D" "A" #{}
-                                                                                                                                                             (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "5")) "A" ["B" "C" "D"] #{} nil)))))))] nil)
+                                                                                                                                                                                                        (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "4")) "D" "A" #{}
+                                                                                                                                                                                                                       (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "5")) "A" ["B" "C" "D"] #{} nil)))))))] nil)
                                 )))
 
 (defn single-nested-choice-branch-protocol []
@@ -280,7 +280,7 @@
                                                  )])
                   (create-protocol [(->branch nil [
                                                    [(->branch nil [
-                                                                   [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "1"))"A" "B" #{} nil)]
+                                                                   [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "1")) "A" "B" #{} nil)]
                                                                    [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "2")) "A" "B" #{} nil)]]
                                                               nil)]
                                                    [(->branch nil [
@@ -372,10 +372,10 @@
 (defn single-recur-protocol [include-ids]
   (if include-ids (create-protocol [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "1")) "A" "B")
                                     (make-recursion :test [
-                                                           (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "1"))  "B" "A")
+                                                           (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "1")) "B" "A")
                                                            (make-choice [
-                                                                         [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "2"))"A" "C")
-                                                                          (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "2"))"C" "A")
+                                                                         [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "2")) "A" "C")
+                                                                          (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "2")) "C" "A")
                                                                           (do-recur :test)]
                                                                          [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "3")) "A" "B")
                                                                           ]
@@ -392,7 +392,7 @@
                                                                             (->recur-identifier nil :test :recur nil)]
                                                                            [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "3")) "A" "B" #{} nil)]] nil)
                                                             ] nil)
-                                    (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "end" ))"A" ["B" "C"] #{} nil)
+                                    (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "end")) "A" ["B" "C"] #{} nil)
                                     ])))
 (def single-recur-protocolControl
   (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "1")) "A" "B" #{}
@@ -488,7 +488,7 @@
                                                                                     (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "1")) "B" "A")
                                                                                     (make-choice [
                                                                                                   [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "2")) "A" "C")
-                                                                                                   (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "2"))"C" "A")
+                                                                                                   (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "2")) "C" "A")
                                                                                                    (do-recur :nested)]
                                                                                                   [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "3")) "A" "B")]
                                                                                                   ])
@@ -529,11 +529,11 @@
                                                (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "2")) "C" "A" #{}
                                                               (->recur-identifier nil :nested :recur nil)))
                                 (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "3")) "A" "B" #{} (->branch nil [
-                                                                                  (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "2")) "A" "C" #{}
-                                                                                                 (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "2")) "C" "D" #{}
-                                                                                                                (->recur-identifier nil :test :recur nil)))
-                                                                                  (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "3")) "A" "E" #{} (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "end")) "A" ["B" "C"] #{} nil))
-                                                                                  ] nil))
+                                                                                                                                            (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "2")) "A" "C" #{}
+                                                                                                                                                           (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "2")) "C" "D" #{}
+                                                                                                                                                                          (->recur-identifier nil :test :recur nil)))
+                                                                                                                                            (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "3")) "A" "E" #{} (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "end")) "A" ["B" "C"] #{} nil))
+                                                                                                                                            ] nil))
                                 ] nil))
   )
 
@@ -655,23 +655,23 @@
 
 (def parallel-after-choice-with-afterControl
   (->branch nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b" #{} (->lateral nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 2)) "b" "a" #{}
-                                                                                 (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 3)) "a" "b" #{} nil))
-                                                                  (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a" #{}
-                                                                                 (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b" #{} nil))
-                                                                  ] (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" "a" #{} nil)))
-                 (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0 ))"a" "b" #{} (->lateral nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 2)) "b" "a" #{}
-                                                                                 (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 3)) "a" "b" #{} nil))
-                                                                  (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a" #{}
-                                                                                 (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b" #{} nil))
-                                                                  ] (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" "a" #{} nil)))] nil))
+                                                                                                                                           (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 3)) "a" "b" #{} nil))
+                                                                                                                            (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a" #{}
+                                                                                                                                           (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b" #{} nil))
+                                                                                                                            ] (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" "a" #{} nil)))
+                 (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" "b" #{} (->lateral nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 2)) "b" "a" #{}
+                                                                                                                                           (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 3)) "a" "b" #{} nil))
+                                                                                                                            (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a" #{}
+                                                                                                                                           (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b" #{} nil))
+                                                                                                                            ] (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" "a" #{} nil)))] nil))
 
 (defn parallel-after-choice-with-after-choice [include-ids]
   (if include-ids (create-protocol [(make-choice [[(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b")]
                                                   [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" "b")]])
-                                    (make-parallel [[(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 2))"b" "a")
-                                                     (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 3))"a" "b")]
-                                                    [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4))"b" "a")
-                                                     (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5))"a" "b")]])
+                                    (make-parallel [[(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 2)) "b" "a")
+                                                     (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 3)) "a" "b")]
+                                                    [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a")
+                                                     (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b")]])
                                     (make-choice [[(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" "a")]
                                                   [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 7)) "b" "a")]])])
                   (create-protocol [(->branch nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b" #{} nil)]
@@ -684,18 +684,18 @@
                                     (->branch nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" "a" #{} nil)]
                                                    [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 7)) "b" "a" #{} nil)]] nil)])))
 (def parallel-after-choice-with-after-choiceControl
-  (->branch nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b" #{} (->lateral nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 2))"b" "a" #{}
-                                                                                 (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 3))"a" "b" #{} nil))
-                                                                  (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a" #{}
-                                                                                 (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b" #{} nil))
-                                                                  ] (->branch nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" "a" #{} nil)
-                                                                                   (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 7)) "b" "a" #{} nil)] nil)))
+  (->branch nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b" #{} (->lateral nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 2)) "b" "a" #{}
+                                                                                                                                           (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 3)) "a" "b" #{} nil))
+                                                                                                                            (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a" #{}
+                                                                                                                                           (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b" #{} nil))
+                                                                                                                            ] (->branch nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" "a" #{} nil)
+                                                                                                                                             (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 7)) "b" "a" #{} nil)] nil)))
                  (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" "b" #{} (->lateral nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 2)) "b" "a" #{}
-                                                                                 (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 3)) "a" "b" #{} nil))
-                                                                  (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a" #{}
-                                                                                 (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b" #{} nil))
-                                                                  ] (->branch nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" "a" #{} nil)
-                                                                                   (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 7)) "b" "a" #{} nil)] nil)))] nil))
+                                                                                                                                           (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 3)) "a" "b" #{} nil))
+                                                                                                                            (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a" #{}
+                                                                                                                                           (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b" #{} nil))
+                                                                                                                            ] (->branch nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" "a" #{} nil)
+                                                                                                                                             (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 7)) "b" "a" #{} nil)] nil)))] nil))
 
 (defn parallel-after-rec-with-after [include-ids]
   (if include-ids (create-protocol [(make-recursion :test [
@@ -720,17 +720,17 @@
                                     (->branch nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" "a" #{} nil)]
                                                    [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 7)) "b" "a" #{} nil)]] nil)])))
 (def parallel-after-rec-with-afterControl
-  (->branch nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1))"a" "b" #{} (->recur-identifier nil :test :recur nil))
-                 (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0))"a" "b" #{} (->lateral nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 2)) "b" "a" #{}
-                                                                                 (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 3)) "a" "b" #{} nil))
-                                                                  (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a" #{}
-                                                                                 (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b" #{} nil))
-                                                                  ] (->branch nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" "a" #{} nil)
-                                                                                   (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 7)) "b" "a" #{} nil)] nil)))] nil))
+  (->branch nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b" #{} (->recur-identifier nil :test :recur nil))
+                 (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" "b" #{} (->lateral nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 2)) "b" "a" #{}
+                                                                                                                                           (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 3)) "a" "b" #{} nil))
+                                                                                                                            (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a" #{}
+                                                                                                                                           (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b" #{} nil))
+                                                                                                                            ] (->branch nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" "a" #{} nil)
+                                                                                                                                             (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 7)) "b" "a" #{} nil)] nil)))] nil))
 
 (defn parallel-after-rec-with-after-rec [include-ids]
   (if include-ids (create-protocol [(make-recursion :test [
-                                                           (make-choice [[(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1))"a" "b")
+                                                           (make-choice [[(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b")
                                                                           (do-recur :test)]
                                                                          [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" "b")]])])
                                     (make-parallel [[(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 2)) "b" "a")
@@ -744,7 +744,7 @@
                   (create-protocol [(->recursion nil :test
                                                  [(->branch nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b" #{} nil)
                                                                   (->recur-identifier nil :test :recur nil)]
-                                                                 [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0))"a" "b" #{} nil)]] nil)] nil)
+                                                                 [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" "b" #{} nil)]] nil)] nil)
                                     (->lateral nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 2)) "b" "a" #{} nil)
                                                      (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 3)) "a" "b" #{} nil)]
                                                     [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a" #{} nil)
@@ -758,13 +758,13 @@
 (def parallel-after-rec-with-after-recControl
   (->branch nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b" #{} (->recur-identifier nil :test :recur nil))
                  (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" "b" #{} (->lateral nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 2)) "b" "a" #{}
-                                                                                 (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 3)) "a" "b" #{} nil))
-                                                                  (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a" #{}
-                                                                                 (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b" #{} nil))
-                                                                  ]
-                                                             (->branch nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" "a" #{}
-                                                                                           (->recur-identifier nil :test2 :recur nil))
-                                                                            (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 7)) "b" "a" #{} nil)] nil)))] nil))
+                                                                                                                                           (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 3)) "a" "b" #{} nil))
+                                                                                                                            (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a" #{}
+                                                                                                                                           (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b" #{} nil))
+                                                                                                                            ]
+                                                                                                                       (->branch nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" "a" #{}
+                                                                                                                                                     (->recur-identifier nil :test2 :recur nil))
+                                                                                                                                      (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 7)) "b" "a" #{} nil)] nil)))] nil))
 (defn nested-parallel [include-ids]
   (if include-ids (create-protocol [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b")
                                     (make-parallel [[(make-parallel [[(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "a")) "b" "a")
@@ -775,7 +775,7 @@
                                                                       (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 3)) "a" "b")]
                                                                      [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a")
                                                                       (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b")]])]])])
-                  (create-protocol [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1 ))"a" "b" #{} nil)
+                  (create-protocol [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b" #{} nil)
                                     (->lateral nil [[(->lateral nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "a")) "b" "a" #{} nil)
                                                                       (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "b")) "a" "b" #{} nil)]
                                                                      [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "b")) "b" "a" #{} nil)
@@ -793,7 +793,7 @@
                                                            (->lateral nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 2)) "b" "a" #{}
                                                                                           (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 3)) "a" "b" #{} nil))
                                                                            (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a" #{}
-                                                                                          (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5 ))"a" "b" #{} nil))] nil)] nil)))
+                                                                                          (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b" #{} nil))] nil)] nil)))
 (defn after-parallel-nested-parallel [include-ids]
   (if include-ids (create-protocol [(make-parallel [[(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "b" "a")
                                                      (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b")]
@@ -807,8 +807,8 @@
                                                                       (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 3)) "a" "b")]
                                                                      [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a")
                                                                       (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b")]])]])])
-                  (create-protocol [(->lateral nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0))"b" "a" #{} nil)
-                                                     (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1))"a" "b" #{} nil)]
+                  (create-protocol [(->lateral nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "b" "a" #{} nil)
+                                                     (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b" #{} nil)]
                                                     [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "hi")) "b" "a" #{} nil)
                                                      (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "hi")) "a" "b" #{} nil)]] nil)
                                     (->lateral nil [[(->lateral nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "a")) "b" "a" #{} nil)
@@ -839,7 +839,7 @@
                                                      (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b")]])
                                     (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" "a")])
                   (create-protocol [(->lateral nil [[(->branch nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b" #{} nil)]
-                                                                    [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0))  "a" "b" #{} nil)]] nil)]
+                                                                    [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" "b" #{} nil)]] nil)]
                                                     [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a" #{} nil)
                                                      (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b" #{} nil)]] nil)
                                     (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" "a" #{} nil)])))
@@ -878,10 +878,10 @@
                                                                                                    [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" ["b" "c"])]])]
                                                                                     [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" ["a" "c"])
                                                                                      (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" ["b" "c"])]])]
-                                                                   [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 9 ))"a" ["b" "c"])]])]
+                                                                   [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 9)) "a" ["b" "c"])]])]
                                                     [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "hi")) "b" ["a" "c"])
                                                      (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "hi")) "a" ["b" "c"])]])
-                                    (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6 ))"b" ["a" "c"])])
+                                    (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" ["a" "c"])])
                   (create-protocol [(->lateral nil [[(->branch nil [[(->lateral nil [[(->branch nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b" #{} nil)]
                                                                                                      [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" "b" #{} nil)]] nil)]
                                                                                      [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a" #{} nil)
@@ -908,44 +908,44 @@
                                                     [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a")
                                                      (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b")]])
                                     (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" "a")])
-                  (create-protocol [(->lateral nil [[(->recursion nil :test [(->branch nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1))"a" "b" #{} nil)]
-                                                                                            [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0))"a" "b" #{} nil)
+                  (create-protocol [(->lateral nil [[(->recursion nil :test [(->branch nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b" #{} nil)]
+                                                                                            [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" "b" #{} nil)
                                                                                              (->recur-identifier nil :test :recur nil)]] nil)] nil)]
-                                                    [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4))"b" "a" #{} nil)
-                                                     (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5))"a" "b" #{} nil)]] nil)
+                                                    [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a" #{} nil)
+                                                     (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b" #{} nil)]] nil)
                                     (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" "a" #{} nil)])))
 
 (def parallel-with-rec-control
-  (->lateral nil [(->branch nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1))"a" "b" #{} nil)
-                                 (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0))"a" "b" #{}
+  (->lateral nil [(->branch nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b" #{} nil)
+                                 (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" "b" #{}
                                                 (->recur-identifier nil :test :recur nil))] nil)
-                  (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4 ))"b" "a" #{} (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5 ))"a" "b" #{} nil))]
-             (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6 ))"b" "a" #{} nil)))
+                  (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a" #{} (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b" #{} nil))]
+             (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" "a" #{} nil)))
 
 (defn rec-with-parallel-with-choice [include-ids]
-  (if include-ids (create-protocol [(make-recursion :test [(make-parallel [[(make-choice [[(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1))"a" "b")]
-                                                                                          [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0))"a" "b")
+  (if include-ids (create-protocol [(make-recursion :test [(make-parallel [[(make-choice [[(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b")]
+                                                                                          [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" "b")
                                                                                            (do-recur :test)]])]
                                                                            [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a")
                                                                             (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b")]
                                                                            ])
                                                            ])
                                     (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" "a")])
-                  (create-protocol [(->recursion nil :test [(->lateral nil [[(->branch nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1))"a" "b" #{} nil)]
-                                                                                            [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0))"a" "b" #{} nil)
+                  (create-protocol [(->recursion nil :test [(->lateral nil [[(->branch nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b" #{} nil)]
+                                                                                            [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" "b" #{} nil)
                                                                                              (->recur-identifier nil :test :recur nil)]] nil)]
-                                                                            [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4 ))"b" "a" #{} nil)
-                                                                             (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5 ))"a" "b" #{} nil)]
+                                                                            [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a" #{} nil)
+                                                                             (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b" #{} nil)]
                                                                             ] nil)
                                                             ] nil)
                                     (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" "a" #{} nil)])))
 
 (defn rec-with-parallel-with-choice-multicast [include-ids]
-  (if include-ids (create-protocol [(make-recursion :test [(make-parallel [[(make-choice [[(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1))"a" ["b" "c"])]
-                                                                                          [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0))"a" ["b" "c"])
+  (if include-ids (create-protocol [(make-recursion :test [(make-parallel [[(make-choice [[(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" ["b" "c"])]
+                                                                                          [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" ["b" "c"])
                                                                                            (do-recur :test)]])]
-                                                                           [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4))"b" ["a" "c"])
-                                                                            (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5))"a" ["b" "c"])]
+                                                                           [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" ["a" "c"])
+                                                                            (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" ["b" "c"])]
                                                                            ])
                                                            ])
                                     (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" ["a" "c"])])
@@ -991,7 +991,7 @@
                                                     [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a" #{} nil)
                                                      (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b" #{} nil)]
                                                     ] nil)
-                                    (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6 ))"b" ["a" "c"])])))
+                                    (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" ["a" "c"])])))
 
 (def parallel-after-interaction-multicastControl
   (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b" #{}
@@ -1003,10 +1003,10 @@
 
 (defn parallel-after-choice-with-after-choice-multicast [include-ids]
   (if include-ids (create-protocol [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b")
-                                    (make-parallel [[(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 2))"b" ["a" "c"])
-                                                     (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 3))"a" ["b" "c"])]
-                                                    [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4))"b" "a")
-                                                     (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5))"a" "b")]])
+                                    (make-parallel [[(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 2)) "b" ["a" "c"])
+                                                     (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 3)) "a" ["b" "c"])]
+                                                    [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a")
+                                                     (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b")]])
                                     (make-choice [[(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" ["a" "c"])]
                                                   [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 7)) "b" "a")]])])
                   (create-protocol [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b" #{} nil)
@@ -1034,11 +1034,11 @@
                   (create-protocol [(->recursion nil :test
                                                  [(->branch nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b" #{} nil)
                                                                   (->recur-identifier nil :test :recur nil)]
-                                                                 [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0 ))"a" "b" #{} nil)]] nil)] nil)
-                                    (->lateral nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 2))"b" ["a" "c"] #{} nil)
-                                                     (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 3))"a" ["b" "c"] #{} nil)]
-                                                    [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4))"b" "a" #{} nil)
-                                                     (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5))"a" "b" #{} nil)]
+                                                                 [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" "b" #{} nil)]] nil)] nil)
+                                    (->lateral nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 2)) "b" ["a" "c"] #{} nil)
+                                                     (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 3)) "a" ["b" "c"] #{} nil)]
+                                                    [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" "a" #{} nil)
+                                                     (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" "b" #{} nil)]
                                                     ] nil)
                                     (->recursion nil :test2
                                                  [(->branch nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" ["a" "c"] #{} nil)
@@ -1058,22 +1058,22 @@
                                     (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" ["a" "c"])
                                     (make-closer "b" "a")
                                     (make-closer "b" "c")])
-                  (create-protocol [(->recursion nil :test [(->lateral nil [[(->branch nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1))"a" ["b" "c"] #{} nil)]
-                                                                                            [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0))"a" ["b" "c"] #{} nil)
+                  (create-protocol [(->recursion nil :test [(->lateral nil [[(->branch nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" ["b" "c"] #{} nil)]
+                                                                                            [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" ["b" "c"] #{} nil)
                                                                                              (->recur-identifier nil :test :recur nil)]] nil)]
-                                                                            [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4))"b" ["a" "c"] #{} nil)
-                                                                             (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5))"a" ["b" "c"] #{} nil)]
+                                                                            [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" ["a" "c"] #{} nil)
+                                                                             (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" ["b" "c"] #{} nil)]
                                                                             ] nil)
                                                             ] nil)
                                     (->closer nil "a" "b" nil)
                                     (->closer nil "a" "c" nil)
-                                    (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6 ))"b" ["a" "c"] #{} nil)
+                                    (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 6)) "b" ["a" "c"] #{} nil)
                                     (->closer nil "b" "a" nil)
                                     (->closer nil "b" "c" nil)])))
 
 (def rec-with-parallel-with-choice-multicast-and-closeControl
-  (->lateral nil [(->branch nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1))"a" ["b" "c"] #{} nil)
-                                 (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0))"a" ["b" "c"] #{}
+  (->lateral nil [(->branch nil [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" ["b" "c"] #{} nil)
+                                 (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" ["b" "c"] #{}
                                                 (->recur-identifier nil :test :recur nil))] nil)
                   (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 4)) "b" ["a" "c"] #{}
                                  (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 5)) "a" ["b" "c"] #{} nil))
@@ -1119,33 +1119,33 @@
                                                                   (do-recur :test)]] nil)] nil)])))
 
 (defn interaction-with-parallel-and-closer [include-ids]
-  (if include-ids (create-protocol [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0))"a" "b")
+  (if include-ids (create-protocol [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" "b")
                                     (make-parallel [[(make-closer "a" "b")]
                                                     [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b")]])])
                   (create-protocol [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" "b" #{} nil)
                                     (->lateral nil [[(->closer nil "a" "b" nil)]
-                                                    [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1 ))"a" "b" #{} nil)]] nil)])))
+                                                    [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b" #{} nil)]] nil)])))
 (defn interaction-with-parallel-and-closer-with-interactions-in-parallel [include-ids]
   (if include-ids (create-protocol [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" "b")
                                     (make-parallel [[(make-closer "a" "b")
                                                      (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 2)) "b" "a")
                                                      (make-closer "b" "a")]
                                                     [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b")]])])
-                  (create-protocol [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0))"a" "b" #{} nil)
+                  (create-protocol [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" "b" #{} nil)
                                     (->lateral nil [[(->closer nil "a" "b" nil)]
-                                                    [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1 ))"a" "b" #{} nil)]] nil)])))
+                                                    [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b" #{} nil)]] nil)])))
 
 (defn interaction-with-nested-choice-and-closer [include-ids]
-  (if include-ids (create-protocol [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0 ))"a" "b")
+  (if include-ids (create-protocol [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" "b")
                                     (make-choice [[(make-choice [[(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b")]])]
                                                   [(make-choice [[(make-closer "a" "b")]])]])])
                   (create-protocol [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "a" "b" #{} nil)
-                                    (->branch nil [[(->branch nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1 ))"a" "b" #{} nil)]] nil)]
+                                    (->branch nil [[(->branch nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b" #{} nil)]] nil)]
                                                    [(->branch nil [[(->closer nil "a" "b" nil)]] nil)]] nil)])))
 
 (defn after-parallel-nested-parallel-with-closer [include-ids]
-  (if include-ids (create-protocol [(make-parallel [[(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0))"b" "a")
-                                                     (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1))"a" "b")]
+  (if include-ids (create-protocol [(make-parallel [[(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "b" "a")
+                                                     (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b")]
                                                     [(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "hi")) "b" "a")
                                                      (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "hi")) "a" "b")]])
                                     (make-parallel [[(make-parallel [[(make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "a")) "b" "a")
@@ -1156,8 +1156,8 @@
                                                                       (make-interaction (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 3)) "a" "b")]
                                                                      [(make-closer "a" "b")
                                                                       (make-closer "b" "a")]])]])])
-                  (create-protocol [(->lateral nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0))"b" "a" #{} nil)
-                                                     (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1))"a" "b" #{} nil)]
+                  (create-protocol [(->lateral nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 0)) "b" "a" #{} nil)
+                                                     (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) 1)) "a" "b" #{} nil)]
                                                     [(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "hi")) "b" "a" #{} nil)
                                                      (->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "hi")) "a" "b" #{} nil)]] nil)
                                     (->lateral nil [[(->lateral nil [[(->interaction nil (fn [m] (= (if (satisfies? sendable m) (get-label m) m) "a")) "b" "a" #{} nil)
