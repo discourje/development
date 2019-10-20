@@ -33,7 +33,7 @@
   [channel return-channel]
   (let [message (<!!! channel)]
     (log-message (format "Received message: %s by %s" message (get-consumer channel)))
-    (when (not= (nil?(>!! return-channel "Hi Alice!"))))))
+    (when (not= (nil? return-channel)) (>!! return-channel "Hi Alice!"))))
 
 ;start the `greet-bob-and-carol' function on thread
 (clojure.core.async/thread (greet-bob-and-carol))

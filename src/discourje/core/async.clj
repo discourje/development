@@ -232,8 +232,10 @@
   [channel]
    (if (channel-closed? channel)
      (log-error :incorrect-communication (format "Invalid communication: you are trying to receive but the channel is closed! From %s to %s" (get-provider channel) (get-consumer channel)))
-     (do (loop []
-           (when (false? (something-in-buffer? (get-chan channel))) (recur)))
+     (do (if use-meta-take
+           (acquire-take channel)
+           (loop []
+             (when (false? (something-in-buffer? (get-chan channel))) (recur))))
          (if (nil? (get-active-interaction (get-monitor channel)))
            (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
            (let [result (peek-channel (get-chan channel))

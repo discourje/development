@@ -80,7 +80,7 @@
                    is-found (atom false)]
                (for [p pars]
                  (cond
-                   (true? @is-found) p
+                   @is-found p
                    (satisfies? interactable p)
                    (if (is-valid-interaction-for-send? sender receivers message p)
                      (assoc-sender-to-interaction p sender is-found)
