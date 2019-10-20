@@ -4,10 +4,10 @@
 
 ;This function will generate a mep with 4 monitors to send and receive the greet message.
 (def message-exchange-pattern
-  (mep (-->> "greet" "alice" "bob")
-       (-->> "greet" "bob" "alice")
-       (-->> "greet" "alice" "carol")
-       (-->> "greet" "carol" "alice")))
+  (mep (-->> String "alice" "bob")
+       (-->> String "bob" "alice")
+       (-->> String "alice" "carol")
+       (-->> String "carol" "alice")))
 
 ;setup infrastructure, generate channels and add monitor
 (def infrastructure (add-infrastructure message-exchange-pattern))

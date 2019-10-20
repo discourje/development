@@ -6,11 +6,11 @@
 ; The protocol below demonstrates how Bob can send both the message labelled 2 and 4 to Alice at the `same' time.
 ; Alose, Alice will be able to respond to Bob with message 3 and 5 at the `same' time.
 (def message-exchange-pattern
-  (mep (-->> 1 "Alice" "Bob")
-       (parallel [(-->> 2 "Bob" "Carol")
-             (-->> 3 "Carol" "Bob")]
-                 [(-->> 4 "Bob" "Alice")
-             (-->> 5 "Alice" "Bob")])
+  (mep (-->> Long "Alice" "Bob")
+       (parallel [(-->> Long "Bob" "Carol")
+             (-->> Long "Carol" "Bob")]
+                 [(-->> Long "Bob" "Alice")
+             (-->> Long "Alice" "Bob")])
        (close "Alice" "Bob")
        (close "Bob" "Alice")
        (close "Bob" "Carol")
