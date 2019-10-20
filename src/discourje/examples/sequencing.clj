@@ -5,10 +5,10 @@
 ;  This function will generate a vector with 4 interactions to send and receive the greet message.
 ;  Notice how send and receivers are defined separately in order to allow for sequencing of actions!
 (def message-exchange-pattern
-  (mep (-->> "greet" "alice" "bob")
-       (-->> "greet" "bob" "alice")
-       (-->> "greet" "alice" "carol")
-       (-->> "greet" "carol" "alice")
+  (mep (-->> String "alice" "bob")
+       (-->> String "bob" "alice")
+       (-->> String "alice" "carol")
+       (-->> String "carol" "alice")
        (close "alice" "bob")
        (close "bob" "alice")
        (close "alice" "carol")

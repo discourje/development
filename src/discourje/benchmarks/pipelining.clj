@@ -91,8 +91,6 @@
                       (<!! (last channels))
                       (force-monitor-reset! (get-monitor (first channels)) interactions)))))]
      time)))
-;(set-logging-exceptions)
-;(discourje-pipeline-new-reverse 32 1)
 
 (defn clojure-pipeline-new-reverse
   ([amount iterations]

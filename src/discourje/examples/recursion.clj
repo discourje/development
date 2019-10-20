@@ -1,6 +1,7 @@
 (ns discourje.examples.recursion
   (require [discourje.core.async :refer :all]
-           [discourje.core.logging :refer :all]))
+           [discourje.core.logging :refer :all])
+  (:import (clojure.lang PersistentArrayMap)))
 
 ;  This function will generate a mep with 1 recursion to send and receive the number message (recursion).
 ;  The protocol offers a choice (with internal interactions) to send messages called greaterThan or lessThan to alice depending on the data received
@@ -8,11 +9,11 @@
 ;  Recur is matched by name, in this case: :generate
 (def message-exchange-pattern
   (mep (rec :generate
-            (-->> "number" "alice" "bob")
+            (-->> PersistentArrayMap "alice" "bob")
             (choice
-              [(-->> "greaterThan" "bob" "alice")
+              [(-->> (fn [m] (= (:flag m) "greaterThan")) "bob" "alice")
                (continue :generate)]
-              [(-->> "lessThan" "bob" "alice")
+              [(-->> (fn [m] (= (:flag m) "lessThan")) "bob" "alice")
                (close "alice" "bob")
                (close "bob" "alice")]))))
 

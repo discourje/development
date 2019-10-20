@@ -5,8 +5,8 @@
 ; This function will generate a vector with 1 interaction to send and receive the greet message.
 ;  Notice how receivers are defined as a vector in order to allow for multicast!
 (def message-exchange-pattern
-  (mep (-->> "greet" "alice" ["bob" "carol"])
-       (-->> "greet" "bob" "alice")
+  (mep (-->> String "alice" ["bob" "carol"])
+       (-->> String "bob" "alice")
        (close "alice" "bob")
        (close "alice" "carol")
        (close "bob" "alice")))
