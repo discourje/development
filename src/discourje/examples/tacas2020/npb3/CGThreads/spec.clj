@@ -12,8 +12,12 @@
                                    discourje.examples.tacas2020.npb3.CGThreads.CGMessage
                                    discourje.examples.tacas2020.npb3.DoneMessage)
                               (fix :X)]
-                             (ins one-all-one master worker :k
-                                  discourje.examples.tacas2020.npb3.ExitMessage
-                                  discourje.examples.tacas2020.npb3.DoneMessage)))))
+                             [(ins one-all-one master worker :k
+                                   discourje.examples.tacas2020.npb3.ExitMessage
+                                   discourje.examples.tacas2020.npb3.DoneMessage)
+                              (rep seq [:i (range :k)]
+                                   [(-## master (worker :i)) (-## (worker :i) master)])]))))
 
 (defn s [k] (ins cg k))
+
+(moni (spec (s 2)))

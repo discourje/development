@@ -260,6 +260,10 @@ public class CG extends CGBase{
 			}
 		}
 	}
+	for (int m = 0; m < num_threads; m++) {
+		worker[m].in.close();
+		worker[m].out.close();
+	}
      }
   void setTimers(){
     File fp = new File("timer.flag");

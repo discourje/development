@@ -41,6 +41,11 @@
                                    discourje.examples.tacas2020.npb3.DoneMessage)
                               (ins one-all-one master resid :k
                                    discourje.examples.tacas2020.npb3.ExitMessage
-                                   discourje.examples.tacas2020.npb3.DoneMessage)]))))
+                                   discourje.examples.tacas2020.npb3.DoneMessage)
+                              (rep seq [:i (range :k)]
+                                   [(-## master (interp :i)) (-## (interp :i) master)
+                                    (-## master (psinv :i)) (-## (psinv :i) master)
+                                    (-## master (rprj :i)) (-## (rprj :i) master)
+                                    (-## master (resid :i)) (-## (resid :i) master)])]))))
 
 (defn s [k] (ins ft k))

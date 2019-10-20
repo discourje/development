@@ -144,6 +144,12 @@ public class FT extends FTBase{
             }
         }
     }
+    for (int m = 0; m < num_threads; m++) {
+        doFFT[m].in.close();
+        doFFT[m].out.close();
+        doEvolve[m].in.close();
+        doEvolve[m].out.close();
+    }
   }
 
   public void appft_serial(){

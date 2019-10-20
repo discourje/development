@@ -216,6 +216,16 @@ public class MG extends MGBase{
             }
         }
     }
+    for (int m = 0; m < num_threads; m++) {
+        interp[m].in.close();
+        interp[m].out.close();
+        psinv[m].in.close();
+        psinv[m].out.close();
+        rprj[m].in.close();
+        rprj[m].out.close();
+        resid[m].in.close();
+        resid[m].out.close();
+    }
   }
   
   public int verify(double rnm2){

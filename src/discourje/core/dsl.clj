@@ -197,7 +197,7 @@
   (->branch (next-id)
             (vec (mapcat identity
                          (map #(if (vector? %)
-                                 [%]
+                                 [(vec (flatten %))]
                                  (if (satisfies? branchable %)
                                    (get-branches %)
                                    [[%]]))
@@ -206,7 +206,7 @@
 
 (defn seqfn
   ([] [])
-  ([first & rest] (into (if (vector? first) first [first])
+  ([first & rest] (into (if (vector? first) (vec (flatten first)) [first])
                         (apply seqfn rest))))
 
 (defn parfn
@@ -214,7 +214,7 @@
   (->lateral (next-id)
              (vec (mapcat identity
                           (map #(if (vector? %)
-                                  [%]
+                                  [(vec (flatten %))]
                                   (if (satisfies? parallelizable %)
                                     (get-parallel %)
                                     [[%]]))

@@ -28,6 +28,9 @@
                                    discourje.examples.tacas2020.npb3.DoneMessage)
                               (ins one-all-one master evolve :k
                                   discourje.examples.tacas2020.npb3.ExitMessage
-                                  discourje.examples.tacas2020.npb3.DoneMessage)]))))
+                                  discourje.examples.tacas2020.npb3.DoneMessage)
+                              (rep seq [:i (range :k)]
+                                   [(-## master (fft :i)) (-## (fft :i) master)
+                                    (-## master (evolve :i)) (-## (evolve :i) master)])]))))
 
 (defn s [k] (ins ft k))

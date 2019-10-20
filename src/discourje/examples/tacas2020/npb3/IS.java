@@ -167,7 +167,11 @@ public class IS extends ISBase{
               } catch (InterruptedException e) {}
           }
       }
-  }  
+      for (int m = 0; m < num_threads; m++) {
+          rankthreads[m].in.close();
+          rankthreads[m].out.close();
+      }
+  }
       
   public double getMOPS(double total_time,int niter,int num_keys){
     double mops = 0.0;
