@@ -40,7 +40,7 @@
 (defn- get-atomic-interaction
   "Check the atomic interaction"
   [sender receiver message active-interaction]
-  (when (is-valid-interaction? sender receiver message active-interaction) active-interaction))
+  (when (and (contains? (get-accepted-sends active-interaction) sender)(is-valid-interaction? sender receiver message active-interaction))active-interaction))
 
 (defn- get-recur-identifier-interaction
   "Check the first element in a recursion interaction"
@@ -84,7 +84,8 @@
   "Remove an interaction from a parallel in a recursive fashion."
   [sender receivers message target-interaction monitor]
   (let [pars (flatten (filter some?
-                              (for [par (get-parallel target-interaction)]
+                              (for [par (get-parallel target-interaction)
+                                    is-found (atom false)]
                                 (let [inter (cond
                                               (satisfies? parallelizable par)
                                               (remove-from-parallel sender receivers message par monitor)
