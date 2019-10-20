@@ -3,7 +3,7 @@
            [discourje.core.logging :refer :all]))
 ;This function will generate a mep with 1 interaction to send and receive the hello world message.
 (def message-exchange-pattern
-  (mep (-->> "helloWorld" "user" "world")
+  (mep (-->> String "user" "world")
        (close "user" "world")))
 
 ;setup infrastructure, generate channels and add monitor

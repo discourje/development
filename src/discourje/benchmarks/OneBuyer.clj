@@ -1,15 +1,16 @@
 (ns discourje.benchmarks.OneBuyer
   (:require [discourje.core.async :refer :all]
-            [discourje.core.logging :refer :all]))
+            [discourje.core.logging :refer :all])
+  (:import (clojure.lang PersistentArrayMap)))
 
 (def buy-goods
   (mep
-    (-->> "quote-request" "buyer" "seller")
+    (-->> PersistentArrayMap "buyer" "seller")
     (choice
-      [(-->> "quote" "seller" "buyer")
-       (-->> "order" "buyer" "seller")
-       (-->> "order-ack" "seller" "buyer")]
-      [(-->> "out-of-stock" "seller" "buyer")])
+      [(-->> String "seller" "buyer")
+       (-->> String "buyer" "seller")
+       (-->> String "seller" "buyer")]
+      [(-->> String "seller" "buyer")])
     )
   )
 
@@ -17,7 +18,7 @@
   "Logic representing Buyer"
   [b->s s->b quote-request order]
   (>!! b->s quote-request)
-  (if (= (<!! s->b) "quote")
+  (if (= (<!! s->b) "$40,00")
     (do (>!! b->s order)
         (<!! s->b))
     "Book is out of stock!"))
@@ -78,7 +79,7 @@
   "Logic representing Buyer"
   [b->s s->b quote-request order]
   (do (clojure.core.async/>!! b->s quote-request)
-      (if (= (clojure.core.async/<!! s->b) "quote")
+      (if (= (clojure.core.async/<!! s->b) "$40,00")
         (do (clojure.core.async/>!! b->s order)
             (clojure.core.async/<!! s->b))
         "Book is out of stock!")))

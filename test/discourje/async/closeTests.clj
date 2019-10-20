@@ -6,11 +6,27 @@
             [discourje.core.logging :refer :all])
   (:use [slingshot.slingshot :only [throw+ try+]]))
 
+
+(defn only-closer-protocol [include-ids]
+  (if include-ids (create-protocol
+                    [(close "alice" "bob")
+                     (close "alice" "carol")])
+                  (create-protocol
+                    [(->closer nil "alice" "bob" nil)
+                     (->closer nil "alice" "carol" nil)])))
+(def only-closer-protocol-control
+  (->closer nil "alice" "bob"
+            (->closer nil "alice" "carol" nil)))
+
+(deftest only-closer-protocol-test
+  (let [mon (generate-monitor (only-closer-protocol false))]
+    (is (= (get-active-interaction mon) only-closer-protocol-control))))
+
 (defn <!!-test
   "Utility method to fix all test cases"
   [channel]
-   (let [value (discourje.core.async/<!! channel)]
-     (get-content value)))
+  (let [value (discourje.core.async/<!! channel)]
+    (get-content value)))
 
 (deftest close-interaction-with-closer-test
   (let [channels (add-infrastructure (interaction-with-closer true))
@@ -62,7 +78,7 @@
     (set-logging-exceptions)
     (>!! ab (msg 0 0))
     (let [a->b (<!!-test ab)]
-      (is (=  a->b 0))
+      (is (= a->b 0))
       (let [a->b1 (>!! ab (msg 1 1))]
         (is (= (<!!-test ab)))
         (close-channel! ab)

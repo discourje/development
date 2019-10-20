@@ -1,13 +1,14 @@
 (ns discourje.examples.branching
   (require [discourje.core.async :refer :all]
-           [discourje.core.logging :refer :all]))
+           [discourje.core.logging :refer :all])
+  (:import (clojure.lang PersistentHashMap PersistentArrayMap)))
 
 ; This function will generate a mep to send and receive the number message.
 ; The mep offers a choice (with internal interactions) to send messages called greaterThan or lessThan to alice depending on the data received
 (def message-exchange-pattern
-  (mep (-->> "number" "alice" "bob")
-       (choice [(-->> "greaterThan" "bob" "alice")]
-               [(-->> "lessThan" "bob" "alice")])
+  (mep (-->> PersistentArrayMap "alice" "bob")
+       (choice [(-->> PersistentArrayMap "bob" "alice")]
+               [(-->> PersistentArrayMap "bob" "alice")])
        (close "alice" "bob")
        (close "bob" "alice")))
 

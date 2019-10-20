@@ -1,7 +1,8 @@
 (ns discourje.benchmarks.TwoBuyer
   (:require [discourje.core.async :refer :all]
             [discourje.core.logging :refer :all])
-  (:import (clojure.lang PersistentArrayMap)))
+  (:import (clojure.lang PersistentArrayMap)
+           (java.util GregorianCalendar)))
 
 (def two-buyer-protocol
   (mep
@@ -10,7 +11,7 @@
     (-->> Long "buyer1" "buyer2")
     (choice
       [(-->> PersistentArrayMap "buyer2" "seller")
-       (-->> String "buyer2" "seller")
+       (-->> Long "buyer2" "seller")
        (-->> Long "seller" "buyer2")]
       [(-->> PersistentArrayMap "buyer2" "seller")])))
 
@@ -89,7 +90,6 @@
                    (force-monitor-reset! (get-monitor b1-s) interactions))))]
     time))
 
-(discourje-two-buyer-monitor-reset 100)
 (defn- clojure-buyer2 "Order a book from buyer2's perspective"
   [s-b2 b1-b2 b2-s ok address]
   (do
