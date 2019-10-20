@@ -184,8 +184,6 @@
 
        time))))
 
-(discourje-scatter-gather-parallel 4 1000)
-
 (defn clojure-scatter-gather
   ([workers]
    (let [workers-prot (create-protocol
@@ -255,5 +253,3 @@
                             (recur result))))
                       (force-monitor-reset! (get-monitor (first m->w)) interactions))))]
        time))))
-
-(clojure-scatter-gather 4 1000)

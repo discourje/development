@@ -77,7 +77,9 @@
   [sender receivers target-interaction monitor]
   (let [pars (flatten (filter some?
                               (for [par (get-parallel target-interaction)]
-                                (let [inter (cond
+                                (let [is-found (atom false)
+                                      inter (cond
+                                              @is-found par
                                               (satisfies? parallelizable par)
                                               (remove-close-from-parallel sender receivers par monitor)
                                               (satisfies? closable par)
@@ -92,19 +94,21 @@
                                                   recursion))
                                               :else
                                               par)]
-                                  (if (nil? inter)
-                                    (if (satisfies? parallelizable par)
-                                      nil
-                                      par)
-                                    (cond
-                                      (satisfies? parallelizable inter)
-                                      (remove-close-from-parallel sender receivers inter monitor)
-                                      (satisfies? closable inter)
-                                      (get-next inter)
-                                      (or (satisfies? branchable inter) (satisfies? interactable inter))
-                                      inter
-                                      (and (instance? clojure.lang.LazySeq inter) (not (satisfies? interactable inter)))
-                                      (first (filter some? inter))))))))]
+                                  (if @is-found
+                                    inter
+                                    (if (nil? inter)
+                                      (if (satisfies? parallelizable par)
+                                        nil
+                                        par)
+                                      (cond
+                                        (satisfies? parallelizable inter)
+                                        (remove-close-from-parallel sender receivers inter monitor)
+                                        (satisfies? closable inter)
+                                        (get-next inter)
+                                        (or (satisfies? branchable inter) (satisfies? interactable inter))
+                                        inter
+                                        (and (instance? clojure.lang.LazySeq inter) (not (satisfies? interactable inter)))
+                                        (first (filter some? inter)))))))))]
     (if (empty? pars)
       (get-next target-interaction)
       (assoc target-interaction :parallels pars))))
