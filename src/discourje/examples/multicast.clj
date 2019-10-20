@@ -5,8 +5,8 @@
 ; This function will generate a vector with 1 interaction to send and receive the greet message.
 ;  Notice how receivers are defined as a vector in order to allow for multicast!
 (def message-exchange-pattern
-  (mep (-->> "greet" "alice" ["bob" "carol"])
-       (-->> "greet" "bob" "alice")
+  (mep (-->> String "alice" ["bob" "carol"])
+       (-->> String "bob" "alice")
        (close "alice" "bob")
        (close "alice" "carol")
        (close "bob" "alice")))
@@ -22,8 +22,8 @@
   "This function will use the protocol to send the greet message to bob and carol.
  Notice: We supply the put operation with a vector of channels"
   []
-  (>!! [alice-to-bob alice-to-carol] (msg "greet" "Greetings, from alice!"))
-  (<!! bob-to-alice "greet")
+  (>!! [alice-to-bob alice-to-carol] "Greetings, from alice!")
+  (<!! bob-to-alice)
   (close! alice-to-bob)
   (close! alice-to-carol)
   (close! bob-to-alice))
@@ -31,9 +31,9 @@
 (defn- receive-greet
   "This function will use the protocol to listen for the greet message."
   [channel return-channel]
-  (let [message (<!!! channel "greet")]
+  (let [message (<!!! channel)]
     (log-message (format "Received message: %s by %s" message (get-consumer channel)))
-    (when (not= (nil?(>!! return-channel (msg "greet" "Hi Alice!")))))))
+    (when (not= (nil?(>!! return-channel "Hi Alice!"))))))
 
 ;start the `greet-bob-and-carol' function on thread
 (clojure.core.async/thread (greet-bob-and-carol))

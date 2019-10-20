@@ -1,15 +1,16 @@
 (ns discourje.async.demoTests
   (:require [clojure.test :refer :all]
-            [discourje.core.async :refer :all]))
+            [discourje.core.async :refer :all])
+  (:import (clojure.lang PersistentArrayMap)))
 
 (def buy-goods
   (mep
-    (-->> "quote-request" "buyer" "seller")
+    (-->> PersistentArrayMap "buyer" "seller")
     (choice
-      [(-->> "quote" "seller" "buyer")
-       (-->> "order" "buyer" "seller")
-       (-->> "order-ack" "seller" "buyer")]
-      [(-->> "out-of-stock" "seller" "buyer")])))
+      [(-->> String "seller" "buyer")
+       (-->> String "buyer" "seller")
+       (-->> String "seller" "buyer")]
+      [(-->> String "seller" "buyer")])))
 
 (def infra (add-infrastructure buy-goods))
 
@@ -25,11 +26,11 @@
   (let [b->s (get-channel infra "buyer" "seller")
         s->b (get-channel infra "seller" "buyer")
         product {:product-type "book" :content {:title "The joy of Clojure"}}]
-    (>!! b->s (msg "quote-request" product))
-    (if (= (:choice (<!! s->b ["quote" "out-of-stock"])) "quote")
-      (do (>!! b->s (msg "order" "confirm order!"))
-          (confirmed-callback (<!! s->b "order-ack")))
-      (out-of-stock-callback "Book is out of stock!"))))
+    (>!! b->s product)
+    (if (= (:choice (<!! s->b) "quote")
+           (do (>!! b->s "confirm order!")
+               (confirmed-callback (<!! s->b)))
+           (out-of-stock-callback "Book is out of stock!")))))
 
 (defn seller
   "Logic representing the Seller"
@@ -37,13 +38,13 @@
   (let [b->s (get-channel infra "buyer" "seller")
         s->b (get-channel infra "seller" "buyer")
         in-stock? (fn [book] (rand-int 2))]
-    (if (== 1 (in-stock? (<!! b->s "quote-request")))
+    (if (== 1 (in-stock? (<!! b->s)))
       (do
-        (>!! s->b (msg "quote" {:choice "quote" :content"$40,00"}))
-        (let [order (<!! b->s "order")]
+        (>!! s->b {:choice "quote" :content "$40,00"})
+        (let [order (<!! b->s)]
           (println order)
-          (>!! s->b (msg "order-ack" "order-ack confirmed!"))))
-      (>!! s->b (msg "out-of-stock" {:choice"out-of-stock" :content "Product out of stock!"})))))
+          (>!! s->b "order-ack confirmed!")))
+      (>!! s->b {:choice "out-of-stock" :content "Product out of stock!"}))))
 
 (clojure.core.async/thread (buyer (fn [m] (println m)) (fn [m] (println m))))
 (clojure.core.async/thread (seller))

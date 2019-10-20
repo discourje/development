@@ -3,8 +3,12 @@
 
 (defmacro -->>
   "Create an Atomic-interaction"
-  [action sender receiver]
-  `(->interaction (uuid/v1) ~action ~sender ~receiver #{} nil))
+  ([sender receiver]
+   `(->interaction (uuid/v1) (fn [~'x] true) ~sender ~receiver #{} nil))
+  ([action sender receiver]
+   `(if (fn? ~action)
+     (->interaction (uuid/v1) ~action ~sender ~receiver #{} nil)
+     (->interaction (uuid/v1) (fn [~'x] (= (type ~'x) ~action)) ~sender ~receiver #{} nil))))
 
 (defmacro close
   "Create an close construct"
@@ -56,20 +60,6 @@
    `(generate-infrastructure ~message-exchange-pattern))
   ([message-exchange-pattern custom-channels]
    `(generate-infrastructure ~message-exchange-pattern ~custom-channels)))
-
-; Sung: Changed this macro into a function and moved to async.clj
-;
-;(defmacro chan
-;  "create a custom channel"
-;  [sender receiver buffer]
-;  `(if (nil? ~buffer)
-;     (->channel ~sender ~receiver (clojure.core.async/chan) nil nil)
-;     (->channel ~sender ~receiver (clojure.core.async/chan ~buffer) ~buffer nil)))
-
-(defmacro msg
-  "Generate a message"
-  [label content]
-  `(->message ~label ~content))
 
 (defmacro thread
   "Execute body on thread"

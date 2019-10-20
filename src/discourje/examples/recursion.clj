@@ -1,6 +1,7 @@
 (ns discourje.examples.recursion
   (require [discourje.core.async :refer :all]
-           [discourje.core.logging :refer :all]))
+           [discourje.core.logging :refer :all])
+  (:import (clojure.lang PersistentArrayMap)))
 
 ;  This function will generate a mep with 1 recursion to send and receive the number message (recursion).
 ;  The protocol offers a choice (with internal interactions) to send messages called greaterThan or lessThan to alice depending on the data received
@@ -8,11 +9,11 @@
 ;  Recur is matched by name, in this case: :generate
 (def message-exchange-pattern
   (mep (rec :generate
-            (-->> "number" "alice" "bob")
+            (-->> PersistentArrayMap "alice" "bob")
             (choice
-              [(-->> "greaterThan" "bob" "alice")
+              [(-->> (fn [m] (= (:flag m) "greaterThan")) "bob" "alice")
                (continue :generate)]
-              [(-->> "lessThan" "bob" "alice")
+              [(-->> (fn [m] (= (:flag m) "lessThan")) "bob" "alice")
                (close "alice" "bob")
                (close "bob" "alice")]))))
 
@@ -26,8 +27,8 @@
   "This function will use the protocol to send the number message to bob and wait for the result to know if it is greaterThan or lessThan threshold."
   [threshold]
   ;We send a map (data structure) in order to send both the threshold and the generated number
-  (>!! alice-to-bob (msg "number" {:threshold threshold :generatedNumber (rand-int (+ threshold 10))}))
-  (let [response (<!! bob-to-alice ["greaterThan" "lessThan"])]
+  (>!! alice-to-bob {:threshold threshold :generatedNumber (rand-int (+ threshold 10))})
+  (let [response (<!! bob-to-alice)]
     (cond
       (= (:flag response) "greaterThan")
       (do (log-message (format "greaterThan received with message: %s" (:content response)))
@@ -40,13 +41,13 @@
 (defn- receive-number
   "This function will use the protocol to listen for the number message. Check the number and threshold and send result"
   []
-  (let [numberMap (<!! alice-to-bob "number")
+  (let [numberMap (<!! alice-to-bob)
         threshold (:threshold numberMap)
         generated (:generatedNumber numberMap)]
     (if (> generated threshold)
-      (do (>!! bob-to-alice (msg "greaterThan" {:flag "greaterThan" :content "Number send is greater!"}))
+      (do (>!! bob-to-alice {:flag "greaterThan" :content "Number send is greater!"})
           (receive-number))
-      (>!! bob-to-alice (msg "lessThan" {:flag "lessThan" :content "Number send is smaller!"})))))
+      (>!! bob-to-alice {:flag "lessThan" :content "Number send is smaller!"}))))
 
 ;start the `send-number-and-await-result' function on thread and supply some threshold
 (clojure.core.async/thread (send-number-and-await-result 5))

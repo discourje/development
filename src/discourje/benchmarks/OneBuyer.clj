@@ -1,15 +1,16 @@
 (ns discourje.benchmarks.OneBuyer
   (:require [discourje.core.async :refer :all]
-            [discourje.core.logging :refer :all]))
+            [discourje.core.logging :refer :all])
+  (:import (clojure.lang PersistentArrayMap)))
 
 (def buy-goods
   (mep
-    (-->> "quote-request" "buyer" "seller")
+    (-->> PersistentArrayMap "buyer" "seller")
     (choice
-      [(-->> "quote" "seller" "buyer")
-       (-->> "order" "buyer" "seller")
-       (-->> "order-ack" "seller" "buyer")]
-      [(-->> "out-of-stock" "seller" "buyer")])
+      [(-->> String "seller" "buyer")
+       (-->> String "buyer" "seller")
+       (-->> String "seller" "buyer")]
+      [(-->> String "seller" "buyer")])
     )
   )
 
@@ -17,18 +18,18 @@
   "Logic representing Buyer"
   [b->s s->b quote-request order]
   (>!! b->s quote-request)
-  (if (= (get-label (<!! s->b ["quote" "out-of-stock"])) "quote")
+  (if (= (<!! s->b) "$40,00")
     (do (>!! b->s order)
-        (<!! s->b "order-ack"))
+        (<!! s->b))
     "Book is out of stock!"))
 
 (defn- discourje-seller
   "Logic representing the Seller"
   [b->s s->b in-stock? quote order-ack out-of-stock]
-  (if (== 1 (in-stock? (get-content (<!! b->s "quote-request"))))
+  (if (== 1 (in-stock? (<!! b->s)))
     (do
       (>!! s->b quote)
-      (<!! b->s "order")
+      (<!! b->s)
       (>!! s->b order-ack))
     (>!! s->b out-of-stock)))
 
@@ -37,12 +38,12 @@
         b->s (vec (for [i infra] (get-channel i "buyer" "seller")))
         s->b (vec (for [i infra] (get-channel i "seller" "buyer")))
         product {:product-type "book" :content {:title "The joy of Clojure"}}
-        quote-request (msg "quote-request" product)
-        order (msg "order" "confirm order!")
+        quote-request "quote-request"
+        order "order"
         in-stock? (fn [book] (rand-int 2))
-        quote (msg "quote" "$40,00")
-        order-ack (msg "order-ack" "order-ack confirmed!")
-        out-of-stock (msg "out-of-stock" "Product out of stock!")
+        quote "$40,00"
+        order-ack "order-ack confirmed!"
+        out-of-stock "Product out of stock!"
         time (custom-time
                (doseq [i (range iterations)]
                  (do
@@ -59,12 +60,12 @@
         s->b (get-channel infra "seller" "buyer")
         interactions (get-active-interaction (get-monitor b->s))
         product {:product-type "book" :content {:title "The joy of Clojure"}}
-        quote-request (msg "quote-request" product)
-        order (msg "order" "confirm order!")
+        quote-request product
+        order "confirm order!"
         in-stock? (fn [book] (rand-int 2))
-        quote (msg "quote" "$40,00")
-        order-ack (msg "order-ack" "order-ack confirmed!")
-        out-of-stock (msg "out-of-stock" "Product out of stock!")
+        quote "$40,00"
+        order-ack "order-ack confirmed!"
+        out-of-stock "Product out of stock!"
         time (custom-time
                (doseq [_ (range iterations)]
                  (do
@@ -78,7 +79,7 @@
   "Logic representing Buyer"
   [b->s s->b quote-request order]
   (do (clojure.core.async/>!! b->s quote-request)
-      (if (= (get-label (clojure.core.async/<!! s->b)) "quote")
+      (if (= (clojure.core.async/<!! s->b) "$40,00")
         (do (clojure.core.async/>!! b->s order)
             (clojure.core.async/<!! s->b))
         "Book is out of stock!")))
@@ -97,12 +98,12 @@
   (let [b->s (vec (for [_ (range iterations)] (clojure.core.async/chan 1)))
         s->b (vec (for [_ (range iterations)] (clojure.core.async/chan 1)))
         product {:product-type "book" :content {:title "The joy of Clojure"}}
-        quote-request (msg "quote-request" product)
-        order (msg "order" "confirm order!")
+        quote-request product
+        order "confirm order!"
         in-stock? (fn [book] (rand-int 2))
-        quote (msg "quote" "$40,00")
-        order-ack (msg "order-ack" "order-ack confirmed!")
-        out-of-stock (msg "out-of-stock" "Product out of stock!")
+        quote  "$40,00"
+        order-ack "order-ack confirmed!"
+        out-of-stock "Product out of stock!"
         time (custom-time
                (doseq [i (range iterations)]
                  (do
@@ -118,12 +119,12 @@
         s->b (get-channel infra "seller" "buyer")
         interactions (get-active-interaction (get-monitor b->s))
         product {:product-type "book" :content {:title "The joy of Clojure"}}
-        quote-request (msg "quote-request" product)
-        order (msg "order" "confirm order!")
+        quote-request product
+        order "confirm order!"
         in-stock? (fn [book] (rand-int 2))
-        quote (msg "quote" "$40,00")
-        order-ack (msg "order-ack" "order-ack confirmed!")
-        out-of-stock (msg "out-of-stock" "Product out of stock!")
+        quote  "$40,00"
+        order-ack "order-ack confirmed!"
+        out-of-stock  "Product out of stock!"
         time (custom-time
                (doseq [_ (range iterations)]
                  (do

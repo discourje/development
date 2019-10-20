@@ -19,8 +19,8 @@
 
 ;Next, lets fix those channels.
 
-(def buyer-to-seller (chan))
-(def seller-to-buyer (chan))
+(def buyer-to-seller (clojure.core.async/chan))
+(def seller-to-buyer (clojure.core.async/chan))
 
 (def product (doto (Book.) (.setName "The Joy of Clojure")))
 
