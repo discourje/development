@@ -8,7 +8,6 @@
   (let [mon (generate-monitor (testDualProtocol false))]
     (println mon)
     (is (= (get-active-interaction mon) testDualProtocolControl))
-    (is (= "1" (get-action (get-active-interaction mon))))
     (is (= "A" (get-sender (get-active-interaction mon))))
     (is (= "B" (get-receivers (get-active-interaction mon))))))
 
