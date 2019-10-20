@@ -37,14 +37,14 @@
                     measurements (if (> (count measurements) 20)
                                    (nthrest measurements (- (count measurements) 20))
                                    measurements)
-                    m20 (long (mean measurements))
-                    sd20 (long (standard-deviation measurements))
-                    rsd20 (long (* 100 (double (/ sd20 m20))))]
+                    m10 (long (mean measurements))
+                    sd10 (long (standard-deviation measurements))
+                    rsd10 (long (* 100 (double (/ sd10 m10))))]
                 (binding [*out* *err*]
                   (println (- end init) "ns;" c "runs;"
                            "ALL:" (str "m = " m ", sd = " sd ", rsd = " rsd "%;")
                            "LAST-100:" (str "m = " m100 ", sd = " sd100 ", rsd = " rsd100 "%;")
-                           "LAST-020:" (str "m = " m20 ", sd = " sd20 ", rsd = " rsd20 "%;")
+                           "LAST-010:" (str "m = " m10 ", sd = " sd10 ", rsd = " rsd10 "%;")
                            ))))))))))
 
 (defn -main
