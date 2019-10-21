@@ -10,7 +10,7 @@
   (string? message))
 
 ;  This function will generate a vector with 4 interactions to send and receive the greet message.
-;  Notice how send and receivers are defined separately in order to allow for sequencing of actions!
+;  Notice how all communications have a different form of validating the message!
 (def message-exchange-pattern
   (mep (-->> String "alice" "bob")                             ; Check by type
        (-->> "bob" "alice")                                    ; Wildcard, we do not care about the message, just the sender and receiver pair

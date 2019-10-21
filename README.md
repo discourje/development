@@ -45,7 +45,7 @@ Using Discourje takes three simple steps:
 
 Step 1: A message exchange pattern can be specified by the following constructs
 -
-- <b>-->> [predicate/value/wildcard sender receiver]</b>: Specifies an `atomic-interaction` which validates that the current communication through the protocol is a send & receive with validation of pred/value/wildcard from `sender` to `receiver`.
+- <b>-->> [predicate/type/wildcard sender receiver]</b>: Specifies an `atomic-interaction` which validates that the current communication through the protocol is a send & receive with validation of pred/value/wildcard from `sender` to `receiver`.
 - <b>choice [branch & more]</b>: Specifies a `choice form` which validates the first monitor in all branches and continues on target branch when an action is verified. Notice it supports variadic input arguments.
 - <b>rec [name interaction & more]</b>: Specifies a `recursion form` which recurs when the protocol encounters a `continue [name]`. Recur is matched by name and also supports nesting!
 - <b>continue [name]</b>: Specifies a recursion back to the matching `rec`.
