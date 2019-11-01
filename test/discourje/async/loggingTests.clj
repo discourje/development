@@ -23,3 +23,8 @@
 (deftest when-set-logging-and-exceptions-can-exceptions-NOT-be-done
   (set-logging)
   (is (= false (can-throw?))))
+
+(deftest throwing-java-exception-works-properly-without-slingshot-library
+  (set-logging-and-exceptions)
+  (set-throwing true)
+  (is (thrown? Exception (log-error :test-exception "this is a test exception"))))

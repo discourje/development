@@ -3,8 +3,7 @@
             [discourje.async.protocolTestData :refer :all ]
             [discourje.core.async :refer :all]
             [clojure.core.async :as async]
-            [discourje.core.logging :refer :all])
-  (:use [slingshot.slingshot :only [throw+ try+]]))
+            [discourje.core.logging :refer :all]))
 
 
 (defn <!!-test

@@ -1,7 +1,6 @@
 (ns discourje.TwoBuyerProtocol.Buyer1
   (:require [discourje.core.async :refer :all]
-            [discourje.core.logging :refer :all])
-  (:use [slingshot.slingshot :only [throw+ try+]]))
+            [discourje.core.logging :refer :all]))
 
 (def books ["The Joy of Clojure" "Mastering Clojure Macros" "Programming Clojure"])
 

@@ -1,7 +1,6 @@
 <b>Discourje</b>
 -
 - [Library Name](LibraryName.md)
-- [Dependencies](Dependencies.md)
 
 <b>Introduction:</b>
 -
