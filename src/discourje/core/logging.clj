@@ -1,5 +1,5 @@
 (ns discourje.core.logging
-  (require [clojure.core.async :as async]))
+  (:require [clojure.core.async :as async]))
 
 ;set the logging level to none, showing no logs nor exceptions
 (def level-none :none)

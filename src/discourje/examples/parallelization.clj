@@ -1,5 +1,5 @@
 (ns discourje.examples.parallelization
-  (require [discourje.core.async :refer :all]
+  (:require [discourje.core.async :refer :all]
            [discourje.core.logging :refer :all]))
 
 ; parallelization allows multiple paths to be traversed.

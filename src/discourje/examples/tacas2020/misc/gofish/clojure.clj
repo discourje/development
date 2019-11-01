@@ -1,5 +1,5 @@
 (ns discourje.examples.tacas2020.misc.gofish.clojure
-  (require [clojure.core.async :refer [>!! <!! close! chan thread]]))
+  (:require [clojure.core.async :refer [>!! <!! close! chan thread]]))
 
 ;;
 ;; Implementation

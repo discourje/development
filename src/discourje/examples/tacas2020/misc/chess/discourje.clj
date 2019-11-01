@@ -1,5 +1,5 @@
 (ns discourje.examples.tacas2020.misc.chess.discourje
-  (require [discourje.core.async :refer :all]))
+  (:require [discourje.core.async :refer :all]))
 
 ;;
 ;; Configuration
