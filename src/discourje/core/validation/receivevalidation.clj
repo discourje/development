@@ -40,7 +40,7 @@
 (defn- get-atomic-interaction
   "Check the atomic interaction"
   [sender receiver message active-interaction]
-  (when (is-valid-interaction? sender receiver message active-interaction) active-interaction))
+  (when (and (contains? (get-accepted-sends active-interaction) sender) (is-valid-interaction? sender receiver message active-interaction)) active-interaction))
 
 (defn- get-recur-identifier-interaction
   "Check the first element in a recursion interaction"
@@ -85,7 +85,9 @@
   [sender receivers message target-interaction monitor]
   (let [pars (flatten (filter some?
                               (for [par (get-parallel target-interaction)]
-                                (let [inter (cond
+                                (let [is-found (atom false)
+                                      inter (cond
+                                              @is-found par
                                               (satisfies? parallelizable par)
                                               (remove-from-parallel sender receivers message par monitor)
                                               (satisfies? interactable par)
@@ -100,21 +102,26 @@
                                                   recursion))
                                               :else
                                               par)]
-                                  (if (nil? inter)
-                                    (if (satisfies? parallelizable par)
-                                      nil
-                                      par)
-                                    (cond
-                                      (satisfies? parallelizable inter)
-                                      (remove-from-parallel sender receivers message inter monitor)
-                                      (satisfies? interactable inter)
-                                      (if (multiple-receivers? inter)
-                                        (assoc inter :receivers (vec (remove #{receivers} (:receivers inter))))
-                                        (get-next inter))
-                                      (or (satisfies? branchable inter) (satisfies? closable inter))
-                                      inter
-                                      (and (instance? clojure.lang.LazySeq inter) (not (satisfies? interactable inter)))
-                                      (first (filter some? inter))))))))]
+                                  (if @is-found
+                                    inter
+                                    (if (nil? inter)
+                                      (if (satisfies? parallelizable par)
+                                        nil
+                                        par)
+                                      (cond
+                                        (satisfies? parallelizable inter)
+                                        (remove-from-parallel sender receivers message inter monitor)
+                                        (satisfies? interactable inter)
+                                        (do
+                                          (reset! is-found true)
+                                          (if (multiple-receivers? inter)
+                                            (assoc inter :receivers (vec (remove #{receivers} (:receivers inter))))
+                                            (get-next inter))
+                                          )
+                                        (or (satisfies? branchable inter) (satisfies? closable inter))
+                                        inter
+                                        (and (instance? clojure.lang.LazySeq inter) (not (satisfies? interactable inter)))
+                                        (first (filter some? inter)))))))))]
     (if (empty? pars)
       (get-next target-interaction)
       (assoc target-interaction :parallels pars))))
@@ -154,14 +161,14 @@
 (defn- apply-receive-to-mon
   "Apply new interaction"
   [monitor sender receivers message active-interaction pre-swap-interaction target-interaction]
-   (cond
-     (satisfies? interactable target-interaction)
-     (swap-active-interaction-by-atomic active-interaction pre-swap-interaction target-interaction receivers)
-     (satisfies? branchable target-interaction)
-     (apply-receive-to-mon monitor sender receivers message active-interaction pre-swap-interaction (get-branch-interaction monitor sender receivers message target-interaction))
-     (satisfies? parallelizable target-interaction)
-     (swap-active-interaction-by-parallel sender receivers message active-interaction target-interaction monitor)
-     (satisfies? identifiable-recur target-interaction)
-     (apply-receive-to-mon monitor sender receivers message active-interaction pre-swap-interaction (get-rec monitor (get-name target-interaction)))
-     :else (log-error :unsupported-operation (format "Unsupported type of interaction to apply %s!" (type target-interaction)))
-     ))
+  (cond
+    (satisfies? interactable target-interaction)
+    (swap-active-interaction-by-atomic active-interaction pre-swap-interaction target-interaction receivers)
+    (satisfies? branchable target-interaction)
+    (apply-receive-to-mon monitor sender receivers message active-interaction pre-swap-interaction (get-branch-interaction monitor sender receivers message target-interaction))
+    (satisfies? parallelizable target-interaction)
+    (swap-active-interaction-by-parallel sender receivers message active-interaction target-interaction monitor)
+    (satisfies? identifiable-recur target-interaction)
+    (apply-receive-to-mon monitor sender receivers message active-interaction pre-swap-interaction (get-rec monitor (get-name target-interaction)))
+    :else (log-error :unsupported-operation (format "Unsupported type of interaction to apply %s!" (type target-interaction)))
+    ))

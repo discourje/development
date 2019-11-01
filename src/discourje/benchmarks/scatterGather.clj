@@ -253,5 +253,3 @@
                             (recur result))))
                       (force-monitor-reset! (get-monitor (first m->w)) interactions))))]
        time))))
-
-;(clojure-scatter-gather 16 16)
