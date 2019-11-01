@@ -1,7 +1,6 @@
 (ns discourje.benchmarks.scatterGather
   (require [discourje.core.async :refer :all]
-           [discourje.core.logging :refer :all]
-           [criterium.core :refer :all]))
+           [discourje.core.logging :refer :all]))
 
 (defn discourje-scatter-gather
   "Scatter gather protocol generator for Discourje:

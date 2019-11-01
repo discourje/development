@@ -1,7 +1,5 @@
 (ns discourje.core.logging
-  (require [clojure.core.async :as async]
-           [slingshot.slingshot :refer :all])
-  (:use [slingshot.slingshot :only [throw+]]))
+  (require [clojure.core.async :as async]))
 
 ;set the logging level to none, showing no logs nor exceptions
 (def level-none :none)
@@ -19,7 +17,7 @@
 (defn- generate-exception
   "Generate a custom exception, as map data structure."
   [type message]
-  {:type type :message message})
+  (str {:type type :message message}))
 
 (defn set-logging-none
   "Set level to none"
@@ -71,7 +69,7 @@
   [type message & more]
   (let [msg (format "%s %s" message (apply str (flatten more)))]
     (if (can-throw?)
-      (throw+ (generate-exception type msg))
+      (throw (Exception. (generate-exception type msg)))
       (log-message (format "ERROR-[%s] - %s" type msg)))
     nil)
   nil)
