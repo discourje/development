@@ -6,8 +6,11 @@
 
 (defn- assoc-sender-to-interaction
   "Assoc a sender to the accepted-sends set and return in"
-  [inter sender]
-  (assoc inter :accepted-sends (conj (:accepted-sends inter) sender)))
+  ([inter sender is-found]
+   (reset! is-found true)
+   (assoc-sender-to-interaction inter sender))
+  ([inter sender]
+   (assoc inter :accepted-sends (conj (:accepted-sends inter) sender))))
 
 (defn- send-active-interaction-by-atomic
   "Send active interaction by atomic"
@@ -73,19 +76,21 @@
 (defn- set-send-on-par
   "Assoc a sender to a nested parallel interaction"
   [sender receivers message target-interaction monitor]
-  (let [pars (let [pars (get-parallel target-interaction)]
+  (let [pars (let [pars (get-parallel target-interaction)
+                   is-found (atom false)]
                (for [p pars]
                  (cond
+                   @is-found p
                    (satisfies? interactable p)
                    (if (is-valid-interaction-for-send? sender receivers message p)
-                     (assoc-sender-to-interaction p sender)
+                     (assoc-sender-to-interaction p sender is-found)
                      p)
                    (satisfies? branchable p)
                    (let [valid-branch (get-send-branch-interaction monitor sender receivers message p)]
                      (if (not (nil? valid-branch))
                        (if (satisfies? parallelizable valid-branch)
                          (set-send-on-par sender receivers message valid-branch monitor)
-                         (assoc-sender-to-interaction valid-branch sender))
+                         (assoc-sender-to-interaction valid-branch sender is-found))
                        p))
                    (satisfies? parallelizable p)
                    (set-send-on-par sender receivers message p monitor)
@@ -94,7 +99,7 @@
                      (if (not (nil? valid-rec))
                        (if (satisfies? parallelizable valid-rec)
                          (set-send-on-par sender receivers message valid-rec monitor)
-                         (assoc-sender-to-interaction valid-rec sender))
+                         (assoc-sender-to-interaction valid-rec sender is-found))
                        p))
                    (satisfies? closable p)
                    p

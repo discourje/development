@@ -1,7 +1,6 @@
 <b>Discourje</b>
 -
 - [Library Name](LibraryName.md)
-- [Dependencies](Dependencies.md)
 
 <b>Introduction:</b>
 -
@@ -24,6 +23,7 @@ Communication is blocking when desired (configure logging levels) and order amon
 - [Custom Channels](src/discourje/examples/customChannels.clj)
 - [Typed Messages](src/discourje/examples/typedMessages.clj)
 - [Logging Levels](src/discourje/examples/logging.clj)
+- [Various validation mechanisms](src/discourje/examples/predicates.clj)
 - Validation on closing channels, all examples implement this!
 - Nesting: Parallelism, Recursion and Branching constructs support nesting!
 
@@ -44,7 +44,7 @@ Using Discourje takes three simple steps:
 
 Step 1: A message exchange pattern can be specified by the following constructs
 -
-- <b>-->> [action sender receiver]</b>: Specifies an `atomic-interaction` which validates that the current communication through the protocol is a send & receive with name `action` from `sender` to `receiver`.
+- <b>-->> [predicate/type/wildcard sender receiver]</b>: Specifies an `atomic-interaction` which validates that the current communication through the protocol is a send & receive with validation of pred/value/wildcard from `sender` to `receiver`.
 - <b>choice [branch & more]</b>: Specifies a `choice form` which validates the first monitor in all branches and continues on target branch when an action is verified. Notice it supports variadic input arguments.
 - <b>rec [name interaction & more]</b>: Specifies a `recursion form` which recurs when the protocol encounters a `continue [name]`. Recur is matched by name and also supports nesting!
 - <b>continue [name]</b>: Specifies a recursion back to the matching `rec`.
@@ -61,10 +61,8 @@ Or by supplying the add-infrastructure macro with custom created channels. (see 
 Step 3: Use Discourje put & take abstractions
 -
 - <b>>!! [channel(s) message]</b>: Put function on channel(s), channels can be a vector of channels to support parallelism (see examples!)
-- <b><!! [channel label(s)]</b>:  Take operation of channel matching label(s). When Expecting a choice to be made by sender, you can listen for multiple labels and act upon receiving a specific one.
-- <b><!!! [channel label(s)]</b>:  Take operation of channel matching label(s), when used with multicast it blocks intill all receivers in the multicast have received their values.
-
-Note: Data being send through Discourje will always be encapsulated in a message. When pure data is transmitted through Discourje a message will be generated with Data type as label, and data as content. (See typedMessages example)
+- <b><!! [channel]</b>:  Take operation of channel. When Expecting a choice to be made by sender.
+- <b><!!! [channel]</b>:  Take operation of channel when used with multicast it blocks until all receivers in the multicast have received their values.
 
 Logging
 -
@@ -94,9 +92,9 @@ See [Logging](src/discourje/examples/logging.clj) for an example.
 Example: Hello World
 -
 ```clojure
-;"This function will generate a mep with 1 interaction to send and receive the hello world message and a close."
+;"This function will generate a mep with 1 interaction to send and receive the hello world string message and a close."
 (def message-exchange-pattern
-  (mep (-->> "helloWorld" "user" "world")
+  (mep (-->> String "user" "world")
        (close "user" "world")))
 ```
 Then generate the infrastructure:
@@ -112,11 +110,11 @@ The next step is to get the required channel for communication
 In the following example we implemented two functions which represent user and world.
 ```clojure
 (defn- send-to-world "This function will use the protocol to send the Hello World! message to world."
-  [] (>!! user-to-world (msg "helloWorld" "Hello World!")))
+  [] (>!! user-to-world "Hello World!"))
 
 (defn- receive-from-user "This function will use the protocol to listen for the helloWorld message."
-  [] (let [message (<!! user-to-world "helloWorld")]
-       (log-message "World received message: " (get-content message))
+  [] (let [message (<!! user-to-world)]
+       (log-message "World received message: " message)
        (close! user-to-world)))
 ```
 

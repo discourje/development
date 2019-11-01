@@ -3,9 +3,7 @@
             [discourje.async.protocolTestData :refer :all]
             [discourje.core.async :refer :all]
             [clojure.core.async :as async]
-            [discourje.core.logging :refer :all])
-  (:use [slingshot.slingshot :only [throw+ try+]]))
-
+            [discourje.core.logging :refer :all]))
 
 (defn only-closer-protocol [include-ids]
   (if include-ids (create-protocol
@@ -14,6 +12,7 @@
                   (create-protocol
                     [(->closer nil "alice" "bob" nil)
                      (->closer nil "alice" "carol" nil)])))
+
 (def only-closer-protocol-control
   (->closer nil "alice" "bob"
             (->closer nil "alice" "carol" nil)))
