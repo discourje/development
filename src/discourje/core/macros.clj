@@ -4,16 +4,16 @@
 (defmacro -->>
   "Create an Atomic-interaction"
   ([sender receiver]
-   `(->interaction (uuid/v1) (fn [~'x] true) ~sender ~receiver #{} nil))
+   `(->interaction (uuid) (fn [~'x] true) ~sender ~receiver #{} nil))
   ([action sender receiver]
    `(if (fn? ~action)
-     (->interaction (uuid/v1) ~action ~sender ~receiver #{} nil)
-     (->interaction (uuid/v1) (fn [~'x] (= (type ~'x) ~action)) ~sender ~receiver #{} nil))))
+     (->interaction (uuid) ~action ~sender ~receiver #{} nil)
+     (->interaction (uuid) (fn [~'x] (= (type ~'x) ~action)) ~sender ~receiver #{} nil))))
 
 (defmacro close
   "Create an close construct"
   [sender receiver]
-  `(->closer (uuid/v1) ~sender ~receiver nil))
+  `(->closer (uuid) ~sender ~receiver nil))
 
 (defmacro close!
   "Close channel pair"
@@ -32,22 +32,22 @@
 (defmacro rec
   "Generate recursion"
   [name interaction & more]
-  `(->recursion (uuid/v1) ~name [~interaction ~@more] nil))
+  `(->recursion (uuid) ~name [~interaction ~@more] nil))
 
 (defmacro continue
   "Continue recursion, matched by name"
   [name]
-  `(->recur-identifier (uuid/v1) ~name :recur nil))
+  `(->recur-identifier (uuid) ~name :recur nil))
 
 (defmacro choice
   "Generate choice"
   [branch & more]
-  `(->branch (uuid/v1) [~branch ~@more] nil))
+  `(->branch (uuid) [~branch ~@more] nil))
 
 (defmacro parallel
   "Generate parallel"
   [parallels & more]
-  `(->lateral (uuid/v1) [~parallels ~@more] nil))
+  `(->lateral (uuid) [~parallels ~@more] nil))
 
 (defmacro mep
   "Generate message exchange pattern aka protocol"
