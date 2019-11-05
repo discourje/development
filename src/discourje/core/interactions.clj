@@ -1,6 +1,18 @@
 ;interactions.clj
 (in-ns 'discourje.core.async)
 
+(defprotocol sendable
+  (is-valid-send? [this monitor sender receivers message])
+  (put-send! [this monitor sender receivers message pre-swap-interaction target-interaction])
+  (get-sendable [this monitor sender receiver message]))
+
+(defprotocol receivable
+  (is-multicastt?[this])
+  (remove-receiver![this current-interaction receiver])
+  (is-valid-receive? [this monitor sender receivers message])
+  (put-receive! [this monitor sender receivers message pre-swap-interaction target-interaction])
+  (get-receivable [this monitor sender receiver message]))
+
 (defprotocol linkable
   (get-id [this])
   (get-next [this]))

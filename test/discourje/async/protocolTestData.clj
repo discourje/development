@@ -3,12 +3,12 @@
             [discourje.core.async :refer :all]))
 
 ;legacy message usage, just to make the tests pass
-(defprotocol sendable
+(defprotocol message-sendable
   (get-label [this])
   (get-content [this]))
 
 (defrecord message [label content]
-  sendable
+  message-sendable
   (get-label [this] label)
   (get-content [this] content))
 
@@ -18,7 +18,7 @@
   `(->message ~label ~content))
 
 (defmacro message-checker [value]
-  `(fn [~'m] (= (if (satisfies? sendable ~'m) (get-label ~'m) ~'m) ~value)))
+  `(fn [~'m] (= (if (satisfies? message-sendable ~'m) (get-label ~'m) ~'m) ~value)))
 ;;------------------------------------------------------
 
 (deftest interactableTest
