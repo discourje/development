@@ -1,5 +1,5 @@
 (ns discourje.examples.logging
-  (require [discourje.core.async :refer :all]
+  (:require [discourje.core.async :refer :all]
            [discourje.core.logging :refer :all]))
 
 ;This function will generate a mep with 4 monitors to send and receive the greet message.

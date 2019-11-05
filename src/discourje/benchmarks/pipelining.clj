@@ -1,5 +1,5 @@
 (ns discourje.benchmarks.pipelining
-  (require [discourje.core.async :refer :all]
+  (:require [discourje.core.async :refer :all]
            [discourje.core.logging :refer :all]))
 
 (defn discourje-pipeline

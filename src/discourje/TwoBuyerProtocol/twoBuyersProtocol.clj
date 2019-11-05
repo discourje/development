@@ -1,5 +1,5 @@
 (ns discourje.TwoBuyerProtocol.twoBuyersProtocol
-  (require [discourje.core.async :refer :all]
+  (:require [discourje.core.async :refer :all]
            [discourje.core.logging :refer :all]
            [discourje.TwoBuyerProtocol.Buyer1 :as b1]
            [discourje.TwoBuyerProtocol.Buyer2 :as b2]

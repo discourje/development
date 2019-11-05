@@ -1,5 +1,5 @@
 (ns discourje.examples.helloWorld
-  (require [discourje.core.async :refer :all]
+  (:require [discourje.core.async :refer :all]
            [discourje.core.logging :refer :all]))
 ;This function will generate a mep with 1 interaction to send and receive the hello world message.
 (def message-exchange-pattern

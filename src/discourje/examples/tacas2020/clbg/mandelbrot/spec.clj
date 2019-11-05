@@ -1,5 +1,5 @@
 ;(ns discourje.examples.tacas2020.clbg.mandelbrot.spec
-;  (require [discourje.core.async :refer :all]))
+;  (:require [discourje.core.async :refer :all]))
 ;
 ;(def master (role "master"))
 ;(def worker (role "worker"))

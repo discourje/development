@@ -1,7 +1,6 @@
 (ns discourje.async.protocolTestData
   (:require [clojure.test :refer :all]
-            [discourje.core.async :refer :all]
-            [clj-uuid :as uuid]))
+            [discourje.core.async :refer :all]))
 
 ;legacy message usage, just to make the tests pass
 (defprotocol sendable
@@ -31,7 +30,7 @@
   (create-protocol [(make-interaction (message-checker "1") "A" ["B" "C"])]))
 
 (def testSingleMulticastProtocolControl
-  [(->interaction (uuid/v1) "1" "A" ["B" "C"] #{} nil)])
+  [(->interaction (uuid) "1" "A" ["B" "C"] #{} nil)])
 
 (defn testDualProtocol [include-ids]
   (if include-ids
@@ -45,8 +44,8 @@
                  (->interaction nil nil "B" "A" #{} nil)))
 
 (defn test-typed-DualProtocol [include-ids]
-  (when include-ids (create-protocol [(make-interaction (message-checker java.lang.String) "A" "B")
-                                      (make-interaction (message-checker java.lang.String) "B" "A")])
+  (if include-ids (create-protocol [(-->> java.lang.String "A" "B")
+                                      (-->> java.lang.String "B" "A")])
                     (create-protocol [(->interaction nil nil "A" "B" #{} nil)
                                       (->interaction nil nil "B" "A" #{} nil)])))
 (def test-typed-DualProtocolControl

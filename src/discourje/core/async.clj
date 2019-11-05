@@ -1,7 +1,6 @@
 (ns discourje.core.async
   (:gen-class)
-  (:require [clj-uuid :as uuid]
-            [discourje.core.logging :refer :all]
+  (:require [discourje.core.logging :refer :all]
             [clojure.walk :refer :all]
             [clojure.core.async :as async]
             [clojure.core.async.impl.protocols :as bufs])
@@ -18,6 +17,9 @@
   "Check whether f is a function, returns false if not"
   (fn? f))
 
+(defn uuid []
+  (.toString (java.util.UUID/randomUUID)))
+
 ;load helper namespace files!
 (load "macros"
       "interactions"
@@ -33,32 +35,32 @@
 
 (defn make-interaction [predicate sender receiver]
   "Creates an interaction object specifying sending action from sender to receiver."
-  (->interaction (uuid/v1) predicate sender receiver #{} nil))
+  (->interaction (uuid) predicate sender receiver #{} nil))
 
 (defn make-choice
   "Create a choice interaction"
   [branches]
-  (->branch (uuid/v1) branches nil))
+  (->branch (uuid) branches nil))
 
 (defn make-recursion
   "Generate recursion"
   [name recursion]
-  (->recursion (uuid/v1) name recursion nil))
+  (->recursion (uuid) name recursion nil))
 
 (defn do-recur
   "do recur to start of recursion"
   [name]
-  (->recur-identifier (uuid/v1) name :recur nil))
+  (->recur-identifier (uuid) name :recur nil))
 
 (defn make-closer
   "Create a closer to close the channel with given sender and receiver pair."
   [sender receiver]
-  (->closer (uuid/v1) sender receiver nil))
+  (->closer (uuid) sender receiver nil))
 
 (defn make-parallel
   "Generate parallel construct"
   [parallels]
-  (->lateral (uuid/v1) parallels nil))
+  (->lateral (uuid) parallels nil))
 
 (defn create-protocol
   "Generate protocol based on interactions"
@@ -70,7 +72,7 @@
   [protocol]
   (let [rec-table (atom {})
         linked-interactions (nest-mep (get-interactions protocol) rec-table)]
-    (->monitor (uuid/v1) (atom linked-interactions) rec-table)))
+    (->monitor (uuid) (atom linked-interactions) rec-table)))
 
 (defn- all-channels-implement-transportable?
   "Do all custom supplied channels implement the transportable interface?"

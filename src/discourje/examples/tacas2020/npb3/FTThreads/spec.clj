@@ -1,5 +1,5 @@
 (ns discourje.examples.tacas2020.npb3.FTThreads.spec
-  (require [discourje.core.async :refer :all]))
+  (:require [discourje.core.async :refer :all]))
 
 (import discourje.examples.tacas2020.npb3.DoneMessage)
 (import discourje.examples.tacas2020.npb3.ExitMessage)

@@ -1,5 +1,5 @@
 (ns discourje.examples.tacas2020.micro.one_one_one.discourje
-  (require [discourje.core.async :refer :all]
+  (:require [discourje.core.async :refer :all]
            [discourje.examples.tacas2020.main :refer [bench]]))
 
 ;;

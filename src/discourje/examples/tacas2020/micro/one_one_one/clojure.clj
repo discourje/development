@@ -1,5 +1,5 @@
 (ns discourje.examples.tacas2020.micro.one_one_one.clojure
-  (require [clojure.core.async :refer [>!! <!! close! chan thread]]
+  (:require [clojure.core.async :refer [>!! <!! close! chan thread]]
            [discourje.examples.tacas2020.main :refer [bench]]))
 
 ;;

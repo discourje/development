@@ -1,5 +1,5 @@
 (ns discourje.examples.multicast
-  (require [discourje.core.async :refer :all]
+  (:require [discourje.core.async :refer :all]
            [discourje.core.logging :refer :all]))
 
 ; This function will generate a vector with 1 interaction to send and receive the greet message.
