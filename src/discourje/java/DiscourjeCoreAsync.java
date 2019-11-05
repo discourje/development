@@ -52,7 +52,89 @@ public class DiscourjeCoreAsync {
                 o = fnMoni.invoke(fnSpec.invoke(fn.invoke()));
                 break;
             case 1:
-                o = fnMoni.invoke(fnSpec.invoke(fn.invoke(args[0])));
+                o = fnMoni.invoke(fnSpec.invoke(fn.invoke(
+                        args[0])));
+                break;
+            case 2:
+                o = fnMoni.invoke(fnSpec.invoke(fn.invoke(
+                        args[0],
+                        args[1])));
+                break;
+            case 3:
+                o = fnMoni.invoke(fnSpec.invoke(fn.invoke(
+                        args[0],
+                        args[1],
+                        args[2])));
+                break;
+            case 4:
+                o = fnMoni.invoke(fnSpec.invoke(fn.invoke(
+                        args[0],
+                        args[1],
+                        args[2],
+                        args[3])));
+                break;
+            case 5:
+                o = fnMoni.invoke(fnSpec.invoke(fn.invoke(
+                        args[0],
+                        args[1],
+                        args[2],
+                        args[3],
+                        args[4])));
+                break;
+            case 6:
+                o = fnMoni.invoke(fnSpec.invoke(fn.invoke(
+                        args[0],
+                        args[1],
+                        args[2],
+                        args[3],
+                        args[4],
+                        args[5])));
+                break;
+            case 7:
+                o = fnMoni.invoke(fnSpec.invoke(fn.invoke(
+                        args[0],
+                        args[1],
+                        args[2],
+                        args[3],
+                        args[4],
+                        args[5],
+                        args[6])));
+                break;
+            case 8:
+                o = fnMoni.invoke(fnSpec.invoke(fn.invoke(
+                        args[0],
+                        args[1],
+                        args[2],
+                        args[3],
+                        args[4],
+                        args[5],
+                        args[6],
+                        args[7])));
+                break;
+            case 9:
+                o = fnMoni.invoke(fnSpec.invoke(fn.invoke(
+                        args[0],
+                        args[1],
+                        args[2],
+                        args[3],
+                        args[4],
+                        args[5],
+                        args[6],
+                        args[7],
+                        args[8])));
+                break;
+            case 10:
+                o = fnMoni.invoke(fnSpec.invoke(fn.invoke(
+                        args[0],
+                        args[1],
+                        args[2],
+                        args[3],
+                        args[4],
+                        args[5],
+                        args[6],
+                        args[7],
+                        args[8],
+                        args[9])));
                 break;
             default:
                 throw new IllegalArgumentException();

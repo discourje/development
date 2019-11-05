@@ -1,24 +1,51 @@
 (ns discourje.examples.tacas2020.main
-  (:gen-class))
+  (:gen-class)
+  (:require [discourje.examples.tacas2020.stat :refer :all]))
 
 (import discourje.examples.tacas2020.Benchmarks)
 (import discourje.examples.tacas2020.clbg.spectralnorm.spectralnorm)
 (import discourje.examples.tacas2020.misc.chess.Engine)
+(import discourje.examples.tacas2020.npb3.CG)
+(import discourje.examples.tacas2020.npb3.FT)
+(import discourje.examples.tacas2020.npb3.IS)
+(import discourje.examples.tacas2020.npb3.MG)
 
 (defn bench
   [time f]
-  (let [begin (System/nanoTime)
-        deadline (+ begin (* time 1000 1000 1000))]
-    (loop [n 0]
-      (f)
-      (let [end (System/nanoTime)
-            n' (+ n 1)]
-        (if (< end deadline)
-          (recur n')
-          (binding [*out* *err*]
-            (println (- end begin) "ns,"
-                     n' "runs,"
-                     (quot (- end begin) n') "ns/run")))))))
+  (let [init (System/nanoTime)
+        deadline (+ init (* time 1000 1000 1000))]
+    (loop [measurements []]
+      (let [begin (System/nanoTime)]
+        (f)
+        (let [end (System/nanoTime)
+              measurements (conj measurements (- end begin))]
+          (if (< end deadline)
+            (recur measurements)
+            (if (= (count measurements) 1)
+              (binding [*out* *err*]
+                (println (- end init) "ns; 1 run"))
+              (let [c (count measurements)
+                    m (long (mean measurements))
+                    sd (long (standard-deviation measurements))
+                    rsd (long (* 100 (double (/ sd m))))
+                    measurements (if (> (count measurements) 100)
+                                   (nthrest measurements (- (count measurements) 100))
+                                   measurements)
+                    m100 (long (mean measurements))
+                    sd100 (long (standard-deviation measurements))
+                    rsd100 (long (* 100 (double (/ sd100 m100))))
+                    measurements (if (> (count measurements) 20)
+                                   (nthrest measurements (- (count measurements) 20))
+                                   measurements)
+                    m10 (long (mean measurements))
+                    sd10 (long (standard-deviation measurements))
+                    rsd10 (long (* 100 (double (/ sd10 m10))))]
+                (binding [*out* *err*]
+                  (println (- end init) "ns;" c "runs;"
+                           "ALL:" (str "m = " m ", sd = " sd ", rsd = " rsd "%;")
+                           "LAST-100:" (str "m = " m100 ", sd = " sd100 ", rsd = " rsd100 "%;")
+                           "LAST-010:" (str "m = " m10 ", sd = " sd10 ", rsd = " rsd10 "%;")
+                           ))))))))))
 
 (defn -main
   [& args]
@@ -60,7 +87,7 @@
       (cond
 
         ;;
-        ;; CLBG benchmarks
+        ;; CLBG
         ;;
 
         (= program "clbg/spectral-norm")
@@ -178,6 +205,30 @@
             (bench (Benchmarks/TIME)
                    #(load "/discourje/examples/tacas2020/misc/ttt/discourje")))
 
+        ;;
+        ;; NPB
+        ;;
+
+        (= program "npb/cg")
+        (do (binding [*out* *err*] (print args "-> "))
+            (bench (Benchmarks/TIME)
+                   #(CG/main (into-array String [(str "np=" K) (str "CLASS=" (nth args 4))]))))
+
+        (= program "npb/ft")
+        (do (binding [*out* *err*] (print args "-> "))
+            (bench (Benchmarks/TIME)
+                   #(FT/main (into-array String [(str "np=" K) (str "CLASS=" (nth args 4))]))))
+
+        (= program "npb/is")
+        (do (binding [*out* *err*] (print args "-> "))
+            (bench (Benchmarks/TIME)
+                   #(IS/main (into-array String [(str "np=" K) (str "CLASS=" (nth args 4))]))))
+
+        (= program "npb/mg")
+        (do (binding [*out* *err*] (print args "-> "))
+            (bench (Benchmarks/TIME)
+                   #(MG/main (into-array String [(str "np=" K) (str "CLASS=" (nth args 4))]))))
+
         :else
         (throw (Exception. "<program>"))))
 
@@ -193,6 +244,8 @@
       (print "micro/one-all-one, micro/one-one-one, micro/ring")
       (print ", ")
       (print "misc/chess, misc/go-fish, misc/ttt")
+      (print ", ")
+      (print "npb/cg, npb/ft, npb/is, npb/mg")
       (println "}"))))
 
 (try
@@ -200,10 +253,15 @@
 
   ;(-main "yes" "2" "5" "micro/one-all-one" "1")
   ;(-main "yes" "2" "5" "micro/one-one-one" "1")
-  ;(-main "yes" "2" "5" "micro/ring" "1")
+  ;(-main "yes" "2" "1" "micro/ring" "1")
 
-  ;(-main "yes" "4" "0" "misc/go-fish")
+  ;(-main "yes" "4" "5" "misc/go-fish")
   ;(-main "yes" "2" "5" "misc/chess" "/Users/sung/Desktop/stockfish-10-64" "60")
   ;(-main "yes" "2" "5" "misc/ttt")
+
+  ;(-main "yes" "2" "5" "npb/cg" "w")
+  ;(-main "yes" "2" "5" "npb/ft" "w")
+  ;(-main "yes" "2" "5" "npb/is" "w")
+  ;(-main "yes" "2" "5" "npb/mg" "w")
 
   (catch Exception e (.printStackTrace e)))
