@@ -13,6 +13,13 @@
   (put-receive! [this monitor sender receivers message pre-swap-interaction target-interaction])
   (get-receivable [this monitor sender receiver message]))
 
+(defprotocol closable
+  (is-valid-for-close? [this monitor sender receivers])
+  (put-close! [this monitor channel pre-swap-interaction target-interaction])
+  (get-closable [this monitor sender receiver])
+  (get-from [this])
+  (get-to [this]))
+
 (defprotocol linkable
   (get-id [this])
   (get-next [this]))
@@ -25,10 +32,6 @@
 
 (defprotocol parallelizable
   (get-parallel [this]))
-
-(defprotocol closable
-  (get-from [this])
-  (get-to [this]))
 
 (defprotocol stringify
   (to-string [this]))
