@@ -1,10 +1,8 @@
 ;interactions.clj
 (in-ns 'discourje.core.async)
 
-(defprotocol idable
-  (get-id [this]))
-
 (defprotocol linkable
+  (get-id [this])
   (get-next [this]))
 
 (defprotocol interactable
@@ -35,25 +33,23 @@
   (is-valid-for-swap? [this] (some? valid)))
 
 (defrecord interaction [id action sender receivers accepted-sends next]
-  idable
-  (get-id [this] id)
   interactable
   (get-action [this] action)
   (get-sender [this] sender)
   (get-receivers [this] receivers)
   (get-accepted-sends [this] accepted-sends)
   linkable
+  (get-id [this] id)
   (get-next [this] next)
   stringify
   (to-string [this] (format "Interaction - Action: %s, Sender: %s, Receivers: %s" action sender receivers)))
 
 (defrecord closer [id sender receiver next]
-  idable
-  (get-id [this] id)
   closable
   (get-from [this] sender)
   (get-to [this] receiver)
   linkable
+  (get-id [this] id)
   (get-next [this] next)
   stringify
   (to-string [this] (format "Closer from Sender: %s to Receiver: %s" sender receiver)))
@@ -62,21 +58,19 @@
   (get-branches [this]))
 
 (defrecord branch [id branches next]
-  idable
-  (get-id [this] id)
   branchable
   (get-branches [this] branches)
   linkable
+  (get-id [this] id)
   (get-next [this] next)
   stringify
   (to-string [this] (format "Branching with branches - %s" (apply str (for [b branches] (format "[ %s ]" (to-string b)))))))
 
 (defrecord lateral [id parallels next]
-  idable
-  (get-id [this] id)
   parallelizable
   (get-parallel [this] parallels)
   linkable
+  (get-id [this] id)
   (get-next [this] next)
   stringify
   (to-string [this] (format "Parallel with parallels - %s" (apply str (for [p parallels] (format "[ %s ]" (to-string p)))))))
@@ -88,13 +82,12 @@
   (get-recursion [this]))
 
 (defrecord recursion [id name recursion next]
-  idable
-  (get-id [this] id)
   namable
   (get-name [this] name)
   recursable
   (get-recursion [this] recursion)
   linkable
+  (get-id [this] id)
   (get-next [this] next)
   stringify
   (to-string [this] (format "Recursion name: %s, with recursion- %s" name (to-string recursion))))
@@ -103,13 +96,12 @@
   (get-option [this]))
 
 (defrecord recur-identifier [id name option next]
-  idable
-  (get-id [this] id)
   namable
   (get-name [this] name)
   identifiable-recur
   (get-option [this] option)
   linkable
+  (get-id [this] id)
   (get-next [this] next)
   stringify
   (to-string [this] (format "Recur-identifier - name: %s, option: %s" name option)))
