@@ -2,7 +2,6 @@
   (:require [clojure.test :refer :all]
             [discourje.core.async :refer :all]))
 
-
 (discourje.core.logging/set-logging-exceptions)
 
 (def foo-bar-protocol

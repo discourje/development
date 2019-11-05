@@ -56,22 +56,10 @@
         ba (get-channel channels "B" "A")]
     (do
       (>!! ab "Hello B")
-      (let [a->b (<!!-test ab)]
+      (let [a->b (<!! ab)]
         (is (= "Hello B" a->b)))
       (>!! ba "Hello A")
-      (let [b->a (<!!-test ba)]
-        (is (= "Hello A" b->a))))))
-
-(deftest send-receive-wildcard-dual-test
-  (let [channels (generate-infrastructure (test-typed-DualProtocol true))
-        ab (get-channel channels "A" "B")
-        ba (get-channel channels "B" "A")]
-    (do
-      (>!! ab "Hello B")
-      (let [a->b (<!!-test ab)]
-        (is (= "Hello B" a->b)))
-      (>!! ba "Hello A")
-      (let [b->a (<!!-test ba)]
+      (let [b->a (<!! ba)]
         (is (= "Hello A" b->a))))))
 
 (deftest send-receive-multicast-protocol-test

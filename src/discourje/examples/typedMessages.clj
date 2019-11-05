@@ -1,5 +1,5 @@
 (ns discourje.examples.typedMessages
-  (require [discourje.core.async :refer :all]
+  (:require [discourje.core.async :refer :all]
            [discourje.core.logging :refer :all]))
 
 ;This function will generate a vector with 4 interactions to send and receive the greet message.

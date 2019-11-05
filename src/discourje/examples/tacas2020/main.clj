@@ -61,10 +61,10 @@
       (cond
         (= verify "no")
         (do (Benchmarks/useClojure)
-            (require '[clojure.core.async :refer [<!! >!! close! chan thread]]))
+            (:require '[clojure.core.async :refer [<!! >!! close! chan thread]]))
         (= verify "yes")
         (do (Benchmarks/useDiscourje)
-            (require '[discourje.core.async :refer :all]))
+            (:require '[discourje.core.async :refer :all]))
         :else
         (throw (Exception. "<language>")))
 
@@ -101,7 +101,7 @@
 
         (and (= program "micro/one-all-one") (= verify "no"))
         (do (binding [*out* *err*] (print args "-> "))
-            (require '[discourje.examples.tacas2020.micro.one_all_one.clojure :refer :all])
+            (:require '[discourje.examples.tacas2020.micro.one_all_one.clojure :refer :all])
             (def n-iter (Integer/parseInt (nth args 4)))
             (eval '(discourje.examples.tacas2020.micro.one_all_one.clojure/run
                      discourje.examples.tacas2020.main/K
@@ -110,7 +110,7 @@
 
         (and (= program "micro/one-all-one") (= verify "yes"))
         (do (binding [*out* *err*] (print args "-> "))
-            (require '[discourje.examples.tacas2020.micro.one_all_one.discourje :refer :all])
+            (:require '[discourje.examples.tacas2020.micro.one_all_one.discourje :refer :all])
             (def n-iter (Integer/parseInt (nth args 4)))
             (eval '(discourje.examples.tacas2020.micro.one_all_one.discourje/run
                      discourje.examples.tacas2020.main/K
@@ -119,7 +119,7 @@
 
         (and (= program "micro/one-one-one") (= verify "no"))
         (do (binding [*out* *err*] (print args "-> "))
-            (require '[discourje.examples.tacas2020.micro.one_one_one.clojure :refer :all])
+            (:require '[discourje.examples.tacas2020.micro.one_one_one.clojure :refer :all])
             (def n-iter (Integer/parseInt (nth args 4)))
             (eval '(discourje.examples.tacas2020.micro.one_one_one.clojure/run
                      discourje.examples.tacas2020.main/K
@@ -128,7 +128,7 @@
 
         (and (= program "micro/one-one-one") (= verify "yes"))
         (do (binding [*out* *err*] (print args "-> "))
-            (require '[discourje.examples.tacas2020.micro.one_one_one.discourje :refer :all])
+            (:require '[discourje.examples.tacas2020.micro.one_one_one.discourje :refer :all])
             (def n-iter (Integer/parseInt (nth args 4)))
             (eval '(discourje.examples.tacas2020.micro.one_one_one.discourje/run
                      discourje.examples.tacas2020.main/K
@@ -137,7 +137,7 @@
 
         (and (= program "micro/ring") (= verify "no"))
         (do (binding [*out* *err*] (print args "-> "))
-            (require '[discourje.examples.tacas2020.micro.ring.clojure :refer :all])
+            (:require '[discourje.examples.tacas2020.micro.ring.clojure :refer :all])
             (def n-iter (Integer/parseInt (nth args 4)))
             (eval '(discourje.examples.tacas2020.micro.ring.clojure/run
                      discourje.examples.tacas2020.main/K
@@ -146,7 +146,7 @@
 
         (and (= program "micro/ring") (= verify "yes"))
         (do (binding [*out* *err*] (print args "-> "))
-            (require '[discourje.examples.tacas2020.micro.ring.discourje :refer :all])
+            (:require '[discourje.examples.tacas2020.micro.ring.discourje :refer :all])
             (def n-iter (Integer/parseInt (nth args 4)))
             (eval '(discourje.examples.tacas2020.micro.ring.discourje/run
                      discourje.examples.tacas2020.main/K
@@ -183,14 +183,14 @@
 
         (and (= program "misc/go-fish") (= verify "no"))
         (do (binding [*out* *err*] (print args "-> "))
-            (require '[discourje.examples.tacas2020.misc.gofish.clojure :refer :all])
+            (:require '[discourje.examples.tacas2020.misc.gofish.clojure :refer :all])
             (eval '(discourje.examples.tacas2020.misc.gofish.clojure/deftypes))
             (eval '(discourje.examples.tacas2020.misc.gofish.clojure/run
                      discourje.examples.tacas2020.main/K)))
 
         (and (= program "misc/go-fish") (= verify "yes"))
         (do (binding [*out* *err*] (print args "-> "))
-            (require '[discourje.examples.tacas2020.misc.gofish.discourje :refer :all])
+            (:require '[discourje.examples.tacas2020.misc.gofish.discourje :refer :all])
             (eval '(discourje.examples.tacas2020.misc.gofish.discourje/deftypes))
             (eval '(discourje.examples.tacas2020.misc.gofish.discourje/run
                      discourje.examples.tacas2020.main/K)))

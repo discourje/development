@@ -1,5 +1,5 @@
 (ns discourje.examples.tacas2020.clbg.spectralnorm.spec
-  (require [discourje.core.async :refer :all]))
+  (:require [discourje.core.async :refer :all]))
 
 (def worker (role "worker"))
 

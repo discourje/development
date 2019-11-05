@@ -1,5 +1,5 @@
 (ns discourje.examples.recursion
-  (require [discourje.core.async :refer :all]
+  (:require [discourje.core.async :refer :all]
            [discourje.core.logging :refer :all])
   (:import (clojure.lang PersistentArrayMap)))
 
