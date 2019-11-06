@@ -2,21 +2,23 @@
 (in-ns 'discourje.core.async)
 
 (defprotocol sendable
-  (is-valid-send? [this monitor sender receivers message])
-  (put-send! [this monitor sender receivers message pre-swap-interaction target-interaction])
-  (get-sendable [this monitor sender receiver message]))
+  (is-valid-sendable? [this monitor sender receivers message])
+  (apply-sendable! [this monitor sender receivers message pre-swap-interaction target-interaction])
+  (get-sendable [this monitor sender receivers message]))
 
 (defprotocol receivable
-  (is-multicastt?[this])
-  (remove-receiver![this current-interaction receiver])
-  (is-valid-receive? [this monitor sender receivers message])
-  (put-receive! [this monitor sender receivers message pre-swap-interaction target-interaction])
-  (get-receivable [this monitor sender receiver message]))
+ ; (is-multicast?[this])
+  ;(remove-receiver![this current-interaction receiver])
+  (is-valid-receivable? [this monitor sender receivers message])
+  (apply-receivable [this monitor sender receivers message pre-swap-interaction target-interaction])
+  (get-receivable [this monitor sender receivers message]))
+
+(defprotocol terminatable
+  (is-valid-closable? [this monitor sender receiver])
+  (apply-closable! [this monitor channel pre-swap-interaction target-interaction])
+  (get-closable [this monitor sender receiver]))
 
 (defprotocol closable
-  (is-valid-for-close? [this monitor sender receivers])
-  (put-close! [this monitor channel pre-swap-interaction target-interaction])
-  (get-closable [this monitor sender receiver])
   (get-from [this])
   (get-to [this]))
 
@@ -57,7 +59,19 @@
   (get-id [this] id)
   (get-next [this] next)
   stringify
-  (to-string [this] (format "Interaction - Action: %s, Sender: %s, Receivers: %s" action sender receivers)))
+  (to-string [this] (format "Interaction - Action: %s, Sender: %s, Receivers: %s" action sender receivers))
+  sendable
+  (is-valid-sendable? [this monitor sender receivers message] (is-valid-sendable-atomic? this sender receivers message))
+  (apply-sendable! [this monitor sender receivers message pre-swap-interaction target-interaction] (apply-sendable-atomic! this pre-swap-interaction target-interaction sender))
+  (get-sendable [this monitor sender receivers message] (get-sendable-atomic this sender receivers message))
+  receivable
+  (is-valid-receivable? [this monitor sender receivers message](get-receivable-atomic this sender receivers message))
+  (apply-receivable [this monitor sender receivers message pre-swap-interaction target-interaction] (apply-receivable-atomic! this pre-swap-interaction target-interaction receivers))
+  (get-receivable [this monitor sender receivers message] (get-receivable-atomic this sender receivers message))
+  terminatable
+  (is-valid-closable? [this monitor sender receiver] (is-valid-closable-atomic? this))
+  (apply-closable! [this monitor channel pre-swap-interaction target-interaction] (apply-closable-atomic! this))
+  (get-closable [this monitor sender receiver] (get-closable-atomic this)))
 
 (defrecord closer [id sender receiver next]
   closable
@@ -79,7 +93,19 @@
   (get-id [this] id)
   (get-next [this] next)
   stringify
-  (to-string [this] (format "Branching with branches - %s" (apply str (for [b branches] (format "[ %s ]" (to-string b)))))))
+  (to-string [this] (format "Branching with branches - %s" (apply str (for [b branches] (format "[ %s ]" (to-string b))))))
+  sendable
+  (is-valid-sendable? [this monitor sender receivers message] (is-valid-sendable-branch? this monitor sender receivers message))
+  (apply-sendable! [this monitor sender receivers message pre-swap-interaction target-interaction] (apply-sendable-branch! this  monitor sender receivers message pre-swap-interaction target-interaction))
+  (get-sendable [this monitor sender receivers message] (get-sendable-branch this monitor sender receivers message))
+  receivable
+  (is-valid-receivable? [this monitor sender receivers message](is-valid-receivable-branch? this monitor sender receivers message))
+  (apply-receivable [this monitor sender receivers message pre-swap-interaction target-interaction] (apply-receivable-branch! this monitor sender receivers message pre-swap-interaction target-interaction))
+  (get-receivable [this monitor sender receivers message] (get-receivable-branch this monitor sender receivers message))
+  terminatable
+  (is-valid-closable? [this monitor sender receiver] (is-valid-closable-branch? this monitor sender receiver))
+  (apply-closable! [this monitor channel pre-swap-interaction target-interaction] (apply-closable-branch! this monitor channel pre-swap-interaction target-interaction))
+  (get-closable [this monitor sender receiver] (get-closable-branch this)))
 
 (defrecord lateral [id parallels next]
   parallelizable

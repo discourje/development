@@ -1,1 +1,11 @@
-(ns discourje.core.constructs.close)
+;close construct
+(in-ns 'discourje.core.async)
+;;---------------------------------Sendable implementation-------------------------------------------------
+
+
+;;--------------------------------Receivable implementation------------------------------------------------
+
+
+;;---------------------------------Closable implementation-------------------------------------------------
+
+

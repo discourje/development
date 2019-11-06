@@ -1,1 +1,11 @@
-(ns discourje.core.constructs.recursion)
+;recursion construct
+(in-ns 'discourje.core.async)
+
+;;---------------------------------Sendable implementation-------------------------------------------------
+
+
+;;--------------------------------Receivable implementation------------------------------------------------
+
+
+;;---------------------------------Closable implementation-------------------------------------------------
+
