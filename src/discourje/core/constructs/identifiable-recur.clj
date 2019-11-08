@@ -13,8 +13,8 @@
   [active-interaction monitor sender receivers message]
   (get-sendable (get-rec monitor (get-name active-interaction)) monitor sender receivers message))
 
-(defn- apply-sendable-recur-identifier! [active-interaction monitor sender receivers message pre-swap-interaction target-interaction]
-  (apply-sendable! active-interaction monitor sender receivers message pre-swap-interaction (get-rec monitor (get-name target-interaction))))
+(defn- apply-sendable-recur-identifier! [target-interaction pre-swap-interaction active-interaction monitor sender receivers message]
+  (apply-sendable! (get-rec monitor (get-name target-interaction)) pre-swap-interaction active-interaction monitor sender receivers message))
 
 ;;--------------------------------Receivable implementation------------------------------------------------
 (defn- is-valid-receivable-recur-identifier? [active-interaction monitor sender receivers message]
@@ -25,8 +25,8 @@
   [active-interaction monitor sender receivers message]
   (get-receivable active-interaction monitor sender receivers message))
 
-(defn- apply-receivable-recur-identifier! [active-interaction monitor sender receivers message pre-swap-interaction target-interaction]
-  (apply-receivable! active-interaction monitor sender receivers message pre-swap-interaction (get-rec monitor (get-name target-interaction))))
+(defn- apply-receivable-recur-identifier! [target-interaction pre-swap-interaction active-interaction monitor sender receivers message]
+  (apply-receivable! (get-rec monitor (get-name target-interaction)) pre-swap-interaction active-interaction monitor sender receivers message))
 ;;---------------------------------Closable implementation-------------------------------------------------
 
 (defn- is-valid-closable-recur-identifier? [active-interaction monitor sender receiver]
@@ -40,5 +40,5 @@
   [active-interaction monitor sender receiver]
   nil)
 
-(defn- apply-closable-recur-identifier! [active-interaction monitor channel pre-swap-interaction target-interaction]
-  (apply-closable! active-interaction monitor channel pre-swap-interaction (get-rec monitor (get-name target-interaction))))
+(defn- apply-closable-recur-identifier! [target-interaction pre-swap-interaction active-interaction monitor channel]
+  (apply-closable! (get-rec monitor (get-name target-interaction)) pre-swap-interaction active-interaction monitor channel))

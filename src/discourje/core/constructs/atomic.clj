@@ -19,7 +19,7 @@
 
 (defn- apply-sendable-atomic!
   "Send active interaction by atomic"
-  [active-interaction pre-swap-interaction target-interaction sender]
+  [target-interaction pre-swap-interaction active-interaction sender]
   (if (nil? sender)
     (log-error :invalid-send (format "sender appears to be nil: %s %s" active-interaction target-interaction))
     (= (get-id (swap! active-interaction (fn [inter]
@@ -56,9 +56,9 @@
 (defn- apply-receivable-atomic!
   "Swap active interaction by atomic
   The end-protocol comparison indicates the protocol is terminated."
-  [active-interaction pre-swap-interaction target-interaction receiver]
-  (if (multiple-receivers? target-interaction)
-    (remove-receiver active-interaction target-interaction receiver)
+  [target-interaction pre-swap-interaction active-interaction receiver]
+  (if (is-multicast-atomic? target-interaction)
+    (remove-receivable-atomic! active-interaction target-interaction receiver)
     (let [swapped (swap! active-interaction (fn [inter]
                                               (if (= (get-id inter) (get-id pre-swap-interaction))
                                                 (get-next target-interaction)

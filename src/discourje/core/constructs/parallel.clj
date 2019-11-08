@@ -35,7 +35,7 @@
         (assoc target-interaction :parallels pars)
         duplicate-par))))
 
-(defn- apply-sendable-parallel! [active-interaction monitor sender receivers message pre-swap-interaction target-interaction]
+(defn- apply-sendable-parallel! [target-interaction pre-swap-interaction active-interaction monitor sender receivers message]
   (swap! active-interaction
          (fn [inter]
            (if (= (get-id inter) (get-id target-interaction))
@@ -94,7 +94,7 @@
       (get-next target-interaction)
       (assoc target-interaction :parallels pars))))
 
-(defn- apply-receivable-parallel! [active-interaction monitor sender receivers message pre-swap-interaction target-interaction]
+(defn- apply-receivable-parallel! [target-interaction pre-swap-interaction active-interaction monitor sender receivers message]
   (let [target-parallel-interaction (get-receivable-parallel monitor sender receivers message target-interaction)]
     (swap! active-interaction
            (fn [inter]
@@ -151,7 +151,7 @@
       (get-next target-interaction)
       (assoc target-interaction :parallels pars))))
 
-(defn- apply-closable-parallel! [active-interaction monitor channel pre-swap-interaction target-interaction]
+(defn- apply-closable-parallel! [target-interaction pre-swap-interaction active-interaction monitor channel]
   (let [target-parallel-interaction (get-closable-parallel monitor (get-provider channel) (get-consumer channel) target-interaction)]
     (swap! active-interaction
            (fn [inter]
