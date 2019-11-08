@@ -7,7 +7,7 @@
                         #(is-valid-sendable? % monitor sender receivers message) (get-parallel active-interaction)))]
     active-interaction))
 
-(defn- get-sendable-branch
+(defn- get-sendable-parallel
   "Check the atomic interaction"
   [active-interaction monitor sender receivers message]
   (when-let [_ (first (filter
@@ -22,8 +22,10 @@
                (for [p pars]
                  (cond
                    @is-found p
-                   (is-valid-sendable? target-interaction monitor sender receivers message)
-                   (let [valid (get-sendable target-interaction monitor sender receivers message)]
+                   (satisfies? parallelizable p)
+                   (set-send-on-parallel sender receivers message p monitor)
+                   (is-valid-sendable? p monitor sender receivers message)
+                   (let [valid (get-sendable p monitor sender receivers message)]
                      (assoc-sender valid sender is-found))
                    :else
                    p
@@ -42,27 +44,121 @@
   true)
 
 ;;--------------------------------Receivable implementation------------------------------------------------
-(defn- is-valid-receivable-branch? [active-interaction monitor sender receivers message]
-  (first (filter #(is-valid-receivable? % monitor sender receivers message) (get-branches active-interaction))))
+(defn- is-valid-receivable-parallel? [active-interaction monitor sender receivers message]
+  (when-let [_ (first (filter
+                        #(is-valid-receivable? % monitor sender receivers message) (get-parallel active-interaction)))]
+    active-interaction))
 
-(defn- get-receivable-branch
+(defn- get-receivable-parallel
   "Check the atomic interaction"
   [active-interaction monitor sender receivers message]
-  (first (filter #(get-receivable % monitor sender receivers message) (get-branches active-interaction))))
+  (when-let [_ (first (filter
+                        #(is-valid-receivable? % monitor sender receivers message) (get-parallel active-interaction)))]
+    active-interaction))
 
-(defn- apply-receivable-branch! [active-interaction monitor sender receivers message pre-swap-interaction target-interaction]
-  (apply-receivable! active-interaction monitor sender receivers message pre-swap-interaction
-                     (get-receivable-branch target-interaction monitor sender receivers message)))
+(defn remove-from-parallel-inter
+  "Remove an interaction from a parallel in a recursive fashion."
+  [sender receivers message target-interaction monitor]
+  (let [pars (flatten (filter some?
+                              (for [par (get-parallel target-interaction)]
+                                (let [is-found (atom false)
+                                      inter (cond
+                                              @is-found par
+                                              (satisfies? parallelizable par)
+                                              (remove-from-parallel-inter sender receivers message par monitor)
+                                              (is-valid-receivable? par monitor sender receivers message)
+                                              (get-receivable par monitor sender receivers monitor)
+                                              :else
+                                              par)]
+                                  (if @is-found
+                                    inter
+                                    (if (nil? inter)
+                                      (if (satisfies? parallelizable par)
+                                        nil
+                                        par)
+                                      (cond
+                                        (satisfies? parallelizable inter)
+                                        (remove-from-parallel-inter sender receivers message inter monitor)
+                                        (satisfies? interactable inter)
+                                        (do
+                                          (reset! is-found true)
+                                          (if (multiple-receivers? inter)
+                                            (assoc inter :receivers (vec (remove #{receivers} (:receivers inter))))
+                                            (get-next inter))
+                                          )
+                                        (or (satisfies? branchable inter) (satisfies? closable inter))
+                                        inter
+                                        (and (instance? clojure.lang.LazySeq inter) (not (satisfies? interactable inter)))
+                                        (first (filter some? inter)))))))))]
+    (if (empty? pars)
+      (get-next target-interaction)
+      (assoc target-interaction :parallels pars))))
+
+(defn- apply-receivable-parallel! [active-interaction monitor sender receivers message pre-swap-interaction target-interaction]
+  (let [target-parallel-interaction (get-receivable-parallel monitor sender receivers message target-interaction)]
+    (swap! active-interaction
+           (fn [inter]
+             (let [target (if (= (get-id inter) (get-id target-parallel-interaction))
+                            (get-receivable-parallel monitor sender receivers message inter)
+                            target-parallel-interaction)]
+               (if (nil? target)
+                 inter
+                 (remove-from-parallel-inter sender receivers message target monitor))))))
+  true)
 ;;---------------------------------Closable implementation-------------------------------------------------
 
-(defn- is-valid-closable-branch? [active-interaction monitor sender receiver]
-  (first (filter #(is-valid-closable-branch? % monitor sender receiver) (get-branches active-interaction))))
+(defn- is-valid-closable-parallel? [active-interaction monitor sender receiver]
+  (when-let [_ (first (filter
+                        #(is-valid-closable? % monitor sender receiver) (get-parallel active-interaction)))]
+    active-interaction))
 
-(defn- get-closable-branch
+(defn- get-closable-parallel
   "Check the atomic interaction"
   [active-interaction monitor sender receiver]
-  (first (filter #(get-closable % monitor sender receiver) (get-branches active-interaction))))
+  (when-let [_ (first (filter
+                        #(is-valid-closable? % monitor sender receiver) (get-parallel active-interaction)))]
+    active-interaction))
+(defn remove-close-from-parallel-inter
+  "Remove an interaction from a parallel in a recursive fashion."
+  [sender receivers target-interaction monitor]
+  (let [pars (flatten (filter some?
+                              (for [par (get-parallel target-interaction)]
+                                (let [is-found (atom false)
+                                      inter (cond
+                                              @is-found par
+                                              (satisfies? parallelizable par)
+                                              (remove-close-from-parallel sender receivers par monitor)
+                                              (is-valid-closable? par monitor sender receivers)
+                                              (get-closable par monitor sender receivers)
+                                              :else
+                                              par)]
+                                  (if @is-found
+                                    inter
+                                    (if (nil? inter)
+                                      (if (satisfies? parallelizable par)
+                                        nil
+                                        par)
+                                      (cond
+                                        (satisfies? parallelizable inter)
+                                        (remove-close-from-parallel sender receivers inter monitor)
+                                        (satisfies? closable inter)
+                                        (get-next inter)
+                                        (or (satisfies? branchable inter) (satisfies? interactable inter))
+                                        inter
+                                        (and (instance? clojure.lang.LazySeq inter) (not (satisfies? interactable inter)))
+                                        (first (filter some? inter)))))))))]
+    (if (empty? pars)
+      (get-next target-interaction)
+      (assoc target-interaction :parallels pars))))
 
-(defn- apply-closable-branch! [active-interaction monitor channel pre-swap-interaction target-interaction]
-  (apply-closable-branch! active-interaction monitor channel pre-swap-interaction
-                          (get-closable-branch target-interaction monitor (get-provider channel) (get-consumer channel))))
+(defn- apply-closable-parallel! [active-interaction monitor channel pre-swap-interaction target-interaction]
+  (let [target-parallel-interaction (get-closable-parallel monitor (get-provider channel) (get-consumer channel) target-interaction)]
+    (swap! active-interaction
+           (fn [inter]
+             (let [target (if (= (get-id inter) (get-id target-parallel-interaction))
+                            (get-closable-parallel monitor (get-provider channel) (get-consumer channel) inter)
+                            target-parallel-interaction)]
+               (if (nil? target)
+                 inter
+                 (remove-close-from-parallel-inter (get-provider channel) (get-consumer channel) target monitor))))))
+  true)
