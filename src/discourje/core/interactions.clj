@@ -3,19 +3,19 @@
 
 (defprotocol sendable
   (is-valid-sendable? [this monitor sender receivers message])
-  (apply-sendable! [this monitor sender receivers message pre-swap-interaction target-interaction])
+  (apply-sendable! [this pre-swap-interaction target-interaction monitor sender receivers message])
   (get-sendable [this monitor sender receivers message]))
 
 (defprotocol receivable
  ; (is-multicast?[this])
   ;(remove-receiver![this current-interaction receiver])
   (is-valid-receivable? [this monitor sender receivers message])
-  (apply-receivable! [this monitor sender receivers message pre-swap-interaction target-interaction])
+  (apply-receivable! [this pre-swap-interaction target-interaction monitor sender receivers message])
   (get-receivable [this monitor sender receivers message]))
 
 (defprotocol terminatable
   (is-valid-closable? [this monitor sender receiver])
-  (apply-closable! [this monitor channel pre-swap-interaction target-interaction])
+  (apply-closable! [this pre-swap-interaction target-interaction monitor channel])
   (get-closable [this monitor sender receiver]))
 
 (defprotocol closable
@@ -62,15 +62,15 @@
   (to-string [this] (format "Interaction - Action: %s, Sender: %s, Receivers: %s" action sender receivers))
   sendable
   (is-valid-sendable? [this monitor sender receivers message] (is-valid-sendable-atomic? this sender receivers message))
-  (apply-sendable! [this monitor sender receivers message pre-swap-interaction target-interaction] (apply-sendable-atomic! this pre-swap-interaction target-interaction sender))
+  (apply-sendable! [this pre-swap-interaction target-interaction monitor sender receivers message] (apply-sendable-atomic! this pre-swap-interaction target-interaction sender))
   (get-sendable [this monitor sender receivers message] (get-sendable-atomic this sender receivers message))
   receivable
   (is-valid-receivable? [this monitor sender receivers message](get-receivable-atomic this sender receivers message))
-  (apply-receivable! [this monitor sender receivers message pre-swap-interaction target-interaction] (apply-receivable-atomic! this pre-swap-interaction target-interaction receivers))
+  (apply-receivable! [this pre-swap-interaction target-interaction monitor sender receivers message] (apply-receivable-atomic! this pre-swap-interaction target-interaction receivers))
   (get-receivable [this monitor sender receivers message] (get-receivable-atomic this sender receivers message))
   terminatable
   (is-valid-closable? [this monitor sender receiver] (is-valid-closable-atomic? this))
-  (apply-closable! [this monitor channel pre-swap-interaction target-interaction] (apply-closable-atomic! this))
+  (apply-closable! [this pre-swap-interaction target-interaction monitor channel] (apply-closable-atomic! this))
   (get-closable [this monitor sender receiver] (get-closable-atomic this)))
 
 (defrecord closer [id sender receiver next]
@@ -84,15 +84,15 @@
   (to-string [this] (format "Closer from Sender: %s to Receiver: %s" sender receiver))
   sendable
   (is-valid-sendable? [this monitor sender receivers message] (is-valid-sendable-closer? this monitor sender receivers message))
-  (apply-sendable! [this monitor sender receivers message pre-swap-interaction target-interaction] (apply-sendable-closer! this  monitor sender receivers message pre-swap-interaction target-interaction))
+  (apply-sendable! [this pre-swap-interaction target-interaction monitor sender receivers message] (apply-sendable-closer! this  monitor sender receivers message pre-swap-interaction target-interaction))
   (get-sendable [this monitor sender receivers message] (get-sendable-closer this monitor sender receivers message))
   receivable
   (is-valid-receivable? [this monitor sender receivers message](is-valid-receivable-closer? this monitor sender receivers message))
-  (apply-receivable! [this monitor sender receivers message pre-swap-interaction target-interaction] (apply-receivable-closer! this monitor sender receivers message pre-swap-interaction target-interaction))
+  (apply-receivable! [this pre-swap-interaction target-interaction monitor sender receivers message] (apply-receivable-closer! this monitor sender receivers message pre-swap-interaction target-interaction))
   (get-receivable [this monitor sender receivers message] (get-receivable-closer this monitor sender receivers message))
   terminatable
   (is-valid-closable? [this monitor sender receiver] (is-valid-closable-closer? this monitor sender receiver))
-  (apply-closable! [this monitor channel pre-swap-interaction target-interaction] (apply-closable-closer! this monitor channel pre-swap-interaction target-interaction))
+  (apply-closable! [this pre-swap-interaction target-interaction monitor channel] (apply-closable-closer! this monitor channel pre-swap-interaction target-interaction))
   (get-closable [this monitor sender receiver] (get-closable-closer this monitor sender receiver)))
 
 (defprotocol branchable
@@ -108,15 +108,15 @@
   (to-string [this] (format "Branching with branches - %s" (apply str (for [b branches] (format "[ %s ]" (to-string b))))))
   sendable
   (is-valid-sendable? [this monitor sender receivers message] (is-valid-sendable-branch? this monitor sender receivers message))
-  (apply-sendable! [this monitor sender receivers message pre-swap-interaction target-interaction] (apply-sendable-branch! this  monitor sender receivers message pre-swap-interaction target-interaction))
+  (apply-sendable! [this pre-swap-interaction target-interaction monitor sender receivers message] (apply-sendable-branch! this  monitor sender receivers message pre-swap-interaction target-interaction))
   (get-sendable [this monitor sender receivers message] (get-sendable-branch this monitor sender receivers message))
   receivable
   (is-valid-receivable? [this monitor sender receivers message](is-valid-receivable-branch? this monitor sender receivers message))
-  (apply-receivable! [this monitor sender receivers message pre-swap-interaction target-interaction] (apply-receivable-branch! this monitor sender receivers message pre-swap-interaction target-interaction))
+  (apply-receivable! [this pre-swap-interaction target-interaction monitor sender receivers message] (apply-receivable-branch! this monitor sender receivers message pre-swap-interaction target-interaction))
   (get-receivable [this monitor sender receivers message] (get-receivable-branch this monitor sender receivers message))
   terminatable
   (is-valid-closable? [this monitor sender receiver] (is-valid-closable-branch? this monitor sender receiver))
-  (apply-closable! [this monitor channel pre-swap-interaction target-interaction] (apply-closable-branch! this monitor channel pre-swap-interaction target-interaction))
+  (apply-closable! [this pre-swap-interaction target-interaction monitor channel] (apply-closable-branch! this monitor channel pre-swap-interaction target-interaction))
   (get-closable [this monitor sender receiver] (get-closable-branch this monitor sender receiver)))
 
 (defrecord lateral [id parallels next]
@@ -129,15 +129,15 @@
   (to-string [this] (format "Parallel with parallels - %s" (apply str (for [p parallels] (format "[ %s ]" (to-string p))))))
   sendable
   (is-valid-sendable? [this monitor sender receivers message] (is-valid-sendable-parallel? this monitor sender receivers message))
-  (apply-sendable! [this monitor sender receivers message pre-swap-interaction target-interaction] (apply-sendable-parallel! this  monitor sender receivers message pre-swap-interaction target-interaction))
+  (apply-sendable! [this pre-swap-interaction target-interaction monitor sender receivers message] (apply-sendable-parallel! this  monitor sender receivers message pre-swap-interaction target-interaction))
   (get-sendable [this monitor sender receivers message] (get-sendable-parallel this monitor sender receivers message))
   receivable
   (is-valid-receivable? [this monitor sender receivers message](is-valid-receivable-parallel? this monitor sender receivers message))
-  (apply-receivable! [this monitor sender receivers message pre-swap-interaction target-interaction] (apply-receivable-parallel! this monitor sender receivers message pre-swap-interaction target-interaction))
+  (apply-receivable! [this pre-swap-interaction target-interaction monitor sender receivers message] (apply-receivable-parallel! this monitor sender receivers message pre-swap-interaction target-interaction))
   (get-receivable [this monitor sender receivers message] (get-receivable-parallel this monitor sender receivers message))
   terminatable
   (is-valid-closable? [this monitor sender receiver] (is-valid-closable-parallel? this monitor sender receiver))
-  (apply-closable! [this monitor channel pre-swap-interaction target-interaction] (apply-closable-parallel! this monitor channel pre-swap-interaction target-interaction))
+  (apply-closable! [this pre-swap-interaction target-interaction monitor channel] (apply-closable-parallel! this monitor channel pre-swap-interaction target-interaction))
   (get-closable [this monitor sender receiver] (get-closable-parallel this monitor sender receiver)))
 
 (defprotocol namable
@@ -172,15 +172,15 @@
   (to-string [this] (format "Recur-identifier - name: %s, option: %s" name option))
   sendable
   (is-valid-sendable? [this monitor sender receivers message] (is-valid-sendable-recur-identifier? this monitor sender receivers message))
-  (apply-sendable! [this monitor sender receivers message pre-swap-interaction target-interaction] (apply-sendable-recur-identifier! this  monitor sender receivers message pre-swap-interaction target-interaction))
+  (apply-sendable! [this pre-swap-interaction target-interaction monitor sender receivers message] (apply-sendable-recur-identifier! this  monitor sender receivers message pre-swap-interaction target-interaction))
   (get-sendable [this monitor sender receivers message] (get-sendable-recur-identifier this monitor sender receivers message))
   receivable
   (is-valid-receivable? [this monitor sender receivers message](is-valid-receivable-recur-identifier? this monitor sender receivers message))
-  (apply-receivable! [this monitor sender receivers message pre-swap-interaction target-interaction] (apply-receivable-recur-identifier! this monitor sender receivers message pre-swap-interaction target-interaction))
+  (apply-receivable! [this pre-swap-interaction target-interaction monitor sender receivers message] (apply-receivable-recur-identifier! this monitor sender receivers message pre-swap-interaction target-interaction))
   (get-receivable [this monitor sender receivers message] (get-receivable-recur-identifier this monitor sender receivers message))
   terminatable
   (is-valid-closable? [this monitor sender receiver] (is-valid-closable-recur-identifier? this monitor sender receiver))
-  (apply-closable! [this monitor channel pre-swap-interaction target-interaction] (apply-closable-recur-identifier! this monitor channel pre-swap-interaction target-interaction))
+  (apply-closable! [this pre-swap-interaction target-interaction monitor channel] (apply-closable-recur-identifier! this monitor channel pre-swap-interaction target-interaction))
   (get-closable [this monitor sender receiver] (get-closable-recur-identifier this monitor sender receiver)))
 
 (defn- find-all-roles

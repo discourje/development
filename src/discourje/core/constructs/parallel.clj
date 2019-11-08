@@ -35,7 +35,7 @@
         (assoc target-interaction :parallels pars)
         duplicate-par))))
 
-(defn- apply-sendable-branch! [active-interaction monitor sender receivers message pre-swap-interaction target-interaction]
+(defn- apply-sendable-parallel! [active-interaction monitor sender receivers message pre-swap-interaction target-interaction]
   (swap! active-interaction
          (fn [inter]
            (if (= (get-id inter) (get-id target-interaction))
