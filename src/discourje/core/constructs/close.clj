@@ -14,6 +14,9 @@
   (log-error :unsupported-operation (format "Unsupported type of interaction to apply %s!" (type target-interaction))))
 
 ;;--------------------------------Receivable implementation------------------------------------------------
+(defn is-multicast-closer? []
+  false)
+
 (defn- is-valid-receivable-closer? [active-interaction monitor sender receivers message]
   nil)
 

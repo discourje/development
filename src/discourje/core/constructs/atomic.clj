@@ -35,11 +35,15 @@
   (when (is-valid-sendable-atomic? active-interaction sender receiver message) active-interaction))
 
 ;;---------------------------------Receivable implementation-----------------------------------------------
+(defn- multiple-receivers?
+    "Does the monitor have multiple receivers?"
+    [active-interaction]
+    (and (instance? Seqable (:receivers active-interaction)) (> (count (:receivers active-interaction)) 1)))
 
 (defn- is-multicast-atomic?
   "Does the monitor have multiple receivers?"
-  [active-interaction]
-  (and (instance? Seqable (:receivers active-interaction)) (> (count (:receivers active-interaction)) 1)))
+  [active-interaction message]
+  (and (is-predicate-valid? message active-interaction) (multiple-receivers? active-interaction)))
 
 (defn- remove-receivable-atomic!
   "Remove a receiver from the active monitor"
@@ -57,7 +61,7 @@
   "Swap active interaction by atomic
   The end-protocol comparison indicates the protocol is terminated."
   [target-interaction pre-swap-interaction active-interaction receiver]
-  (if (is-multicast-atomic? target-interaction)
+  (if (multiple-receivers? target-interaction)
     (remove-receivable-atomic! active-interaction target-interaction receiver)
     (let [swapped (swap! active-interaction (fn [inter]
                                               (if (= (get-id inter) (get-id pre-swap-interaction))

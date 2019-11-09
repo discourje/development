@@ -1,13 +1,6 @@
 ;channels.clj
 (in-ns 'discourje.core.async)
 
-(defprotocol transportable
-  (get-provider [this])
-  (get-consumer [this])
-  (get-chan [this])
-  (get-monitor [this])
-  (get-buffer [this]))
-
 (defrecord channel [provider consumers chan buffer monitor meta-put meta-take]
   transportable
   (get-provider [this] provider)

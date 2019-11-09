@@ -1048,16 +1048,16 @@
                                                                  [(->interaction nil nil "b" "a" #{} nil)]] nil)] nil)])))
 
 (defn rec-with-parallel-with-choice-multicast-and-close [include-ids]
-  (if include-ids (create-protocol [(make-recursion :test [(make-parallel [[(make-choice [[(make-interaction (message-checker 1) "a" ["b" "c"])]
-                                                                                          [(make-interaction (message-checker 0) "a" ["b" "c"])
+  (if include-ids (create-protocol [(make-recursion :test [(make-parallel [[(make-choice [[(-->> 1 "a" ["b" "c"])]
+                                                                                          [(-->> 0 "a" ["b" "c"])
                                                                                            (do-recur :test)]])]
-                                                                           [(make-interaction (message-checker 4) "b" ["a" "c"])
-                                                                            (make-interaction (message-checker 5) "a" ["b" "c"])]
+                                                                           [(-->> 4 "b" ["a" "c"])
+                                                                            (-->> 5 "a" ["b" "c"])]
                                                                            ])
                                                            ])
                                     (make-closer "a" "b")
                                     (make-closer "a" "c")
-                                    (make-interaction (message-checker 6) "b" ["a" "c"])
+                                    (-->> 6 "b" ["a" "c"])
                                     (make-closer "b" "a")
                                     (make-closer "b" "c")])
                   (create-protocol [(->recursion nil :test [(->lateral nil [[(->branch nil [[(->interaction nil nil "a" ["b" "c"] #{} nil)]

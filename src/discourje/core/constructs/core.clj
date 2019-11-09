@@ -4,6 +4,7 @@
 (defn is-predicate-valid?
   "Is the predicate in the monitor valid compared to the message or label (when given)"
   [message active-interaction]
+  (println (get-action active-interaction) "|" message)
   ((get-action active-interaction) message))
 
 (defn- contains-value?
@@ -22,18 +23,7 @@
            (or (contains-value? receivers (:receivers active-interaction)) (= receivers (:receivers active-interaction)))
            (or (= receivers (:receivers active-interaction)) (contains-value? (:receivers active-interaction) receivers))))))
 
-(defn- is-active-interaction-multicast? [monitor active-interaction message]
-  (cond
-    (satisfies? interactable active-interaction)
-    (and (is-predicate-valid? message active-interaction)
-         (instance? Seqable (get-receivers active-interaction)))
-    (satisfies? branchable active-interaction)
-    (first (filter #(is-active-interaction-multicast? monitor % message) (get-branches active-interaction)))
-    (satisfies? parallelizable active-interaction)
-    (first (filter #(is-active-interaction-multicast? monitor % message) (get-parallel active-interaction)))
-    (satisfies? identifiable-recur active-interaction)
-    (is-active-interaction-multicast? monitor (get-rec monitor (get-name (get-next active-interaction))) message)
-    :else
-    (do (log-error :unsupported-operation (format "Unsupported communication type: Communication invalid, type: %s" (type active-interaction)))
-        false)))
-
+(defn- interaction-to-string
+  "Stringify an interaction, returns empty string if the given interaction is nil"
+  [interaction]
+  (if (satisfies? stringify interaction) (to-string interaction) interaction))

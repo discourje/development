@@ -44,6 +44,9 @@
   true)
 
 ;;--------------------------------Receivable implementation------------------------------------------------
+(defn is-multicast-parallel? [active-interaction monitor message]
+  (first (filter #(is-multicast? % monitor message) (get-parallel active-interaction))))
+
 (defn- is-valid-receivable-parallel? [active-interaction monitor sender receivers message]
   (when-let [_ (first (filter
                         #(is-valid-receivable? % monitor sender receivers message) (get-parallel active-interaction)))]
@@ -67,7 +70,7 @@
                                               (satisfies? parallelizable par)
                                               (remove-from-parallel-inter sender receivers message par monitor)
                                               (is-valid-receivable? par monitor sender receivers message)
-                                              (get-receivable par monitor sender receivers monitor)
+                                              (get-receivable par monitor sender receivers message)
                                               :else
                                               par)]
                                   (if @is-found
@@ -95,11 +98,11 @@
       (assoc target-interaction :parallels pars))))
 
 (defn- apply-receivable-parallel! [target-interaction pre-swap-interaction active-interaction monitor sender receivers message]
-  (let [target-parallel-interaction (get-receivable-parallel monitor sender receivers message target-interaction)]
+  (let [target-parallel-interaction (get-receivable-parallel target-interaction monitor sender receivers message)]
     (swap! active-interaction
            (fn [inter]
              (let [target (if (= (get-id inter) (get-id target-parallel-interaction))
-                            (get-receivable-parallel monitor sender receivers message inter)
+                            (get-receivable-parallel inter monitor sender receivers message)
                             target-parallel-interaction)]
                (if (nil? target)
                  inter
@@ -128,7 +131,7 @@
                                       inter (cond
                                               @is-found par
                                               (satisfies? parallelizable par)
-                                              (remove-close-from-parallel sender receivers par monitor)
+                                              (remove-close-from-parallel-inter sender receivers par monitor)
                                               (is-valid-closable? par monitor sender receivers)
                                               (get-closable par monitor sender receivers)
                                               :else
@@ -141,7 +144,7 @@
                                         par)
                                       (cond
                                         (satisfies? parallelizable inter)
-                                        (remove-close-from-parallel sender receivers inter monitor)
+                                        (remove-close-from-parallel-inter sender receivers inter monitor)
                                         (satisfies? closable inter)
                                         (get-next inter)
                                         (or (satisfies? branchable inter) (satisfies? interactable inter))
@@ -153,11 +156,11 @@
       (assoc target-interaction :parallels pars))))
 
 (defn- apply-closable-parallel! [target-interaction pre-swap-interaction active-interaction monitor channel]
-  (let [target-parallel-interaction (get-closable-parallel monitor (get-provider channel) (get-consumer channel) target-interaction)]
+  (let [target-parallel-interaction (get-closable-parallel target-interaction monitor (get-provider channel) (get-consumer channel))]
     (swap! active-interaction
            (fn [inter]
              (let [target (if (= (get-id inter) (get-id target-parallel-interaction))
-                            (get-closable-parallel monitor (get-provider channel) (get-consumer channel) inter)
+                            (get-closable-parallel inter monitor (get-provider channel) (get-consumer channel))
                             target-parallel-interaction)]
                (if (nil? target)
                  inter

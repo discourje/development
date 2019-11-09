@@ -17,6 +17,9 @@
   (apply-sendable! (get-rec monitor (get-name target-interaction)) pre-swap-interaction active-interaction monitor sender receivers message))
 
 ;;--------------------------------Receivable implementation------------------------------------------------
+(defn is-multicast-recur-identifier? [active-interaction monitor message]
+  (is-multicast? (get-rec monitor (get-name active-interaction)) monitor message))
+
 (defn- is-valid-receivable-recur-identifier? [active-interaction monitor sender receivers message]
   (is-valid-receivable? monitor sender receivers message (get-rec monitor (get-name active-interaction))))
 
