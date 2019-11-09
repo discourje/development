@@ -118,6 +118,7 @@
   (when-let [_ (first (filter
                         #(is-valid-closable? % monitor sender receiver) (get-parallel active-interaction)))]
     active-interaction))
+
 (defn remove-close-from-parallel-inter
   "Remove an interaction from a parallel in a recursive fashion."
   [sender receivers target-interaction monitor]

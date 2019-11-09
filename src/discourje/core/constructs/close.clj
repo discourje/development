@@ -22,7 +22,7 @@
   [active-interaction monitor sender receivers message]
   nil)
 
-(defn- apply-receivable-closer! [target-interaction  pre-swap-interaction active-interaction monitor sender receivers message]
+(defn- apply-receivable-closer! [target-interaction pre-swap-interaction active-interaction monitor sender receivers message]
   (log-error :unsupported-operation (format "Unsupported type of interaction to apply %s!" (type target-interaction))))
 ;;---------------------------------Closable implementation-------------------------------------------------
 (defn- is-valid-close?
@@ -43,4 +43,4 @@
     active-interaction))
 
 (defn- apply-closable-closer! [target-interaction pre-swap-interaction active-interaction monitor channel]
-  (apply-receivable-atomic! active-interaction pre-swap-interaction target-interaction nil))
+  (apply-receivable-atomic! target-interaction pre-swap-interaction active-interaction nil))

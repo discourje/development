@@ -49,6 +49,13 @@
   (get-valid [this] valid)
   (is-valid-for-swap? [this] (some? valid)))
 
+
+(load "constructs/atomic"
+      "constructs/branch"
+      "constructs/close"
+      "constructs/identifiable-recur"
+      "constructs/parallel")
+
 (defrecord interaction [id action sender receivers accepted-sends next]
   interactable
   (get-action [this] action)
