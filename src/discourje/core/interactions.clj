@@ -7,7 +7,7 @@
   (get-sendable [this monitor sender receivers message]))
 
 (defprotocol receivable
- ; (is-multicast?[this])
+  ; (is-multicast?[this])
   ;(remove-receiver![this current-interaction receiver])
   (is-valid-receivable? [this monitor sender receivers message])
   (apply-receivable! [this pre-swap-interaction active-interaction monitor sender receivers message])
@@ -50,7 +50,8 @@
   (is-valid-for-swap? [this] (some? valid)))
 
 
-(load "constructs/atomic"
+(load "constructs/core"
+      "constructs/atomic"
       "constructs/branch"
       "constructs/close"
       "constructs/identifiable-recur"
@@ -72,7 +73,7 @@
   (apply-sendable! [this pre-swap-interaction active-interaction monitor sender receivers message] (apply-sendable-atomic! this pre-swap-interaction active-interaction sender))
   (get-sendable [this monitor sender receivers message] (get-sendable-atomic this sender receivers message))
   receivable
-  (is-valid-receivable? [this monitor sender receivers message](get-receivable-atomic this sender receivers message))
+  (is-valid-receivable? [this monitor sender receivers message] (get-receivable-atomic this sender receivers message))
   (apply-receivable! [this pre-swap-interaction active-interaction monitor sender receivers message] (apply-receivable-atomic! this pre-swap-interaction active-interaction receivers))
   (get-receivable [this monitor sender receivers message] (get-receivable-atomic this sender receivers message))
   terminatable
@@ -94,7 +95,7 @@
   (apply-sendable! [this pre-swap-interaction active-interaction monitor sender receivers message] (apply-sendable-closer! this pre-swap-interaction active-interaction monitor sender receivers message))
   (get-sendable [this monitor sender receivers message] (get-sendable-closer this monitor sender receivers message))
   receivable
-  (is-valid-receivable? [this monitor sender receivers message](is-valid-receivable-closer? this monitor sender receivers message))
+  (is-valid-receivable? [this monitor sender receivers message] (is-valid-receivable-closer? this monitor sender receivers message))
   (apply-receivable! [this pre-swap-interaction active-interaction monitor sender receivers message] (apply-receivable-closer! this pre-swap-interaction active-interaction monitor sender receivers message))
   (get-receivable [this monitor sender receivers message] (get-receivable-closer this monitor sender receivers message))
   terminatable
@@ -118,7 +119,7 @@
   (apply-sendable! [this pre-swap-interaction active-interaction monitor sender receivers message] (apply-sendable-branch! this pre-swap-interaction active-interaction monitor sender receivers message))
   (get-sendable [this monitor sender receivers message] (get-sendable-branch this monitor sender receivers message))
   receivable
-  (is-valid-receivable? [this monitor sender receivers message](is-valid-receivable-branch? this monitor sender receivers message))
+  (is-valid-receivable? [this monitor sender receivers message] (is-valid-receivable-branch? this monitor sender receivers message))
   (apply-receivable! [this pre-swap-interaction active-interaction monitor sender receivers message] (apply-receivable-branch! this pre-swap-interaction active-interaction monitor sender receivers message))
   (get-receivable [this monitor sender receivers message] (get-receivable-branch this monitor sender receivers message))
   terminatable
@@ -139,7 +140,7 @@
   (apply-sendable! [this pre-swap-interaction active-interaction monitor sender receivers message] (apply-sendable-parallel! this pre-swap-interaction active-interaction monitor sender receivers message))
   (get-sendable [this monitor sender receivers message] (get-sendable-parallel this monitor sender receivers message))
   receivable
-  (is-valid-receivable? [this monitor sender receivers message](is-valid-receivable-parallel? this monitor sender receivers message))
+  (is-valid-receivable? [this monitor sender receivers message] (is-valid-receivable-parallel? this monitor sender receivers message))
   (apply-receivable! [this pre-swap-interaction active-interaction monitor sender receivers message] (apply-receivable-parallel! this pre-swap-interaction active-interaction monitor sender receivers message))
   (get-receivable [this monitor sender receivers message] (get-receivable-parallel this monitor sender receivers message))
   terminatable
@@ -182,7 +183,7 @@
   (apply-sendable! [this pre-swap-interaction active-interaction monitor sender receivers message] (apply-sendable-recur-identifier! this pre-swap-interaction active-interaction monitor sender receivers message))
   (get-sendable [this monitor sender receivers message] (get-sendable-recur-identifier this monitor sender receivers message))
   receivable
-  (is-valid-receivable? [this monitor sender receivers message](is-valid-receivable-recur-identifier? this monitor sender receivers message))
+  (is-valid-receivable? [this monitor sender receivers message] (is-valid-receivable-recur-identifier? this monitor sender receivers message))
   (apply-receivable! [this pre-swap-interaction active-interaction monitor sender receivers message] (apply-receivable-recur-identifier! this pre-swap-interaction active-interaction monitor sender receivers message))
   (get-receivable [this monitor sender receivers message] (get-receivable-recur-identifier this monitor sender receivers message))
   terminatable
