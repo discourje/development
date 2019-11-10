@@ -4,7 +4,6 @@
 (defn is-predicate-valid?
   "Is the predicate in the monitor valid compared to the message or label (when given)"
   [message active-interaction]
-  (println (get-action active-interaction) "|" message)
   ((get-action active-interaction) message))
 
 (defn- contains-value?

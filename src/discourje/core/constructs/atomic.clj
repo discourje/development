@@ -12,6 +12,7 @@
 (defn- assoc-sender
   "Assoc a sender to the accepted-sends set and return in"
   ([atomic sender is-found]
+   (println "associng sender" sender "to" atomic)
    (reset! is-found true)
    (assoc-sender atomic sender))
   ([atomic sender]
@@ -76,7 +77,8 @@
 (defn- get-receivable-atomic
   "Check the atomic interaction"
   [active-interaction sender receiver message]
-  (when (and (contains? (get-accepted-sends active-interaction) sender) (is-valid-interaction? sender receiver message active-interaction)) active-interaction))
+  (when (and (contains? (get-accepted-sends active-interaction) sender) (is-valid-interaction? sender receiver message active-interaction))
+    active-interaction))
 
 ;;---------------------------------Closable implementation-------------------------------------------------
 

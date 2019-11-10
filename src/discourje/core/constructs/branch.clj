@@ -11,7 +11,7 @@
   (first (filter #(get-sendable % monitor sender receivers message) (get-branches active-interaction))))
 
 (defn- apply-sendable-branch! [target-interaction pre-swap-interaction active-interaction monitor sender receivers message]
-  (apply-sendable! (get-sendable-branch target-interaction monitor sender receivers message) pre-swap-interaction active-interaction monitor sender receivers message))
+  (apply-sendable! (get-sendable target-interaction monitor sender receivers message) pre-swap-interaction active-interaction monitor sender receivers message))
 
 ;;--------------------------------Receivable implementation------------------------------------------------
 (defn is-multicast-branch? [active-interaction monitor message]

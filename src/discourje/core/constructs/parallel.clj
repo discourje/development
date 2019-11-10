@@ -5,13 +5,15 @@
 (defn- is-valid-sendable-parallel? [active-interaction monitor sender receivers message]
   (when-let [_ (first (filter
                         #(is-valid-sendable? % monitor sender receivers message) (get-parallel active-interaction)))]
+    (println "found valid send par")
     active-interaction))
 
 (defn- get-sendable-parallel
   "Check the atomic interaction"
   [active-interaction monitor sender receivers message]
   (when-let [_ (first (filter
-                        #(is-valid-sendable? % monitor sender receivers message) (get-parallel active-interaction)))]
+                        #(get-sendable % monitor sender receivers message) (get-parallel active-interaction)))]
+    (println "found valid send par")
     active-interaction))
 
 (defn- set-send-on-parallel
@@ -25,8 +27,10 @@
                    (satisfies? parallelizable p)
                    (set-send-on-parallel sender receivers message p monitor)
                    (is-valid-sendable? p monitor sender receivers message)
-                   (let [valid (get-sendable p monitor sender receivers message)]
-                     (assoc-sender valid sender is-found))
+                   (let [valid (is-valid-sendable? p monitor sender receivers message)]
+                     (if (satisfies? parallelizable valid)
+                       (set-send-on-parallel sender receivers message valid monitor)
+                       (assoc-sender valid sender is-found)))
                    :else
                    p
                    )))]

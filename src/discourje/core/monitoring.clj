@@ -7,8 +7,6 @@
 ;      "validation/receivevalidation"
 ;      "validation/sendvalidation")
 
-(declare contains-value? is-valid-interaction?)
-
 (defn equal-monitors?
   "Check if all channels have the same monitor"
   [channels]

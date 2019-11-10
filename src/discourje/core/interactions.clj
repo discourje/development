@@ -78,7 +78,7 @@
   (get-id [this] id)
   (get-next [this] next)
   stringify
-  (to-string [this] (format "Interaction - Action: %s, Sender: %s, Receivers: %s" action sender receivers))
+  (to-string [this] (format "Interaction - Action: %s, Sender: %s, Receivers: %s with accepted sends %s" action sender receivers accepted-sends))
   sendable
   (is-valid-sendable? [this monitor sender receivers message] (is-valid-sendable-atomic? this sender receivers message))
   (apply-sendable! [this pre-swap-interaction active-interaction monitor sender receivers message] (apply-sendable-atomic! this pre-swap-interaction active-interaction sender))

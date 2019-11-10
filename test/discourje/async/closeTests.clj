@@ -130,7 +130,7 @@
         (do (>!! [ab ac] 0)
             (is (= (<!! ab) 0))
             (is (= (<!! ac) 0))
-            (do (>!! [ba bc] 4)
+            (do (>!! [ba bc] 4) ;send doesnt seem te be conjoined
                 (let [b->a4 (<!! ba)
                       b->c4 (<!! bc)]
                   (is (= b->a4 4))
