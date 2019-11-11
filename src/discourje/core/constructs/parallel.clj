@@ -5,7 +5,6 @@
 (defn- is-valid-sendable-parallel? [active-interaction monitor sender receivers message]
   (when-let [_ (first (filter
                         #(is-valid-sendable? % monitor sender receivers message) (get-parallel active-interaction)))]
-    (println "found valid send par")
     active-interaction))
 
 (defn- get-sendable-parallel
@@ -13,7 +12,6 @@
   [active-interaction monitor sender receivers message]
   (when-let [_ (first (filter
                         #(get-sendable % monitor sender receivers message) (get-parallel active-interaction)))]
-    (println "found valid send par")
     active-interaction))
 
 (defn- set-send-on-parallel
@@ -27,7 +25,7 @@
                    (satisfies? parallelizable p)
                    (set-send-on-parallel sender receivers message p monitor)
                    (is-valid-sendable? p monitor sender receivers message)
-                   (let [valid (is-valid-sendable? p monitor sender receivers message)]
+                   (let [valid (get-sendable p monitor sender receivers message)]
                      (if (satisfies? parallelizable valid)
                        (set-send-on-parallel sender receivers message valid monitor)
                        (assoc-sender valid sender is-found)))
@@ -73,10 +71,12 @@
                                               @is-found par
                                               (satisfies? parallelizable par)
                                               (remove-from-parallel-inter sender receivers message par monitor)
-                                              (is-valid-receivable? par monitor sender receivers message)
+                                              (not= nil (is-valid-receivable? par monitor sender receivers message))
                                               (get-receivable par monitor sender receivers message)
                                               :else
                                               par)]
+                                  (println "inter" inter par)
+                                  (println "par" par)
                                   (if @is-found
                                     inter
                                     (if (nil? inter)
@@ -97,6 +97,7 @@
                                         inter
                                         (and (instance? clojure.lang.LazySeq inter) (not (satisfies? interactable inter)))
                                         (first (filter some? inter)))))))))]
+    (println"pars =" pars)
     (if (empty? pars)
       (get-next target-interaction)
       (assoc target-interaction :parallels pars))))

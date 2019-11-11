@@ -124,20 +124,20 @@
     (loop [reps 0]
       (if (> reps 2)
         (do
-          (>!! [ab ac] 1)
-          (is (= (<!! ab) 1))
-          (is (= (<!! ac) 1)))
-        (do (>!! [ab ac] 0)
-            (is (= (<!! ab) 0))
-            (is (= (<!! ac) 0))
-            (do (>!! [ba bc] 4) ;send doesnt seem te be conjoined
-                (let [b->a4 (<!! ba)
-                      b->c4 (<!! bc)]
+          (>!! [ab ac] (msg 1 1))
+          (is (= (<!!-test ab) 1))
+          (is (= (<!!-test ac) 1)))
+        (do (>!! [ab ac] (msg 0 0))
+            (is (= (<!!-test ab) 0))
+            (is (= (<!!-test ac) 0))
+            (do (>!! [ba bc] (msg 4 4))
+                (let [b->a4 (<!!-test ba)
+                      b->c4 (<!!-test bc)]
                   (is (= b->a4 4))
                   (is (= b->c4 4))
-                  (>!! [ab ac] 5)
-                  (is (= (<!! ab) 5))
-                  (is (= (<!! ac) 5))))
+                  (>!! [ab ac] (msg 5 5))
+                  (is (= (<!!-test ab) 5))
+                  (is (= (<!!-test ac) 5))))
             (recur (+ reps 1)))))
     (do
       (close-channel! ab)
@@ -146,9 +146,9 @@
       (close-channel! "a" "c" channels)
       (is true (channel-closed? ac))
       (is true (channel-closed? (get-channel channels "a" "c")))
-      (>!! [ba bc] 6)
-      (let [b->a6 (<!! ba)
-            b->c6 (<!! bc)]
+      (>!! [ba bc] (msg 6 6))
+      (let [b->a6 (<!!-test ba)
+            b->c6 (<!!-test bc)]
         (is (= b->a6 6))
         (is (= b->c6 6))
         (close-channel! ba)
@@ -158,6 +158,7 @@
         (is true (channel-closed? bc))
         (is true (channel-closed? (get-channel channels "b" "c")))
         (is (nil? (get-active-interaction (get-monitor ab))))))))
+
 
 (deftest send-and-receive-after-parallel-nested-parallel-test
   (let [channels (add-infrastructure (after-parallel-nested-parallel-with-closer true))

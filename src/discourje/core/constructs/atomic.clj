@@ -77,6 +77,9 @@
 (defn- get-receivable-atomic
   "Check the atomic interaction"
   [active-interaction sender receiver message]
+  (println "inter="(interaction-to-string active-interaction) " sender =" sender " receivers =" receiver " message" message)
+  (println "good receive?="(contains? (get-accepted-sends active-interaction) sender))
+  (println "valid?" (is-valid-interaction? sender receiver message active-interaction))
   (when (and (contains? (get-accepted-sends active-interaction) sender) (is-valid-interaction? sender receiver message active-interaction))
     active-interaction))
 
