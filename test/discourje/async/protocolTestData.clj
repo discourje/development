@@ -1151,14 +1151,14 @@
                                                      (make-interaction (message-checker 1) "a" "b")]
                                                     [(make-interaction (message-checker "hi") "b" "a")
                                                      (make-interaction (message-checker "hi") "a" "b")]])
-                                    ;(make-parallel [[(make-parallel [[(make-interaction (message-checker "a") "b" "a")
-                                    ;                                  (make-interaction (message-checker "b") "a" "b")]
-                                    ;                                 [(make-interaction (message-checker "b") "b" "a")
-                                    ;                                  (make-interaction (message-checker "a") "a" "b")]])]
-                                    ;                [(make-parallel [[(make-interaction (message-checker 2) "b" "a")
-                                    ;                                  (make-interaction (message-checker 3) "a" "b")]
-                                    ;                                 [(make-closer "a" "b")
-                                    ;                                  (make-closer "b" "a")]])]])
+                                    (make-parallel [[(make-parallel [[(make-interaction (message-checker "a") "b" "a")
+                                                                      (make-interaction (message-checker "b") "a" "b")]
+                                                                     [(make-interaction (message-checker "b") "b" "a")
+                                                                      (make-interaction (message-checker "a") "a" "b")]])]
+                                                    [(make-parallel [[(make-interaction (message-checker 2) "b" "a")
+                                                                      (make-interaction (message-checker 3) "a" "b")]
+                                                                     [(make-closer "a" "b")
+                                                                      (make-closer "b" "a")]])]])
                                     ])
                   (create-protocol [(->lateral nil [[(->interaction nil nil "b" "a" #{} nil)
                                                      (->interaction nil nil "a" "b" #{} nil)]

@@ -23,7 +23,7 @@
 (deftest send-test
   (let [channels (generate-infrastructure (testDualProtocol true))
         c (get-channel channels "A" "B")]
-    (>!! c (->message "1" "hello world"))
+    (>!! c (msg "1" "hello world"))
     (let [m (async/<!! (get-chan c))]
       (is (= "1" (get-label m)))
       (is (= "hello world" (get-content m))))))
