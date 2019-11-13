@@ -195,28 +195,6 @@
   (apply-closable! [this pre-swap-interaction active-interaction monitor channel] (apply-closable-recur-identifier! this pre-swap-interaction active-interaction monitor channel))
   (get-closable [this monitor sender receiver] (get-closable-recur-identifier this monitor sender receiver)))
 
-(defn- find-all-roles
-  "List all sender and receivers in the protocol"
-  [protocol result]
-  (let [result2 (flatten (vec (conj result [])))]
-    (conj result2
-          (flatten
-            (for [element protocol]
-              (cond
-                (satisfies? discourje.core.async/recursable element)
-                (conj result2 (flatten (find-all-roles (:recursion element) result2)))
-                (satisfies? discourje.core.async/branchable element)
-                (let [branched-interactions (for [branch (get-branches element)] (find-all-roles branch result2))]
-                  (conj result2 (flatten branched-interactions)))
-                (satisfies? discourje.core.async/parallelizable element)
-                (let [parallel-interactions (for [p (get-parallel element)] (find-all-roles p result2))]
-                  (conj result2 (flatten parallel-interactions)))
-                (satisfies? discourje.core.async/interactable element)
-                (do
-                  (if (instance? Seqable (get-receivers element))
-                    (conj result2 (flatten (get-receivers element)) (get-sender element))
-                    (conj result2 (get-receivers element) (get-sender element))))))))))
-
 (defn- find-all-role-pairs
   "List all sender and receivers in the protocol"
   [protocol result]
@@ -241,12 +219,6 @@
                 result2
                 :else
                 (log-error :invalid-communication-type "Cannot find roles pairs for type:" element)))))))
-
-(defn get-distinct-roles
-  "Get all distinct senders and receivers in the protocol"
-  [interactions]
-  (let [x (find-all-roles interactions [])]
-    (vec (filter some? (distinct (flatten (first x)))))))
 
 (defn get-distinct-role-pairs
   "Get minimum amount of distinct sender and receivers pairs needed to implement the given protocol"

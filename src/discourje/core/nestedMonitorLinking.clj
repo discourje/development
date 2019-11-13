@@ -46,8 +46,7 @@
       (satisfies? recursable last)
       (let [rec (nest-mep (if-not (nil? next) (conj (get-recursion last) next) (get-recursion last)) rec-table)
             result (assoc (assoc last :next nil) :recursion rec)]
-        (assoc-to-rec-table rec-table result))))
-  )
+        (assoc-to-rec-table rec-table result)))))
 
 (defn nest-mep
   "assign all next keys in a given vector of interactions (note that choice, parallel and recursion make this function called recursively)"

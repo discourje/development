@@ -12,7 +12,6 @@
   [channels]
   (= 1 (count (distinct (for [c channels] (get-monitor-id (get-monitor c)))))))
 
-
 (defn force-monitor-reset! "Force the monitor to go back to the first interaction." [monitor interactions]
   (reset! (:active-interaction monitor) interactions))
 
