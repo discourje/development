@@ -61,47 +61,6 @@
                         #(is-valid-receivable? % monitor sender receivers message) (get-parallel active-interaction)))]
     active-interaction))
 
-;(defn remove-from-parallel-inter
-;  "Remove an interaction from a parallel in a recursive fashion."
-;  [sender receivers message target-interaction monitor]
-;  (let [pars (flatten (filter some?
-;                              (for [par (get-parallel target-interaction)]
-;                                (let [is-found (atom false)
-;                                      inter (cond
-;                                              @is-found par
-;                                              (satisfies? parallelizable par)
-;                                              (remove-from-parallel-inter sender receivers message par monitor)
-;                                              (not= nil (is-valid-receivable? par monitor sender receivers message))
-;                                              (get-receivable par monitor sender receivers message)
-;                                              :else
-;                                              par)]
-;                                  (println "inter" inter par)
-;                                  (println "par" par)
-;                                  (if @is-found
-;                                    inter
-;                                    (if (nil? inter)
-;                                      (if (satisfies? parallelizable par)
-;                                        nil
-;                                        par)
-;                                      (cond
-;                                        (satisfies? parallelizable inter)
-;                                        (remove-from-parallel-inter sender receivers message inter monitor)
-;                                        (satisfies? interactable inter)
-;                                        (do
-;                                          (reset! is-found true)
-;                                          (if (multiple-receivers? inter)
-;                                            (assoc inter :receivers (vec (remove #{receivers} (:receivers inter))))
-;                                            (get-next inter))
-;                                          )
-;                                        (or (satisfies? branchable inter) (satisfies? closable inter))
-;                                        inter
-;                                        (and (instance? clojure.lang.LazySeq inter) (not (satisfies? interactable inter)))
-;                                        (first (filter some? inter)))))))))]
-;    (println"pars =" pars)
-;    (if (empty? pars)
-;      (get-next target-interaction)
-;      (assoc target-interaction :parallels pars))))
-
 (defn remove-from-parallel
   "Remove an interaction from a parallel in a recursive fashion."
   [sender receivers message target-interaction monitor]
@@ -171,39 +130,6 @@
                         #(is-valid-closable? % monitor sender receiver) (get-parallel active-interaction)))]
     active-interaction))
 
-;(defn remove-close-from-parallel-inter
-;  "Remove an interaction from a parallel in a recursive fashion."
-;  [sender receivers target-interaction monitor]
-;  (let [pars (flatten (filter some?
-;                              (for [par (get-parallel target-interaction)]
-;                                (let [is-found (atom false)
-;                                      inter (cond
-;                                              @is-found par
-;                                              (satisfies? parallelizable par)
-;                                              (remove-close-from-parallel-inter sender receivers par monitor)
-;                                              (is-valid-closable? par monitor sender receivers)
-;                                              (get-closable par monitor sender receivers)
-;                                              :else
-;                                              par)]
-;                                  (if @is-found
-;                                    inter
-;                                    (if (nil? inter)
-;                                      (if (satisfies? parallelizable par)
-;                                        nil
-;                                        par)
-;                                      (cond
-;                                        (satisfies? parallelizable inter)
-;                                        (remove-close-from-parallel-inter sender receivers inter monitor)
-;                                        (satisfies? closable inter)
-;                                        (get-next inter)
-;                                        (or (satisfies? branchable inter) (satisfies? interactable inter))
-;                                        inter
-;                                        (and (instance? clojure.lang.LazySeq inter) (not (satisfies? interactable inter)))
-;                                        (first (filter some? inter)))))))))]
-;    (if (empty? pars)
-;      (get-next target-interaction)
-;      (assoc target-interaction :parallels pars))))
-
 (defn remove-close-from-parallel
   "Remove an interaction from a parallel in a recursive fashion."
   [sender receivers target-interaction monitor]
@@ -214,18 +140,8 @@
                                               @is-found par
                                               (satisfies? parallelizable par)
                                               (remove-close-from-parallel sender receivers par monitor)
-                                              ;(satisfies? closable par)
-                                              ;(when (is-valid-close? sender receivers par) par)
-                                              ;(satisfies? branchable par)
-                                              ;(get-closable-branch par monitor sender receivers)
                                               (is-valid-closable? par monitor sender receivers)
                                               (get-closable par monitor sender receivers)
-                                              ;(satisfies? identifiable-recur par)
-                                              ;(let [recursion (get-rec monitor (get-name par))
-                                              ;      valid-rec (get-closable-recur-identifier recursion monitor sender receivers)]
-                                              ;  (if (nil? valid-rec)
-                                              ;    par
-                                              ;    recursion))
                                               :else
                                               par)]
                                   (if @is-found
