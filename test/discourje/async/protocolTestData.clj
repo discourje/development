@@ -35,9 +35,9 @@
 (defn testDualProtocol [include-ids]
   (if include-ids
     (create-protocol [(make-interaction (message-checker "1") "A" "B")
-                      (make-interaction (message-checker "2") "B" "A")]))
+                      (make-interaction (message-checker "2") "B" "A")])
   (create-protocol [(->interaction nil nil "A" "B" #{} nil)
-                    (->interaction nil nil "B" "A" #{} nil)]))
+                    (->interaction nil nil "B" "A" #{} nil)])))
 
 (def testDualProtocolControl
   (->interaction nil nil "A" "B" #{}

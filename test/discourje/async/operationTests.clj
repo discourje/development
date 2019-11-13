@@ -12,6 +12,12 @@
   (let [value (discourje.core.async/<!! channel)]
     (get-content value)))
 
+(defn <!!!-test
+  "Utility method to fix all test cases"
+  [channel]
+  (let [value (discourje.core.async/<!!! channel)]
+    (get-content value)))
+
 (deftest add-sender
   (let [inter (->interaction nil 1 "a" "b" #{} nil)]
     (is (= (->interaction nil 1 "a" "b" #{"b"} nil) (assoc inter :accepted-sends (conj (:accepted-sends inter) "b"))))))
@@ -27,13 +33,6 @@
     (let [m (async/<!! (get-chan c))]
       (is (= "1" (get-label m)))
       (is (= "hello world" (get-content m))))))
-
-(deftest receive-test
-  (let [channels (generate-infrastructure (testDualProtocol true))
-        c (get-channel channels "A" "B")]
-    (async/>!! (get-chan c) (->message "1" "hello world"))
-    (let [m (<!!-test c)]
-      (is (= "hello world"  m)))))
 
 (deftest send-receive-dual-test
   (let [channels (generate-infrastructure (testDualProtocol true))
@@ -350,7 +349,6 @@
               (let [numberMap (<!!-test ab)
                     threshold (:threshold numberMap)
                     generated (:generatedNumber numberMap)]
-                (println numberMap)
                 (if (> generated threshold)
                   (do (>!! ba (->message "2" {:label "2" :content "Number send is greater!"}))
                       (fnB fnB))
@@ -443,7 +441,7 @@
                        (<!!-test ba)))
         fnB (fn [] (do (<!!! ab)
                        (>!! ba (msg "2" "hi too"))))
-        fnC (fn [] (<!!! ac))
+        fnC (fn [] (<!!!-test ac))
         a (clojure.core.async/thread (fnA))
         c (clojure.core.async/thread (fnC))]
     (clojure.core.async/thread (fnB))
@@ -460,7 +458,7 @@
                      (>!! ab (msg "1" 1))
                      (<!!-test ba)
                      (>!! [ab ac] (msg "3" 3))
-                     (<!!! ba)))
+                     (<!!!-test ba)))
         fnB (fn [] (do (<!!-test ab)
                        (>!! ba (msg "2" 2))
                        (<!!-test ab)
