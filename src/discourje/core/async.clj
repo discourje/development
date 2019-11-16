@@ -189,7 +189,7 @@
                           (valid-send? (get-monitor channel) (get-provider channel) (get-consumer channel) message))]
                     (if (is-valid-for-swap? valid-interaction)
                       (apply-send! (get-monitor channel) (get-valid valid-interaction) (get-pre-swap valid-interaction) (get-provider channel) (get-consumer channel) message)
-                      (log-error :incorrect-communication (format "Atomic-send communication invalid! message: %s, sender: %s, receiver: %s, while active interaction is: %s" message (get-provider channel) (get-consumer channel) (to-string (get-active-interaction (get-monitor channel))))))))
+                      (log-error :incorrect-communication (format "Atomic-send communication invalid! message: %s, sender: %s, receiver: %s, while active interaction is: %s" message (get-provider channel) (get-consumer channel) (interaction-to-string (get-active-interaction (get-monitor channel))))))))
         ]
     (if (vector? channel)
       (>E channel message)
