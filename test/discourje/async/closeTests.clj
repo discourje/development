@@ -159,6 +159,7 @@
         (is true (channel-closed? (get-channel channels "b" "c")))
         (is (nil? (get-active-interaction (get-monitor ab))))))))
 
+
 (deftest send-and-receive-after-parallel-nested-parallel-test
   (let [channels (add-infrastructure (after-parallel-nested-parallel-with-closer true))
         ab (get-channel channels "a" "b")

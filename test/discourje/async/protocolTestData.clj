@@ -3,12 +3,12 @@
             [discourje.core.async :refer :all]))
 
 ;legacy message usage, just to make the tests pass
-(defprotocol sendable
+(defprotocol message-sendable
   (get-label [this])
   (get-content [this]))
 
 (defrecord message [label content]
-  sendable
+  message-sendable
   (get-label [this] label)
   (get-content [this] content))
 
@@ -18,7 +18,7 @@
   `(->message ~label ~content))
 
 (defmacro message-checker [value]
-  `(fn [~'m] (= (if (satisfies? sendable ~'m) (get-label ~'m) ~'m) ~value)))
+  `(fn [~'m] (= (if (satisfies? message-sendable ~'m) (get-label ~'m) ~'m) ~value)))
 ;;------------------------------------------------------
 
 (deftest interactableTest
@@ -35,9 +35,9 @@
 (defn testDualProtocol [include-ids]
   (if include-ids
     (create-protocol [(make-interaction (message-checker "1") "A" "B")
-                      (make-interaction (message-checker "2") "B" "A")]))
+                      (make-interaction (message-checker "2") "B" "A")])
   (create-protocol [(->interaction nil nil "A" "B" #{} nil)
-                    (->interaction nil nil "B" "A" #{} nil)]))
+                    (->interaction nil nil "B" "A" #{} nil)])))
 
 (def testDualProtocolControl
   (->interaction nil nil "A" "B" #{}
@@ -1073,6 +1073,7 @@
                                     (->closer nil "b" "a" nil)
                                     (->closer nil "b" "c" nil)])))
 
+
 (def rec-with-parallel-with-choice-multicast-and-closeControl
   (->lateral nil [(->branch nil [(->interaction nil nil "a" ["b" "c"] #{} nil)
                                  (->interaction nil nil "a" ["b" "c"] #{}
@@ -1157,7 +1158,8 @@
                                                     [(make-parallel [[(make-interaction (message-checker 2) "b" "a")
                                                                       (make-interaction (message-checker 3) "a" "b")]
                                                                      [(make-closer "a" "b")
-                                                                      (make-closer "b" "a")]])]])])
+                                                                      (make-closer "b" "a")]])]])
+                                    ])
                   (create-protocol [(->lateral nil [[(->interaction nil nil "b" "a" #{} nil)
                                                      (->interaction nil nil "a" "b" #{} nil)]
                                                     [(->interaction nil nil "b" "a" #{} nil)
