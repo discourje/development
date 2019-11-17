@@ -1,5 +1,5 @@
 # Based on openjdk:8, already includes lein
-image: clojure:lein-2.8.1
+image: clojure:openjdk-11-lein-2.8.1
 # If you need to configure a database, add a `services` section here
 # See https://docs.gitlab.com/ce/ci/services/postgres.html
 # Make sure you configure the connection as well
