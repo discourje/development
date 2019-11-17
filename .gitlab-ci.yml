@@ -20,6 +20,5 @@ test:
   script:
   # If you need to run any migrations or configure the database, this 
   # would be the point to do it.
-  - lein with-profile discourje
   - lein test
 
