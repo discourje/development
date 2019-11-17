@@ -1,5 +1,5 @@
 # Based on openjdk:8, already includes lein
-image: clojure:lein-2.7.0
+image: clojure:lein-2.8.1
 # If you need to configure a database, add a `services` section here
 # See https://docs.gitlab.com/ce/ci/services/postgres.html
 # Make sure you configure the connection as well
@@ -13,7 +13,7 @@ before_script:
   # Retrieve project dependencies
   # Do this on before_script since it'll be shared between both test and
   # any production sections a user adds
-  - apt-get update -y
+  # - apt-get update -y
   - lein deps
 
 test:
