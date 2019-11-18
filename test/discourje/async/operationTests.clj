@@ -437,16 +437,16 @@
         ab (get-channel channels "A" "B")
         ac (get-channel channels "A" "C")
         ba (get-channel channels "B" "A")
-        fnA (fn [] (do (>!! [ab ac] (msg "1" "Hi"))
+        fnA (fn [] (do (>!! [ab ac] (msg "1" 1))
                        (<!!-test ba)))
-        fnB (fn [] (do (<!!! ab)
-                       (>!! ba (msg "2" "hi too"))))
+        fnB (fn [] (do (<!!!-test ab)
+                       (>!! ba (msg "2" 2))))
         fnC (fn [] (<!!!-test ac))
         a (clojure.core.async/thread (fnA))
         c (clojure.core.async/thread (fnC))]
     (clojure.core.async/thread (fnB))
-    (is (= "hi too" (async/<!! a)))
-    (is (= "Hi" (async/<!! c)))
+    (is (= 1 (async/<!! c)))
+    (is (= 2 (async/<!! a)))
     (is (nil? (get-active-interaction (get-monitor ab))))))
 
 (deftest send-receive-testMulticastParticipantsWithChoiceProtocol
@@ -461,9 +461,9 @@
                      (<!!!-test ba)))
         fnB (fn [] (do (<!!-test ab)
                        (>!! ba (msg "2" 2))
-                       (<!!-test ab)
+                       (<!!!-test ab)
                        (>!! ba (msg "4" 4))))
-        fnC (fn [] (<!!-test ac))
+        fnC (fn [] (<!!!-test ac))
         a (clojure.core.async/thread (fnA))
         c (clojure.core.async/thread (fnC))]
     (clojure.core.async/thread (fnB))
