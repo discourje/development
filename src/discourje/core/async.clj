@@ -224,15 +224,16 @@
         (if (nil? (get-active-interaction (get-monitor channel)))
           (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
           (let [result (peek-channel (get-chan channel))
-                isParallel (is-current-multicast? (get-monitor channel) result)
+                is-multicast (is-current-multicast? (get-monitor channel) result)
                 id (get-id (get-active-interaction (get-monitor channel)))
                 valid-interaction (valid-receive? (get-monitor channel) (get-provider channel) (get-consumer channel) result)]
             (if-not (is-valid-for-swap? valid-interaction)
               (log-error :incorrect-communication (format "Atomic-receive communication invalid! sender: %s, receiver: %s, while active interaction is: %s" (get-provider channel) (get-consumer channel) (to-string (get-active-interaction (get-monitor channel)))))
               (do (apply-receive! (get-monitor channel) (get-valid valid-interaction) (get-pre-swap valid-interaction) (get-provider channel) (get-consumer channel) result)
                   (allow-receive channel)
-                  (loop [par isParallel]
-                    (when (true? par) (recur (= id (get-id (get-active-interaction (get-monitor channel)))))))
+                  (loop [par is-multicast
+                         active-inter (get-active-interaction (get-monitor channel))]
+                    (when (true? par) (recur (and (not= nil active-inter)(= id (get-id active-inter))) (get-active-interaction (get-monitor channel)))))
                   result)))))))
 
 (defn close-channel!
