@@ -17,8 +17,19 @@ before_script:
   - lein deps
 
 test:
+  stage: test
   script:
-  # If you need to run any migrations or configure the database, this 
-  # would be the point to do it.
   - lein test
+  only:
+    - master
+    - develop
+
+build:
+  stage: build
+  script:
+    - lein with-profile discourje uberjar
+    - lein with-profile tacas2020 uberjar
+  only:
+    - master
+
 

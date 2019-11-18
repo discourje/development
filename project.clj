@@ -17,5 +17,5 @@
                          :aot          [discourje.examples.tacas2020.main]
                          :uberjar-name "tacas2020.jar"}})
 
-;; $ lein with-profile default uberjar
+;; $ lein with-profile discourje uberjar
 ;; $ lein with-profile tacas2020 uberjar
