@@ -45,7 +45,7 @@ build-tacas:
     - develop
 
 test:
-  stage: test
+  stage: test_stage
   script:
   - lein test
   only:
