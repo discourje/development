@@ -26,3 +26,19 @@
   (get-chan [this])
   (get-monitor [this])
   (get-buffer [this]))
+
+(defprotocol mappable-rec
+  (get-rec-name [this])
+  (get-mapping [this])
+  (get-mapped-rec [this]))
+
+(defn apply-mapping-to-rec [rec mapping]
+  (if (nil? mapping)
+    rec
+    rec))
+
+(defrecord rec-table-entry [name mapping rec]
+  mappable-rec
+  (get-rec-name [this] name)
+  (get-mapping [this] mapping)
+  (get-mapped-rec [this] (apply-mapping-to-rec rec mapping)))

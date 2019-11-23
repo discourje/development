@@ -3,10 +3,16 @@
 
 (declare nest-mep)
 
+(defn create-rec-table-entry [inter]
+  (if (vector? (get-name inter))
+    (->rec-table-entry (first (get-name inter)) (second (get-name inter)) (get-recursion inter))
+    (->rec-table-entry (get-name inter) nil (get-recursion inter))))
+
 (defn- assoc-to-rec-table [rec-table inter]
   (if (and (satisfies? recursable inter) (not (vector? (get-recursion inter))))
     (do (when (or (nil? ((get-name inter) @rec-table)) (empty? ((get-name inter) @rec-table)))
-          (swap! rec-table assoc (get-name inter) (get-recursion inter)))
+          (let [entry (create-rec-table-entry inter)]
+            (swap! rec-table assoc (get-rec-name entry) entry)))
         (get-recursion inter))
     inter))
 
