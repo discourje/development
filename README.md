@@ -9,7 +9,7 @@ A protocol acts as an agreement on how participants interact with each other.
 All communication between participants is monitored by the protocol to ensure the correct flow of communication.
 When participants deviate from the specified protocol the communication will be logged, but will never block unless configured to throw exceptions.
 
-Discourje is written in Clojure (v1.8.0) and is built as an abstraction layer on clojure.core.async.
+Discourje is written in Clojure (v1.10.1) and is built as an abstraction layer on clojure.core.async.
 Discourje extends Core.async channels, put and take functions with validation logic to verify if the correct communication flow is followed. 
 Communication is blocking when desired (configure logging levels) and order among messages, and on channels is preserved.
 

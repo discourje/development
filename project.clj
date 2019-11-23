@@ -1,5 +1,5 @@
-(defproject discourje "5.0.1"
-  :description "FIXME: write description"
+(defproject discourje "6.1.0"
+  :description "Discourje is a library to describe communication between systems as protocols.\nA protocol acts as an agreement on how participants interact with each other.\nAll communication between participants is monitored by the protocol to ensure the correct flow of communication."
   :url "https://gitlab.com/ruben.hamers/Discourje"
   :license {:name "Eclipse Public License"
             :url  "http://www.eclipse.org/legal/epl-v10.html"}
@@ -10,9 +10,9 @@
                  [clojure-complete "0.2.5"]]
   :source-paths ["src"]
   :java-source-paths ["src"]
-  ;:java-source-paths ["src/discourje/demo/javaObjects"]
   :profiles {:discourje {:main discourje.main
-                         :aot  [discourje.main]}
+                         :aot  [discourje.main]
+                         :uberjar-name "discourje.jar"}
              :tacas2020 {:main         discourje.examples.tacas2020.main
                          :aot          [discourje.examples.tacas2020.main]
                          :uberjar-name "tacas2020.jar"}})

@@ -4,6 +4,10 @@ image: clojure:openjdk-11-lein-2.8.1
 # See https://docs.gitlab.com/ce/ci/services/postgres.html
 # Make sure you configure the connection as well
 
+stages:
+  - test_stage
+  - build_stage
+
 before_script:
   # If you need to install any external applications, like a 
   # postgres client, you may want to uncomment the line below:
@@ -17,19 +21,33 @@ before_script:
   - lein deps
 
 test:
-  stage: test
+  stage: test_stage
   script:
-  - lein test
+    - lein test
   only:
     - master
     - develop
 
-build:
-  stage: build
+build-discourje:
+  stage: build_stage
   script:
     - lein with-profile discourje uberjar
-    - lein with-profile tacas2020 uberjar
+  artifacts:
+    paths:
+      - /builds/ruben.hamers/Discourje/target/discourje.jar
+    expire_in: 1 week
   only:
     - master
+    - develop
 
-
+build-tacas:
+  stage: build_stage
+  script:
+    - lein with-profile tacas2020 uberjar
+  artifacts:
+    paths:
+      - /builds/ruben.hamers/Discourje/target/tacas2020.jar
+    expire_in: 1 week
+  only:
+    - master
+    - develop
