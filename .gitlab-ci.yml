@@ -5,8 +5,8 @@ image: clojure:openjdk-11-lein-2.8.1
 # Make sure you configure the connection as well
 
 stages:
-  - build_stage
   - test_stage
+  - build_stage
 
 before_script:
   # If you need to install any external applications, like a 
@@ -19,6 +19,14 @@ before_script:
   # any production sections a user adds
   # - apt-get update -y
   - lein deps
+
+test:
+  stage: test_stage
+  script:
+    - lein test
+  only:
+    - master
+    - develop
 
 build-discourje:
   stage: build_stage
@@ -40,14 +48,6 @@ build-tacas:
     paths:
       - /builds/ruben.hamers/Discourje/target/tacas2020.jar
     expire_in: 1 week
-  only:
-    - master
-    - develop
-
-test:
-  stage: test_stage
-  script:
-  - lein test
   only:
     - master
     - develop
