@@ -4,6 +4,10 @@ image: clojure:openjdk-11-lein-2.8.1
 # See https://docs.gitlab.com/ce/ci/services/postgres.html
 # Make sure you configure the connection as well
 
+stages:
+  - build_stage
+  - test_stage
+
 before_script:
   # If you need to install any external applications, like a 
   # postgres client, you may want to uncomment the line below:
@@ -15,10 +19,6 @@ before_script:
   # any production sections a user adds
   # - apt-get update -y
   - lein deps
-
-stages:
-  - build_stage
-  - test_stage
 
 build-discourje:
   stage: build_stage
@@ -51,6 +51,3 @@ test:
   only:
     - master
     - develop
-
-
-
