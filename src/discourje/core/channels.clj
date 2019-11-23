@@ -1,13 +1,6 @@
 ;channels.clj
 (in-ns 'discourje.core.async)
 
-(defprotocol transportable
-  (get-provider [this])
-  (get-consumer [this])
-  (get-chan [this])
-  (get-monitor [this])
-  (get-buffer [this]))
-
 (defrecord channel [provider consumers chan buffer monitor meta-put meta-take]
   transportable
   (get-provider [this] provider)
@@ -60,19 +53,6 @@
    (if (nil? buffer)
      (new-channel sender receiver (clojure.core.async/chan) nil nil)
      (new-channel sender receiver (clojure.core.async/chan buffer) buffer nil))))
-
-(defn unique-cartesian-product
-  "Generate channels between all participants and filters out duplicates e.g.: A<->A"
-  [x y]
-  (filter some?
-          (for [x x y y]
-            (when (not (identical? x y))
-              (vector x y)))))
-
-(defn generate-channels
-  "Generates communication channels between all participants, and adds the monitor"
-  [participants monitor buffer]
-  (map #(apply (fn [s r] (generate-channel s r monitor buffer)) %) (unique-cartesian-product participants participants)))
 
 (defn generate-minimum-channels
   "Generates communication channels between minimum amount of participants required for a protocol, and adds the monitor
