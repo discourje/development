@@ -16,14 +16,28 @@ before_script:
   # - apt-get update -y
   - lein deps
 
-build:
-  stage: build
+stages:
+  - build_stage
+  - test_stage
+
+build-discourje:
+  stage: build_stage
   script:
     - lein with-profile discourje uberjar
-    - lein with-profile tacas2020 uberjar
   artifacts:
     paths:
       - /builds/ruben.hamers/Discourje/target/discourje.jar
+    expire_in: 1 week
+  only:
+    - master
+    - develop
+
+build-tacas:
+  stage: build_stage
+  script:
+    - lein with-profile tacas2020 uberjar
+  artifacts:
+    paths:
       - /builds/ruben.hamers/Discourje/target/tacas2020.jar
     expire_in: 1 week
   only:
