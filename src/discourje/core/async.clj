@@ -18,9 +18,9 @@
       "macros"
       "interactions"
       "channels"
+      "nestedMonitorLinking"
       "monitoring"
-      "buffers"
-      "nestedMonitorLinking")
+      "buffers")
 
 (defn close-infrastructure!
   "Close all channels of the Discourje infrastructure"
@@ -76,7 +76,6 @@
 (defn channel-closed?
   "check whether a channel is closed"
   ([channel]
-   (println  (type channel))
    (if (nil? channel)
      (do (log-error :invalid-channel "Cannot check if the given channel is closed, it is nil!")
          false)

@@ -7,8 +7,7 @@
   (get-sendable [this monitor sender receivers message]))
 
 (defprotocol receivable
-   (is-multicast?[this monitor message])
-  ;(remove-receiver![this current-interaction receiver])
+  (is-multicast? [this monitor message])
   (is-valid-receivable? [this monitor sender receivers message])
   (apply-receivable! [this pre-swap-interaction active-interaction monitor sender receivers message])
   (get-receivable [this monitor sender receivers message]))
@@ -24,7 +23,8 @@
 
 (defprotocol linkable
   (get-id [this])
-  (get-next [this]))
+  (get-next [this])
+  (apply-rec-mapping [this mapping]))
 
 (defprotocol interactable
   (get-action [this])
@@ -77,6 +77,7 @@
   linkable
   (get-id [this] id)
   (get-next [this] next)
+  (apply-rec-mapping [this mapping] (apply-rec-mapping-atomic! this mapping))
   stringify
   (to-string [this] (format "Interaction - Action: %s, Sender: %s, Receivers: %s with accepted sends %s" action sender receivers accepted-sends))
   sendable
@@ -100,6 +101,7 @@
   linkable
   (get-id [this] id)
   (get-next [this] next)
+  (apply-rec-mapping [this mapping] (apply-rec-mapping-closer! this mapping))
   stringify
   (to-string [this] (format "Closer from Sender: %s to Receiver: %s" sender receiver))
   sendable
@@ -122,6 +124,7 @@
   linkable
   (get-id [this] id)
   (get-next [this] next)
+  (apply-rec-mapping [this mapping] (apply-rec-mapping-branch! this mapping))
   stringify
   (to-string [this] (format "Branching with branches - %s" (apply str (for [b branches] (format "[ %s ]" (to-string b))))))
   sendable
@@ -144,6 +147,7 @@
   linkable
   (get-id [this] id)
   (get-next [this] next)
+  (apply-rec-mapping [this mapping] (apply-rec-mapping-parallel! this mapping))
   stringify
   (to-string [this] (format "Parallel with parallels - %s" (apply str (for [p parallels] (format "[ %s ]" (to-string p))))))
   sendable
@@ -179,6 +183,7 @@
   linkable
   (get-id [this] id)
   (get-next [this] next)
+  (apply-rec-mapping [this mapping] (apply-rec-mapping-recur-identifier! this mapping))
   stringify
   (to-string [this] (format "Recur-identifier - name: %s, option: %s" name option))
   sendable

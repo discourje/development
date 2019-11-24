@@ -1,6 +1,8 @@
 ;identifiable-recur construct
 (in-ns 'discourje.core.async)
-
+;;---------------------------------Linkable implementation-------------------------------------------------
+(defn- apply-rec-mapping-recur-identifier! [this mapping]
+ this)
 ;;---------------------------------Sendable implementation-------------------------------------------------
 (defn- is-valid-sendable-recur-identifier? [active-interaction monitor sender receivers message]
   (if (satisfies? parallelizable active-interaction)

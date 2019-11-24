@@ -1,7 +1,22 @@
 ;nestedMonitorLinking.clj
 (in-ns 'discourje.core.async)
-
 (declare nest-mep)
+
+(defprotocol mappable-rec
+  (get-rec-name [this])
+  (get-initial-mapping [this])
+  (get-mapped-rec [this mapping]))
+
+(defn apply-mapping-to-rec [rec mapping]
+  (if (nil? mapping)
+    rec
+    (apply-rec-mapping rec mapping)))
+
+(defrecord rec-table-entry [name initial-mapping rec]
+  mappable-rec
+  (get-rec-name [this] name)
+  (get-initial-mapping [this] initial-mapping)
+  (get-mapped-rec [this mapping] (apply-mapping-to-rec rec mapping)))
 
 (defn create-rec-table-entry [inter]
   (if (vector? (get-name inter))
@@ -10,10 +25,10 @@
 
 (defn- assoc-to-rec-table [rec-table inter]
   (if (and (satisfies? recursable inter) (not (vector? (get-recursion inter))))
-    (do (when (or (nil? ((get-name inter) @rec-table)) (empty? ((get-name inter) @rec-table)))
-          (let [entry (create-rec-table-entry inter)]
-            (swap! rec-table assoc (get-rec-name entry) entry)))
-        (get-recursion inter))
+    (let [entry (create-rec-table-entry inter)]
+      (when (or (nil? ((get-rec-name entry) @rec-table)) (empty? ((get-rec-name entry) @rec-table)))
+        (swap! rec-table assoc (get-rec-name entry) (get-mapped-rec entry (get-initial-mapping entry))))
+      (get-recursion inter))
     inter))
 
 (defn- assoc-interaction

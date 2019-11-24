@@ -1,6 +1,11 @@
 ;core.clj
 (in-ns 'discourje.core.async)
 
+(defn- map-value! [original mapping]
+  (if (keyword? original)
+    (original mapping)
+    original))
+
 (defn is-predicate-valid?
   "Is the predicate in the monitor valid compared to the message or label (when given)"
   [message active-interaction]
