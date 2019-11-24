@@ -200,6 +200,14 @@
   (apply-closable! [this pre-swap-interaction active-interaction monitor channel] (apply-closable-recur-identifier! this pre-swap-interaction active-interaction monitor channel))
   (get-closable [this monitor sender receiver] (get-closable-recur-identifier this monitor sender receiver)))
 
+(defn unique-cartesian-product
+  "Generate channels between all participants and filters out duplicates e.g.: A<->A"
+  [x y]
+  (filter some?
+          (for [x x y y]
+            (when (not (identical? x y))
+              (vector x y)))))
+
 (defn- find-all-role-pairs
   "List all sender and receivers in the protocol"
   [protocol result]
@@ -209,7 +217,15 @@
             (for [element protocol]
               (cond
                 (satisfies? discourje.core.async/recursable element)
-                (conj result2 (flatten (find-all-role-pairs (get-recursion element) result2)))
+                (if (vector? (get-name element))
+                  (let [mapping (second (get-name element))
+                        mapping-vals (vals mapping)
+                        cartesian-product (unique-cartesian-product mapping-vals mapping-vals)
+                        mapped-channels (vec (for [pair cartesian-product] {:sender (first pair) :receivers (second pair)}))
+                        result3 (conj result2 (flatten mapped-channels))]
+                    (conj result3 (flatten (find-all-role-pairs (get-recursion element) result3)))
+                    )
+                (conj result2 (flatten (find-all-role-pairs (get-recursion element) result2))))
                 (satisfies? discourje.core.async/branchable element)
                 (let [branched-interactions (for [branch (get-branches element)] (find-all-role-pairs branch result2))]
                   (conj result2 (flatten branched-interactions)))
@@ -217,7 +233,9 @@
                 (let [parallel-interactions (for [p (get-parallel element)] (find-all-role-pairs p result2))]
                   (conj result2 (flatten parallel-interactions)))
                 (satisfies? discourje.core.async/interactable element)
-                (conj result2 {:sender (get-sender element) :receivers (get-receivers element)})
+                (if (or (keyword? (get-sender element)) (keyword? (get-receivers element)))
+                  result2
+                  (conj result2 {:sender (get-sender element) :receivers (get-receivers element)}))
                 (satisfies? discourje.core.async/closable element)
                 result2
                 (satisfies? discourje.core.async/identifiable-recur element)
