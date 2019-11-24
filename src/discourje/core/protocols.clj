@@ -1,6 +1,13 @@
 ;protocols.clj
 (in-ns 'discourje.core.async)
 
+(defprotocol transportable
+  (get-provider [this])
+  (get-consumer [this])
+  (get-chan [this])
+  (get-monitor [this])
+  (get-buffer [this]))
+
 (defprotocol monitoring
   (get-monitor-id [this])
   (get-active-interaction [this])
@@ -19,13 +26,6 @@
 (defrecord protocol [interactions]
   protocolable
   (get-interactions [this] interactions))
-
-(defprotocol transportable
-  (get-provider [this])
-  (get-consumer [this])
-  (get-chan [this])
-  (get-monitor [this])
-  (get-buffer [this]))
 
 (defprotocol mappable-rec
   (get-rec-name [this])
