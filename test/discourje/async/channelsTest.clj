@@ -111,7 +111,6 @@
 (deftest minimum-amount-testSingleParallelProtocol-roles-test
   (let [roles (get-distinct-role-pairs (get-interactions (testSingleMulticastProtocol)))
         channels (generate-minimum-channels roles nil 1)]
-    (println channels)
     (is (= 2 (count channels)))))
 
 (deftest minimum-amount-parallel-after-interaction-roles-test

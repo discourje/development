@@ -2,9 +2,12 @@
 (in-ns 'discourje.core.async)
 
 (defn- map-value! [original mapping]
-  (if (keyword? original)
-    (original mapping)
-    original))
+  (let [map-fn (fn [org mapp] (if (keyword? org)
+                                (org mapp)
+                                org))]
+    (if (vector? original)
+      (vec (for [rsvr original] (map-fn rsvr mapping)))
+      (map-fn original mapping))))
 
 (defn is-predicate-valid?
   "Is the predicate in the monitor valid compared to the message or label (when given)"

@@ -225,7 +225,7 @@
                         result3 (conj result2 (flatten mapped-channels))]
                     (conj result3 (flatten (find-all-role-pairs (get-recursion element) result3)))
                     )
-                (conj result2 (flatten (find-all-role-pairs (get-recursion element) result2))))
+                  (conj result2 (flatten (find-all-role-pairs (get-recursion element) result2))))
                 (satisfies? discourje.core.async/branchable element)
                 (let [branched-interactions (for [branch (get-branches element)] (find-all-role-pairs branch result2))]
                   (conj result2 (flatten branched-interactions)))
@@ -233,9 +233,11 @@
                 (let [parallel-interactions (for [p (get-parallel element)] (find-all-role-pairs p result2))]
                   (conj result2 (flatten parallel-interactions)))
                 (satisfies? discourje.core.async/interactable element)
-                (if (or (keyword? (get-sender element)) (keyword? (get-receivers element)))
+                (if (or (keyword? (get-sender element)) (or (and (vector? (get-receivers element)) (first (filter true? (filter keyword? (get-receivers element)))))) (keyword? (get-receivers element)))
                   result2
-                  (conj result2 {:sender (get-sender element) :receivers (get-receivers element)}))
+                  (if (vector? (get-receivers element))
+                    (conj result2 (flatten (vec (for [rsvr (get-receivers element)] {:sender (get-sender element) :receivers rsvr}))))
+                    (conj result2 {:sender (get-sender element) :receivers (get-receivers element)})))
                 (satisfies? discourje.core.async/closable element)
                 result2
                 (satisfies? discourje.core.async/identifiable-recur element)

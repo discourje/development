@@ -7,16 +7,13 @@
   (get-initial-mapping [this])
   (get-mapped-rec [this mapping]))
 
-(defn apply-mapping-to-rec [rec mapping]
-  (if (nil? mapping)
-    rec
-    (apply-rec-mapping rec mapping)))
-
 (defrecord rec-table-entry [name initial-mapping rec]
   mappable-rec
   (get-rec-name [this] name)
   (get-initial-mapping [this] initial-mapping)
-  (get-mapped-rec [this mapping] (apply-mapping-to-rec rec mapping)))
+  (get-mapped-rec [this mapping] (if (nil? mapping)
+                                   rec
+                                   (apply-rec-mapping rec mapping))))
 
 (defn create-rec-table-entry [inter]
   (if (vector? (get-name inter))
