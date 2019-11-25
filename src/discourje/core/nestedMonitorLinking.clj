@@ -28,7 +28,7 @@
     (let [entry (create-rec-table-entry inter)]
       (when (or (nil? ((get-rec-name entry) @rec-table)) (empty? ((get-rec-name entry) @rec-table)))
         (swap! rec-table assoc (get-rec-name entry) (get-mapped-rec entry (get-initial-mapping entry))))
-      (get-recursion inter))
+      (get-mapped-rec entry (get-initial-mapping entry)))
     inter))
 
 (defn- assoc-interaction

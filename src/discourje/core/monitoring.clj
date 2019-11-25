@@ -12,7 +12,7 @@
 
 (defn- get-rec-from-table [name rec-table]
   (if (vector? name)
-    (get-mapped-rec ((first name) rec-table) (second name))
+    (apply-rec-mapping ((first name) rec-table) (second name))
     (name rec-table)))
 
 (defrecord monitor [id active-interaction recursion-set]

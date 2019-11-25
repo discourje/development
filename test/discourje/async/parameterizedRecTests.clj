@@ -20,12 +20,12 @@
                                     ])
                   (create-protocol [(->interaction nil nil "A" "B" #{} nil)
                                     (->recursion nil [:test {:r1 "A" :r2 "B" :r3 "C"}]
-                                                 [(->interaction nil nil "B" "A" #{} nil)
+                                                 [(->interaction nil nil :r2 :r1 #{} nil)
                                                   (->branch nil [
-                                                                 [(->interaction nil nil "A" "C" #{} nil)
-                                                                  (->interaction nil nil "C" "A" #{} nil)
+                                                                 [(->interaction nil nil :r1 :r3 #{} nil)
+                                                                  (->interaction nil nil :r3 :r1 #{} nil)
                                                                   (->recur-identifier nil [:test {:r1 "A" :r2 "B" :r3 "C"}] :recur nil)]
-                                                                 [(->interaction nil nil "A" "B" #{} nil)]] nil)
+                                                                 [(->interaction nil nil :r1 :r2 #{} nil)]] nil)
                                                   ] nil)
                                     (->interaction nil nil "A" ["B" "C"] #{} nil)
                                     ])))
@@ -46,6 +46,10 @@
 (deftest single-recur-protocol-params-test
   (let [mon (generate-monitor (single-recur-protocol-params false))]
     (is (= (get-active-interaction mon) single-recur-protocol-paramsControl))))
+
+(deftest unique7-roles-single-recur-params-test
+  (println (get-distinct-role-pairs (get-interactions (single-recur-protocol-params true))))
+  (is (= 7 (count (get-distinct-role-pairs (get-interactions (single-recur-protocol-params true)))))))
 
 (deftest send-receive-single-recur-protocol-params
   (let [channels (generate-infrastructure (single-recur-protocol-params true))
