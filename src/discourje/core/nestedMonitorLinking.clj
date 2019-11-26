@@ -11,13 +11,24 @@
   mappable-rec
   (get-rec-name [this] name)
   (get-initial-mapping [this] initial-mapping)
-  (get-mapped-rec [this mapping] (if (nil? mapping)
+  (get-mapped-rec [this mapping] (cond
+                                   (nil? initial-mapping)
                                    rec
-                                   (apply-rec-mapping rec mapping))))
+                                   (nil? mapping)
+                                   (apply-rec-mapping rec initial-mapping)
+                                   :else
+                                   (apply-rec-mapping rec (if (map mapping)
+                                                            mapping
+                                                            (apply hash-map mapping)))))
+    )
 
 (defn create-rec-table-entry [inter]
   (if (vector? (get-name inter))
-    (->rec-table-entry (first (get-name inter)) (second (get-name inter)) (get-recursion inter))
+    (->rec-table-entry (first (get-name inter))
+                       (if (map? (second (get-name inter)))
+                         (second (get-name inter))
+                         (apply hash-map (second (get-name inter))))
+                       (get-recursion inter))
     (->rec-table-entry (get-name inter) nil (get-recursion inter))))
 
 (defn- assoc-to-rec-table [rec-table inter]

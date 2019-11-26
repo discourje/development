@@ -219,7 +219,9 @@
                 (satisfies? discourje.core.async/recursable element)
                 (if (vector? (get-name element))
                   (let [mapping (second (get-name element))
-                        mapping-vals (vals mapping)
+                        mapping-vals (if (map? mapping)
+                                       (vals mapping)
+                                       (vals (apply hash-map mapping)))
                         cartesian-product (unique-cartesian-product mapping-vals mapping-vals)
                         mapped-channels (vec (for [pair cartesian-product] {:sender (first pair) :receivers (second pair)}))
                         result3 (conj result2 (flatten mapped-channels))]

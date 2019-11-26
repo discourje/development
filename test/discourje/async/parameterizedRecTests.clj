@@ -11,7 +11,7 @@
                                                      (make-choice [
                                                                    [(make-interaction (message-checker "2") :r1 :r3)
                                                                     (make-interaction (message-checker "2") :r3 :r1)
-                                                                    (do-recur [:test {:r1 "A" :r2 "B" :r3 "C"}])]
+                                                                    (do-recur [:test [:r1 "A" :r2 "B" :r3 "C"]])]
                                                                    [(make-interaction (message-checker "3") :r1 :r2)
                                                                     ]
                                                                    ])
@@ -24,7 +24,7 @@
                                                   (->branch nil [
                                                                  [(->interaction nil nil :r1 :r3 #{} nil)
                                                                   (->interaction nil nil :r3 :r1 #{} nil)
-                                                                  (->recur-identifier nil [:test {:r1 "A" :r2 "B" :r3 "C"}] :recur nil)]
+                                                                  (->recur-identifier nil [:test [:r1 "A" :r2 "B" :r3 "C"]] :recur nil)]
                                                                  [(->interaction nil nil :r1 :r2 #{} nil)]] nil)
                                                   ] nil)
                                     (->interaction nil nil "A" ["B" "C"] #{} nil)
@@ -36,7 +36,7 @@
                                 (->branch nil [
                                                (->interaction nil nil "A" "C" #{}
                                                               (->interaction nil nil "C" "A" #{}
-                                                                             (->recur-identifier nil [:test {:r1 "A" :r2 "B" :r3 "C"}] :recur nil)))
+                                                                             (->recur-identifier nil [:test [:r1 "A" :r2 "B" :r3 "C"]] :recur nil)))
                                                (->interaction nil nil "A" "B" #{} (->interaction nil nil "A" ["B" "C"] #{} nil))
 
                                                ] nil))
@@ -84,10 +84,10 @@
             (is (= "ending" a->c-end)))))))
 
 (defn rec-with-parallel-with-choice-multicast-and-close-params [include-ids]
-  (if include-ids (create-protocol [(make-recursion [:test {:r1 "a" :r2 "b" :r3 "c"}]
+  (if include-ids (create-protocol [(make-recursion [:test [:r1 "a" :r2 "b" :r3 "c"]]
                                                     [(make-parallel [[(make-choice [[(make-interaction (message-checker 1) :r1 [:r2 :r3])]
                                                                                     [(make-interaction (message-checker 0) :r1 [:r2 :r3])
-                                                                                     (do-recur [:test {:r1 "a" :r2 "b" :r3 "c"}])]])]
+                                                                                     (do-recur [:test [:r1 "a" :r2 "b":r3 "c"]])]])]
                                                                      [(make-interaction (message-checker 4) :r2 [:r1 :r3])
                                                                       (make-interaction (message-checker 5) :r1 [:r2 :r3])]
                                                                      ])
@@ -154,3 +154,13 @@
         (is true (channel-closed? (get-channel channels "b" "c")))
         (is (nil? (get-active-interaction (get-monitor ab))))))))
 
+(defn single-recur-one-choice-params-swap-protocol []
+  (create-protocol [(make-recursion [:generate [:r1 "A" :r2 "B"]]
+                                    [(make-interaction (message-checker "1") :r1 :r2)
+                                     (make-choice [
+                                                   [(make-interaction (message-checker "2") :r2 :r1)
+                                                    (do-recur [:generate [:r1 "B" :r2 "A"]])]
+                                                   [(make-interaction (message-checker "3") :r2 :r1)]
+                                                   ])
+                                     ])
+                    ]))
