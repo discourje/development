@@ -183,7 +183,6 @@
                   (do (>!! r2 (->message "2" {:label "2" :content "Number send is greater!"}))
                       (fnB fnB r2 r1))
                   (>!! r2 (->message "3" {:label "3" :content "Number send is smaller!"})))))
-
         ]
     (let [result-a (clojure.core.async/thread (fnA fnA ab ba))]
       (clojure.core.async/thread (fnB fnB ab ba))
