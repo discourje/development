@@ -164,3 +164,28 @@
                                                    ])
                                      ])
                     ]))
+
+(deftest send-receive-single-recur-one-choice-params-swap-protocol
+  (let [channels (generate-infrastructure (single-recur-one-choice-params-swap-protocol))
+        ab (get-channel channels "A" "B")
+        ba (get-channel channels "B" "A")
+        fnA (fn [fnA r1 r2]
+              (>!! r1 (->message "1" {:threshold 5 :generatedNumber 2}))
+              (let [response (<!!-test r2)]
+                (cond
+                  (= (:label response) "2") (do (fnA fnA r2 r1))
+                  (= (:label response) "3") response)))
+        fnB (fn [fnB r1 r2]
+              (let [numberMap (<!!-test r1)
+                    threshold (:threshold numberMap)
+                    generated (:generatedNumber numberMap)]
+                (if (> generated threshold)
+                  (do (>!! r2 (->message "2" {:label "2" :content "Number send is greater!"}))
+                      (fnB fnB r2 r1))
+                  (>!! r2 (->message "3" {:label "3" :content "Number send is smaller!"})))))
+
+        ]
+    (let [result-a (clojure.core.async/thread (fnA fnA ab ba))]
+      (clojure.core.async/thread (fnB fnB ab ba))
+      (is (= (:label (clojure.core.async/<!! result-a)) "3"))
+      (is (nil? (get-active-interaction (get-monitor ab)))))))
