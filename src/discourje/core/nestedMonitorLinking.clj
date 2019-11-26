@@ -14,13 +14,13 @@
   (get-mapped-rec [this mapping] (cond
                                    (nil? initial-mapping)
                                    rec
-                                   (nil? mapping)
+                                   (or (nil? mapping) (not= (count (keys initial-mapping)) (count (keys mapping))))
                                    (apply-rec-mapping rec initial-mapping)
                                    :else
                                    (apply-rec-mapping rec (if (map mapping)
                                                             mapping
                                                             (apply hash-map mapping)))))
-    )
+  )
 
 (defn create-rec-table-entry [inter]
   (if (vector? (get-name inter))
