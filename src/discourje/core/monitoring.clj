@@ -9,10 +9,14 @@
 (defn force-monitor-reset! "Force the monitor to go back to the first interaction." [monitor interactions]
   (reset! (:active-interaction monitor) interactions))
 
-
 (defn- get-rec-from-table [name rec-table]
   (if (vector? name)
-    (apply-rec-mapping ((first name) @rec-table) (second name))
+    (let [entry ((first name) @rec-table)
+          mapping (second name)]
+      (get-mapped-rec entry (get-initial-mapping-keys mapping))
+      )
+
+
     (name @rec-table)))
 
 (defrecord monitor [id active-interaction recursion-set]

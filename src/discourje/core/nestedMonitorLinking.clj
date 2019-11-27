@@ -50,8 +50,8 @@
   (if (and (satisfies? recursable inter) (not (vector? (get-recursion inter))))
     (let [entry (create-rec-table-entry inter)]
       (when (or (nil? ((get-rec-name entry) @rec-table)) (empty? ((get-rec-name entry) @rec-table)))
-        (swap! rec-table assoc (get-rec-name entry) (get-mapped-rec entry (get-initial-mapping-keys (get-initial-mapping entry)))))
-      (get-mapped-rec entry (get-initial-mapping-keys (get-initial-mapping entry))))
+        (swap! rec-table assoc (get-rec-name entry) entry))
+      (get-mapped-rec entry (get-initial-mapping-keys (get-current-mapping entry))))
     inter))
 
 (defn- assoc-interaction
