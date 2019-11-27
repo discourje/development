@@ -4,39 +4,54 @@
 
 (defprotocol mappable-rec
   (get-rec-name [this])
-  (get-initial-mapping [this])
+  (get-current-mapping [this])
   (get-mapped-rec [this mapping]))
+
+(defn create-new-mapping [initial-mapping mapping]
+  (let [map-vec (vec initial-mapping)
+        continue-mapping (if (map? mapping)
+                           (vec (flatten (vec mapping)))
+                           mapping)
+        new-vec (atom [])]
+    (loop [index 0]
+      (reset! new-vec (conj @new-vec (assoc (nth map-vec index) 0 (nth continue-mapping index))))
+      (when (< index (- (count map-vec) 1))
+        (recur (+ index 1))))
+    (apply array-map (flatten @new-vec))))
 
 (defrecord rec-table-entry [name initial-mapping rec]
   mappable-rec
   (get-rec-name [this] name)
-  (get-initial-mapping [this] initial-mapping)
+  (get-current-mapping [this] initial-mapping)
   (get-mapped-rec [this mapping] (cond
                                    (nil? initial-mapping)
                                    rec
                                    (or (nil? mapping) (not= (count (keys initial-mapping)) (count (keys mapping))))
                                    (apply-rec-mapping rec initial-mapping)
                                    :else
-                                   (apply-rec-mapping rec (if (map mapping)
-                                                            mapping
-                                                            (apply hash-map mapping)))))
+                                   (apply-rec-mapping rec (create-new-mapping initial-mapping mapping))))
   )
 
-(defn create-rec-table-entry [inter]
+(defn- create-rec-table-entry [inter]
   (if (vector? (get-name inter))
     (->rec-table-entry (first (get-name inter))
                        (if (map? (second (get-name inter)))
                          (second (get-name inter))
-                         (apply hash-map (second (get-name inter))))
+                         (apply array-map (second (get-name inter))))
                        (get-recursion inter))
     (->rec-table-entry (get-name inter) nil (get-recursion inter))))
+
+(defn- get-initial-mapping-keys [initial-mapping]
+  (vec (keys (if (map initial-mapping)
+               initial-mapping
+               (apply array-map initial-mapping)))))
 
 (defn- assoc-to-rec-table [rec-table inter]
   (if (and (satisfies? recursable inter) (not (vector? (get-recursion inter))))
     (let [entry (create-rec-table-entry inter)]
       (when (or (nil? ((get-rec-name entry) @rec-table)) (empty? ((get-rec-name entry) @rec-table)))
-        (swap! rec-table assoc (get-rec-name entry) (get-mapped-rec entry (get-initial-mapping entry))))
-      (get-mapped-rec entry (get-initial-mapping entry)))
+        (swap! rec-table assoc (get-rec-name entry) (get-mapped-rec entry (get-initial-mapping-keys (get-initial-mapping entry)))))
+      (get-mapped-rec entry (get-initial-mapping-keys (get-initial-mapping entry))))
     inter))
 
 (defn- assoc-interaction

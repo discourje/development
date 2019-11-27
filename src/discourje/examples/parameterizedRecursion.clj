@@ -22,7 +22,6 @@
 (defn first-choice-branch [r1 r2]
   (>!! r1 (rand-int 2))
   (let [response (<!! r2)]
-    (println response)
     (cond
       (string? response) (do (println "new iteration!")
                              (first-choice-branch r2 r1))
@@ -31,10 +30,10 @@
                              (println "protocol done, and all channels closed.")))))
 
 (defn second-choice-branch [r1 r2]
-  (if (== 0 (let [v (<!! r1)] (println v) v))
+  (if (== 0 (<!! r1))
     (do (>!! r2 "number greater than 0")
         (second-choice-branch r2 r1))
     (>!! r2 1)))
 
-(first-choice-branch alice-to-bob bob-to-alice)
-(second-choice-branch alice-to-bob bob-to-alice)
+(thread(first-choice-branch alice-to-bob bob-to-alice))
+(thread (second-choice-branch alice-to-bob bob-to-alice))

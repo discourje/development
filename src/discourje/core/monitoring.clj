@@ -12,8 +12,8 @@
 
 (defn- get-rec-from-table [name rec-table]
   (if (vector? name)
-    (apply-rec-mapping ((first name) rec-table) (second name))
-    (name rec-table)))
+    (apply-rec-mapping ((first name) @rec-table) (second name))
+    (name @rec-table)))
 
 (defrecord monitor [id active-interaction recursion-set]
   monitoring
@@ -26,7 +26,7 @@
   (valid-receive? [this sender receivers message] (let [pre-swap @active-interaction]
                                                     (->swappable-interaction pre-swap (is-valid-receivable? pre-swap this sender receivers message))))
   (is-current-multicast? [this message] (is-multicast? @active-interaction this message))
-  (get-rec [this name] (get-rec-from-table name @recursion-set))
+  (get-rec [this name] (get-rec-from-table name recursion-set))
   (valid-close? [this sender receiver] (let [pre-swap @active-interaction]
                                          (->swappable-interaction pre-swap (is-valid-closable? pre-swap this sender receiver))))
   (apply-close! [this target-interaction pre-swap-interaction channel] (apply-closable! target-interaction pre-swap-interaction active-interaction this channel)))
