@@ -18,7 +18,7 @@
   (valid-close? [this sender receiver])
   (apply-close! [this target-interaction pre-swap-interaction channel])
   (is-current-multicast? [this message])
-  (get-rec [this name]))
+  (get-rec [this name save-mapping]))
 
 (defprotocol protocolable
   (get-interactions [this]))

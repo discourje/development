@@ -83,11 +83,11 @@
                                               (satisfies? branchable par)
                                               (get-receivable-branch par monitor sender receivers message)
                                               (satisfies? identifiable-recur par)
-                                              (let [recursion (get-rec monitor (get-name par))
+                                              (let [recursion (get-rec monitor (get-name par) false)
                                                     valid-rec (get-receivable-recur-identifier recursion monitor sender receivers message)]
                                                 (if (nil? valid-rec)
                                                   par
-                                                  recursion))
+                                                  (get-rec monitor (get-name par) true)))
                                               :else
                                               par)]
                                   (if @is-found
