@@ -13,11 +13,19 @@
                            (vec (flatten (vec mapping)))
                            mapping)
         new-vec (atom [])]
+    (println "initial"initial-mapping)
+    (println "desired new" mapping)
+   ; (println "map-vec"map-vec)
+    ;(println "continue"continue-mapping)
+    (println "bla" (apply array-map (flatten (for [kw mapping] [kw (kw initial-mapping)]))))
     (loop [index 0]
       (reset! new-vec (conj @new-vec (assoc (nth map-vec index) 0 (nth continue-mapping index))))
       (when (< index (- (count map-vec) 1))
         (recur (+ index 1))))
-    (apply array-map (flatten @new-vec))))
+    (do ;(println "result mapping" (apply array-map (flatten @new-vec)))
+      (apply array-map (flatten @new-vec)))
+;try new bla as result
+    ))
 
 (defrecord rec-table-entry [name initial-mapping rec]
   mappable-rec

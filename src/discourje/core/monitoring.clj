@@ -15,9 +15,11 @@
           mapping (second name)
           new-mapping (create-new-mapping (get-current-mapping entry) mapping)
           new-recursion (get-mapped-rec entry mapping)]
-      (println save-mapping)
+      ;(println save-mapping)
+      ;(println "oldmapping = "  (get-current-mapping entry) )
       (when (true? save-mapping)
-        (do (println new-mapping)
+        (do; (println "mapping to set"mapping)
+          ;(println "new mapping="new-mapping)
             (swap! rec-table assoc (first name) (assoc entry :initial-mapping new-mapping))
             ;(reset! rec-table (assoc @rec-table (first name) (assoc entry :initial-mapping new-mapping)))
             ))

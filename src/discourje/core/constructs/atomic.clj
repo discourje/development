@@ -24,14 +24,15 @@
 
 (defn- apply-sendable-atomic!
   "Send active interaction by atomic"
-  [target-interaction pre-swap-interaction active-interaction sender]
+  [target-interaction pre-swap-interaction active-interaction monitor sender]
   (if (nil? sender)
     (log-error :invalid-send (format "sender appears to be nil: %s %s" active-interaction target-interaction))
     (= (get-id (swap! active-interaction (fn [inter]
                                            (if (= (get-id inter) (get-id pre-swap-interaction))
-                                             (assoc-sender target-interaction sender)
-                                             inter)
-                                           )))
+                                             (do (when (satisfies? identifiable-recur inter)
+                                                   (get-rec monitor (get-name inter) true))
+                                                 (assoc-sender target-interaction sender))
+                                             inter))))
        (get-id target-interaction))))
 
 (defn- get-sendable-atomic
