@@ -188,3 +188,39 @@
       (clojure.core.async/thread (fnB fnB ab ba))
       (is (= (:label (clojure.core.async/<!! result-a)) "3"))
       (is (nil? (get-active-interaction (get-monitor ab)))))))
+
+(defn single-recur-one-choice-params-swap-nocontinuespecs-protocol []
+  (create-protocol [(make-recursion [:generate [:r1 "A" :r2 "B"]]
+                                    [(make-interaction (message-checker "1") :r1 :r2)
+                                     (make-choice [
+                                                   [(make-interaction (message-checker "2") :r2 :r1)
+                                                    (do-recur :generate)]
+                                                   [(make-interaction (message-checker "3") :r2 :r1)]
+                                                   ])
+                                     ])
+                    ]))
+
+(deftest send-receive-single-recur-one-choice-params-swap-nocontinuespecs-protocol
+  (let [channels (generate-infrastructure (single-recur-one-choice-params-swap-nocontinuespecs-protocol))
+        ab (get-channel channels "A" "B")
+        ba (get-channel channels "B" "A")
+        fnA (fn [fnA r1 r2 iterations]
+              (>!! r1 (->message "1" {:threshold 3 :generatedNumber iterations}))
+              (let [response (<!!-test r2)]
+                (cond
+                  (= (:label response) "2") (do (fnA fnA r1 r2 (+ iterations 1)))
+                  (= (:label response) "3") response)))
+        fnB (fn [fnB r1 r2]
+              (let [numberMap (<!!-test r1)
+                    threshold (:threshold numberMap)
+                    generated (:generatedNumber numberMap)]
+                (if (< generated threshold)
+                  (do (>!! r2 (->message "2" {:label "2" :content "Number send is smaller!"}))
+                      (println "parameterized rec with no continue spec repeat")
+                      (fnB fnB r1 r2))
+                  (>!! r2 (->message "3" {:label "3" :content "Number send is greater!"})))))
+        ]
+    (let [result-a (clojure.core.async/thread (fnA fnA ab ba 0))]
+      (clojure.core.async/thread (fnB fnB ab ba))
+      (is (= (:label (clojure.core.async/<!! result-a)) "3"))
+      (is (nil? (get-active-interaction (get-monitor ab)))))))

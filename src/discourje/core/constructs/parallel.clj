@@ -35,7 +35,9 @@
                    (let [valid (get-sendable p monitor sender receivers message)]
                      (if (satisfies? parallelizable valid)
                        (set-send-on-parallel sender receivers message valid monitor)
-                       (assoc-sender valid sender is-found)))
+                       (do (when (satisfies? identifiable-recur p)
+                             (get-rec monitor (get-name p) true))
+                           (assoc-sender valid sender is-found))))
                    :else
                    p
                    )))]
