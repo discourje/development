@@ -18,9 +18,9 @@
       "macros"
       "interactions"
       "channels"
+      "nestedMonitorLinking"
       "monitoring"
-      "buffers"
-      "nestedMonitorLinking")
+      "buffers")
 
 (defn close-infrastructure!
   "Close all channels of the Discourje infrastructure"

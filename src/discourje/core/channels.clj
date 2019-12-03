@@ -13,7 +13,6 @@
   (->channel provider consumers chan buffer monitor
              (new java.util.concurrent.Semaphore buffer)
              (new java.util.concurrent.Semaphore 0)))
-
 (defn acquire-put [channel]
   (.acquire (:meta-put channel)))
 
