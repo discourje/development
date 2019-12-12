@@ -38,6 +38,18 @@
       (is true (channel-closed? ab)))
     (is (nil? (get-active-interaction (get-monitor ab))))))
 
+(deftest channel-cannot-be-closed-before-receive-test       ;; active monitor is still the interation!
+  (let [channels (add-infrastructure (interaction-with-closer true))
+        ab (get-channel channels "a" "b")]
+    (set-logging-exceptions)
+    (>!! ab (msg 0 0))
+    (is (thrown? Exception (close-channel! ab)))
+    (let [a->b (<!!-test ab)]
+      (is (= a->b 0))
+      (close-channel! ab)
+      (is true (channel-closed? ab)))
+    (is (nil? (get-active-interaction (get-monitor ab))))))
+
 (deftest close-interaction-with-choice-and-closer-test
   (let [channels (add-infrastructure (interaction-with-choice-and-closer true))
         ab (get-channel channels "a" "b")]
