@@ -24,8 +24,10 @@
         m2 (->message "2" "Hello A")]
     (clojure.core.async/go
           (>! ab m1)
-          (let [a->b (<!-test ab)]
-            (is (= "Hello B" a->b)))
-          (>! ba m2)
-          (let [b->a (<!-test ba)]
-            (is (= "Hello A" b->a))))))
+          (println (clojure.core.async/<! (get-chan ab)))
+          ;(let [a->b (<!-test ab)]
+          ;  (is (= "Hello B" a->b)))
+          ;(>! ba m2)
+          ;(let [b->a (<!-test ba)]
+          ;  (is (= "Hello A" b->a)))
+          )))

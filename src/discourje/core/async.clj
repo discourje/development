@@ -120,9 +120,9 @@
 (defn- allow-send!
   "Allow send message in channel"
   [channel message]
-  (async/>! (get-chan channel) message)
-  (release-take channel)
-  channel)
+  (do (async/>! (get-chan channel) message)
+      (release-take channel)
+      channel))
 
 (defn- allow-receive!!
   "Allow a receive on the channel"
@@ -202,7 +202,7 @@
             (allow-sends!! channels message)
             (recur (send-fn)))))))
 
-(defn- go->E [channels message]
+(defn go->E [channels message]
   "Send in multicast"
   (do (loop []
         (when (can-puts? channels) (recur)))
@@ -239,28 +239,31 @@
             (if send-result
               (allow-send!! channel message)
               (recur (send-fn))))))))
-
-(defn >!
+(defn validate-send [channel message]
+  (let [valid-interaction
+        (cond
+          (channel-closed? channel)
+          (log-error :incorrect-communication (format "Invalid communication: you are trying to send but the channel is closed! From %s to %s" (get-provider channel) (get-consumer channel)))
+          :else
+          (valid-send? (get-monitor channel) (get-provider channel) (get-consumer channel) message))]
+    (if (is-valid-for-swap? valid-interaction)
+      (apply-send! (get-monitor channel) (get-valid valid-interaction) (get-pre-swap valid-interaction) (get-provider channel) (get-consumer channel) message)
+      (log-error :incorrect-communication (format "Atomic-send communication invalid! message: %s, sender: %s, receiver: %s, while active interaction is: %s" message (get-provider channel) (get-consumer channel) (interaction-to-string (get-active-interaction (get-monitor channel))))))))
+(defmacro >!
   "Put on channel"
   [channel message]
-  (let [send-fn (fn []
-                  (let [valid-interaction
-                        (cond
-                          (channel-closed? channel)
-                          (log-error :incorrect-communication (format "Invalid communication: you are trying to send but the channel is closed! From %s to %s" (get-provider channel) (get-consumer channel)))
-                          :else
-                          (valid-send? (get-monitor channel) (get-provider channel) (get-consumer channel) message))]
-                    (if (is-valid-for-swap? valid-interaction)
-                      (apply-send! (get-monitor channel) (get-valid valid-interaction) (get-pre-swap valid-interaction) (get-provider channel) (get-consumer channel) message)
-                      (log-error :incorrect-communication (format "Atomic-send communication invalid! message: %s, sender: %s, receiver: %s, while active interaction is: %s" message (get-provider channel) (get-consumer channel) (interaction-to-string (get-active-interaction (get-monitor channel))))))))
-        ]
-    (if (vector? channel)
-      (go->E channel message)
-      (do (acquire-put channel)
-          (loop [send-result (send-fn)]
-            (if send-result
-              (allow-send! channel message)
-              (recur (send-fn))))))))
+   `(if (vector? ~channel)
+      (go->E ~channel ~message)
+     (do (acquire-put ~channel)
+          (loop [~'send-result (validate-send ~channel ~message)]
+            (if ~'send-result
+              (do (async/>! (get-chan ~channel) ~message)
+                  (release-take ~channel)
+                  ~channel)
+              ;(allow-send! channel message)
+              (recur (validate-send ~channel ~message)))))))
+(def c (generate-channel "a" "b" nil 1))
+(macroexpand `(>! c 1))
 
 (defn <!!
   "take form channel"
