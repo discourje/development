@@ -4,11 +4,11 @@
             [discourje.async.protocolTestData :refer :all]
             [discourje.async.operationTests :refer :all]))
 
-(defn <!-test
+(defmacro <!-test
   "Utility method to fix all test cases"
   [channel]
-  (let [value (discourje.core.async/<! channel)]
-    (get-content value)))
+  `(let [~'value (discourje.core.async/<! ~channel)]
+    (get-content ~'value)))
 
 (defn <!-!-test
   "Utility method to fix all test cases"
@@ -24,10 +24,10 @@
         m2 (->message "2" "Hello A")]
     (clojure.core.async/go
           (>! ab m1)
-          (println (clojure.core.async/<! (get-chan ab)))
-          ;(let [a->b (<!-test ab)]
-          ;  (is (= "Hello B" a->b)))
-          ;(>! ba m2)
-          ;(let [b->a (<!-test ba)]
-          ;  (is (= "Hello A" b->a)))
+          (let [a->b (<!-test ab)]
+            (println a->b)
+            (is (= "Hello B" a->b)))
+          (>! ba m2)
+          (let [b->a (<!-test ba)]
+            (is (= "Hello A" b->a)))
           )))
