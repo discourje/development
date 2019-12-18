@@ -222,7 +222,9 @@
                  ~channel)
              (recur (validate-send ~channel ~message)))))))
 (def c (generate-channel "a" "b" nil 1))
-(macroexpand `(>! c 1))
+(def d (generate-channel "c" "b" nil 1))
+(macroexpand `(>! [c d] 1))
+(macroexpand `(>E! [c d] 1))
 
 (defn <!!
   "take form channel"
