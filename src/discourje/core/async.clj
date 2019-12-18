@@ -105,10 +105,10 @@
          (log-error :invalid-channels "Cannot generate infrastructure, make sure all channels required for the protocol are given!")))
      (log-error :invalid-channels "Cannot generate infrastructure, make sure all supplied channels implement the `transportable' protocol!"))))
 
-;(defmacro go
-;  "Clojure.core.async go macro"
-;  [& body]
-;  `(async/go ~@body))
+(defmacro go
+  "Clojure.core.async go macro"
+  [& body]
+  `(async/go ~@body))
 
 (defn- allow-send!!
   "Allow send message in channel"
@@ -117,13 +117,6 @@
   (release-take channel)
   channel)
 
-(defn- allow-send!
-  "Allow send message in channel"
-  [channel message]
-  (do (async/>! (get-chan channel) message)
-      (release-take channel)
-      channel))
-
 (defn- allow-receive!!
   "Allow a receive on the channel"
   [channel]
@@ -131,20 +124,7 @@
   (release-put channel)
   channel)
 
-(defn allow-receive!
-  "Allow a receive on the channel"
-  [channel]
-  (do (async/<! (get-chan channel))
-  (release-put channel)
-  channel))
-
 (defn- allow-sends!!
-  "Allow sending message on multiple channels"
-  [channels message]
-  (doseq [c channels] (allow-send!! c message))
-  channels)
-
-(defn- allow-sends!
   "Allow sending message on multiple channels"
   [channels message]
   (doseq [c channels] (allow-send!! c message))
@@ -163,12 +143,7 @@
   [channels]
   (and (not (empty? channels)) (every? #(not (channel-closed? %)) channels)))
 
-(defn- can-put?
-  "check if the buffer in full, when full wait until there is space in the buffer"
-  [^channel channel]
-  (true? (buffer-full? (get-chan channel))))
-
-(defn- can-puts?
+(defn can-puts?
   "check if the buffer in full on all channels, when full wait until there is space in the buffer"
   [channel]
   (some #(buffer-full? (get-chan %)) channel))
@@ -186,59 +161,6 @@
     :else
     (all-valid-channels? channels message)))
 
-(defn- >E [channels message]
-  "Send in multicast"
-  (do (loop []
-        (when (can-puts? channels) (recur)))
-      (let [first-chan (first channels)
-            send-fn (fn []
-                      (let [valid-interaction (all-channels-valid-for-send? channels message)]
-                        (if (is-valid-for-swap? valid-interaction)
-                          (apply-send! (get-monitor first-chan) (get-valid valid-interaction) (get-pre-swap valid-interaction) (get-provider first-chan) (vec (for [c channels] (get-consumer c))) message)
-                          (log-error :incorrect-communication "Trying to send in multicast, but the monitor is not correct for all channels!" message))))
-            ]
-        (loop [send-result (send-fn)]
-          (if send-result
-            (allow-sends!! channels message)
-            (recur (send-fn)))))))
-
-(defn go->E [channels message]
-  "Send in multicast"
-  (do (loop []
-        (when (can-puts? channels) (recur)))
-      (let [first-chan (first channels)
-            send-fn (fn []
-                      (let [valid-interaction (all-channels-valid-for-send? channels message)]
-                        (if (is-valid-for-swap? valid-interaction)
-                          (apply-send! (get-monitor first-chan) (get-valid valid-interaction) (get-pre-swap valid-interaction) (get-provider first-chan) (vec (for [c channels] (get-consumer c))) message)
-                          (log-error :incorrect-communication "Trying to send in multicast, but the monitor is not correct for all channels!" message))))
-            ]
-        (loop [send-result (send-fn)]
-          (if send-result
-            (allow-sends! channels message)
-            (recur (send-fn)))))))
-
-(defn >!!
-  "Put on channel"
-  [channel message]
-  (let [send-fn (fn []
-                  (let [valid-interaction
-                        (cond
-                          (channel-closed? channel)
-                          (log-error :incorrect-communication (format "Invalid communication: you are trying to send but the channel is closed! From %s to %s" (get-provider channel) (get-consumer channel)))
-                          :else
-                          (valid-send? (get-monitor channel) (get-provider channel) (get-consumer channel) message))]
-                    (if (is-valid-for-swap? valid-interaction)
-                      (apply-send! (get-monitor channel) (get-valid valid-interaction) (get-pre-swap valid-interaction) (get-provider channel) (get-consumer channel) message)
-                      (log-error :incorrect-communication (format "Atomic-send communication invalid! message: %s, sender: %s, receiver: %s, while active interaction is: %s" message (get-provider channel) (get-consumer channel) (interaction-to-string (get-active-interaction (get-monitor channel))))))))
-        ]
-    (if (vector? channel)
-      (>E channel message)
-      (do (acquire-put channel)
-          (loop [send-result (send-fn)]
-            (if send-result
-              (allow-send!! channel message)
-              (recur (send-fn))))))))
 (defn validate-send [channel message]
   (let [valid-interaction
         (cond
@@ -249,19 +171,56 @@
     (if (is-valid-for-swap? valid-interaction)
       (apply-send! (get-monitor channel) (get-valid valid-interaction) (get-pre-swap valid-interaction) (get-provider channel) (get-consumer channel) message)
       (log-error :incorrect-communication (format "Atomic-send communication invalid! message: %s, sender: %s, receiver: %s, while active interaction is: %s" message (get-provider channel) (get-consumer channel) (interaction-to-string (get-active-interaction (get-monitor channel))))))))
+
+(defn validate-multicast [channels message]
+  (let [first-chan (first channels)
+        valid-interaction (all-channels-valid-for-send? channels message)]
+    (if (is-valid-for-swap? valid-interaction)
+      (apply-send! (get-monitor first-chan) (get-valid valid-interaction) (get-pre-swap valid-interaction) (get-provider first-chan) (vec (for [c channels] (get-consumer c))) message)
+      (log-error :incorrect-communication "Trying to send in multicast, but the monitor is not correct for all channels!" message))))
+
+(defn- >E!! [channels message]
+  "Send in multicast"
+  (do (loop []
+        (when (can-puts? channels) (recur)))
+      (loop [send-result (validate-multicast channels message)]
+        (if send-result
+          (allow-sends!! channels message)
+          (recur (validate-multicast channels message))))))
+
+(defmacro >E! [channels message]
+  "Send in multicast"
+  `(do (loop []
+        (when (can-puts? ~channels) (recur)))
+      (loop [~'send-result (validate-multicast ~channels ~message)]
+        (if ~'send-result
+          (do (doseq [~'c ~channels] (async/>! (get-chan ~'c) ~message))
+              ~channels)
+          (recur (validate-multicast ~channels ~message))))))
+
+(defn >!!
+  "Put on channel"
+  [channel message]
+  (if (vector? channel)
+    (>E!! channel message)
+    (do (acquire-put channel)
+        (loop [send-result (validate-send channel message)]
+          (if send-result
+            (allow-send!! channel message)
+            (recur (validate-send channel message)))))))
+
 (defmacro >!
   "Put on channel"
   [channel message]
-   `(if (vector? ~channel)
-      (go->E ~channel ~message)
+  `(if (vector? ~channel)
+     (>E! ~channel ~message)
      (do (acquire-put ~channel)
-          (loop [~'send-result (validate-send ~channel ~message)]
-            (if ~'send-result
-              (do (async/>! (get-chan ~channel) ~message)
-                  (release-take ~channel)
-                  ~channel)
-              ;(allow-send! channel message)
-              (recur (validate-send ~channel ~message)))))))
+         (loop [~'send-result (validate-send ~channel ~message)]
+           (if ~'send-result
+             (do (async/>! (get-chan ~channel) ~message)
+                 (release-take ~channel)
+                 ~channel)
+             (recur (validate-send ~channel ~message)))))))
 (def c (generate-channel "a" "b" nil 1))
 (macroexpand `(>! c 1))
 
@@ -282,19 +241,19 @@
 (defmacro <!
   "take form channel"
   [channel]
- `(do (acquire-take ~channel)
-      (if (nil? (get-active-interaction (get-monitor ~channel)))
-        (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
-        (let [~'result (peek-channel (get-chan ~channel))
-              ~'valid-interaction (valid-receive? (get-monitor ~channel) (get-provider ~channel) (get-consumer ~channel) ~'result)]
-          (if-not (is-valid-for-swap? ~'valid-interaction)
-            (log-error :incorrect-communication (format "Atomic-receive communication invalid! sender: %s, receiver: %s with message %s , while active interaction is: %s" (get-provider ~channel) (get-consumer ~channel) ~'result (to-string (get-active-interaction (get-monitor ~channel)))))
-            (do (apply-receive! (get-monitor ~channel) (get-valid ~'valid-interaction) (get-pre-swap ~'valid-interaction) (get-provider ~channel) (get-consumer ~channel) ~'result)
-                (async/<! (get-chan ~channel))
-                (release-put ~channel)
-                ~'result))))))
+  `(do (acquire-take ~channel)
+       (if (nil? (get-active-interaction (get-monitor ~channel)))
+         (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
+         (let [~'result (peek-channel (get-chan ~channel))
+               ~'valid-interaction (valid-receive? (get-monitor ~channel) (get-provider ~channel) (get-consumer ~channel) ~'result)]
+           (if-not (is-valid-for-swap? ~'valid-interaction)
+             (log-error :incorrect-communication (format "Atomic-receive communication invalid! sender: %s, receiver: %s with message %s , while active interaction is: %s" (get-provider ~channel) (get-consumer ~channel) ~'result (to-string (get-active-interaction (get-monitor ~channel)))))
+             (do (apply-receive! (get-monitor ~channel) (get-valid ~'valid-interaction) (get-pre-swap ~'valid-interaction) (get-provider ~channel) (get-consumer ~channel) ~'result)
+                 (async/<! (get-chan ~channel))
+                 (release-put ~channel)
+                 ~'result))))))
 (macroexpand `(<! c))
-(defn <!!!
+(defn <!!8
   "take form channel peeking, and delay receive when parallel"
   [channel]
   (do (acquire-take channel)
@@ -313,7 +272,7 @@
                   (when (true? par) (recur (and (not= nil active-inter) (= id (get-id active-inter))) (get-active-interaction (get-monitor channel)))))
                 result))))))
 
-(defn <!-!
+(defn <!8
   "take form channel peeking, and delay receive when parallel"
   [channel]
   (do (acquire-take channel)
@@ -326,7 +285,7 @@
           (if-not (is-valid-for-swap? valid-interaction)
             (log-error :incorrect-communication (format "Atomic-receive communication invalid! sender: %s, receiver: %s, while active interaction is: %s" (get-provider channel) (get-consumer channel) (to-string (get-active-interaction (get-monitor channel)))))
             (do (apply-receive! (get-monitor channel) (get-valid valid-interaction) (get-pre-swap valid-interaction) (get-provider channel) (get-consumer channel) result)
-                (allow-receive! channel)
+                (async/<! (get-chan channel))
                 (loop [par is-multicast
                        active-inter (get-active-interaction (get-monitor channel))]
                   (when (true? par) (recur (and (not= nil active-inter) (= id (get-id active-inter))) (get-active-interaction (get-monitor channel)))))

@@ -31,7 +31,7 @@
 (defn- receive-greet
   "This function will use the protocol to listen for the greet message."
   [channel return-channel]
-  (let [message (<!!! channel)]
+  (let [message (<!!8 channel)]
     (log-message (format "Received message: %s by %s" message (get-consumer channel)))
     (when (not= (nil? return-channel)) (>!! return-channel "Hi Alice!"))))
 
