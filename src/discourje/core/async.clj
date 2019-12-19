@@ -127,7 +127,7 @@
 (defn- allow-sends!!
   "Allow sending message on multiple channels"
   [channels message]
-  (doseq [c channels] (allow-send!! c message))
+  (doseq [c channels] (do (acquire-put c) (allow-send!! c message)))
   channels)
 
 (defn all-valid-channels?
@@ -191,12 +191,15 @@
 (defmacro >E! [channels message]
   "Send in multicast"
   `(do (loop []
-        (when (can-puts? ~channels) (recur)))
-      (loop [~'send-result (validate-multicast ~channels ~message)]
-        (if ~'send-result
-          (do (doseq [~'c ~channels] (async/>! (get-chan ~'c) ~message))
-              ~channels)
-          (recur (validate-multicast ~channels ~message))))))
+         (when (can-puts? ~channels) (recur)))
+       (loop [~'send-result (validate-multicast ~channels ~message)]
+         (if ~'send-result
+           (do (doseq [~'c ~channels]
+                 (do (acquire-put ~'c)
+                     (async/>! (get-chan ~'c) ~message)
+                     (release-take ~'c)))
+               ~channels)
+           (recur (validate-multicast ~channels ~message))))))
 
 (defn >!!
   "Put on channel"
@@ -221,10 +224,6 @@
                  (release-take ~channel)
                  ~channel)
              (recur (validate-send ~channel ~message)))))))
-(def c (generate-channel "a" "b" nil 1))
-(def d (generate-channel "c" "b" nil 1))
-(macroexpand `(>! [c d] 1))
-(macroexpand `(>E! [c d] 1))
 
 (defn <!!
   "take form channel"

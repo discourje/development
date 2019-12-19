@@ -56,24 +56,46 @@
         m4 (->message "4" "C->A-B")]
     (is (= "C->A-B"
            (clojure.core.async/<!! (go
-                                     (do
-                                       (println 1)
-                                       (>! ab m1)
-                                       (println 2)
-                                       (<!-test ab)
-                                       (println 3)
-                                       (>! ba m2)
-                                       (println 4)
-                                       (<!-test ba)
-                                       (println 5)
-                                       (>! ac m3)
-                                       (println 6)
-                                       (<!-test ac)
-                                       (println 7)
-                                       (>! [ca cb] m4)
-                                       (println 8)
-                                       (<!-test ca)
-                                       (println 9)
-                                       (<!-test cb)
-                                       (println 10))))))
+                                     (>! ab m1)
+                                     (<!-test ab)
+                                     (>! ba m2)
+                                     (<!-test ba)
+                                     (>! ac m3)
+                                     (<!-test ac)
+                                     (>! [ca cb] m4)
+                                     (<!-test ca)
+                                     (<!-test cb)))))
+    (is (nil? (get-active-interaction (get-monitor ab))))))
+
+(deftest go-send-and-receive-parallel-after-rec-with-after-rec--multicast-test
+  (let [channels (add-infrastructure (parallel-after-rec-with-after-rec-multicasts true))
+        ab (get-channel channels "a" "b")
+        ba (get-channel channels "b" "a")
+        ac (get-channel channels "a" "c")
+        bc (get-channel channels "b" "c")]
+    ; go blocks must be separated into two go blocks or else the compiler throws this exception:
+    ; Syntax error (IndexOutOfBoundsException) compiling fn* at (test/discourje/async/goblockTests.clj:78:72).
+    ; Method code too large!
+    (is (= 4
+           (clojure.core.async/<!! (go
+                                     (>! ab (msg 0 0))
+                                     (<!-test ab)
+                                     (>! [ba bc] (msg 2 2))
+                                     (<!-test ba)
+                                     (<!-test bc)
+                                     (>! [ab ac] (msg 3 3))
+                                     (<!-test ab)
+                                     (<!-test ac)
+                                     (>! ba (msg 4 4))
+                                     (<!-test ba)
+                                     ))))
+    (is (= 7
+           (clojure.core.async/<!! (go
+                                     (>! ab (msg 5 5))
+                                     (<!-test ab)
+                                     (>! [ba bc] (msg 6 6))
+                                     (<!-test ba)
+                                     (<!-test bc)
+                                     (>! ba (msg 7 7))
+                                     (<!-test ba)))))
     (is (nil? (get-active-interaction (get-monitor ab))))))
