@@ -99,3 +99,57 @@
                                      (>! ba (msg 7 7))
                                      (<!-test ba)))))
     (is (nil? (get-active-interaction (get-monitor ab))))))
+
+(deftest go-close-interaction-with-closer-test
+  (let [channels (add-infrastructure (interaction-with-closer true))
+        ab (get-channel channels "a" "b")]
+    (clojure.core.async/<!! (go
+                              (>! ab (msg 0 0))
+                              (<!-test ab)
+                              (close-channel! ab)))
+    (is true (channel-closed? ab))
+    (is (nil? (get-active-interaction (get-monitor ab))))))
+
+(deftest send-and-receive-rec-with-parallel-with-choice-multicast-and-close-test
+  (let [channels (add-infrastructure (rec-with-parallel-with-choice-multicast-and-close true))
+        ab (get-channel channels "a" "b")
+        ac (get-channel channels "a" "c")
+        ba (get-channel channels "b" "a")
+        bc (get-channel channels "b" "c")]
+    (loop [reps 0]
+      (if (> reps 2)
+        (is (= 1
+               (clojure.core.async/<!! (go
+                                         (println reps)
+                                         (do (>! [ab ac] (msg 1 1))
+                                             (<!-test ab)
+                                             (<!-test ac))))))
+        (let [v (clojure.core.async/<!! (go
+                                          (do (>! [ab ac] (msg 0 0))
+                                              (<!-test ab)
+                                              (<!-test ac)
+                                              (do (>! [ba bc] (msg 4 4))
+                                                  (<!-test ba)
+                                                  (<!-test bc)
+                                                  (>! [ab ac] (msg 5 5))
+                                                  (<!-test ab)
+                                                  (<!-test ac)))))]
+          (is (== v 5))
+          (recur (+ reps 1)))))
+    (clojure.core.async/<!! (go
+                              (close-channel! ab)
+                              (close-channel! "a" "c" channels)
+                              (>! [ba bc] (msg 6 6))
+                              (<!-test ba)
+                              (<!-test bc)
+                              (close-channel! ba)
+                              (close-channel! bc)))
+    (is true (channel-closed? ab))
+    (is true (channel-closed? (get-channel channels "a" "b")))
+    (is true (channel-closed? ac))
+    (is true (channel-closed? (get-channel channels "a" "c")))
+    (is true (channel-closed? ba))
+    (is true (channel-closed? (get-channel channels "b" "a")))
+    (is true (channel-closed? bc))
+    (is true (channel-closed? (get-channel channels "b" "c")))
+    (is (nil? (get-active-interaction (get-monitor ab))))))

@@ -177,7 +177,7 @@
         valid-interaction (all-channels-valid-for-send? channels message)]
     (if (is-valid-for-swap? valid-interaction)
       (apply-send! (get-monitor first-chan) (get-valid valid-interaction) (get-pre-swap valid-interaction) (get-provider first-chan) (vec (for [c channels] (get-consumer c))) message)
-      (log-error :incorrect-communication "Trying to send in multicast, but the monitor is not correct for all channels!" message))))
+      (log-error :incorrect-communication "Trying to send in multicast, but the monitor is not correct for all channels!" (to-string first-chan) message))))
 
 (defn- >E!! [channels message]
   "Send in multicast"
@@ -253,7 +253,6 @@
                  (async/<! (get-chan ~channel))
                  (release-put ~channel)
                  ~'result))))))
-(macroexpand `(<! c))
 (defn <!!8
   "take form channel peeking, and delay receive when parallel"
   [channel]
