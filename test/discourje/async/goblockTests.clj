@@ -2,7 +2,8 @@
   (:require [clojure.test :refer :all]
             [discourje.core.async :refer :all]
             [discourje.async.protocolTestData :refer :all]
-            [discourje.async.operationTests :refer :all]))
+            [discourje.async.operationTests :refer :all]
+            [discourje.async.parameterizedRecTests :refer :all]))
 
 (defmacro <!-test
   "Utility method to fix all test cases"
@@ -120,7 +121,6 @@
       (if (> reps 2)
         (is (= 1
                (clojure.core.async/<!! (go
-                                         (println reps)
                                          (do (>! [ab ac] (msg 1 1))
                                              (<!-test ab)
                                              (<!-test ac))))))
@@ -153,3 +153,30 @@
     (is true (channel-closed? bc))
     (is true (channel-closed? (get-channel channels "b" "c")))
     (is (nil? (get-active-interaction (get-monitor ab))))))
+
+(deftest go-send-receive-single-recur-protocol-params
+  (let [channels (generate-infrastructure (single-recur-protocol-params true))
+        ab (get-channel channels "A" "B")
+        ba (get-channel channels "B" "A")
+        ac (get-channel channels "A" "C")
+        ca (get-channel channels "C" "A")
+        flag (atom false)]
+    (is (= "ending"
+           (clojure.core.async/<!! (go (>! ab (->message "1" "AB"))
+                                       (<!-test ab)
+                                       (while (false? @flag)
+                                         (>! ba (->message "1" "AB"))
+                                         (<!-test ba)
+                                         (if (== 1 (+ 1 (rand-int 2)))
+                                           (do
+                                             (>! ac (->message "2" "AC"))
+                                             (<!-test ac)
+                                             (>! ca (->message "2" "AC"))
+                                             (<!-test ca))
+                                           (do
+                                             (>! ab (->message "3" "AB3"))
+                                             (<!-test ab)
+                                             (reset! flag true))))
+                                       (>! [ab ac] (->message "end" "ending"))
+                                       (<!-test ab)
+                                       (<!-test ac)))))))

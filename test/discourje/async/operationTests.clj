@@ -15,7 +15,7 @@
 (defn <!!!-test
   "Utility method to fix all test cases"
   [channel]
-  (let [value (discourje.core.async/<!!8 channel)]
+  (let [value (discourje.core.async/<!!! channel)]
     (get-content value)))
 
 (deftest add-sender

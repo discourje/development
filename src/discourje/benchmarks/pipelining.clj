@@ -24,7 +24,7 @@
                 (loop [pipe 0]
                   (do
                     (>!! (nth channels pipe) msg)
-                    (<!!8 (nth channels pipe))
+                    (<!!! (nth channels pipe))
                     (when (true? (< pipe (- amount 1)))
                       (recur (+ 1 pipe))))))]
      (close-infrastructure! infra)

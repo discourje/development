@@ -18,11 +18,11 @@
         s-b1 (get-channel infra "seller" "buyer1")
         b1-b2 (get-channel infra "buyer1" "buyer2")]
     (>!! b1-s (generate-book))
-    (let [quote (<!!8 s-b1)
+    (let [quote (<!!! s-b1)
           div (quote-div quote)]
       (do
         (>!! b1-b2 div)
-        (when (<!!8 s-b1)
+        (when (<!!! s-b1)
           (order-book infra))))))
 
 ;send title to seller

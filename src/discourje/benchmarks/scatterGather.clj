@@ -36,7 +36,7 @@
                   (doseq [w w->m]
                     (thread
                       (do
-                        (<!!8 (:take w))
+                        (<!!! (:take w))
                         (loop []
                           (when (nil? (>!! (:put w) msg))
                             (recur))))))
@@ -73,7 +73,7 @@
                       (doseq [w w->m]
                         (thread
                           (do
-                            (<!!8 (:take w))
+                            (<!!! (:take w))
                             (loop []
                               (when (nil? (>!! (:put w) msg))
                                 (recur))))))
@@ -138,7 +138,7 @@
                   (doseq [w w->m]
                     (thread
                       (do
-                        (<!!8 (:take w))
+                        (<!!! (:take w))
                         (>!! (:put w) msg))))
                   (>!! m->w msg)
                   (loop [worker-id 0]
@@ -170,7 +170,7 @@
                       (doseq [w w->m]
                         (thread
                           (do
-                            (<!!8 (:take w))
+                            (<!!! (:take w))
                             (>!! (:put w) msg))))
                       (>!! m->w msg)
                       (loop [worker-id 0]
