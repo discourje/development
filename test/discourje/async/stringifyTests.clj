@@ -16,3 +16,6 @@
 
 (deftest stringify-identifiable-recur-test
   (is (= "Recur-identifier - name: :rec, option: :recur" (to-string (do-recur :rec)))))
+
+(deftest stringify-channel-test
+  (is (= "channel with Provider a, Consumer b and buffer 1" (to-string (generate-channel "a" "b" nil 1)))))
