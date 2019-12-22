@@ -1,6 +1,13 @@
 ;parallel construct
 (in-ns 'discourje.core.async)
 
+;;---------------------------------Linkable implementation-------------------------------------------------
+(defn- apply-rec-mapping-parallel! [this mapping]
+  (if (nil? (get-next this))
+    (assoc this :parallels (for [b (get-parallel this)] (apply-rec-mapping b mapping)))
+    (assoc (assoc this :parallels (for [b (get-parallel this)] (apply-rec-mapping b mapping))) :next (apply-rec-mapping (get-next this) mapping))
+    )
+  )
 ;;---------------------------------Sendable implementation-------------------------------------------------
 (defn- is-valid-sendable-parallel? [active-interaction monitor sender receivers message]
   (when-let [_ (first (filter
@@ -28,7 +35,9 @@
                    (let [valid (get-sendable p monitor sender receivers message)]
                      (if (satisfies? parallelizable valid)
                        (set-send-on-parallel sender receivers message valid monitor)
-                       (assoc-sender valid sender is-found)))
+                       (do (when (satisfies? identifiable-recur p)
+                             (get-rec monitor (get-name p) true))
+                           (assoc-sender valid sender is-found))))
                    :else
                    p
                    )))]
@@ -76,11 +85,11 @@
                                               (satisfies? branchable par)
                                               (get-receivable-branch par monitor sender receivers message)
                                               (satisfies? identifiable-recur par)
-                                              (let [recursion (get-rec monitor (get-name par))
+                                              (let [recursion (get-rec monitor (get-name par) false)
                                                     valid-rec (get-receivable-recur-identifier recursion monitor sender receivers message)]
                                                 (if (nil? valid-rec)
                                                   par
-                                                  recursion))
+                                                  (get-rec monitor (get-name par) true)))
                                               :else
                                               par)]
                                   (if @is-found

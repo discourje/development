@@ -1,5 +1,10 @@
 ;atomic construct
 (in-ns 'discourje.core.async)
+;;---------------------------------Linkable implementation-------------------------------------------------
+(defn- apply-rec-mapping-atomic! [this mapping]
+  (if (nil? (get-next this))
+    (assoc (assoc this :sender (map-value! (get-sender this) mapping)) :receivers (map-value! (get-receivers this) mapping))
+    (assoc (assoc (assoc this :sender (map-value! (get-sender this) mapping)) :receivers (map-value! (get-receivers this) mapping)) :next (apply-rec-mapping (get-next this) mapping))))
 
 ;;---------------------------------Sendable implementation-------------------------------------------------
 (defn- is-valid-sendable-atomic?
@@ -19,14 +24,15 @@
 
 (defn- apply-sendable-atomic!
   "Send active interaction by atomic"
-  [target-interaction pre-swap-interaction active-interaction sender]
+  [target-interaction pre-swap-interaction active-interaction monitor sender]
   (if (nil? sender)
     (log-error :invalid-send (format "sender appears to be nil: %s %s" active-interaction target-interaction))
     (= (get-id (swap! active-interaction (fn [inter]
                                            (if (= (get-id inter) (get-id pre-swap-interaction))
-                                             (assoc-sender target-interaction sender)
-                                             inter)
-                                           )))
+                                             (do (when (satisfies? identifiable-recur inter)
+                                                   (get-rec monitor (get-name inter) true))
+                                                 (assoc-sender target-interaction sender))
+                                             inter))))
        (get-id target-interaction))))
 
 (defn- get-sendable-atomic
@@ -36,9 +42,9 @@
 
 ;;---------------------------------Receivable implementation-----------------------------------------------
 (defn- multiple-receivers?
-    "Does the monitor have multiple receivers?"
-    [active-interaction]
-    (and (instance? Seqable (:receivers active-interaction)) (> (count (:receivers active-interaction)) 1)))
+  "Does the monitor have multiple receivers?"
+  [active-interaction]
+  (and (instance? Seqable (:receivers active-interaction)) (> (count (:receivers active-interaction)) 1)))
 
 (defn- is-multicast-atomic?
   "Does the monitor have multiple receivers?"

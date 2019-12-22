@@ -1,12 +1,6 @@
 ;monitoring.clj
 (in-ns 'discourje.core.async)
 
-
-;load helper namespace files!
-;(load "validation/closevalidation"
-;      "validation/receivevalidation"
-;      "validation/sendvalidation")
-
 (defn equal-monitors?
   "Check if all channels have the same monitor"
   [channels]
@@ -14,6 +8,17 @@
 
 (defn force-monitor-reset! "Force the monitor to go back to the first interaction." [monitor interactions]
   (reset! (:active-interaction monitor) interactions))
+
+(defn- get-rec-from-table [name rec-table save-mapping]
+  (if (vector? name)
+    (let [entry ((first name) @rec-table)
+          mapping (second name)
+          new-mapping (create-new-mapping (get-current-mapping entry) mapping)
+          new-recursion (get-mapped-rec entry mapping)]
+      (when (true? save-mapping)
+        (swap! rec-table assoc (first name) (assoc entry :initial-mapping new-mapping)))
+      new-recursion)
+    (get-mapped-rec (name @rec-table) nil)))
 
 (defrecord monitor [id active-interaction recursion-set]
   monitoring
@@ -26,7 +31,7 @@
   (valid-receive? [this sender receivers message] (let [pre-swap @active-interaction]
                                                     (->swappable-interaction pre-swap (is-valid-receivable? pre-swap this sender receivers message))))
   (is-current-multicast? [this message] (is-multicast? @active-interaction this message))
-  (get-rec [this name] (name @recursion-set))
+  (get-rec [this name save-mapping] (get-rec-from-table name recursion-set save-mapping))
   (valid-close? [this sender receiver] (let [pre-swap @active-interaction]
                                          (->swappable-interaction pre-swap (is-valid-closable? pre-swap this sender receiver))))
   (apply-close! [this target-interaction pre-swap-interaction channel] (apply-closable! target-interaction pre-swap-interaction active-interaction this channel)))

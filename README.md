@@ -20,12 +20,14 @@ Communication is blocking when desired (configure logging levels) and order amon
 - [Multicast](src/discourje/examples/multicast.clj)
 - [Branching](src/discourje/examples/branching.clj)
 - [Recursion](src/discourje/examples/recursion.clj)
+- [Parameterized Recursion](src/discourje/examples/parameterizedRecursion.clj)
 - [Custom Channels](src/discourje/examples/customChannels.clj)
 - [Typed Messages](src/discourje/examples/typedMessages.clj)
 - [Logging Levels](src/discourje/examples/logging.clj)
 - [Various validation mechanisms](src/discourje/examples/predicates.clj)
 - Validation on closing channels, all examples implement this!
 - Nesting: Parallelism, Recursion and Branching constructs support nesting!
+- Clojure.core.async `go-block` support!
 
 <i>See examples for each function for more info.</i>
 
@@ -46,8 +48,8 @@ Step 1: A message exchange pattern can be specified by the following constructs
 -
 - <b>-->> [predicate/type/wildcard sender receiver]</b>: Specifies an `atomic-interaction` which validates that the current communication through the protocol is a send & receive with validation of pred/value/wildcard from `sender` to `receiver`.
 - <b>choice [branch & more]</b>: Specifies a `choice form` which validates the first monitor in all branches and continues on target branch when an action is verified. Notice it supports variadic input arguments.
-- <b>rec [name interaction & more]</b>: Specifies a `recursion form` which recurs when the protocol encounters a `continue [name]`. Recur is matched by name and also supports nesting!
-- <b>continue [name]</b>: Specifies a recursion back to the matching `rec`.
+- <b>rec [name interaction & more]</b>: Specifies a `recursion form` which recurs when the protocol encounters a `continue [name]`. Recur is matched by name and also supports nesting! Note that the Rec name can be parameterized key-value-pairs.
+- <b>continue [name]</b>: Specifies a recursion back to the matching `rec`, if it contains mapping they will be applied next iteration. See [Parameterized Recursion](src/discourje/examples/parameterizedRecursion.clj) for more info. 
 - <b>par [parallel & more]</b>: Specifies a `parallel form` supports traversing multiple branches in parallel. Notice it supports variadic input arguments.
 - <b>close [sender receiver infrastructure]|[channel]</b>: Specifies a `close form` that validates if a channel is allowed to be closed.
 
@@ -60,9 +62,11 @@ Or by supplying the add-infrastructure macro with custom created channels. (see 
 
 Step 3: Use Discourje put & take abstractions
 -
-- <b>>!! [channel(s) message]</b>: Put function on channel(s), channels can be a vector of channels to support parallelism (see examples!)
-- <b><!! [channel]</b>:  Take operation of channel. When Expecting a choice to be made by sender.
+- <b>>!! [channel(s) message]</b>: Put function on channel(s), channels can be a vector of channels to support multicast (see examples!)
+- <b><!! [channel]</b>:  Take operation of channel.
 - <b><!!! [channel]</b>:  Take operation of channel when used with multicast it blocks until all receivers in the multicast have received their values.
+- <b>>! [channel(s) message]</b>: Go-block Put macro on channel(s), channels can be a vector of channels to support multicast.
+- <b><! [channel]</b>:  Go-block Take macro.
 
 Logging
 -

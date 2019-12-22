@@ -7,13 +7,14 @@
   (get-consumer [this] consumers)
   (get-chan [this] chan)
   (get-monitor [this] monitor)
-  (get-buffer [this] buffer))
+  (get-buffer [this] buffer)
+  stringify
+  (to-string [this] (format "channel with Provider %s, Consumer %s and buffer %s" provider consumers buffer)))
 
 (defn new-channel [provider consumers chan buffer monitor]
   (->channel provider consumers chan buffer monitor
              (new java.util.concurrent.Semaphore buffer)
              (new java.util.concurrent.Semaphore 0)))
-
 (defn acquire-put [channel]
   (.acquire (:meta-put channel)))
 
