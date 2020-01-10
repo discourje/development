@@ -106,9 +106,14 @@
      (log-error :invalid-channels "Cannot generate infrastructure, make sure all supplied channels implement the `transportable' protocol!"))))
 
 (defmacro go
-  "Clojure.core.async go macro"
+  "Discourje.core.async go macro"
   [& body]
   `(async/go ~@body))
+
+(defmacro go-loop
+  "Like (go (loop ...))"
+  [bindings & body]
+  `(async/go-loop ~bindings ~@body))
 
 (defn- allow-send!!
   "Allow send message in channel"
