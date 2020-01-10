@@ -158,17 +158,16 @@
   (let [channels (generate-infrastructure (one-recur-with-choice-protocol true))
         ab (get-channel channels "A" "B")
         ac (get-channel channels "A" "C")]
-    (go-loop [reps 0]
-             (if (< reps 2)
-               (do
-                 (>! ac (->message "2" "AC"))
-                 (let [a->c (<!-test ac)]
-                   (is (= "AC" a->c)))
-                 (recur (inc reps)))
-               (do
-                 (>! ab (->message "3" "AB3"))
-                 (let [a->b3 (<!-test ab)]
-                   (is (= "AB3" a->b3))))))))
+    (is (= "AB3"
+           (clojure.core.async/<!! (go-loop [reps 0]
+                                            (if (< reps 2)
+                                              (do
+                                                (>! ac (->message "2" "AC"))
+                                                (<!-test ac)
+                                                (recur (inc reps)))
+                                              (do
+                                                (>! ab (->message "3" "AB3"))
+                                                (<!-test ab)))))))))
 
 
 (deftest go-send-receive-single-recur-protocol-params
