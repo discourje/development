@@ -185,7 +185,7 @@
       (log-error :incorrect-communication "Trying to send in multicast, but the monitor is not correct for all channels!" (to-string first-chan) message))))
 
 (defn- >E!! [channels message]
-  "Send in multicast"
+  "Send in multicast, blocking"
   (do (loop []
         (when (can-puts? channels) (recur)))
       (loop [send-result (validate-multicast channels message)]
@@ -194,7 +194,7 @@
           (recur (validate-multicast channels message))))))
 
 (defmacro >E! [channels message]
-  "Send in multicast"
+  "Send in multicast, in go-block"
   `(do (loop []
          (when (can-puts? ~channels) (recur)))
        (loop [~'send-result (validate-multicast ~channels ~message)]
@@ -207,7 +207,7 @@
            (recur (validate-multicast ~channels ~message))))))
 
 (defn >!!
-  "Put on channel"
+  "Put on channel blocking"
   [channel message]
   (if (vector? channel)
     (>E!! channel message)
@@ -218,7 +218,7 @@
             (recur (validate-send channel message)))))))
 
 (defmacro >!
-  "Put on channel"
+  "Put on channel, in go-block"
   [channel message]
   `(if (vector? ~channel)
      (>E! ~channel ~message)
@@ -230,8 +230,24 @@
                  ~channel)
              (recur (validate-send ~channel ~message)))))))
 
+(defn put!
+  "Put on channel, with callback"
+  ([channel message]
+   (put! channel message nil))
+  ([channel message callback] (put! channel message callback true))
+  ([channel message callback on-caller?]
+   (throw (Exception. ("Not implemented yet!")))
+   ))
+
+(defn take!
+  "Take from channel, with callback"
+  ([channel callback] (take! channel callback true))
+  ([channel callback on-caller?]
+   (throw (Exception. ("Not implemented yet!")))
+   ))
+
 (defn <!!
-  "take form channel"
+  "take form channel blocking"
   [channel]
   (do (acquire-take channel)
       (if (nil? (get-active-interaction (get-monitor channel)))
@@ -245,7 +261,7 @@
                 result))))))
 
 (defmacro <!
-  "take form channel"
+  "take form channel, in go-block"
   [channel]
   `(do (acquire-take ~channel)
        (if (nil? (get-active-interaction (get-monitor ~channel)))
@@ -259,7 +275,8 @@
                  (release-put ~channel)
                  ~'result))))))
 (defn <!!!
-  "take form channel peeking, and delay receive when parallel"
+  "take from channel (blocking) peeking, and delay receive when parallel
+  This synchronizes all receives in a multi-cast"
   [channel]
   (do (acquire-take channel)
       (if (nil? (get-active-interaction (get-monitor channel)))

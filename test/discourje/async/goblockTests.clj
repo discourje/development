@@ -11,12 +11,6 @@
   `(let [~'value (discourje.core.async/<! ~channel)]
      (get-content ~'value)))
 
-(defmacro <!8-test
-  "Utility method to fix all test cases"
-  [channel]
-  `(let [~'value (discourje.core.async/<!8 ~channel)]
-     (get-content ~'value)))
-
 (deftest go-send-receive-dual-test
   (let [channels (generate-infrastructure (testDualProtocol true))
         ab (get-channel channels "A" "B")
