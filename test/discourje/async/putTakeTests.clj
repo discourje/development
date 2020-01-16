@@ -59,46 +59,79 @@
                        (take! ab (fn [v] (is (= "Hello B and C" (get-content v)))))
                        (take! ac (fn [v] (is (= "Hello B and C" (get-content v)))))))))
 
-(deftest put-and-take-rec-with-parallel-with-choice-multicast-and-close-test
-  (let [channels (add-infrastructure (rec-with-parallel-with-choice-multicast-and-close true))
+
+(deftest send-and-receive-parallel-after-rec-with-after-rec--multicast-test
+  (let [channels (add-infrastructure (parallel-after-rec-with-after-rec-multicasts true))
         ab (get-channel channels "a" "b")
-        ac (get-channel channels "a" "c")
         ba (get-channel channels "b" "a")
+        ac (get-channel channels "a" "c")
         bc (get-channel channels "b" "c")]
-    (loop [reps 0]
-      (if (> reps 2)
-        (do
-          (>!! [ab ac] (msg 1 1))
-          (is (= (<!!-test ab) 1))
-          (is (= (<!!-test ac) 1)))
-        (do (>!! [ab ac] (msg 0 0))
-            (is (= (<!!-test ab) 0))
-            (is (= (<!!-test ac) 0))
-            (do (>!! [ba bc] (msg 4 4))
-                (let [b->a4 (<!!-test ba)
-                      b->c4 (<!!-test bc)]
-                  (is (= b->a4 4))
-                  (is (= b->c4 4))
-                  (>!! [ab ac] (msg 5 5))
-                  (is (= (<!!-test ab) 5))
-                  (is (= (<!!-test ac) 5))))
-            (recur (+ reps 1)))))
-    (do
-      (close-channel! ab)
-      (is true (channel-closed? ab))
-      (is true (channel-closed? (get-channel channels "a" "b")))
-      (close-channel! "a" "c" channels)
-      (is true (channel-closed? ac))
-      (is true (channel-closed? (get-channel channels "a" "c")))
-      (>!! [ba bc] (msg 6 6))
-      (let [b->a6 (<!!-test ba)
-            b->c6 (<!!-test bc)]
-        (is (= b->a6 6))
-        (is (= b->c6 6))
-        (close-channel! ba)
-        (close-channel! bc)
-        (is true (channel-closed? ba))
-        (is true (channel-closed? (get-channel channels "b" "a")))
-        (is true (channel-closed? bc))
-        (is true (channel-closed? (get-channel channels "b" "c")))
-        (is (nil? (get-active-interaction (get-monitor ab))))))))
+    (put! ab (msg 0 0)
+          (fn [a]
+            (take! ab (fn [b]
+                        (is (= (get-content b) 0))
+                        (put! [ba bc] (msg 2 2)
+                              (fn [c]
+                                (take! ba
+                                       (fn [d] (do (is (= (get-content d) 2))
+                                                   (take! bc
+                                                          (fn [e] (do (is (= (get-content e) 2))
+                                                                      (put! [ab ac] (msg 3 3)
+                                                                            (fn [f]
+                                                                              (take! ab
+                                                                                     (fn [g] (do (is (= (get-content g) 3))
+                                                                                                 (take! ac
+                                                                                                        (fn [h] (do (is (= (get-content h) 3))
+
+                                                                                                                    ))))))
+
+                                                                              ))
+
+                                                                      ))))))
+
+                                ))
+                        (do (>!! [ba bc] (msg 2 2))
+                            (let [b->a2 (<!!-test ba)
+                                  b->c2 (<!!-test bc)]
+                              (is (= b->a2 2))
+                              (is (= b->c2 2))
+                              (>!! [ab ac] (msg 3 3))
+                              (is (= (<!!-test ab) 3))
+                              (is (= (<!!-test ac) 3))))
+                        (do (>!! ba (msg 4 4))
+                            (let [b->a4 (<!!-test ba)]
+                              (is (= b->a4 4))
+                              (>!! ab (msg 5 5))
+                              (is (= (<!!-test ab) 5))))
+                        (do (>!! [ba bc] (msg 6 6))
+                            (is (= (<!!-test ba) 6))
+                            (is (= (<!!-test bc) 6)))
+                        (do (>!! ba (msg 7 7))
+                            (is (= (<!!-test ba) 7))
+                            (is (nil? (get-active-interaction (get-monitor ab)))))
+
+                        ))
+            ))
+
+    (>!! ab (msg 0 0))
+    (let [a->b (<!!-test ab)]
+      (is (= a->b 0))
+      (do (>!! [ba bc] (msg 2 2))
+          (let [b->a2 (<!!-test ba)
+                b->c2 (<!!-test bc)]
+            (is (= b->a2 2))
+            (is (= b->c2 2))
+            (>!! [ab ac] (msg 3 3))
+            (is (= (<!!-test ab) 3))
+            (is (= (<!!-test ac) 3))))
+      (do (>!! ba (msg 4 4))
+          (let [b->a4 (<!!-test ba)]
+            (is (= b->a4 4))
+            (>!! ab (msg 5 5))
+            (is (= (<!!-test ab) 5))))
+      (do (>!! [ba bc] (msg 6 6))
+          (is (= (<!!-test ba) 6))
+          (is (= (<!!-test bc) 6)))
+      (do (>!! ba (msg 7 7))
+          (is (= (<!!-test ba) 7))
+          (is (nil? (get-active-interaction (get-monitor ab))))))))
