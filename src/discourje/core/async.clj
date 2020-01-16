@@ -131,15 +131,17 @@
 (defn- allow-puts!
   "Allow sending message on multiple channels"
   [channels message callback on-caller?]
-  (doseq [c channels] (do (acquire-put c) (allow-send!! c message)))
-  channels)
+  (let [counter (atom 0)
+        synchronize-fn (fn [x] (do (swap! counter inc)
+                                   (when (== @counter (count channels))
+                                     (callback true))))]
+    (doseq [c channels] (do (acquire-put c) (async/put! (get-chan c) message (fn [x] (do (release-take c) (synchronize-fn x))) on-caller?)))
+    channels))
 
 (defn- allow-take!
-  "Allow a receive on the channel"
+  "Allow a take! on the channel"
   [channel callback on-caller?]
-  (async/take! (get-chan channel) (fn [channel-val] (do
-                                                      (release-put channel)
-                                                      (callback channel-val))))
+  (async/take! (get-chan channel) (fn [channel-val] (do (release-put channel) (callback channel-val))) on-caller?)
   channel)
 
 (defn- allow-receive!!
@@ -147,12 +149,6 @@
   [channel]
   (async/<!! (get-chan channel))
   (release-put channel)
-  channel)
-
-(defn- allow-take!
-  "Allow a take! on the channel"
-  [channel callback on-caller?]
-  (async/take! (get-chan channel) (fn [channel-val] (do (release-put channel) (callback channel-val))))
   channel)
 
 (defn- allow-sends!!
