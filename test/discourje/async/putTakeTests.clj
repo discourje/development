@@ -60,12 +60,13 @@
                        (take! ac (fn [v] (is (= "Hello B and C" (get-content v)))))))))
 
 
-(deftest send-and-receive-parallel-after-rec-with-after-rec--multicast-test
+(deftest put-take-parallel-after-rec-with-after-rec--multicast-test-callback-hell
   (let [channels (add-infrastructure (parallel-after-rec-with-after-rec-multicasts true))
         ab (get-channel channels "a" "b")
         ba (get-channel channels "b" "a")
         ac (get-channel channels "a" "c")
         bc (get-channel channels "b" "c")]
+    ; never do this in production!
     (put! ab (msg 0 0)
           (fn [a]
             (take! ab (fn [b]
@@ -83,55 +84,19 @@
                                                                                                  (take! ac
                                                                                                         (fn [h] (do (is (= (get-content h) 3))
 
-                                                                                                                    ))))))
-
-                                                                              ))
-
-                                                                      ))))))
-
-                                ))
-                        (do (>!! [ba bc] (msg 2 2))
-                            (let [b->a2 (<!!-test ba)
-                                  b->c2 (<!!-test bc)]
-                              (is (= b->a2 2))
-                              (is (= b->c2 2))
-                              (>!! [ab ac] (msg 3 3))
-                              (is (= (<!!-test ab) 3))
-                              (is (= (<!!-test ac) 3))))
-                        (do (>!! ba (msg 4 4))
-                            (let [b->a4 (<!!-test ba)]
-                              (is (= b->a4 4))
-                              (>!! ab (msg 5 5))
-                              (is (= (<!!-test ab) 5))))
-                        (do (>!! [ba bc] (msg 6 6))
-                            (is (= (<!!-test ba) 6))
-                            (is (= (<!!-test bc) 6)))
-                        (do (>!! ba (msg 7 7))
-                            (is (= (<!!-test ba) 7))
-                            (is (nil? (get-active-interaction (get-monitor ab)))))
-
-                        ))
-            ))
-
-    (>!! ab (msg 0 0))
-    (let [a->b (<!!-test ab)]
-      (is (= a->b 0))
-      (do (>!! [ba bc] (msg 2 2))
-          (let [b->a2 (<!!-test ba)
-                b->c2 (<!!-test bc)]
-            (is (= b->a2 2))
-            (is (= b->c2 2))
-            (>!! [ab ac] (msg 3 3))
-            (is (= (<!!-test ab) 3))
-            (is (= (<!!-test ac) 3))))
-      (do (>!! ba (msg 4 4))
-          (let [b->a4 (<!!-test ba)]
-            (is (= b->a4 4))
-            (>!! ab (msg 5 5))
-            (is (= (<!!-test ab) 5))))
-      (do (>!! [ba bc] (msg 6 6))
-          (is (= (<!!-test ba) 6))
-          (is (= (<!!-test bc) 6)))
-      (do (>!! ba (msg 7 7))
-          (is (= (<!!-test ba) 7))
-          (is (nil? (get-active-interaction (get-monitor ab))))))))
+                                                                                                                    (put! ba (msg 4 4)
+                                                                                                                          (fn[i] (take! ba
+                                                                                                                                        (fn [j] (do (is (= (get-content j) 4))
+                                                                                                                                                    (put! ab (msg 5 5)
+                                                                                                                                                          (fn[k] (take! ab
+                                                                                                                                                                        (fn [l] (do (is (= (get-content l) 5))
+                                                                                                                                                                                    (put! [ba bc] (msg 6 6)
+                                                                                                                                                                                          (fn[m] (take! ba
+                                                                                                                                                                                                        (fn[n] (do (is (= (get-content n) 6))
+                                                                                                                                                                                                                   (take! bc
+                                                                                                                                                                                                                          (fn[o] (do (is (= (get-content o) 6))
+                                                                                                                                                                                                                                     (put! ba (msg 7 7)
+                                                                                                                                                                                                                                           (fn[p] (take! ba
+                                                                                                                                                                                                                                                         (fn[q] (do
+                                                                                                                                                                                                                                                                  (is (= (get-content q) 7))
+                                                                                                                                                                                                                                                                  (is (nil? (get-active-interaction (get-monitor ab)))))))))))))))))))))))))))))))))))))))))))))))))
