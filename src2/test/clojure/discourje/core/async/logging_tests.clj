@@ -1,7 +1,6 @@
-(ns discourje.async.loggingTests
+(ns discourje.core.async.logging-tests
   (:require [clojure.test :refer :all]
-            [discourje.core.async :refer :all]
-            [discourje.core.logging :refer :all]))
+            [discourje.core.async.logging :refer :all]))
 
 (deftest when-set-throwing-exceptions-can-be-thrown
   (set-throwing true)
