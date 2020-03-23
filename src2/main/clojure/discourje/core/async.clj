@@ -1,1 +1,1 @@
-(ns clojure.discourje.core.async)
+(ns discourje.core.async)

@@ -1,4 +1,4 @@
-(ns discourje.core.logging
+(ns discourje.core.async.logging
   (:require [clojure.core.async :as async]))
 
 ;set the logging level to none, showing no logs nor exceptions
@@ -69,7 +69,7 @@
   [type message & more]
   (let [msg (format "%s %s" message (apply str (flatten more)))]
     (if (can-throw?)
-      (throw (Exception. (generate-exception type msg)))
+      (throw (Exception. (generate-exception type msg) nil))
       (log-message (format "ERROR-[%s] - %s" type msg)))
     nil)
   nil)

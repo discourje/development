@@ -1,5 +1,5 @@
 ;core.clj
-(in-ns 'discourje.core.async)
+(in-ns 'discourje.core.async.impl.dsl.syntax)
 
 (defn- map-value! [original mapping]
   (let [map-fn (fn [org mapp] (if (keyword? org)

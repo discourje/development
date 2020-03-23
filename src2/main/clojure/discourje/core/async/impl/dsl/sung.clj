@@ -1,5 +1,6 @@
-;dsl.clj
-(in-ns 'discourje.core.async)
+(ns discourje.core.async.impl.dsl.sung
+  (:require [clojure.walk :refer :all]
+            [discourje.core.async.impl.dsl.syntax :refer :all]))
 
 ;;
 ;; Macros
@@ -176,7 +177,7 @@
 
 (defn -->fn
   ([sender receiver]
-   (-->fn sender receiver (fn [x] true)))
+   (-->fn sender receiver (fn [_] true)))
   ([sender receiver f]
    (->interaction (next-id)
                   f
@@ -238,8 +239,8 @@
   (let [s (eval (eval sp))]
     (->protocol (if (vector? s) (vec (flatten s)) [s]))))
 
-(defn moni [spec]
-  (generate-monitor spec))
+;(defn moni [spec]
+;  (generate-monitor spec))
 
 ;;
 ;; Patterns

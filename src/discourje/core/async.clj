@@ -10,9 +10,6 @@
   "Check whether f is a function, returns false if not"
   (fn? f))
 
-(defn uuid []
-  (.toString (java.util.UUID/randomUUID)))
-
 ;load helper namespace files!
 (load "protocols"
       "macros"
