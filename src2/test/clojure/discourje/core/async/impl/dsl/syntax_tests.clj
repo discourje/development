@@ -1,4 +1,4 @@
-(ns discourje.core.async.impl.dsl.ruben-tests
+(ns discourje.core.async.impl.dsl.syntax-tests
   (:require [clojure.test :refer :all]
             [discourje.core.async.impl.test-data :refer :all]
             [discourje.core.async.impl.dsl.syntax :refer :all]))
