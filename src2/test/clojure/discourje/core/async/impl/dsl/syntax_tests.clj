@@ -59,11 +59,11 @@
 (deftest one-recur-with-choice-protocol-ids-test
   (let [mon (generate-spec (one-recur-with-choice-protocol false))]
     (println (:recursion-set mon))
-    (is (= (get-active-interaction mon)one-recur-with-choice-protocolControl))))
+    (is (= (get-active-interaction mon) one-recur-with-choice-protocolControl))))
 
 (deftest rec-with-parallel-with-choice-multicast-ids-test
   (let [mon (generate-spec (rec-with-parallel-with-choice-multicast false))]
-    (println(:recursion-set mon))
+    (println (:recursion-set mon))
     (is (not-empty @(:recursion-set mon)))))
 (deftest one-recur-with-startchoice-and-endchoice-protocol-ids-test
   (let [mon (generate-spec (one-recur-with-startchoice-and-endchoice-protocol false))]
@@ -71,7 +71,7 @@
 
 (deftest two-buyer-protocol-ids-test
   (let [mon (generate-spec (two-buyer-protocol false))]
-    (is (= (get-active-interaction mon)two-buyer-protocolControl))))
+    (is (= (get-active-interaction mon) two-buyer-protocolControl))))
 
 (deftest parallel-after-interaction-test
   (let [mon (generate-spec (parallel-after-interaction false))]
@@ -109,3 +109,25 @@
   (let [mon (generate-spec (rec-with-parallel-with-choice-multicast-and-close false))]
     (is (not-empty @(:recursion-set mon)))
     (is (= (get-active-interaction mon) rec-with-parallel-with-choice-multicast-and-closeControl))))
+
+;;;;
+;;;; stringifyTests.clj
+;;;;
+
+(deftest stringify-interaction-test
+  (is (= "Interaction - Action: 1, Sender: A, Receivers: B with accepted sends #{}" (to-string (make-interaction "1" "A" "B")))))
+
+(deftest stringify-close-test
+  (is (= "Closer from Sender: A to Receiver: B" (to-string (make-closer "A" "B")))))
+
+(deftest stringify-branch-test
+  (is (= "Branching with branches - [ Interaction - Action: 1, Sender: A, Receivers: B with accepted sends #{} ][ Interaction - Action: 1, Sender: A, Receivers: B with accepted sends #{} ]" (to-string (get-active-interaction (generate-spec (create-protocol [(make-choice [[(make-interaction "1" "A" "B")] [(make-interaction "1" "A" "B")]])])))))))
+
+(deftest stringify-parallel-test
+  (is (= "Parallel with parallels - [ Interaction - Action: 1, Sender: A, Receivers: B with accepted sends #{} ][ Interaction - Action: 1, Sender: A, Receivers: B with accepted sends #{} ]" (to-string (get-active-interaction (generate-spec (create-protocol [(make-parallel [[(make-interaction "1" "A" "B")] [(make-interaction "1" "A" "B")]])])))))))
+
+(deftest stringify-identifiable-recur-test
+  (is (= "Recur-identifier - name: :rec, option: :recur" (to-string (do-recur :rec)))))
+
+;(deftest stringify-channel-test
+;  (is (= "channel with Provider a, Consumer b and buffer 1" (to-string (generate-channel "a" "b" nil 1)))))

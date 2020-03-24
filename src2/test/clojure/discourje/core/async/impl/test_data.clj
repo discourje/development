@@ -45,8 +45,8 @@
                  (->interaction nil nil "B" "A" #{} nil)))
 
 (defn test-typed-DualProtocol [include-ids]
-  (if include-ids (create-protocol [(-->> java.lang.String "A" "B")
-                                    (-->> java.lang.String "B" "A")])
+  (if include-ids (create-protocol [(-->> String "A" "B")
+                                    (-->> String "B" "A")])
                   (create-protocol [(->interaction nil nil "A" "B" #{} nil)
                                     (->interaction nil nil "B" "A" #{} nil)])))
 (def test-typed-DualProtocolControl
