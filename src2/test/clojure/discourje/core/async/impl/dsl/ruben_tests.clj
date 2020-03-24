@@ -1,6 +1,7 @@
-(ns discourje.async.macroTests
+(ns discourje.core.async.impl.dsl.ruben-tests
   (:require [clojure.test :refer :all]
-            [discourje.core.async :refer :all]))
+            [discourje.core.async.impl.dsl.syntax :refer :all]
+            [discourje.core.async.impl.dsl.ruben :refer :all]))
 
 (deftest- test-->
           (let [inter (-->> 1 "a" "b")]
@@ -42,25 +43,18 @@
         i3 (-->> 3 "A" "B")]
     (is (= (assoc (make-parallel [[i1] [i2] [i3]]) :id 1) (assoc (parallel [i1] [i2] [i3]) :id 1)))))
 
-(deftest create-channel-test
-  (let [fnChan (generate-channel "a" "b" 1)
-        macroChan (chan "a" "b" 1)]
-    (is (= (get-provider fnChan) (get-provider macroChan)))
-    (is (= (get-consumer fnChan) (get-consumer macroChan)))
-    (is (= (get-buffer fnChan) (get-buffer macroChan)))))
-
-(def api-two-buyer-protocol
-  (mep
-    (rec :order-book
-         (-->> "title" "Buyer1" "Seller")
-         (-->> "quote" "Seller" ["Buyer1" "Buyer2"])
-         (-->> "quoteDiv" "Buyer1" "Buyer2")
-         (choice
-           [(-->> "ok" "Buyer2" "Seller")
-            (-->> "date" "Seller" "Buyer2")
-            (continue :order-book)]
-           [(-->> "quit" "Buyer2" "Seller")]))))
-
+;(def api-two-buyer-protocol
+;  (mep
+;    (rec :order-book
+;         (-->> "title" "Buyer1" "Seller")
+;         (-->> "quote" "Seller" ["Buyer1" "Buyer2"])
+;         (-->> "quoteDiv" "Buyer1" "Buyer2")
+;         (choice
+;           [(-->> "ok" "Buyer2" "Seller")
+;            (-->> "date" "Seller" "Buyer2")
+;            (continue :order-book)]
+;           [(-->> "quit" "Buyer2" "Seller")]))))
+;
 ;(deftest send-receive-two-buyer-protocol-test
 ;  (let [infra (generate-infrastructure api-two-buyer-protocol)
 ;        b1s (get-channel infra "Buyer1" "Seller")
