@@ -27,7 +27,7 @@
 
 (defprotocol monitoring
   (get-monitor-id [this])
-  (get-active-interaction [this])
+  ;(get-active-interaction [this])
   (apply-receive! [this target-interaction pre-swap-interaction sender receivers message])
   (apply-send! [this target-interaction pre-swap-interaction sender receivers message])
   (valid-send? [this sender receivers message])
@@ -35,7 +35,8 @@
   (valid-close? [this sender receiver])
   (apply-close! [this target-interaction pre-swap-interaction channel])
   (is-current-multicast? [this message])
-  (get-rec [this name save-mapping]))
+  ;(get-rec [this name save-mapping])
+  )
 
 (load "monitor/core"
       "monitor/atomic"

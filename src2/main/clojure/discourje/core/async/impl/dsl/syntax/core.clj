@@ -1,6 +1,8 @@
 ;core.clj
 (in-ns 'discourje.core.async.impl.dsl.syntax)
 
+(import clojure.lang.Seqable)
+
 (defn- map-value! [original mapping]
   (let [map-fn (fn [org mapp] (if (keyword? org)
                                 (org mapp)

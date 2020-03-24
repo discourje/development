@@ -1,6 +1,7 @@
-(ns discourje.async.protocolTestData
+(ns discourje.core.async.impl.test-data
   (:require [clojure.test :refer :all]
-            [discourje.core.async :refer :all]))
+            [discourje.core.async.impl.dsl.syntax :refer :all]
+            [discourje.core.async.impl.dsl.ruben :refer :all]))
 
 ;legacy message usage, just to make the tests pass
 (defprotocol message-sendable

@@ -24,47 +24,6 @@
   [infra]
   (doseq [c (get-channels infra)] (clojure.core.async/close! (get-chan c))))
 
-(defn make-interaction [predicate sender receiver]
-  "Creates an interaction object specifying sending action from sender to receiver."
-  (->interaction (uuid) predicate sender receiver #{} nil))
-
-(defn make-choice
-  "Create a choice interaction"
-  [branches]
-  (->branch (uuid) branches nil))
-
-(defn make-recursion
-  "Generate recursion"
-  [name recursion]
-  (->recursion (uuid) name recursion nil))
-
-(defn do-recur
-  "do recur to start of recursion"
-  [name]
-  (->recur-identifier (uuid) name :recur nil))
-
-(defn make-closer
-  "Create a closer to close the channel with given sender and receiver pair."
-  [sender receiver]
-  (->closer (uuid) sender receiver nil))
-
-(defn make-parallel
-  "Generate parallel construct"
-  [parallels]
-  (->lateral (uuid) parallels nil))
-
-(defn create-protocol
-  "Generate protocol based on interactions"
-  [interactions]
-  (->protocol interactions))
-
-(defn generate-monitor
-  "Generate the monitor based on the given protocol"
-  [protocol]
-  (let [rec-table (atom {})
-        linked-interactions (nest-mep (get-interactions protocol) rec-table)]
-    (->monitor (uuid) (atom linked-interactions) rec-table)))
-
 (defn- all-channels-implement-transportable?
   "Do all custom supplied channels implement the transportable interface?"
   [channels]

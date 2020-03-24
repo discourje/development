@@ -1,5 +1,6 @@
 ;nestedMonitorLinking.clj
-(in-ns 'discourje.core.async)
+(in-ns 'discourje.core.async.impl.dsl.syntax)
+
 (declare nest-mep)
 
 (defprotocol mappable-rec

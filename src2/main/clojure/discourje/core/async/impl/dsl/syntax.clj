@@ -1,5 +1,6 @@
 (ns discourje.core.async.impl.dsl.syntax
-  (:require [discourje.core.async.logging :refer :all]))
+  (:require [discourje.core.async.logging :refer :all])
+  (:import (java.util UUID)))
 
 (defprotocol closable
   (get-from [this])
@@ -50,7 +51,8 @@
       "syntax/branch"
       "syntax/close"
       "syntax/identifiable-recur"
-      "syntax/parallel")
+      "syntax/parallel"
+      "syntax/nestedMonitorLinking")
 
 (defrecord interaction [id action sender receivers accepted-sends next]
   interactable
@@ -177,3 +179,67 @@
 (defrecord protocol [interactions]
   protocolable
   (get-interactions [this] interactions))
+
+(defn uuid []
+  (.toString (UUID/randomUUID)))
+
+(defn make-interaction [predicate sender receiver]
+  "Creates an interaction object specifying sending action from sender to receiver."
+  (->interaction (uuid) predicate sender receiver #{} nil))
+
+(defn make-choice
+  "Create a choice interaction"
+  [branches]
+  (->branch (uuid) branches nil))
+
+(defn make-recursion
+  "Generate recursion"
+  [name recursion]
+  (->recursion (uuid) name recursion nil))
+
+(defn do-recur
+  "do recur to start of recursion"
+  [name]
+  (->recur-identifier (uuid) name :recur nil))
+
+(defn make-closer
+  "Create a closer to close the channel with given sender and receiver pair."
+  [sender receiver]
+  (->closer (uuid) sender receiver nil))
+
+(defn make-parallel
+  "Generate parallel construct"
+  [parallels]
+  (->lateral (uuid) parallels nil))
+
+(defn create-protocol
+  "Generate protocol based on interactions"
+  [interactions]
+  (->protocol interactions))
+
+(defn- get-rec-from-table [name rec-table save-mapping]
+  (if (vector? name)
+    (let [entry ((first name) @rec-table)
+          mapping (second name)
+          new-mapping (create-new-mapping (get-current-mapping entry) mapping)
+          new-recursion (get-mapped-rec entry mapping)]
+      (when (true? save-mapping)
+        (swap! rec-table assoc (first name) (assoc entry :initial-mapping new-mapping)))
+      new-recursion)
+    (get-mapped-rec (name @rec-table) nil)))
+
+(defprotocol RecursiveInteractions
+  (get-active-interaction [this])
+  (get-rec [this name save-mapping]))
+
+(defrecord Spec [id active-interaction recursion-set]
+  RecursiveInteractions
+  (get-active-interaction [this] @active-interaction)
+  (get-rec [this name save-mapping] (get-rec-from-table name recursion-set save-mapping)))
+
+(defn generate-spec
+  "Generate the spec based on the given protocol"
+  [protocol]
+  (let [rec-table (atom {})
+        linked-interactions (nest-mep (get-interactions protocol) rec-table)]
+    (->Spec (uuid) (atom linked-interactions) rec-table)))

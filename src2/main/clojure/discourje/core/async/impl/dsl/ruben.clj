@@ -1,9 +1,5 @@
 (ns discourje.core.async.impl.dsl.ruben
-  (:require [discourje.core.async.impl.dsl.syntax :refer :all])
-  (:import (java.util UUID)))
-
-(defn uuid []
-  (.toString (UUID/randomUUID)))
+  (:require [discourje.core.async.impl.dsl.syntax :refer :all]))
 
 (defmacro -->>
   "Create an Atomic-interaction"
