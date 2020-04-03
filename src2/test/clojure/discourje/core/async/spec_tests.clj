@@ -1,8 +1,6 @@
 (ns discourje.core.async.spec-tests
   (:require [clojure.test :refer :all]
-            [discourje.core.async.spec :as s]
-            [discourje.core.async.impl.lts :as lts])
-  (:import (discourje.core.async.impl.lts LTS)))
+            [discourje.core.async.spec :as s]))
 
 (def alice (s/role "alice"))
 (def bob (s/role "bob"))
@@ -58,10 +56,9 @@
 
   ;(def spec (s/apply :repeat [1 (s/-->> (alice 2) (bob 4))]))
 
-  (def lts (LTS. spec lts/expander))
-  (.expandRecursively (.getInitialState lts))
-  (println (.toString lts))
+  (def lts (s/lts spec true))
 
-  (lts/visualize lts "/Applications/mCRL2.app/Contents" "/Users/sungshik/Desktop/lts.aut")
+  (s/println lts)
+  (s/ltsgraph lts "/Applications/mCRL2.app/Contents" "/Users/sungshik/Desktop/lts.aut")
 
   (catch Throwable t (.printStackTrace t)))

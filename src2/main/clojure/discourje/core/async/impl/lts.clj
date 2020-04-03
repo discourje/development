@@ -5,10 +5,6 @@
   (:import (java.util.function Function Predicate)
            (discourje.core.async.impl.lts Send Receive Close)))
 
-(defn visualize [lts mcrl2-root-dir tmp-file]
-  (spit tmp-file (.toString lts))
-  (future (clojure.java.shell/sh (str mcrl2-root-dir "/bin/ltsgraph") tmp-file)))
-
 (defn- smash [spec]
   (if (and (vector? spec) (= (count spec) 1))
     (smash (first spec))

@@ -1,6 +1,9 @@
 package discourje.core.async.impl.lts;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 public class LTS<Spec> {
@@ -11,9 +14,13 @@ public class LTS<Spec> {
 
     private Function<Spec, Map<Action, Spec>> expander;
 
-    public LTS(Spec initialStateSpec, Function<Spec, Map<Action, Spec>> expander) {
+    public LTS(Spec initialStateSpec, Function<Spec, Map<Action, Spec>> expander, boolean expandRecursively) {
         this.initialState = newOrGetState(initialStateSpec);
         this.expander = expander;
+        
+        if (expandRecursively) {
+            this.initialState.expandRecursively();
+        }
     }
 
     @Override
@@ -31,6 +38,7 @@ public class LTS<Spec> {
 
     private State<Spec> newOrGetState(Spec spec) {
         var s = states.get(spec);
+        //noinspection Java8MapApi
         if (s == null) {
 
             s = new State<>() {
@@ -97,67 +105,26 @@ public class LTS<Spec> {
 
             states.put(spec, s);
         }
+
         return s;
     }
 
-//    public static void areBisimilar(LTS<?> lts1, LTS<?> lts2) {
-//
-//
-//        var alphas = new HashSet<Action>();
-//
-//        for (State s : lts1.states.values()) {
-//            alphas.addAll(s.getAlphas());
-//        }
-//
-//        var partition = new HashSet<Set<State>>();
-//        partition.add(states);
-//
-//        while (true) {
-//            var partition$prime = new HashSet<Set<State>>();
-//
-//            for (Set<State> block : partition) {
-//                var intersection = new HashSet<State>();
-//                var complement = new HashSet<State>();
-//                BooleanSupplier isSplit = () ->
-//                        !intersection.isEmpty() && !complement.isEmpty();
-//
-//                for (Set<State> splitter : partition) {
-//                    for (Alpha a : alphas) {
-//                        intersection.clear();
-//                        complement.clear();
-//
-//                        for (State s : block) {
-//                            if (s.hasSomeSuccessor(a, splitter)) {
-//                                intersection.add(s);
-//                            } else {
-//                                complement.add(s);
-//                            }
-//                        }
-//
-//                        if (isSplit.getAsBoolean()) break;
-//                    }
-//
-//                    if (isSplit.getAsBoolean()) break;
-//                }
-//
-//                if (!intersection.isEmpty()) {
-//                    partition$prime.add(intersection);
-//                }
-//                if (!complement.isEmpty()) {
-//                    partition$prime.add(complement);
-//                }
-//            }
-//
-//            System.out.println(states.size() + " " + partition.size());
-//
-//            if (partition.equals(partition$prime)) {
-//                break;
-//            } else {
-//                partition = partition$prime;
-//            }
-//        }
-//
-//
-//        return partition;
-//    }
+    public interface State<Spec> {
+
+        default void expand() {
+            expandRecursively(1);
+        }
+
+        default void expandRecursively() {
+            expandRecursively(Integer.MAX_VALUE);
+        }
+
+        void expandRecursively(int bound);
+
+        Spec getSpec();
+
+        Map<Action, State<Spec>> getTransitions();
+
+        boolean isExpanded();
+    }
 }

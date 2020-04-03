@@ -1,10 +1,76 @@
 package discourje.core.async.impl.lts;
 
-import java.util.LinkedHashMap;
-import java.util.Objects;
+import discourje.core.async.impl.lts.LTS.State;
+
+import java.util.*;
+import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 
 public class LTSs {
+
+    public static boolean bisimilar(LTS<?> lts1, LTS<?> lts2) {
+
+        var states = new LinkedHashSet<State<?>>();
+        states.addAll(lts1.getStates());
+        states.addAll(lts2.getStates());
+
+        var actions = new HashSet<Action>();
+        for (State<?> s : states) {
+            actions.addAll(s.getTransitions().keySet());
+        }
+
+        var partition = new HashSet<Set<State<?>>>();
+        partition.add(states);
+
+        while (true) {
+            var partition$prime = new HashSet<Set<State<?>>>();
+
+            for (Set<State<?>> block : partition) {
+                var intersection = new HashSet<State<?>>();
+                var complement = new HashSet<State<?>>();
+                BooleanSupplier isSplit = () -> !intersection.isEmpty() && !complement.isEmpty();
+
+                for (Set<State<?>> splitter : partition) {
+                    for (Action a : actions) {
+                        intersection.clear();
+                        complement.clear();
+
+                        for (State<?> s : block) {
+                            if (splitter.contains(s.getTransitions().get(a))) {
+                                intersection.add(s);
+                            } else {
+                                complement.add(s);
+                            }
+                        }
+
+                        if (isSplit.getAsBoolean()) break;
+                    }
+
+                    if (isSplit.getAsBoolean()) break;
+                }
+
+                if (!intersection.isEmpty()) {
+                    partition$prime.add(intersection);
+                }
+                if (!complement.isEmpty()) {
+                    partition$prime.add(complement);
+                }
+            }
+
+            if (partition.equals(partition$prime)) {
+                break;
+            } else {
+                partition = partition$prime;
+            }
+        }
+
+        for (Set<State<?>> block : partition) {
+            if (block.contains(lts1.getInitialState())) {
+                return block.contains(lts2.getInitialState());
+            }
+        }
+        return false;
+    }
 
     public static String toAldebaran(LTS<?> lts) {
 

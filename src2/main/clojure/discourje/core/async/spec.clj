@@ -1,5 +1,7 @@
 (ns discourje.core.async.spec
-  (:require [discourje.core.async.impl.ast :as ast]))
+  (:require [discourje.core.async.impl.ast :as ast]
+            [discourje.core.async.impl.lts :as lts])
+  (:import (discourje.core.async.impl.lts LTS)))
 
 ;;;;
 ;;;; Roles
@@ -82,6 +84,20 @@
 (defmacro apply
   [name exprs]
   `(concat ['~name] '~exprs))
+
+;;;;
+;;;; LTS tools
+;;;;
+
+(defn lts [spec expandRecursively]
+  (LTS. spec lts/expander expandRecursively))
+
+(defn println [lts]
+  (.toString lts))
+
+(defn ltsgraph [lts mcrl2-root-dir tmp-file]
+  (spit tmp-file (.toString lts))
+  (future (clojure.java.shell/sh (str mcrl2-root-dir "/bin/ltsgraph") tmp-file)))
 
 ;;;;
 ;;;; TODO: Everything below is part of monitoring and should be put elsewhere at some point
