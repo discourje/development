@@ -1,10 +1,9 @@
 (ns discourje.core.async.spec
   (:require [discourje.core.async.impl.ast :as ast]
-            [discourje.core.async.impl.lts :as lts])
-  (:import (discourje.core.async.impl.lts LTS)))
+            [discourje.core.async.impl.lts :as lts]))
 
 ;;;;
-;;;; Roles
+;;;; Discourje: Roles
 ;;;;
 
 (defn role [name]
@@ -13,18 +12,18 @@
     ([i] (str name "[" i "]"))))
 
 ;;;;
-;;;; Actions
+;;;; Discourje: Actions
 ;;;;
 
 (defmacro -->>
   ([sender receiver]
    (let [predicate 'Object
-         channel (ast/channel sender receiver)]
+         channel (ast/channel `~sender `~receiver)]
      [(ast/send predicate channel) (ast/receive predicate channel)]))
   ([predicate sender receiver]
    (let [;pr `(if (fn? ~predicate) ~predicate (fn [~'x] (= (type ~'x) ~predicate)))
          pr predicate
-         ch (ast/channel sender receiver)]
+         ch (ast/channel `~sender `~receiver)]
      [(ast/send pr ch) (ast/receive pr ch)])))
 
 (defmacro close
@@ -32,7 +31,7 @@
   `(ast/close (ast/channel ~sender ~receiver)))
 
 ;;;;
-;;;; Nullary operators
+;;;; Discourje: Nullary operators
 ;;;;
 
 (defmacro end
@@ -40,7 +39,7 @@
   (ast/end))
 
 ;;;;
-;;;; Multiary operators
+;;;; Discourje: Multiary operators
 ;;;;
 
 (defmacro choice
@@ -52,7 +51,7 @@
   `(ast/parallel [~branch ~@more]))
 
 ;;;;
-;;;; Conditional operators
+;;;; Discourje: Conditional operators
 ;;;;
 
 (defmacro if
@@ -62,7 +61,7 @@
    `(ast/if-then-else '~condition ~branch1 ~branch2)))
 
 ;;;;
-;;;; Recursion operators
+;;;; Discourje: Recursion operators
 ;;;;
 
 (defmacro loop
@@ -74,7 +73,7 @@
   `(ast/recur '~name '[~@more]))
 
 ;;;;
-;;;; Registry operators
+;;;; Discourje: Registry operators
 ;;;;
 
 (defmacro def
@@ -86,14 +85,27 @@
   `(concat ['~name] '~exprs))
 
 ;;;;
+;;;; Aldebaran
+;;;;
+
+(defmacro aldebaran [_ header & more]
+  `(ast/graph (first '~header) '~more))
+
+;;;;
 ;;;; LTS tools
 ;;;;
 
-(defn lts [spec expandRecursively]
-  (LTS. spec lts/expander expandRecursively))
+(defn lts
+  ([ast]
+   (lts/lts ast true))
+  ([ast expandRecursively]
+   (lts/lts ast expandRecursively)))
+
+(defn bisimilar? [lts1 lts2]
+  (lts/bisimilar? lts1 lts2))
 
 (defn println [lts]
-  (.toString lts))
+  (clojure.core/println (.toString lts)))
 
 (defn ltsgraph [lts mcrl2-root-dir tmp-file]
   (spit tmp-file (.toString lts))

@@ -1,8 +1,10 @@
 (ns discourje.core.async.impl.ast)
 
 ;;;;
-;;;; Channels
+;;;; Discourje
 ;;;;
+
+(defprotocol Discourje)
 
 (defrecord Channel [sender receiver])
 
@@ -10,10 +12,11 @@
   (->Channel sender receiver))
 
 ;;;;
-;;;; Actions
+;;;; Discourje: Actions
 ;;;;
 
-(defrecord Action [type predicate channel])
+(defrecord Action [type predicate channel]
+  Discourje)
 
 (def action-types #{:send :receive :close})
 
@@ -25,19 +28,21 @@
   (->Action :close (fn [_] true) channel))
 
 ;;;;
-;;;; Nullary operators
+;;;; Discourje: Nullary operators
 ;;;;
 
-(defrecord Nullary [type])
+(defrecord Nullary [type]
+  Discourje)
 
 (defn end []
   (->Nullary :end))
 
 ;;;;
-;;;; Multiary operators
+;;;; Discourje: Multiary operators
 ;;;;
 
-(defrecord Multiary [type branches])
+(defrecord Multiary [type branches]
+  Discourje)
 
 (defn choice [branches]
   (->Multiary :choice branches))
@@ -45,10 +50,11 @@
   (->Multiary :parallel branches))
 
 ;;;;
-;;;; Conditional operators
+;;;; Discourje: Conditional operators
 ;;;;
 
-(defrecord If [type condition branch1 branch2])
+(defrecord If [type condition branch1 branch2]
+  Discourje)
 
 (defn if-then-else [condition branch1 branch2]
   (->If :if condition branch1 branch2))
@@ -56,10 +62,11 @@
   (if-then-else condition branch (end)))
 
 ;;;;
-;;;; Recursion operators
+;;;; Discourje: Recursion operators
 ;;;;
 
-(defrecord Loop [type name vars exprs body])
+(defrecord Loop [type name vars exprs body]
+  Discourje)
 
 (defn loop
   ([name bindings body]
@@ -69,13 +76,14 @@
   ([name vars exprs body]
    (->Loop :loop name vars exprs body)))
 
-(defrecord Recur [type name exprs])
+(defrecord Recur [type name exprs]
+  Discourje)
 
 (defn recur [name exprs]
   (->Recur :recur name exprs))
 
 ;;;;
-;;;; Registry operators
+;;;; Discourje: Registry operators
 ;;;;
 
 (def registry (atom {}))
@@ -322,3 +330,27 @@
 ;                    (assoc-last-interaction (first interactions) rec-table)
 ;                    )))]
 ;    (assoc-to-rec-table rec-table inter)))
+
+;;;;
+;;;; Aldebaran
+;;;;
+
+(defprotocol Aldebaran)
+
+(defrecord Graph [v0 edges]
+  Aldebaran)
+
+(defn graph [v0 edges]
+  (->Graph v0
+           (clojure.core/loop [todo edges
+                               result {}]
+             (if (empty? todo)
+               result
+               (recur (rest todo)
+                      (let [transition (first todo)
+                            source (nth transition 0)
+                            label (nth transition 1)
+                            target (nth transition 2)]
+                        (if (contains? result source)
+                          (update result source #(merge % {label target}))
+                          (merge result {source {label target}}))))))))

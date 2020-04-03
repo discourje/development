@@ -3,210 +3,216 @@
             [clojure.java.shell :refer :all]
             [discourje.core.async.impl.ast :as ast])
   (:import (java.util.function Function Predicate)
-           (discourje.core.async.impl.lts Send Receive Close)))
+           (discourje.core.async.impl.lts Action Send Receive Close LTS LTSs)))
 
-(defn- smash [spec]
-  (if (and (vector? spec) (= (count spec) 1))
-    (smash (first spec))
-    spec))
+(defn- smash [ast]
+  (if (and (vector? ast) (= (count ast) 1))
+    (smash (first ast))
+    ast))
 
-(defn- smap [spec]
-  (zipmap (:vars spec) (map eval (:exprs spec))))
+(defn- smap [ast]
+  (zipmap (:vars ast) (map eval (:exprs ast))))
 
-(defn substitute [spec smap]
-  ;(println spec)
+(defn substitute [ast smap]
+  ;(println ast)
   (cond
 
     ;; End
-    (= (:type spec) :end)
-    spec
+    (= (:type ast) :end)
+    ast
 
     ;; Action
-    (contains? ast/action-types (:type spec))
-    (w/postwalk-replace smap spec)
+    (contains? ast/action-types (:type ast))
+    (w/postwalk-replace smap ast)
 
     ;; Choice
-    (= (:type spec) :choice)
-    (ast/choice (mapv #(substitute % smap) (:branches spec)))
+    (= (:type ast) :choice)
+    (ast/choice (mapv #(substitute % smap) (:branches ast)))
 
     ;; Parallel
-    (= (:type spec) :parallel)
-    (ast/parallel (mapv #(substitute % smap) (:branches spec)))
+    (= (:type ast) :parallel)
+    (ast/parallel (mapv #(substitute % smap) (:branches ast)))
 
     ;; If
-    (= (:type spec) :if)
-    (ast/if-then-else (w/postwalk-replace smap (:condition spec))
-                      (substitute (:branch1 spec) smap)
-                      (substitute (:branch2 spec) smap))
+    (= (:type ast) :if)
+    (ast/if-then-else (w/postwalk-replace smap (:condition ast))
+                      (substitute (:branch1 ast) smap)
+                      (substitute (:branch2 ast) smap))
 
     ;; Loop
-    (= (:type spec) :loop)
-    (ast/loop (:name spec)
-              (:vars spec)
-              (w/postwalk-replace smap (:exprs spec))
-              (substitute (:body spec) (apply dissoc smap (:vars spec))))
+    (= (:type ast) :loop)
+    (ast/loop (:name ast)
+              (:vars ast)
+              (w/postwalk-replace smap (:exprs ast))
+              (substitute (:body ast) (apply dissoc smap (:vars ast))))
 
     ;; Recur
-    (= (:type spec) :recur)
-    (ast/recur (:name spec)
-               (w/postwalk-replace smap (:exprs spec)))
+    (= (:type ast) :recur)
+    (ast/recur (:name ast)
+               (w/postwalk-replace smap (:exprs ast)))
 
     ;; Sequence
-    (vector? spec)
-    (mapv #(substitute % smap) spec)
+    (vector? ast)
+    (mapv #(substitute % smap) ast)
 
     ;; Application
-    (coll? spec)
-    (concat [(first spec)]
-            (w/postwalk-replace smap (rest spec)))
+    (coll? ast)
+    (concat [(first ast)]
+            (w/postwalk-replace smap (rest ast)))
 
     :else (throw (Exception.))))
 
-(defn unfold [loop spec]
-  ;(println "unfold: " (:type spec))
+(defn unfold [loop ast]
+  ;(println "unfold: " (:type ast))
   (cond
 
     ;; End
-    (= (:type spec) :end)
-    spec
+    (= (:type ast) :end)
+    ast
 
     ;; Action
-    (contains? ast/action-types (:type spec))
-    spec
+    (contains? ast/action-types (:type ast))
+    ast
 
     ;; Choice
-    (= (:type spec) :choice)
-    (ast/choice (mapv #(unfold loop %) (:branches spec)))
+    (= (:type ast) :choice)
+    (ast/choice (mapv #(unfold loop %) (:branches ast)))
 
     ;; Parallel
-    (= (:type spec) :parallel)
-    (ast/parallel (mapv #(unfold loop %) (:branches spec)))
+    (= (:type ast) :parallel)
+    (ast/parallel (mapv #(unfold loop %) (:branches ast)))
 
     ;; If
-    (= (:type spec) :if)
-    (ast/if-then-else (:condition spec)
-                      (unfold loop (:branch1 spec))
-                      (unfold loop (:branch2 spec)))
+    (= (:type ast) :if)
+    (ast/if-then-else (:condition ast)
+                      (unfold loop (:branch1 ast))
+                      (unfold loop (:branch2 ast)))
 
     ;; Loop
-    (= (:type spec) :loop)
-    (ast/loop (:name spec)
-              (:vars spec)
-              (:exprs spec)
-              (if (= (:name loop) (:name spec)) (:body spec) (unfold loop (:body spec))))
+    (= (:type ast) :loop)
+    (ast/loop (:name ast)
+              (:vars ast)
+              (:exprs ast)
+              (if (= (:name loop) (:name ast)) (:body ast) (unfold loop (:body ast))))
 
     ;; Recur
-    (= (:type spec) :recur)
-    (if (= (:name loop) (:name spec))
-      (ast/loop (:name loop) (:vars loop) (:exprs spec) (:body loop))
-      spec)
+    (= (:type ast) :recur)
+    (if (= (:name loop) (:name ast))
+      (ast/loop (:name loop) (:vars loop) (:exprs ast) (:body loop))
+      ast)
 
     ;; Sequence
-    (vector? spec)
-    (mapv #(unfold loop %) spec)
+    (vector? ast)
+    (mapv #(unfold loop %) ast)
 
     ;; Application
-    (coll? spec)
-    spec
+    (coll? ast)
+    ast
 
     :else (throw (Exception.))))
 
-(defn terminated? [spec]
+(defn terminated? [ast]
   (cond
 
     ;; End
-    (= (:type spec) :end)
+    (= (:type ast) :end)
     true
 
     ;; Action
-    (contains? ast/action-types (:type spec))
+    (contains? ast/action-types (:type ast))
     false
 
     ;; Choice
-    (= (:type spec) :choice)
-    (not (not-any? terminated? (:branches spec)))
+    (= (:type ast) :choice)
+    (not (not-any? terminated? (:branches ast)))
 
     ;; Parallel
-    (= (:type spec) :parallel)
-    (every? terminated? (:branches spec))
+    (= (:type ast) :parallel)
+    (every? terminated? (:branches ast))
 
     ;; If
-    (= (:type spec) :if)
-    (terminated? (if (eval (:condition spec)) (:branch1 spec) (:branch2 spec)))
+    (= (:type ast) :if)
+    (terminated? (if (eval (:condition ast)) (:branch1 ast) (:branch2 ast)))
 
     ;; Loop
-    (= (:type spec) :loop)
-    (terminated? (unfold spec (substitute (:body spec) (smap spec))))
+    (= (:type ast) :loop)
+    (terminated? (unfold ast (substitute (:body ast) (smap ast))))
 
     ;; Recur
-    (= (:type spec) :recur)
+    (= (:type ast) :recur)
     (throw (Exception.))
 
     ;; Sequence
-    (vector? spec)
-    (every? terminated? spec)
+    (vector? ast)
+    (every? terminated? ast)
 
     ;; Application
-    (coll? spec)
-    (let [name (first spec)
-          vals (map eval (rest spec))
+    (coll? ast)
+    (let [name (first ast)
+          vals (map eval (rest ast))
           body (:body (get (get @ast/registry name) (count vals)))
           vars (:vars (get (get @ast/registry name) (count vals)))]
       (terminated? (substitute body (zipmap vars vals))))
 
     :else (throw (Exception.))))
 
-(defn successors [spec]
-  ;(println "successors: " (:type spec))
+(defn successors [ast]
+  ;(println "successors: " (:type ast))
   (cond
 
     ;; End
-    (= (:type spec) :end)
+    (= (:type ast) :end)
     {}
 
     ;; Action
-    (contains? ast/action-types (:type spec))
+    (contains? ast/action-types (:type ast))
     (let [role-fn (fn [role]
                     (if (coll? role)
                       (apply ((if (fn? (first role)) identity eval) (first role)) (map eval (rest role)))
                       (eval role)))
-          sender (role-fn (:sender (:channel spec)))
-          receiver (role-fn (:receiver (:channel spec)))
-          predicate (:predicate spec)]
-      (cond (= (:type spec) :send)
+          sender (role-fn (:sender (:channel ast)))
+          receiver (role-fn (:receiver (:channel ast)))
+          predicate (:predicate ast)]
+      (cond (= (:type ast) :send)
             {(reify
                Send
                (getSender [_] (.toString sender))
                (getReceiver [_] (.toString receiver))
                (getPredicate [_] (reify Predicate (test [this message] true)))
                Object
+               (equals [this o] (= (.toString this) (.toString o)))
+               (hashCode [this] (.hashCode (.toString this)))
                (toString [_] (str "!(" sender "," receiver "," predicate ")")))
              (ast/end)}
-            (= (:type spec) :receive)
+            (= (:type ast) :receive)
             {(reify
                Receive
                (getSender [_] (.toString sender))
                (getReceiver [_] (.toString receiver))
                (getPredicate [_] (reify Predicate (test [this message] true)))
                Object
+               (equals [this o] (= (.toString this) (.toString o)))
+               (hashCode [this] (.hashCode (.toString this)))
                (toString [_] (str "?(" sender "," receiver "," predicate ")")))
              (ast/end)}
-            (= (:type spec) :close)
+            (= (:type ast) :close)
             {(reify
                Close
                (getSender [_] (.toString sender))
                (getReceiver [_] (.toString receiver))
                Object
+               (equals [this o] (= (.toString this) (.toString o)))
+               (hashCode [this] (.hashCode (.toString this)))
                (toString [_] (str "C(" sender "," receiver ")")))
              (ast/end)}))
 
     ;; Choice
-    (= (:type spec) :choice)
-    (reduce merge (map successors (:branches spec)))
+    (= (:type ast) :choice)
+    (reduce merge (map successors (:branches ast)))
 
     ;; Parallel
-    (= (:type spec) :parallel)
-    (let [branches (:branches spec)]
+    (= (:type ast) :parallel)
+    (let [branches (:branches ast)]
       (loop [i 0
              result {}]
         (if (= i (count branches))
@@ -217,42 +223,67 @@
             (recur (inc i) (merge result (if (empty? m) {} (update-in m (keys m) f))))))))
 
     ;; If
-    (= (:type spec) :if)
-    (successors (if (eval (:condition spec)) (:branch1 spec) (:branch2 spec)))
+    (= (:type ast) :if)
+    (successors (if (eval (:condition ast)) (:branch1 ast) (:branch2 ast)))
 
     ;; Loop
-    (= (:type spec) :loop)
-    (successors (unfold spec (substitute (:body spec) (smap spec))))
+    (= (:type ast) :loop)
+    (successors (unfold ast (substitute (:body ast) (smap ast))))
 
     ;; Recur
-    (= (:type spec) :recur)
+    (= (:type ast) :recur)
     (throw (Exception.))
 
     ;; Sequence
-    (vector? spec)
-    (if (empty? spec)
+    (vector? ast)
+    (if (empty? ast)
       {}
-      (if (terminated? (first spec))
-        (successors (vec (rest spec)))
-        (let [m (successors (first spec))]
+      (if (terminated? (first ast))
+        (successors (vec (rest ast)))
+        (let [m (successors (first ast))]
           (update-in m (keys m)
-                     #(smash (into (if (terminated? %) [] [%]) (rest spec)))))))
+                     #(smash (into (if (terminated? %) [] [%]) (rest ast)))))))
 
     ;; Application
-    (coll? spec)
-    (let [name (first spec)
-          vals (mapv eval (rest spec))
+    (coll? ast)
+    (let [name (first ast)
+          vals (mapv eval (rest ast))
           body (:body (get (get @ast/registry name) (count vals)))
           vars (:vars (get (get @ast/registry name) (count vals)))]
       (successors (substitute body (zipmap vars vals))))
 
     :else (throw (Exception.))))
 
-(def expander
-  (reify
-    Function
-    (apply [_ spec]
-      ; (println (str "to expand: " spec))
-      (let [m (successors spec)]
-        ; (println (str "expanded: " m))
-        m))))
+(defn lts [ast expandRecursively]
+  (cond
+
+    ;; Aldebaran
+    (satisfies? ast/Aldebaran ast)
+    (LTS. (:v0 ast)
+          (reify
+            Function
+            (apply [_ v]
+              (let [m (get (:edges ast) v)
+                    keys (keys m)
+                    vals (map #(reify
+                                 Action
+                                 Object
+                                 (equals [this o] (= (.toString this) (.toString o)))
+                                 (hashCode [this] (.hashCode (.toString this)))
+                                 (toString [_] (str %)))
+                              keys)]
+                (if (nil? keys)
+                  {}
+                  (clojure.set/rename-keys m (zipmap keys vals))))))
+          expandRecursively)
+
+    ;; Discourje
+    :else
+    (LTS. ast
+          (reify
+            Function
+            (apply [_ ast] (successors ast)))
+          expandRecursively)))
+
+(defn bisimilar? [lts1 lts2]
+  (LTSs/bisimilar lts1 lts2))
