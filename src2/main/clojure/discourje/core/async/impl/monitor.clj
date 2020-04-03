@@ -1,6 +1,6 @@
 (ns discourje.core.async.impl.monitor
   (require [discourje.core.async.logging :refer :all]
-           [discourje.core.async.impl.dsl.syntax :refer :all]))
+           [discourje.core.async.impl.dsl.abstract :refer :all]))
 
 (defprotocol sendable
   (is-valid-sendable? [this monitor sender receivers message])
