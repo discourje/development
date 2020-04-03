@@ -1,5 +1,5 @@
-(ns discourje.core.async.impl.dsl.semantics
-  (:require [discourje.core.async.impl.dsl.syntax :as syntax]
+(ns discourje.core.async.impl.lts
+  (:require [discourje.core.async.impl.ast :as ast]
             [clojure.walk :as w])
   (:import (java.util.function Function Predicate)
            (discourje.core.async.impl.lts Send Receive Close)))
@@ -26,34 +26,34 @@
     spec
 
     ;; Action
-    (contains? syntax/action-types (:type spec))
+    (contains? ast/action-types (:type spec))
     (w/postwalk-replace smap spec)
 
     ;; Choice
     (= (:type spec) :choice)
-    (syntax/choice (mapv #(substitute % smap) (:branches spec)))
+    (ast/choice (mapv #(substitute % smap) (:branches spec)))
 
     ;; Parallel
     (= (:type spec) :parallel)
-    (syntax/parallel (mapv #(substitute % smap) (:branches spec)))
+    (ast/parallel (mapv #(substitute % smap) (:branches spec)))
 
     ;; If
     (= (:type spec) :if)
-    (syntax/if-then-else (w/postwalk-replace smap (:condition spec))
-                         (substitute (:branch1 spec) smap)
-                         (substitute (:branch2 spec) smap))
+    (ast/if-then-else (w/postwalk-replace smap (:condition spec))
+                      (substitute (:branch1 spec) smap)
+                      (substitute (:branch2 spec) smap))
 
     ;; Loop
     (= (:type spec) :loop)
-    (syntax/loop (:name spec)
-                 (:vars spec)
-                 (w/postwalk-replace smap (:exprs spec))
-                 (substitute (:body spec) (apply dissoc smap (:vars spec))))
+    (ast/loop (:name spec)
+              (:vars spec)
+              (w/postwalk-replace smap (:exprs spec))
+              (substitute (:body spec) (apply dissoc smap (:vars spec))))
 
     ;; Recur
     (= (:type spec) :recur)
-    (syntax/recur (:name spec)
-                  (w/postwalk-replace smap (:exprs spec)))
+    (ast/recur (:name spec)
+               (w/postwalk-replace smap (:exprs spec)))
 
     ;; Sequence
     (vector? spec)
@@ -75,34 +75,34 @@
     spec
 
     ;; Action
-    (contains? syntax/action-types (:type spec))
+    (contains? ast/action-types (:type spec))
     spec
 
     ;; Choice
     (= (:type spec) :choice)
-    (syntax/choice (mapv #(unfold loop %) (:branches spec)))
+    (ast/choice (mapv #(unfold loop %) (:branches spec)))
 
     ;; Parallel
     (= (:type spec) :parallel)
-    (syntax/parallel (mapv #(unfold loop %) (:branches spec)))
+    (ast/parallel (mapv #(unfold loop %) (:branches spec)))
 
     ;; If
     (= (:type spec) :if)
-    (syntax/if-then-else (:condition spec)
-                         (unfold loop (:branch1 spec))
-                         (unfold loop (:branch2 spec)))
+    (ast/if-then-else (:condition spec)
+                      (unfold loop (:branch1 spec))
+                      (unfold loop (:branch2 spec)))
 
     ;; Loop
     (= (:type spec) :loop)
-    (syntax/loop (:name spec)
-                 (:vars spec)
-                 (:exprs spec)
-                 (if (= (:name loop) (:name spec)) (:body spec) (unfold loop (:body spec))))
+    (ast/loop (:name spec)
+              (:vars spec)
+              (:exprs spec)
+              (if (= (:name loop) (:name spec)) (:body spec) (unfold loop (:body spec))))
 
     ;; Recur
     (= (:type spec) :recur)
     (if (= (:name loop) (:name spec))
-      (syntax/loop (:name loop) (:vars loop) (:exprs spec) (:body loop))
+      (ast/loop (:name loop) (:vars loop) (:exprs spec) (:body loop))
       spec)
 
     ;; Sequence
@@ -123,7 +123,7 @@
     true
 
     ;; Action
-    (contains? syntax/action-types (:type spec))
+    (contains? ast/action-types (:type spec))
     false
 
     ;; Choice
@@ -154,8 +154,8 @@
     (coll? spec)
     (let [name (first spec)
           vals (map eval (rest spec))
-          body (:body (get (get @syntax/registry name) (count vals)))
-          vars (:vars (get (get @syntax/registry name) (count vals)))]
+          body (:body (get (get @ast/registry name) (count vals)))
+          vars (:vars (get (get @ast/registry name) (count vals)))]
       (terminated? (substitute body (zipmap vars vals))))
 
     :else (throw (Exception.))))
@@ -169,7 +169,7 @@
     {}
 
     ;; Action
-    (contains? syntax/action-types (:type spec))
+    (contains? ast/action-types (:type spec))
     (let [role-fn (fn [role]
                     (if (coll? role)
                       (apply ((if (fn? (first role)) identity eval) (first role)) (map eval (rest role)))
@@ -185,7 +185,7 @@
                (getPredicate [_] (reify Predicate (test [this message] true)))
                Object
                (toString [_] (str "!(" sender "," receiver "," predicate ")")))
-             (syntax/end)}
+             (ast/end)}
             (= (:type spec) :receive)
             {(reify
                Receive
@@ -194,7 +194,7 @@
                (getPredicate [_] (reify Predicate (test [this message] true)))
                Object
                (toString [_] (str "?(" sender "," receiver "," predicate ")")))
-             (syntax/end)}
+             (ast/end)}
             (= (:type spec) :close)
             {(reify
                Close
@@ -202,7 +202,7 @@
                (getReceiver [_] (.toString receiver))
                Object
                (toString [_] (str "C(" sender "," receiver ")")))
-             (syntax/end)}))
+             (ast/end)}))
 
     ;; Choice
     (= (:type spec) :choice)
@@ -217,7 +217,7 @@
           result
           (let [branch (nth branches i)
                 m (successors branch)
-                f #(syntax/parallel (into (subvec branches 0 i) (into [%] (subvec branches (inc i) (count branches)))))]
+                f #(ast/parallel (into (subvec branches 0 i) (into [%] (subvec branches (inc i) (count branches)))))]
             (recur (inc i) (merge result (if (empty? m) {} (update-in m (keys m) f))))))))
 
     ;; If
@@ -246,8 +246,8 @@
     (coll? spec)
     (let [name (first spec)
           vals (mapv eval (rest spec))
-          body (:body (get (get @syntax/registry name) (count vals)))
-          vars (:vars (get (get @syntax/registry name) (count vals)))]
+          body (:body (get (get @ast/registry name) (count vals)))
+          vars (:vars (get (get @ast/registry name) (count vals)))]
       (successors (substitute body (zipmap vars vals))))
 
     :else (throw (Exception.))))

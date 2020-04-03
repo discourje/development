@@ -1,13 +1,8 @@
-(ns discourje.core.async.impl.dsl.syntax)
+(ns discourje.core.async.impl.ast)
 
 ;;;;
-;;;; Roles and channels
+;;;; Channels
 ;;;;
-
-(defn role [name]
-  (fn
-    ([] (str name))
-    ([i] (str name "[" i "]"))))
 
 (defrecord Channel [sender receiver])
 
@@ -50,7 +45,7 @@
   (->Multiary :parallel branches))
 
 ;;;;
-;;;; Other operators
+;;;; Conditional operators
 ;;;;
 
 (defrecord If [type condition branch1 branch2])
@@ -59,6 +54,10 @@
   (->If :if condition branch1 branch2))
 (defn if-then [condition branch]
   (if-then-else condition branch (end)))
+
+;;;;
+;;;; Recursion operators
+;;;;
 
 (defrecord Loop [type name vars exprs body])
 
@@ -76,7 +75,7 @@
   (->Recur :recur name exprs))
 
 ;;;;
-;;;; Definitions
+;;;; Registry operators
 ;;;;
 
 (def registry (atom {}))

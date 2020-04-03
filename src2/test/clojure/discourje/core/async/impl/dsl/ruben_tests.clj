@@ -1,19 +1,19 @@
 (ns discourje.core.async.impl.dsl.ruben-tests
   (:require [clojure.test :refer :all]
-            [discourje.core.async.impl.dsl.syntax :refer :all]
-            [discourje.core.async.impl.dsl.ruben :refer :all]))
+            [discourje.core.async.impl.dsl.abstract :refer :all]
+            [discourje.core.async.impl.dsl.concrete :refer :all]))
 
 (deftest- test-->
           (let [inter (-->> 1 "a" "b")]
-            (is (= (true? ((get-action inter) Long))))))
+            (is (= (true? ((get-predicate inter) Long))))))
 
 (deftest- test-->withFunction
           (let [inter (-->> (fn [x] (+ x 1)) "a" "b")]
-            (is (== 2 ((get-action inter) 1)))))
+            (is (== 2 ((get-predicate inter) 1)))))
 
 (deftest- test-->>withWildcard
           (let [inter (-->> "a" "b")]
-            (is (= (true? ((get-action inter) "random value"))))))
+            (is (= (true? ((get-predicate inter) "random value"))))))
 
 (deftest close-test
   (is (= (assoc (make-closer "a" "b") :id 1) (assoc (close "a" "b") :id 1))))

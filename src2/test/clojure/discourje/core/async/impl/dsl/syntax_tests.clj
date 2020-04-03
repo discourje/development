@@ -1,7 +1,7 @@
 (ns discourje.core.async.impl.dsl.syntax-tests
   (:require [clojure.test :refer :all]
             [discourje.core.async.impl.test-data :refer :all]
-            [discourje.core.async.impl.dsl.syntax :refer :all]))
+            [discourje.core.async.impl.dsl.abstract :refer :all]))
 
 ;;;;
 ;;;; monitorTests.clj
@@ -132,26 +132,26 @@
                                                      ])
                                     (make-interaction (message-checker "end") "A" ["B" "C"])
                                     ])
-                  (create-protocol [(->interaction nil nil "A" "B" #{} nil)
-                                    (->recursion nil [:test {:r1 "A" :r2 "B" :r3 "C"}]
-                                                 [(->interaction nil nil :r2 :r1 #{} nil)
-                                                  (->branch nil [
-                                                                 [(->interaction nil nil :r1 :r3 #{} nil)
-                                                                  (->interaction nil nil :r3 :r1 #{} nil)
-                                                                  (->recur-identifier nil [:test [:r1 :r2 :r3]] :recur nil)]
-                                                                 [(->interaction nil nil :r1 :r2 #{} nil)]] nil)
+                  (create-protocol [(->Interaction nil nil "A" "B" #{} nil)
+                                    (->Recursion nil [:test {:r1 "A" :r2 "B" :r3 "C"}]
+                                                 [(->Interaction nil nil :r2 :r1 #{} nil)
+                                                  (->Choice nil [
+                                                                 [(->Interaction nil nil :r1 :r3 #{} nil)
+                                                                  (->Interaction nil nil :r3 :r1 #{} nil)
+                                                                  (->Continue nil [:test [:r1 :r2 :r3]] :recur nil)]
+                                                                 [(->Interaction nil nil :r1 :r2 #{} nil)]] nil)
                                                   ] nil)
-                                    (->interaction nil nil "A" ["B" "C"] #{} nil)
+                                    (->Interaction nil nil "A" ["B" "C"] #{} nil)
                                     ])))
 
 (def single-recur-protocol-paramsControl
-  (->interaction nil nil "A" "B" #{}
-                 (->interaction nil nil "B" "A" #{}
-                                (->branch nil [
-                                               (->interaction nil nil "A" "C" #{}
-                                                              (->interaction nil nil "C" "A" #{}
-                                                                             (->recur-identifier nil [:test [:r1 :r2 :r3]] :recur nil)))
-                                               (->interaction nil nil "A" "B" #{} (->interaction nil nil "A" ["B" "C"] #{} nil))
+  (->Interaction nil nil "A" "B" #{}
+                 (->Interaction nil nil "B" "A" #{}
+                                (->Choice nil [
+                                               (->Interaction nil nil "A" "C" #{}
+                                                              (->Interaction nil nil "C" "A" #{}
+                                                                             (->Continue nil [:test [:r1 :r2 :r3]] :recur nil)))
+                                               (->Interaction nil nil "A" "B" #{} (->Interaction nil nil "A" ["B" "C"] #{} nil))
 
                                                ] nil))
                  )

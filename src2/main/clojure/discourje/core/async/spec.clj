@@ -1,46 +1,83 @@
 (ns discourje.core.async.spec
-  (:require [discourje.core.async.impl.dsl.syntax :as s]))
+  (:require [discourje.core.async.impl.ast :as ast]))
+
+;;;;
+;;;; Roles
+;;;;
+
+(defn role [name]
+  (fn
+    ([] (str name))
+    ([i] (str name "[" i "]"))))
+
+;;;;
+;;;; Actions
+;;;;
 
 (defmacro -->>
   ([sender receiver]
    (let [predicate 'Object
-         channel (s/channel sender receiver)]
-     [(s/send predicate channel) (s/receive predicate channel)]))
+         channel (ast/channel sender receiver)]
+     [(ast/send predicate channel) (ast/receive predicate channel)]))
   ([predicate sender receiver]
    (let [;pr `(if (fn? ~predicate) ~predicate (fn [~'x] (= (type ~'x) ~predicate)))
          pr predicate
-         ch (s/channel sender receiver)]
-     [(s/send pr ch) (s/receive pr ch)])))
+         ch (ast/channel sender receiver)]
+     [(ast/send pr ch) (ast/receive pr ch)])))
 
 (defmacro close
   [sender receiver]
-  `(s/close (s/channel ~sender ~receiver)))
+  `(ast/close (ast/channel ~sender ~receiver)))
+
+;;;;
+;;;; Nullary operators
+;;;;
+
+(defmacro end
+  []
+  (ast/end))
+
+;;;;
+;;;; Multiary operators
+;;;;
 
 (defmacro choice
   [branch & more]
-  `(s/choice [~branch ~@more]))
+  `(ast/choice [~branch ~@more]))
 
 (defmacro parallel
   [branch & more]
-  `(s/parallel [~branch ~@more]))
+  `(ast/parallel [~branch ~@more]))
+
+;;;;
+;;;; Conditional operators
+;;;;
 
 (defmacro if
   ([condition branch]
-   `(s/if-then '~condition ~branch))
+   `(ast/if-then '~condition ~branch))
   ([condition branch1 branch2]
-   `(s/if-then-else '~condition ~branch1 ~branch2)))
+   `(ast/if-then-else '~condition ~branch1 ~branch2)))
+
+;;;;
+;;;; Recursion operators
+;;;;
 
 (defmacro loop
   [name bindings body & more]
-  `(s/loop '~name '~bindings [~body ~@more]))
+  `(ast/loop '~name '~bindings [~body ~@more]))
 
 (defmacro recur
   [name & more]
-  `(s/recur '~name '[~@more]))
+  `(ast/recur '~name '[~@more]))
+
+;;;;
+;;;; Registry operators
+;;;;
 
 (defmacro def
   [name vars body & more]
-  `(s/register! '~name '~vars [~body ~@more]))
+  `(ast/register! '~name '~vars [~body ~@more]))
 
 (defmacro apply
   [name exprs]
