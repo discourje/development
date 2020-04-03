@@ -1,5 +1,6 @@
 (ns discourje.core.async.impl.lts
   (:require [clojure.walk :as w]
+            [clojure.java.shell :refer :all]
             [discourje.core.async.impl.ast :as ast])
   (:import (java.util.function Function Predicate)
            (discourje.core.async.impl.lts Send Receive Close)))
