@@ -1,13 +1,12 @@
 (ns discourje.core.async.impl.lts
-  (:require [discourje.core.async.impl.ast :as ast]
-            [clojure.walk :as w])
+  (:require [clojure.walk :as w]
+            [discourje.core.async.impl.ast :as ast])
   (:import (java.util.function Function Predicate)
            (discourje.core.async.impl.lts Send Receive Close)))
 
 (defn visualize [lts mcrl2-root-dir tmp-file]
   (spit tmp-file (.toString lts))
-  (clojure.core.async/thread
-    (clojure.java.shell/sh (str mcrl2-root-dir "/bin/ltsgraph") tmp-file)))
+  (future (clojure.java.shell/sh (str mcrl2-root-dir "/bin/ltsgraph") tmp-file)))
 
 (defn- smash [spec]
   (if (and (vector? spec) (= (count spec) 1))
