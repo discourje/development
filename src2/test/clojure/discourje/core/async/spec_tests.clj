@@ -5,8 +5,18 @@
 (defn msg [lts1 lts2]
   (str "\n *** lts1 ***\n\n" lts1 "\n\n *** lts2 ***\n\n" lts2 "\n"))
 
-(s/defrole ::alice "alice")
-(s/defrole ::bob "bob")
+(defn defroles [f]
+  (s/defrole ::alice "alice")
+  (s/defrole ::bob "bob")
+  (f))
+
+(defroles (fn [] true))
+
+(use-fixtures :once defroles)
+
+;;;;
+;;;; Roles
+;;;;
 
 (deftest role-tests
   (is (= (s/role "alice") (s/role "alice")))
@@ -22,6 +32,10 @@
   (is (= (s/role ::alice (inc i)) (s/role ::alice (inc i)))))
 
 (role-tests)
+
+;;;;
+;;;; Actions
+;;;;
 
 (deftest -->>-tests
   (let [lts1 (s/lts (s/-->> ::alice ::bob))
@@ -57,44 +71,61 @@
 
 (close-tests)
 
+;;;;
+;;;; Vectors
+;;;;
 
-;(deftest spec-tests
-;
-;  ;; Action
-;
-;  (let [lts1 (s/lts (s/-->> "alice" "bob"))
-;        lts2 (s/lts (s/aldebaran des (0, 2, 3)
-;                                 (0, "!(alice,bob,Object)", 1)
-;                                 (1, "?(alice,bob,Object)", 2)))]
-;    (is (s/bisimilar? lts1 lts2)
-;        (str "\n *** lts1 ***\n\n" lts1 "\n\n *** lts2 ***\n\n" lts2 "\n")))
-;
-;  (let [lts1 (s/lts (s/-->> Long "alice" "bob"))
-;        lts2 (s/lts (s/aldebaran des (0, 2, 3)
-;                                 (0, "!(alice,bob,Long)", 1)
-;                                 (1, "?(alice,bob,Long)", 2)))]
-;    (is (s/bisimilar? lts1 lts2)
-;        (str "\n *** lts1 ***\n\n" lts1 "\n\n *** lts2 ***\n\n" lts2 "\n")))
-;
-;  (let [lts1 (s/lts (s/close "alice" "bob"))
-;        lts2 (s/lts (s/aldebaran des (0, 1, 2)
-;                                 (0, "C(alice,bob)", 1)))]
-;    (is (s/bisimilar? lts1 lts2)
-;        (str "\n *** lts1 ***\n\n" lts1 "\n\n *** lts2 ***\n\n" lts2 "\n")))
-;
-;  ;; Sequence
-;
-;  (let [lts1 (s/lts [(s/-->> "alice" "bob")
-;                     (s/close "alice" "bob")])
-;        lts2 (s/lts (s/aldebaran des (0, 3, 4)
-;                                 (0, "!(alice,bob,Object)", 1)
-;                                 (1, "?(alice,bob,Object)", 2)
-;                                 (2, "C(alice,bob)", 3)))]
-;    (is (s/bisimilar? lts1 lts2)
-;        (str "\n *** lts1 ***\n\n" lts1 "\n\n *** lts2 ***\n\n" lts2 "\n")))
-;  )
+(deftest vector-tests
+  (let [lts1 (s/lts [(s/-->> ::alice ::bob)
+                     (s/close ::alice ::bob)])
+        lts2 (s/lts (s/aldebaran des (0, 3, 4)
+                                 (0, "!(Object,alice,bob)", 1)
+                                 (1, "?(Object,alice,bob)", 2)
+                                 (2, "C(alice,bob)", 3)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
-;(spec-tests)
+  (let [lts1 (s/lts [[(s/-->> ::alice ::bob)
+                      (s/close ::alice ::bob)]])
+        lts2 (s/lts (s/aldebaran des (0, 3, 4)
+                                 (0, "!(Object,alice,bob)", 1)
+                                 (1, "?(Object,alice,bob)", 2)
+                                 (2, "C(alice,bob)", 3)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (s/lts [(s/-->> ::alice ::bob)
+                     (s/-->> ::alice ::bob)
+                     (s/close ::alice ::bob)])
+        lts2 (s/lts (s/aldebaran des (0, 5, 6)
+                                 (0, "!(Object,alice,bob)", 1)
+                                 (1, "?(Object,alice,bob)", 2)
+                                 (2, "!(Object,alice,bob)", 3)
+                                 (3, "?(Object,alice,bob)", 4)
+                                 (4, "C(alice,bob)", 5)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (s/lts [[(s/-->> ::alice ::bob)
+                      (s/-->> ::alice ::bob)]
+                     (s/close ::alice ::bob)])
+        lts2 (s/lts (s/aldebaran des (0, 5, 6)
+                                 (0, "!(Object,alice,bob)", 1)
+                                 (1, "?(Object,alice,bob)", 2)
+                                 (2, "!(Object,alice,bob)", 3)
+                                 (3, "?(Object,alice,bob)", 4)
+                                 (4, "C(alice,bob)", 5)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (s/lts [(s/-->> ::alice ::bob)
+                     [(s/-->> ::alice ::bob)
+                      (s/close ::alice ::bob)]])
+        lts2 (s/lts (s/aldebaran des (0, 5, 6)
+                                 (0, "!(Object,alice,bob)", 1)
+                                 (1, "?(Object,alice,bob)", 2)
+                                 (2, "!(Object,alice,bob)", 3)
+                                 (3, "?(Object,alice,bob)", 4)
+                                 (4, "C(alice,bob)", 5)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2))))
+
+(vector-tests)
 
 
 ;(try
