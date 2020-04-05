@@ -166,6 +166,13 @@
          ""
          (mapv eval (:index-exprs role)))))
 
+(defn eval-predicate [predicate]
+  {:pre [(ast/predicate? predicate)]}
+  (let [x (eval (:expr predicate))]
+    (cond
+      (class? x) #(= (type %) x)
+      (fn? x) x)))
+
 (defn successors [ast]
   ;(println "successors: " (:type ast))
   (cond
@@ -178,28 +185,28 @@
     (contains? ast/action-types (:type ast))
     (let [sender (eval-role (:sender ast))
           receiver (eval-role (:receiver ast))
-          predicate (:predicate ast)]
+          predicate (eval-predicate (:predicate ast))]
       (cond (= (:type ast) :send)
             {(reify
                Send
                (getSender [_] (.toString sender))
                (getReceiver [_] (.toString receiver))
-               (getPredicate [_] (reify Predicate (test [this message] true)))
+               (getPredicate [_] (reify Predicate (test [_ message] (predicate message))))
                Object
                (equals [this o] (= (.toString this) (.toString o)))
                (hashCode [this] (.hashCode (.toString this)))
-               (toString [_] (str "!(" sender "," receiver "," predicate ")")))
+               (toString [_] (str "!(" (:expr (:predicate ast)) "," sender "," receiver ")")))
              (ast/end)}
             (= (:type ast) :receive)
             {(reify
                Receive
                (getSender [_] (.toString sender))
                (getReceiver [_] (.toString receiver))
-               (getPredicate [_] (reify Predicate (test [this message] true)))
+               (getPredicate [_] (reify Predicate (test [_ message] (predicate message))))
                Object
                (equals [this o] (= (.toString this) (.toString o)))
                (hashCode [this] (.hashCode (.toString this)))
-               (toString [_] (str "?(" sender "," receiver "," predicate ")")))
+               (toString [_] (str "?(" (:expr (:predicate ast)) "," sender "," receiver ")")))
              (ast/end)}
             (= (:type ast) :close)
             {(reify

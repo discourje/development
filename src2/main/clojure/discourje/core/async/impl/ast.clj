@@ -45,20 +45,36 @@
 ;;;; Discourje: Actions
 ;;;;
 
-(defrecord Action [type predicate-expr sender receiver]
+(defrecord Predicate [expr])
+
+(defn predicate? [x]
+  (instance? Predicate x))
+
+(defn predicate [expr]
+  {:pre []}
+  (->Predicate expr))
+
+(defrecord Action [type predicate sender receiver]
   Discourje)
 
 (def action-types #{:send :receive :close})
 
 (defn send [predicate sender receiver]
+  {:pre [(predicate? predicate)
+         (role? sender)
+         (role? receiver)]}
   (->Action :send predicate sender receiver))
+
 (defn receive [predicate sender receiver]
+  {:pre [(predicate? predicate)
+         (role? sender)
+         (role? receiver)]}
   (->Action :receive predicate sender receiver))
 
 (defn close [sender receiver]
   {:pre [(role? sender)
          (role? receiver)]}
-  (->Action :close '(fn [_] true) sender receiver))
+  (->Action :close (predicate '(fn [_] true)) sender receiver))
 
 ;;;;
 ;;;; Discourje: Nullary operators

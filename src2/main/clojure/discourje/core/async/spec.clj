@@ -6,7 +6,8 @@
 ;;;; Discourje: Roles
 ;;;;
 
-(defn defrole [k name]
+(defn defrole
+  [k name]
   (ast/put-role-name! k name))
 
 (defmacro role
@@ -17,16 +18,20 @@
 ;;;; Discourje: Actions
 ;;;;
 
-;(defmacro -->>
-;  ([sender receiver]
-;   (let [predicate 'Object
-;         channel (ast/channel (eval `~sender) (eval `~receiver))]
-;     [(ast/send predicate channel) (ast/receive predicate channel)]))
-;  ([predicate sender receiver]
-;   (let [;pr `(if (fn? ~predicate) ~predicate (fn [~'x] (= (type ~'x) ~predicate)))
-;         pr predicate
-;         ch (ast/channel `~sender `~receiver)]
-;     [(ast/send pr ch) (ast/receive pr ch)])))
+(defmacro predicate
+  [expr]
+  `(ast/predicate '~expr))
+
+(defmacro -->>
+  ([sender-expr receiver-expr]
+   `(-->> ~'Object ~sender-expr ~receiver-expr))
+  ([predicate-expr sender-expr receiver-expr]
+   [`(ast/send (ast/predicate '~predicate-expr)
+               (ast/role '~sender-expr)
+               (ast/role '~receiver-expr))
+    `(ast/receive (ast/predicate '~predicate-expr)
+                  (ast/role '~sender-expr)
+                  (ast/role '~receiver-expr))]))
 
 (defmacro close
   [sender-expr receiver-expr]
