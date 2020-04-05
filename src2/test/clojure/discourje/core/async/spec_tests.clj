@@ -177,12 +177,6 @@
 
 ;(def spec (s/apply :repeat [1 (s/-->> (alice 2) (bob 4))]))
 
-
-
-;(def lts (s/lts spec true))
-;(s/println lts)
-;(s/ltsgraph lts "/Applications/mCRL2.app/Contents" "/Users/sungshik/Desktop/lts.aut")
-
 ;(catch Throwable t (.printStackTrace t)))
 
 
@@ -207,3 +201,10 @@
 ;  (s/ltsgraph lts "/Applications/mCRL2.app/Contents" "/Users/sungshik/Desktop/lts.aut")
 ;
 ;  (catch Throwable t (.printStackTrace t)))
+
+(def lts (s/lts (s/choice (s/choice [(s/-->> "alice" "bob")
+                                     (s/close "alice" "bob")]
+                                    (s/-->> "alice" "carol"))
+                          (s/close "alice" "bob"))))
+(s/println lts)
+(s/ltsgraph lts "/Applications/mCRL2.app/Contents" "/Users/sungshik/Desktop/lts.aut")
