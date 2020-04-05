@@ -2,46 +2,76 @@
   (:require [clojure.test :refer :all]
             [discourje.core.async.spec :as s]))
 
-(deftest spec-tests
+(defn msg [lts1 lts2]
+  (str "\n *** lts1 ***\n\n" lts1 "\n\n *** lts2 ***\n\n" lts2 "\n"))
 
-  ;; Action
+(s/defrole :alice "alice")
+(s/defrole :bob "bob")
+(s/defrole ::alice "alice")
+(s/defrole ::bob "bob")
 
-  (let [lts1 (s/lts (s/-->> "alice" "bob"))
-        lts2 (s/lts (s/aldebaran des (0, 2, 3)
-                                 (0, "!(alice,bob,Object)", 1)
-                                 (1, "?(alice,bob,Object)", 2)))]
-    (is (s/bisimilar? lts1 lts2)
-        (str "\n *** lts1 ***\n\n" lts1 "\n\n *** lts2 ***\n\n" lts2 "\n")))
+(deftest role-tests
+  (is (= (s/role "alice") (s/role "alice")))
+  (is (= (s/role x) (s/role x)))
+  (is (= (s/role ::alice) (s/role ::alice)))
+  (is (= (s/role ::alice 1) (s/role ::alice 1)))
+  (is (= (s/role ::alice 1 2) (s/role ::alice 1 2)))
+  (is (= (s/role ::alice "foo" "bar") (s/role ::alice "foo" "bar")))
+  (is (= (s/role ::alice i) (s/role ::alice i)))
+  (is (= (s/role ::alice i j) (s/role ::alice i j)))
+  (is (= (s/role ::alice i 1 "foo") (s/role ::alice i 1 "foo")))
+  (is (= (s/role ::alice (inc 1)) (s/role ::alice (inc 1))))
+  (is (= (s/role ::alice (inc i)) (s/role ::alice (inc i)))))
 
-  (let [lts1 (s/lts (s/-->> Long "alice" "bob"))
-        lts2 (s/lts (s/aldebaran des (0, 2, 3)
-                                 (0, "!(alice,bob,Long)", 1)
-                                 (1, "?(alice,bob,Long)", 2)))]
-    (is (s/bisimilar? lts1 lts2)
-        (str "\n *** lts1 ***\n\n" lts1 "\n\n *** lts2 ***\n\n" lts2 "\n")))
-
-  (let [lts1 (s/lts (s/close "alice" "bob"))
+(deftest close-tests
+  (let [lts1 (s/lts (s/close :alice :bob))
         lts2 (s/lts (s/aldebaran des (0, 1, 2)
                                  (0, "C(alice,bob)", 1)))]
-    (is (s/bisimilar? lts1 lts2)
-        (str "\n *** lts1 ***\n\n" lts1 "\n\n *** lts2 ***\n\n" lts2 "\n")))
-
-  ;; Sequence
-
-  (let [lts1 (s/lts [(s/-->> "alice" "bob")
-                     (s/close "alice" "bob")])
-        lts2 (s/lts (s/aldebaran des (0, 3, 4)
-                                 (0, "!(alice,bob,Object)", 1)
-                                 (1, "?(alice,bob,Object)", 2)
-                                 (2, "C(alice,bob)", 3)))]
-    (is (s/bisimilar? lts1 lts2)
-        (str "\n *** lts1 ***\n\n" lts1 "\n\n *** lts2 ***\n\n" lts2 "\n")))
-  )
-
-(spec-tests)
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2))))
 
 
-(try
+
+
+  ;(deftest spec-tests
+  ;
+  ;  ;; Action
+  ;
+  ;  (let [lts1 (s/lts (s/-->> "alice" "bob"))
+  ;        lts2 (s/lts (s/aldebaran des (0, 2, 3)
+  ;                                 (0, "!(alice,bob,Object)", 1)
+  ;                                 (1, "?(alice,bob,Object)", 2)))]
+  ;    (is (s/bisimilar? lts1 lts2)
+  ;        (str "\n *** lts1 ***\n\n" lts1 "\n\n *** lts2 ***\n\n" lts2 "\n")))
+  ;
+  ;  (let [lts1 (s/lts (s/-->> Long "alice" "bob"))
+  ;        lts2 (s/lts (s/aldebaran des (0, 2, 3)
+  ;                                 (0, "!(alice,bob,Long)", 1)
+  ;                                 (1, "?(alice,bob,Long)", 2)))]
+  ;    (is (s/bisimilar? lts1 lts2)
+  ;        (str "\n *** lts1 ***\n\n" lts1 "\n\n *** lts2 ***\n\n" lts2 "\n")))
+  ;
+  ;  (let [lts1 (s/lts (s/close "alice" "bob"))
+  ;        lts2 (s/lts (s/aldebaran des (0, 1, 2)
+  ;                                 (0, "C(alice,bob)", 1)))]
+  ;    (is (s/bisimilar? lts1 lts2)
+  ;        (str "\n *** lts1 ***\n\n" lts1 "\n\n *** lts2 ***\n\n" lts2 "\n")))
+  ;
+  ;  ;; Sequence
+  ;
+  ;  (let [lts1 (s/lts [(s/-->> "alice" "bob")
+  ;                     (s/close "alice" "bob")])
+  ;        lts2 (s/lts (s/aldebaran des (0, 3, 4)
+  ;                                 (0, "!(alice,bob,Object)", 1)
+  ;                                 (1, "?(alice,bob,Object)", 2)
+  ;                                 (2, "C(alice,bob)", 3)))]
+  ;    (is (s/bisimilar? lts1 lts2)
+  ;        (str "\n *** lts1 ***\n\n" lts1 "\n\n *** lts2 ***\n\n" lts2 "\n")))
+  ;  )
+
+  ;(spec-tests)
+
+
+  ;(try
 
   ;(def spec (s/choice (s/-->> Long "alice" "bob")
   ;                    (s/close "alice" "bob")))
@@ -96,27 +126,27 @@
   ;(s/println lts)
   ;(s/ltsgraph lts "/Applications/mCRL2.app/Contents" "/Users/sungshik/Desktop/lts.aut")
 
-  (catch Throwable t (.printStackTrace t)))
+  ;(catch Throwable t (.printStackTrace t)))
 
 
 
 
 
-;(try
-;  (def ast (s/aldebaran des (0, 9, 9)
-;                        (0, "!(alice[0],alice[1],Long)", 1)
-;                        (1, "?(alice[0],alice[1],Long)", 2)
-;                        (2, "!(alice[1],alice[2],Long)", 3)
-;                        (3, "?(alice[1],alice[2],Long)", 4)
-;                        (4, "!(alice[2],alice[3],Long)", 5)
-;                        (5, "?(alice[2],alice[3],Long)", 6)
-;                        (6, "!(alice[3],alice[0],Long)", 7)
-;                        (7, "?(alice[3],alice[0],Long)", 8)
-;                        (8, "!(alice[0],alice[1],Long)", 1)))
-;  (println ast)
-;
-;  (def lts (s/lts ast true))
-;  (s/println lts)
-;  (s/ltsgraph lts "/Applications/mCRL2.app/Contents" "/Users/sungshik/Desktop/lts.aut")
-;
-;  (catch Throwable t (.printStackTrace t)))
+  ;(try
+  ;  (def ast (s/aldebaran des (0, 9, 9)
+  ;                        (0, "!(alice[0],alice[1],Long)", 1)
+  ;                        (1, "?(alice[0],alice[1],Long)", 2)
+  ;                        (2, "!(alice[1],alice[2],Long)", 3)
+  ;                        (3, "?(alice[1],alice[2],Long)", 4)
+  ;                        (4, "!(alice[2],alice[3],Long)", 5)
+  ;                        (5, "?(alice[2],alice[3],Long)", 6)
+  ;                        (6, "!(alice[3],alice[0],Long)", 7)
+  ;                        (7, "?(alice[3],alice[0],Long)", 8)
+  ;                        (8, "!(alice[0],alice[1],Long)", 1)))
+  ;  (println ast)
+  ;
+  ;  (def lts (s/lts ast true))
+  ;  (s/println lts)
+  ;  (s/ltsgraph lts "/Applications/mCRL2.app/Contents" "/Users/sungshik/Desktop/lts.aut")
+  ;
+  ;  (catch Throwable t (.printStackTrace t)))

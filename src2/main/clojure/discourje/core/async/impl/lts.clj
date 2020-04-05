@@ -156,6 +156,16 @@
 
     :else (throw (Exception.))))
 
+(defn eval-role [role]
+  {:pre [(ast/role? role)]}
+  (str (cond
+         (string? (:name-expr role)) (:name-expr role)
+         (keyword? (:name-expr role)) (ast/get-role-name (:name-expr role))
+         :else (throw (Exception.)))
+       (if (empty? (:index-exprs role))
+         ""
+         (mapv eval (:index-exprs role)))))
+
 (defn successors [ast]
   ;(println "successors: " (:type ast))
   (cond
@@ -166,12 +176,8 @@
 
     ;; Action
     (contains? ast/action-types (:type ast))
-    (let [role-fn (fn [role]
-                    (if (coll? role)
-                      (apply ((if (fn? (first role)) identity eval) (first role)) (map eval (rest role)))
-                      (eval role)))
-          sender (role-fn (:sender (:channel ast)))
-          receiver (role-fn (:receiver (:channel ast)))
+    (let [sender (eval-role (:sender ast))
+          receiver (eval-role (:receiver ast))
           predicate (:predicate ast)]
       (cond (= (:type ast) :send)
             {(reify

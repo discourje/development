@@ -1,31 +1,64 @@
 (ns discourje.core.async.impl.ast)
 
+(defn println-true [& more]
+  (println more)
+  true)
+
 ;;;;
 ;;;; Discourje
 ;;;;
 
 (defprotocol Discourje)
 
-(defrecord Channel [sender receiver])
+;;;;
+;;;; Discourje: Roles
+;;;;
 
-(defn channel [sender receiver]
-  (->Channel sender receiver))
+(def role-names (atom {}))
+
+(defn put-role-name! [k name]
+  {:pre [(keyword? k)
+         (string? name)]}
+  (swap! role-names (fn [m] (into m {k name}))))
+
+(defn get-role-name [k]
+  (get @role-names k))
+
+(defrecord Role [name-expr index-exprs])
+
+(defn role? [x]
+  (instance? Role x))
+
+(defn role
+  ([expr]
+   {:pre [(or (not (coll? expr)) (seq? expr))]}
+   (cond
+     (not (coll? expr)) (role expr [])
+     (seq? expr) (role (first expr) (vec (rest expr)))))
+
+  ([name-expr index-exprs]
+   {:pre [(or (string? name-expr) (symbol? name-expr) (keyword? name-expr))
+          (vector? index-exprs)]}
+   (->Role name-expr index-exprs)))
 
 ;;;;
 ;;;; Discourje: Actions
 ;;;;
 
-(defrecord Action [type predicate channel]
+(defrecord Action [type predicate-expr sender receiver]
   Discourje)
 
 (def action-types #{:send :receive :close})
 
-(defn send [predicate channel]
-  (->Action :send predicate channel))
-(defn receive [predicate channel]
-  (->Action :receive predicate channel))
-(defn close [channel]
-  (->Action :close (fn [_] true) channel))
+(defn send [predicate sender receiver]
+  (->Action :send predicate sender receiver))
+(defn receive [predicate sender receiver]
+  (->Action :receive predicate sender receiver))
+
+(defn close [sender receiver]
+  {:pre [(role? sender)
+         (role? receiver)]}
+  (->Action :close '(fn [_] true) sender receiver))
 
 ;;;;
 ;;;; Discourje: Nullary operators
