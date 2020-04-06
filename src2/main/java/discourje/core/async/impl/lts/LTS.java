@@ -98,6 +98,11 @@ public class LTS<Spec> {
                 }
 
                 @Override
+                public State<Spec> makeTransition(Action a) {
+                    return transitions.get(a);
+                }
+
+                @Override
                 public boolean isExpanded() {
                     return transitions != null;
                 }
@@ -124,6 +129,8 @@ public class LTS<Spec> {
         Spec getSpec();
 
         Map<Action, State<Spec>> getTransitions();
+
+        State<Spec> makeTransition(Action a);
 
         boolean isExpanded();
     }
