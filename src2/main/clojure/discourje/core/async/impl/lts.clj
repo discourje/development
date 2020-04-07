@@ -51,12 +51,12 @@
     (ast/recur (:name ast)
                (w/postwalk-replace smap (:exprs ast)))
 
-    ;; Sequence
+    ;; Vector
     (vector? ast)
     (mapv #(substitute % smap) ast)
 
     ;; Application
-    (coll? ast)
+    (seq? ast)
     (concat [(first ast)]
             (w/postwalk-replace smap (rest ast)))
 
@@ -101,12 +101,12 @@
       (ast/loop (:name loop) (:vars loop) (:exprs ast) (:body loop))
       ast)
 
-    ;; Sequence
+    ;; Vector
     (vector? ast)
     (mapv #(unfold loop %) ast)
 
     ;; Application
-    (coll? ast)
+    (seq? ast)
     ast
 
     :else (throw (Exception.))))
@@ -142,12 +142,12 @@
     (= (:type ast) :recur)
     (throw (Exception.))
 
-    ;; Sequence
+    ;; Vector
     (vector? ast)
     (every? terminated? ast)
 
     ;; Application
-    (coll? ast)
+    (seq? ast)
     (let [name (first ast)
           vals (map eval (rest ast))
           body (:body (get (get @ast/registry name) (count vals)))
@@ -247,7 +247,7 @@
     (= (:type ast) :recur)
     (throw (Exception.))
 
-    ;; Sequence
+    ;; Vector
     (vector? ast)
     (if (empty? ast)
       {}
@@ -258,7 +258,7 @@
                      #(smash (into (if (terminated? %) [] [%]) (rest ast)))))))
 
     ;; Application
-    (coll? ast)
+    (seq? ast)
     (let [name (first ast)
           vals (mapv eval (rest ast))
           body (:body (get (get @ast/registry name) (count vals)))
