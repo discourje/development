@@ -351,11 +351,35 @@
                                (s/-->> ::alice ::bob)]))]
     (is (s/not-bisimilar? lts1 lts2) (msg lts1 lts2))))
 
+(multiary-tests)
+
 ;;;;
 ;;;; Conditional operators
 ;;;;
 
-;; TODO
+(deftest if-tests
+  (let [lts1 (s/lts (s/if true (s/-->> ::alice ::bob)
+                               (s/-->> ::alice ::carol)))
+        lts2 (s/lts (s/aldebaran des (0, 2, 3)
+                                 (0, "!(Object,alice,bob)", 1)
+                                 (1, "?(Object,alice,bob)", 2)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (s/lts (s/if false (s/-->> ::alice ::bob)
+                                (s/-->> ::alice ::carol)))
+        lts2 (s/lts (s/aldebaran des (0, 2, 3)
+                                 (0, "!(Object,alice,carol)", 1)
+                                 (1, "?(Object,alice,carol)", 2)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (s/lts (s/if (= (inc 1) 2) (s/-->> ::alice ::bob)
+                                        (s/-->> ::alice ::carol)))
+        lts2 (s/lts (s/aldebaran des (0, 2, 3)
+                                 (0, "!(Object,alice,bob)", 1)
+                                 (1, "?(Object,alice,bob)", 2)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2))))
+
+(if-tests)
 
 ;;;;
 ;;;; Recursion operators
