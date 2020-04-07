@@ -72,6 +72,28 @@
 (close-tests)
 
 ;;;;
+;;;; Multiary operators
+;;;;
+
+(deftest choice-tests
+  (let [lts1 (s/lts (s/choice (s/-->> ::alice ::bob)
+                              (s/close ::alice ::bob)))
+        lts2 (s/lts (s/aldebaran des (0, 3, 3)
+                                 (0, "!(Object,alice,bob)", 1)
+                                 (0, "C(alice,bob)", 2)
+                                 (1, "?(Object,alice,bob)", 2)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (s/lts (s/choice (s/-->> ::alice ::bob)
+                              (s/-->> ::alice ::bob)))
+        lts2 (s/lts (s/aldebaran des (0, 2, 3)
+                                 (0, "!(Object,alice,bob)", 1)
+                                 (1, "?(Object,alice,bob)", 2)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2))))
+
+(choice-tests)
+
+;;;;
 ;;;; Vectors
 ;;;;
 
@@ -130,9 +152,6 @@
 
 ;(try
 
-;(def spec (s/choice (s/-->> Long "alice" "bob")
-;                    (s/close "alice" "bob")))
-;
 ;(def spec (s/choice (s/choice [(s/-->> Long "alice" "bob")
 ;                               (s/close "alice" "bob")]
 ;                              (s/-->> Long "alice" "carol"))
@@ -202,9 +221,6 @@
 ;
 ;  (catch Throwable t (.printStackTrace t)))
 
-(def lts (s/lts (s/choice (s/choice [(s/-->> "alice" "bob")
-                                     (s/close "alice" "bob")]
-                                    (s/-->> "alice" "carol"))
-                          (s/close "alice" "bob"))))
-(s/println lts)
+(def lts (s/lts (s/choice (s/-->> ::alice ::bob)
+                          (s/close ::alice ::bob))))
 (s/ltsgraph lts "/Applications/mCRL2.app/Contents" "/Users/sungshik/Desktop/lts.aut")
