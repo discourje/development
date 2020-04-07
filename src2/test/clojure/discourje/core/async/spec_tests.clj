@@ -2,12 +2,6 @@
   (:require [clojure.test :refer :all]
             [discourje.core.async.spec :as s]))
 
-; Fake constants to avoid "cannot be resolved" warnings
-(def des nil)
-(def x nil)
-(def i nil)
-(def j nil)
-
 (defn msg [lts1 lts2]
   (str "\n *** lts1 ***\n\n" lts1 "\n\n *** lts2 ***\n\n" lts2 "\n"))
 
@@ -402,10 +396,39 @@
                                  (7, "?(Object,alice,bob)", 0)))]
     (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
-  (let [lts1 (s/lts (s/loop ring-omega [i 0
-                                        n 3]
-                            (s/-->> (::alice i) (::alice (mod (inc i) n)))
-                            (s/recur ring-omega (mod (inc i) n) n)))
+  (let [lts1 (s/lts (s/loop pipe [i 0
+                                  n 3]
+                            (s/if (< i (dec n))
+                              [(s/-->> (::alice i) (::alice (inc i)))
+                               (s/recur pipe (inc i) n)])))
+        lts2 (s/lts (s/aldebaran des (0, 4, 5)
+                                 (0, "!(Object,alice[0],alice[1])", 1)
+                                 (1, "?(Object,alice[0],alice[1])", 2)
+                                 (2, "!(Object,alice[1],alice[2])", 3)
+                                 (3, "?(Object,alice[1],alice[2])", 4)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (s/lts (s/loop ring [i 0
+                                  n 3]
+                            (s/if (< i n)
+                              [(s/-->> (::alice i) (::alice (mod (inc i) n)))
+                               (s/recur ring (inc i) n)])))
+        lts2 (s/lts (s/aldebaran des (0, 6, 7)
+                                 (0, "!(Object,alice[0],alice[1])", 1)
+                                 (1, "?(Object,alice[0],alice[1])", 2)
+                                 (2, "!(Object,alice[1],alice[2])", 3)
+                                 (3, "?(Object,alice[1],alice[2])", 4)
+                                 (4, "!(Object,alice[2],alice[0])", 5)
+                                 (5, "?(Object,alice[2],alice[0])", 6)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (s/lts (s/loop omega []
+                            [(s/loop ring [i 0
+                                           n 3]
+                                     (s/if (< i n)
+                                       [(s/-->> (::alice i) (::alice (mod (inc i) n)))
+                                        (s/recur ring (inc i) n)]))
+                             (s/recur omega)]))
         lts2 (s/lts (s/aldebaran des (0, 7, 7)
                                  (0, "!(Object,alice[0],alice[1])", 1)
                                  (1, "?(Object,alice[0],alice[1])", 2)
@@ -413,33 +436,119 @@
                                  (3, "?(Object,alice[1],alice[2])", 4)
                                  (4, "!(Object,alice[2],alice[0])", 5)
                                  (5, "?(Object,alice[2],alice[0])", 0)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (s/lts (s/loop multicast [i 0
+                                       n 3]
+                            (s/if (< i n)
+                              (s/parallel (s/-->> ::alice (::bob i))
+                                          (s/recur multicast (inc i) n)))))
+        lts2 (s/lts (s/aldebaran des (0, 54, 27)
+                                 (0, "!(Object,alice,bob[0])", 1)
+                                 (0, "!(Object,alice,bob[1])", 2)
+                                 (0, "!(Object,alice,bob[2])", 3)
+                                 (1, "?(Object,alice,bob[0])", 4)
+                                 (1, "!(Object,alice,bob[1])", 5)
+                                 (1, "!(Object,alice,bob[2])", 6)
+                                 (2, "!(Object,alice,bob[0])", 5)
+                                 (2, "?(Object,alice,bob[1])", 21)
+                                 (2, "!(Object,alice,bob[2])", 22)
+                                 (3, "!(Object,alice,bob[0])", 6)
+                                 (3, "!(Object,alice,bob[1])", 22)
+                                 (3, "?(Object,alice,bob[2])", 26)
+                                 (4, "!(Object,alice,bob[1])", 7)
+                                 (4, "!(Object,alice,bob[2])", 8)
+                                 (5, "?(Object,alice,bob[0])", 7)
+                                 (5, "?(Object,alice,bob[1])", 15)
+                                 (5, "!(Object,alice,bob[2])", 16)
+                                 (6, "?(Object,alice,bob[0])", 8)
+                                 (6, "!(Object,alice,bob[1])", 16)
+                                 (6, "?(Object,alice,bob[2])", 20)
+                                 (7, "?(Object,alice,bob[1])", 9)
+                                 (7, "!(Object,alice,bob[2])", 10)
+                                 (8, "!(Object,alice,bob[1])", 10)
+                                 (8, "?(Object,alice,bob[2])", 14)
+                                 (9, "!(Object,alice,bob[2])", 11)
+                                 (10, "?(Object,alice,bob[1])", 11)
+                                 (10, "?(Object,alice,bob[2])", 13)
+                                 (11, "?(Object,alice,bob[2])", 12)
+                                 (13, "?(Object,alice,bob[1])", 12)
+                                 (14, "!(Object,alice,bob[1])", 13)
+                                 (15, "?(Object,alice,bob[0])", 9)
+                                 (15, "!(Object,alice,bob[2])", 17)
+                                 (16, "?(Object,alice,bob[0])", 10)
+                                 (16, "?(Object,alice,bob[1])", 17)
+                                 (16, "?(Object,alice,bob[2])", 19)
+                                 (17, "?(Object,alice,bob[0])", 11)
+                                 (17, "?(Object,alice,bob[2])", 18)
+                                 (18, "?(Object,alice,bob[0])", 12)
+                                 (19, "?(Object,alice,bob[0])", 13)
+                                 (19, "?(Object,alice,bob[1])", 18)
+                                 (20, "?(Object,alice,bob[0])", 14)
+                                 (20, "!(Object,alice,bob[1])", 19)
+                                 (21, "!(Object,alice,bob[0])", 15)
+                                 (21, "!(Object,alice,bob[2])", 23)
+                                 (22, "!(Object,alice,bob[0])", 16)
+                                 (22, "?(Object,alice,bob[1])", 23)
+                                 (22, "?(Object,alice,bob[2])", 25)
+                                 (23, "!(Object,alice,bob[0])", 17)
+                                 (23, "?(Object,alice,bob[2])", 24)
+                                 (24, "!(Object,alice,bob[0])", 18)
+                                 (25, "!(Object,alice,bob[0])", 19)
+                                 (25, "?(Object,alice,bob[1])", 24)
+                                 (26, "!(Object,alice,bob[0])", 20)
+                                 (26, "!(Object,alice,bob[1])", 25)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (s/lts (s/loop anycast [i 0
+                                     n 3]
+                            (s/if (< i (dec n))
+                              (s/choice (s/-->> ::alice (::bob i))
+                                        (s/recur anycast (inc i) n))
+                              (s/-->> ::alice (::bob i)))))
+        lts2 (s/lts (s/aldebaran des (0, 6, 5)
+                                 (0, "!(Object,alice,bob[0])", 1)
+                                 (0, "!(Object,alice,bob[1])", 2)
+                                 (0, "!(Object,alice,bob[2])", 3)
+                                 (1, "?(Object,alice,bob[0])", 4)
+                                 (2, "?(Object,alice,bob[1])", 4)
+                                 (3, "?(Object,alice,bob[2])", 4)))]
     (is (s/bisimilar? lts1 lts2) (msg lts1 lts2))))
 
 (loop-recur-tests)
 
-;;;;
-;;;; Registry operators
-;;;;
+;;;;;
+;;;;; Registry operators
+;;;;;
 
-;; TODO
+(deftest apply-tests
+  (s/def ::pipe [role type min max]
+    (s/loop pipe [i min]
+            (s/if (< i (dec max))
+              [(s/-->> type (role i) (role (inc i)))
+               (s/recur pipe (inc i))])))
 
-;(def spec (s/loop pipe [i 0
-;                        n 4]
-;                  (s/if (< i n)
-;                    [(s/-->> Long (alice i) (alice (inc i)))
-;                     (s/recur pipe (inc i) n)])))
+  (let [lts1 (s/lts (s/apply ::pipe [::alice Long 10 14]))
+        lts2 (s/lts (s/aldebaran des (0, 6, 7)
+                                 (0, "!(Long,alice[10],alice[11])", 1)
+                                 (1, "?(Long,alice[10],alice[11])", 2)
+                                 (2, "!(Long,alice[11],alice[12])", 3)
+                                 (3, "?(Long,alice[11],alice[12])", 4)
+                                 (4, "!(Long,alice[12],alice[13])", 5)
+                                 (5, "?(Long,alice[12],alice[13])", 6)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
-;(s/def :pipe
-;  [role min max]
-;  (s/loop pipe [i min]
-;          (s/if (< i max)
-;            [(s/-->> Long (role i) (role (inc i)))
-;             (s/recur pipe (inc i))])))
-;
-;(s/def :pipe
-;  [role max]
-;  (s/apply :pipe [alice 0 max]))
-;
-;(def spec (s/apply :pipe [alice 2]))
+  (s/def ::pipe [role type n]
+    (s/apply ::pipe [role type 0 n]))
 
-;(def spec (s/apply :repeat [1 (s/-->> (alice 2) (bob 4))]))
+  (let [lts1 (s/lts (s/apply ::pipe [::alice Long 4]))
+        lts2 (s/lts (s/aldebaran des (0, 6, 7)
+                                 (0, "!(Long,alice[0],alice[1])", 1)
+                                 (1, "?(Long,alice[0],alice[1])", 2)
+                                 (2, "!(Long,alice[1],alice[2])", 3)
+                                 (3, "?(Long,alice[1],alice[2])", 4)
+                                 (4, "!(Long,alice[2],alice[3])", 5)
+                                 (5, "?(Long,alice[2],alice[3])", 6)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2))))
+
+(apply-tests)

@@ -133,16 +133,13 @@
 ;;;; Temp
 ;;;;
 
-(ltsgraph (lts (aldebaran des (0, 9, 9)
-                          (0, "!(Long,alice[0],alice[1])", 1)
-                          (1, "?(Long,alice[0],alice[1])", 2)
-                          (2, "!(Long,alice[1],alice[2])", 3)
-                          (3, "?(Long,alice[1],alice[2])", 4)
-                          (4, "!(Long,alice[2],alice[3])", 5)
-                          (5, "?(Long,alice[2],alice[3])", 6)
-                          (6, "!(Long,alice[3],alice[0])", 7)
-                          (7, "?(Long,alice[3],alice[0])", 8)
-                          (8, "!(Long,alice[0],alice[1])", 1)))
+(ltsgraph (lts (aldebaran des (0, 6, 4)
+                          (0, "!(Object,alice,bob[0])", 1)
+                          (0, "!(Object,alice,bob[1])", 2)
+                          (0, "!(Object,alice,bob[2])", 3)
+                          (1, "?(Object,alice,bob[0])", 0)
+                          (2, "?(Object,alice,bob[1])", 0)
+                          (3, "?(Object,alice,bob[2])", 0)))
           "/Applications/mCRL2.app/Contents"
           "/Users/sungshik/Desktop/lts.aut")
 

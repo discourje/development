@@ -5,13 +5,10 @@
   (:import (java.util.function Function Predicate)
            (discourje.core.async.impl.lts Action Send Receive Close LTS LTSs)))
 
-(defn- smash [ast]
-  (if (and (vector? ast) (= (count ast) 1))
-    (smash (first ast))
-    ast))
-
 (defn- smap [ast]
-  (zipmap (:vars ast) (map eval (:exprs ast))))
+  (zipmap (:vars ast)
+          ;(map eval (:exprs ast))))
+          (:exprs ast)))
 
 (defn substitute [ast smap]
   ;(println ast)
@@ -63,7 +60,7 @@
     :else (throw (Exception.))))
 
 (defn unfold [loop ast]
-  ;(println "unfold: " (:type ast))
+  ;(println "unfold: " ast)
   (cond
 
     ;; End
@@ -149,7 +146,8 @@
     ;; Application
     (seq? ast)
     (let [name (first ast)
-          vals (map eval (rest ast))
+          ;vals (map eval (rest ast))
+          vals (rest ast)
           body (:body (get (get @ast/registry name) (count vals)))
           vars (:vars (get (get @ast/registry name) (count vals)))]
       (terminated? (substitute body (zipmap vars vals))))
@@ -281,7 +279,8 @@
     ;; Application
     (seq? ast)
     (let [name (first ast)
-          vals (mapv eval (rest ast))
+          ;(mapv eval (rest ast))
+          vals (rest ast)
           body (:body (get (get @ast/registry name) (count vals)))
           vars (:vars (get (get @ast/registry name) (count vals)))]
       (successors (substitute body (zipmap vars vals))))
