@@ -92,6 +92,24 @@
   `(concat ['~name] '~exprs))
 
 ;;;;
+;;;; Discourje: Patterns
+;;;;
+
+(require '[discourje.core.async.spec :as s])
+
+(s/def ::-->>not [t r1 r2]
+  (s/-->> (fn [x] (not= (type x) t)) r1 r2))
+
+(s/def ::pipe [t r-name min max]
+  (s/loop pipe [i min]
+          (s/if (< i (dec max))
+            [(s/-->> t (r-name i) (r-name (inc i)))
+             (s/recur pipe (inc i))])))
+
+(s/def ::pipe [t r-name n]
+  (s/apply ::pipe [t r-name 0 n]))
+
+;;;;
 ;;;; Aldebaran
 ;;;;
 

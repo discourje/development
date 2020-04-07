@@ -522,13 +522,13 @@
 ;;;;;
 
 (deftest apply-tests
-  (s/def ::pipe [role type min max]
-    (s/loop pipe [i min]
-            (s/if (< i (dec max))
-              [(s/-->> type (role i) (role (inc i)))
-               (s/recur pipe (inc i))])))
+  (let [lts1 (s/lts (s/apply ::s/-->>not [Long ::alice ::bob]))
+        lts2 (s/lts (s/aldebaran des (0, 2, 3)
+                                 (0, "!((fn [x] (not= (type x) Long)),alice,bob)", 1)
+                                 (1, "?((fn [x] (not= (type x) Long)),alice,bob)", 2)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
-  (let [lts1 (s/lts (s/apply ::pipe [::alice Long 10 14]))
+  (let [lts1 (s/lts (s/apply ::s/pipe [Long ::alice 10 14]))
         lts2 (s/lts (s/aldebaran des (0, 6, 7)
                                  (0, "!(Long,alice[10],alice[11])", 1)
                                  (1, "?(Long,alice[10],alice[11])", 2)
@@ -538,10 +538,7 @@
                                  (5, "?(Long,alice[12],alice[13])", 6)))]
     (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
-  (s/def ::pipe [role type n]
-    (s/apply ::pipe [role type 0 n]))
-
-  (let [lts1 (s/lts (s/apply ::pipe [::alice Long 4]))
+  (let [lts1 (s/lts (s/apply ::s/pipe [Long ::alice 4]))
         lts2 (s/lts (s/aldebaran des (0, 6, 7)
                                  (0, "!(Long,alice[0],alice[1])", 1)
                                  (1, "?(Long,alice[0],alice[1])", 2)
