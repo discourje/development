@@ -8,6 +8,8 @@
 (defn defroles [f]
   (s/defrole ::alice "alice")
   (s/defrole ::bob "bob")
+  (s/defrole ::carol "carol")
+  (s/defrole ::dave "dave")
   (f))
 
 (defroles (fn [] true))
@@ -76,22 +78,77 @@
 ;;;;
 
 (deftest choice-tests
-  (let [lts1 (s/lts (s/choice (s/-->> ::alice ::bob)
-                              (s/close ::alice ::bob)))
-        lts2 (s/lts (s/aldebaran des (0, 3, 3)
-                                 (0, "!(Object,alice,bob)", 1)
-                                 (0, "C(alice,bob)", 2)
-                                 (1, "?(Object,alice,bob)", 2)))]
-    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  ;; Idempotence
 
   (let [lts1 (s/lts (s/choice (s/-->> ::alice ::bob)
                               (s/-->> ::alice ::bob)))
         lts2 (s/lts (s/aldebaran des (0, 2, 3)
                                  (0, "!(Object,alice,bob)", 1)
                                  (1, "?(Object,alice,bob)", 2)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  ;; Commutativity
+
+  (let [lts1 (s/lts (s/choice (s/-->> ::alice ::bob)
+                              (s/-->> ::alice ::carol)))
+        lts2 (s/lts (s/aldebaran des (0, 4, 4)
+                                 (0, "!(Object,alice,carol)", 1)
+                                 (0, "!(Object,alice,bob)", 2)
+                                 (1, "?(Object,alice,carol)", 3)
+                                 (2, "?(Object,alice,bob)", 3)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (s/lts (s/choice (s/-->> ::alice ::carol)
+                              (s/-->> ::alice ::bob)))
+        lts2 (s/lts (s/aldebaran des (0, 4, 4)
+                                 (0, "!(Object,alice,carol)", 1)
+                                 (0, "!(Object,alice,bob)", 2)
+                                 (1, "?(Object,alice,carol)", 3)
+                                 (2, "?(Object,alice,bob)", 3)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  ;; Associativity
+
+  (let [lts1 (s/lts (s/choice (s/choice (s/-->> ::alice ::bob)
+                                        (s/-->> ::alice ::carol))
+                              (s/-->> ::alice ::dave)))
+        lts2 (s/lts (s/aldebaran des (0, 6, 5)
+                                 (0, "!(Object,alice,bob)", 1)
+                                 (0, "!(Object,alice,carol)", 2)
+                                 (0, "!(Object,alice,dave)", 3)
+                                 (1, "?(Object,alice,bob)", 4)
+                                 (2, "?(Object,alice,carol)", 4)
+                                 (3, "?(Object,alice,dave)", 4)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (s/lts (s/choice (s/-->> ::alice ::bob)
+                              (s/choice (s/-->> ::alice ::carol)
+                                        (s/-->> ::alice ::dave))))
+        lts2 (s/lts (s/aldebaran des (0, 6, 5)
+                                 (0, "!(Object,alice,bob)", 1)
+                                 (0, "!(Object,alice,carol)", 2)
+                                 (0, "!(Object,alice,dave)", 3)
+                                 (1, "?(Object,alice,bob)", 4)
+                                 (2, "?(Object,alice,carol)", 4)
+                                 (3, "?(Object,alice,dave)", 4)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (s/lts (s/choice (s/-->> ::alice ::bob)
+                              (s/-->> ::alice ::carol)
+                              (s/-->> ::alice ::dave)))
+        lts2 (s/lts (s/aldebaran des (0, 6, 5)
+                                 (0, "!(Object,alice,bob)", 1)
+                                 (0, "!(Object,alice,carol)", 2)
+                                 (0, "!(Object,alice,dave)", 3)
+                                 (1, "?(Object,alice,bob)", 4)
+                                 (2, "?(Object,alice,carol)", 4)
+                                 (3, "?(Object,alice,dave)", 4)))]
     (is (s/bisimilar? lts1 lts2) (msg lts1 lts2))))
 
 (choice-tests)
+
+
 
 ;;;;
 ;;;; Vectors
@@ -198,29 +255,12 @@
 
 ;(catch Throwable t (.printStackTrace t)))
 
+(def lts (s/lts (s/aldebaran des (0, 6, 5)
+                             (0, "!(Object,alice,bob)", 1)
+                             (0, "!(Object,alice,carol)", 2)
+                             (0, "!(Object,alice,dave)", 3)
+                             (1, "?(Object,alice,bob)", 4)
+                             (2, "?(Object,alice,carol)", 4)
+                             (3, "?(Object,alice,dave)", 4))))
 
-
-
-
-;(try
-;  (def ast (s/aldebaran des (0, 9, 9)
-;                        (0, "!(alice[0],alice[1],Long)", 1)
-;                        (1, "?(alice[0],alice[1],Long)", 2)
-;                        (2, "!(alice[1],alice[2],Long)", 3)
-;                        (3, "?(alice[1],alice[2],Long)", 4)
-;                        (4, "!(alice[2],alice[3],Long)", 5)
-;                        (5, "?(alice[2],alice[3],Long)", 6)
-;                        (6, "!(alice[3],alice[0],Long)", 7)
-;                        (7, "?(alice[3],alice[0],Long)", 8)
-;                        (8, "!(alice[0],alice[1],Long)", 1)))
-;  (println ast)
-;
-;  (def lts (s/lts ast true))
-;  (s/println lts)
-;  (s/ltsgraph lts "/Applications/mCRL2.app/Contents" "/Users/sungshik/Desktop/lts.aut")
-;
-;  (catch Throwable t (.printStackTrace t)))
-
-(def lts (s/lts (s/choice (s/-->> ::alice ::bob)
-                          (s/close ::alice ::bob))))
 (s/ltsgraph lts "/Applications/mCRL2.app/Contents" "/Users/sungshik/Desktop/lts.aut")
