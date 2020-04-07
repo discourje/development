@@ -33,6 +33,10 @@
     (= (:type ast) :parallel)
     (ast/parallel (mapv #(substitute % smap) (:branches ast)))
 
+    ;; Vector
+    (vector? ast)
+    (mapv #(substitute % smap) ast)
+
     ;; If
     (= (:type ast) :if)
     (ast/if-then-else (w/postwalk-replace smap (:condition ast))
@@ -50,10 +54,6 @@
     (= (:type ast) :recur)
     (ast/recur (:name ast)
                (w/postwalk-replace smap (:exprs ast)))
-
-    ;; Vector
-    (vector? ast)
-    (mapv #(substitute % smap) ast)
 
     ;; Application
     (seq? ast)
@@ -82,6 +82,10 @@
     (= (:type ast) :parallel)
     (ast/parallel (mapv #(unfold loop %) (:branches ast)))
 
+    ;; Vector
+    (vector? ast)
+    (mapv #(unfold loop %) ast)
+
     ;; If
     (= (:type ast) :if)
     (ast/if-then-else (:condition ast)
@@ -100,10 +104,6 @@
     (if (= (:name loop) (:name ast))
       (ast/loop (:name loop) (:vars loop) (:exprs ast) (:body loop))
       ast)
-
-    ;; Vector
-    (vector? ast)
-    (mapv #(unfold loop %) ast)
 
     ;; Application
     (seq? ast)
@@ -130,6 +130,10 @@
     (= (:type ast) :parallel)
     (every? terminated? (:branches ast))
 
+    ;; Vector
+    (vector? ast)
+    (every? terminated? ast)
+
     ;; If
     (= (:type ast) :if)
     (terminated? (if (eval (:condition ast)) (:branch1 ast) (:branch2 ast)))
@@ -141,10 +145,6 @@
     ;; Recur
     (= (:type ast) :recur)
     (throw (Exception.))
-
-    ;; Vector
-    (vector? ast)
-    (every? terminated? ast)
 
     ;; Application
     (seq? ast)
@@ -235,6 +235,16 @@
                 f #(ast/parallel (into (subvec branches 0 i) (into [%] (subvec branches (inc i) (count branches)))))]
             (recur (inc i) (merge-with into result (if (empty? m) {} (update-in m (keys m) f))))))))
 
+    ;; Vector
+    (vector? ast)
+    (if (empty? ast)
+      {}
+      (if (terminated? (first ast))
+        (successors (vec (rest ast)))
+        (let [m (successors (first ast))]
+          (update-in m (keys m)
+                     (fn [x] (mapv #(smash (into (if (terminated? %) [] [%]) (rest ast))) x))))))
+
     ;; If
     (= (:type ast) :if)
     (successors (if (eval (:condition ast)) (:branch1 ast) (:branch2 ast)))
@@ -246,19 +256,6 @@
     ;; Recur
     (= (:type ast) :recur)
     (throw (Exception.))
-
-    ;; Vector
-    (vector? ast)
-    (if (empty? ast)
-      {}
-      (if (terminated? (first ast))
-        (successors (vec (rest ast)))
-
-
-
-        (let [m (successors (first ast))]
-          (update-in m (keys m)
-                     (fn [x] (mapv #(smash (into (if (terminated? %) [] [%]) (rest ast))) x))))))
 
     ;; Application
     (seq? ast)
