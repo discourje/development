@@ -385,30 +385,43 @@
 ;;;; Recursion operators
 ;;;;
 
-;; TODO
+(deftest loop-recur-tests
+  (let [lts1 (s/lts (s/loop swap [r1 ::alice
+                                  r2 ::bob]
+                            (s/-->> r1 r2)
+                            (s/-->> r2 r1)
+                            (s/recur swap r2 r1)))
+        lts2 (s/lts (s/aldebaran des (0, 8, 8)
+                                 (0, "!(Object,alice,bob)", 1)
+                                 (1, "?(Object,alice,bob)", 2)
+                                 (2, "!(Object,bob,alice)", 3)
+                                 (3, "?(Object,bob,alice)", 4)
+                                 (4, "!(Object,bob,alice)", 5)
+                                 (5, "?(Object,bob,alice)", 6)
+                                 (6, "!(Object,alice,bob)", 7)
+                                 (7, "?(Object,alice,bob)", 0)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (s/lts (s/loop ring-omega [i 0
+                                        n 3]
+                            (s/-->> (::alice i) (::alice (mod (inc i) n)))
+                            (s/recur ring-omega (mod (inc i) n) n)))
+        lts2 (s/lts (s/aldebaran des (0, 7, 7)
+                                 (0, "!(Object,alice[0],alice[1])", 1)
+                                 (1, "?(Object,alice[0],alice[1])", 2)
+                                 (2, "!(Object,alice[1],alice[2])", 3)
+                                 (3, "?(Object,alice[1],alice[2])", 4)
+                                 (4, "!(Object,alice[2],alice[0])", 5)
+                                 (5, "?(Object,alice[2],alice[0])", 0)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2))))
+
+(loop-recur-tests)
 
 ;;;;
 ;;;; Registry operators
 ;;;;
 
 ;; TODO
-
-
-
-
-
-;(try
-
-;(def spec (s/loop ring [i 0
-;                        n 4]
-;                  (s/-->> Long (alice i) (alice (mod (inc i) n)))
-;                  (s/recur ring (mod (inc i) n) n)))
-
-;(def spec (s/loop swap [r1 "alice"
-;                        r2 "bob"]
-;                  (s/-->> Long r1 r2)
-;                  (s/-->> Long r2 r1)
-;                  (s/recur swap r2 r1)))
 
 ;(def spec (s/loop pipe [i 0
 ;                        n 4]
@@ -430,12 +443,3 @@
 ;(def spec (s/apply :pipe [alice 2]))
 
 ;(def spec (s/apply :repeat [1 (s/-->> (alice 2) (bob 4))]))
-
-;(catch Throwable t (.printStackTrace t)))
-
-;(def lts (s/lts (s/aldebaran des (0, 3, 4)
-;                             (0, "!(Object,alice,bob)", 1)
-;                             (1, "?(Object,alice,bob)", 2)
-;                             (2, "C(alice,bob)", 3))))
-;
-;(s/ltsgraph lts "/Applications/mCRL2.app/Contents" "/Users/sungshik/Desktop/lts.aut")

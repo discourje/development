@@ -102,11 +102,19 @@
 ;;;; LTS tools
 ;;;;
 
+(defn expandRecursively!
+  ([lts]
+   (lts/expandRecursively! lts))
+  ([lts bound]
+   (lts/expandRecursively! lts bound)))
+
 (defn lts
   ([ast]
-   (lts/lts ast true))
+   (lts ast true))
   ([ast expandRecursively]
-   (lts/lts ast expandRecursively)))
+   (let [lts (lts/lts ast)]
+     (if expandRecursively (expandRecursively! lts))
+     lts)))
 
 (defn bisimilar? [lts1 lts2]
   (lts/bisimilar? lts1 lts2))
@@ -120,6 +128,23 @@
 (defn ltsgraph [lts mcrl2-root-dir tmp-file]
   (spit tmp-file (.toString lts))
   (future (clojure.java.shell/sh (str mcrl2-root-dir "/bin/ltsgraph") tmp-file)))
+
+;;;;
+;;;; Temp
+;;;;
+
+(ltsgraph (lts (aldebaran des (0, 9, 9)
+                          (0, "!(Long,alice[0],alice[1])", 1)
+                          (1, "?(Long,alice[0],alice[1])", 2)
+                          (2, "!(Long,alice[1],alice[2])", 3)
+                          (3, "?(Long,alice[1],alice[2])", 4)
+                          (4, "!(Long,alice[2],alice[3])", 5)
+                          (5, "?(Long,alice[2],alice[3])", 6)
+                          (6, "!(Long,alice[3],alice[0])", 7)
+                          (7, "?(Long,alice[3],alice[0])", 8)
+                          (8, "!(Long,alice[0],alice[1])", 1)))
+          "/Applications/mCRL2.app/Contents"
+          "/Users/sungshik/Desktop/lts.aut")
 
 ;;;;
 ;;;; TODO: Everything below is part of monitoring and should be put elsewhere at some point

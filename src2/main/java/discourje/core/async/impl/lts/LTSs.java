@@ -118,11 +118,16 @@ public class LTSs {
         var b = new StringBuilder();
         var n = 0;
         for (State<?> s : lts.getStates()) {
-            n += s.getTransitionsOrNull().size();
+            var transitions = s.getTransitionsOrNull();
+            n += transitions == null ? 0 : s.getTransitionsOrNull().size();
         }
         b.append("des (0,").append(n).append(",").append(lts.getStates().size()).append(")");
         for (State<?> s : lts.getStates()) {
-            if (!s.getTransitionsOrNull().isEmpty()) {
+            var transitions = s.getTransitionsOrNull();
+            if (transitions == null) {
+                b.append(System.lineSeparator());
+                b.append(identifiers.get(s)).append(" not yet expanded");
+            } else if (!transitions.isEmpty()) {
                 b.append(System.lineSeparator());
                 b.append(stateToAldebaran.apply(s));
             }

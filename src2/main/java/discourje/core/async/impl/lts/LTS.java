@@ -11,18 +11,13 @@ public class LTS<Spec> {
 
     private Function<Spec, Map<Action, Collection<Spec>>> expander;
 
-    public LTS(Collection<Spec> initialStateSpecs, Function<Spec, Map<Action, Collection<Spec>>> expander, boolean expandRecursively) {
+    public LTS(Collection<Spec> initialStateSpecs, Function<Spec, Map<Action, Collection<Spec>>> expander) {
         this.initialStates = new LinkedHashSet<>();
         for (Spec initialStateSpec : initialStateSpecs) {
             this.initialStates.add(newOrGetState(initialStateSpec));
         }
 
         this.expander = expander;
-        if (expandRecursively) {
-            for (State<Spec> initialState : initialStates) {
-                initialState.expandRecursively();
-            }
-        }
     }
 
     @Override
@@ -31,8 +26,12 @@ public class LTS<Spec> {
     }
 
     public void expandRecursively() {
+        expandRecursively(Integer.MAX_VALUE);
+    }
+
+    public void expandRecursively(int bound) {
         for (State<Spec> s : states.values()) {
-            s.expandRecursively();
+            s.expandRecursively(bound);
         }
     }
 

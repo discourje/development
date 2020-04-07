@@ -254,8 +254,12 @@
         (let [branch (first ast)
               branches-after (vec (rest ast))
               ;; f inserts an "evaluated" branch before "unevaluated" branches
-              f (fn [branch'] (reduce into [(if (terminated? branch') [] [branch'])
-                                            branches-after]))
+              f (fn [branch']
+                  (let [branches' (reduce into [(if (terminated? branch') [] [branch'])
+                                                branches-after])]
+                    (if (= 1 (count branches'))
+                      (first branches')
+                      branches')))
               ;; mapv-f maps f over a vector of branches
               mapv-f (fn [branches'] (mapv #(f %) branches'))
               ;; map-mapv-f maps mapv-f over a map from actions to vectors of branches
@@ -284,7 +288,7 @@
 
     :else (throw (Exception.))))
 
-(defn lts [ast expandRecursively]
+(defn lts [ast]
   (cond
 
     ;; Aldebaran
@@ -304,16 +308,20 @@
                               keys)]
                 (if (nil? keys)
                   {}
-                  (clojure.set/rename-keys m (zipmap keys vals))))))
-          expandRecursively)
+                  (clojure.set/rename-keys m (zipmap keys vals)))))))
 
     ;; Discourje
     :else
     (LTS. #{ast}
           (reify
             Function
-            (apply [_ ast] (successors ast)))
-          expandRecursively)))
+            (apply [_ ast] (successors ast))))))
+
+(defn expandRecursively!
+  ([lts]
+   (.expandRecursively lts))
+  ([lts bound]
+   (.expandRecursively lts bound)))
 
 (defn bisimilar? [lts1 lts2]
   (LTSs/bisimilar lts1 lts2))
