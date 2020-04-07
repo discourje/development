@@ -234,7 +234,7 @@
   (let [lts1 (s/lts (s/parallel (s/-->> ::alice ::bob)
                                 (s/-->> ::alice ::bob)))
         lts2 (s/lts (s/parallel (s/-->> ::alice ::bob)))]
-    (is (not (s/bisimilar? lts1 lts2)) (msg lts1 lts2)))
+    (is (s/not-bisimilar? lts1 lts2) (msg lts1 lts2)))
 
   ;; Commutativity
   (let [lts1 (s/lts (s/parallel (s/-->> ::alice ::bob)
@@ -295,14 +295,14 @@
   (let [lts1 (s/lts [(s/-->> ::alice ::bob)
                      (s/-->> ::alice ::bob)])
         lts2 (s/lts [(s/-->> ::alice ::bob)])]
-    (is (not (s/bisimilar? lts1 lts2)) (msg lts1 lts2)))
+    (is (s/not-bisimilar? lts1 lts2) (msg lts1 lts2)))
 
   ;; Non-commutativity
   (let [lts1 (s/lts [(s/-->> ::alice ::bob)
                      (s/-->> ::alice ::carol)])
         lts2 (s/lts [(s/-->> ::alice ::carol)
                      (s/-->> ::alice ::bob)])]
-    (is (not (s/bisimilar? lts1 lts2)) (msg lts1 lts2)))
+    (is (s/not-bisimilar? lts1 lts2) (msg lts1 lts2)))
 
   ;; Associativity
   (let [lts1 (s/lts [(s/-->> ::alice ::bob)
@@ -324,6 +324,33 @@
 
 (vector-tests)
 
+(deftest multiary-tests
+  (let [lts1 (s/lts [(s/choice (s/-->> ::alice ::bob)
+                               (s/-->> ::alice ::carol))
+                     (s/-->> ::alice ::dave)])
+        lts2 (s/lts (s/choice [(s/-->> ::alice ::bob)
+                               (s/-->> ::alice ::dave)]
+                              [(s/-->> ::alice ::carol)
+                               (s/-->> ::alice ::dave)]))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (s/lts [(s/-->> ::alice ::bob)
+                     (s/choice (s/-->> ::alice ::carol)
+                               (s/-->> ::alice ::dave))])
+        lts2 (s/lts (s/choice [(s/-->> ::alice ::bob)
+                               (s/-->> ::alice ::carol)]
+                              [(s/-->> ::alice ::bob)
+                               (s/-->> ::alice ::dave)]))]
+    (is (s/not-bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (s/lts (s/parallel (s/-->> ::alice ::bob)
+                                (s/-->> ::alice ::carol)))
+        lts2 (s/lts (s/choice [(s/-->> ::alice ::bob)
+                               (s/-->> ::alice ::carol)]
+                              [(s/-->> ::alice ::carol)
+                               (s/-->> ::alice ::bob)]))]
+    (is (s/not-bisimilar? lts1 lts2) (msg lts1 lts2))))
+
 ;;;;
 ;;;; Conditional operators
 ;;;;
@@ -342,20 +369,12 @@
 
 ;; TODO
 
-;;;;
-;;;; Vectors
-;;;;
 
 
 
 
 ;(try
 
-;(def spec (s/choice (s/choice [(s/-->> Long "alice" "bob")
-;                               (s/close "alice" "bob")]
-;                              (s/-->> Long "alice" "carol"))
-;                    (s/close "alice" "bob")))
-;
 ;(def spec (s/loop ring [i 0
 ;                        n 4]
 ;                  (s/-->> Long (alice i) (alice (mod (inc i) n)))

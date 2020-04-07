@@ -231,11 +231,12 @@
         (if (= i (count branches))
           result
           (let [branch (nth branches i)
-                ;; f inserts an "evaluated" branch into "unevaluated" branches
-                f (fn [branch'] (ast/parallel (reduce into
-                                                      [(subvec branches 0 i)
-                                                       [branch']
-                                                       (subvec branches (inc i) (count branches))])))
+                branches-before (subvec branches 0 i)
+                branches-after (subvec branches (inc i) (count branches))
+                ;; f inserts an "evaluated" branch between (possibly before or after) "unevaluated" branches
+                f (fn [branch'] (ast/parallel (reduce into [branches-before
+                                                            (if (terminated? branch') [] [branch'])
+                                                            branches-after])))
                 ;; mapv-f maps f over a vector of branches
                 mapv-f (fn [branches'] (mapv #(f %) branches'))
                 ;; map-mapv-f maps mapv-f over a map from actions to vectors of branches
@@ -250,9 +251,16 @@
       {}
       (if (terminated? (first ast))
         (successors (vec (rest ast)))
-        (let [m (successors (first ast))]
-          (update-in m (keys m)
-                     (fn [x] (mapv #(smash (into (if (terminated? %) [] [%]) (rest ast))) x))))))
+        (let [branch (first ast)
+              branches-after (vec (rest ast))
+              ;; f inserts an "evaluated" branch before "unevaluated" branches
+              f (fn [branch'] (reduce into [(if (terminated? branch') [] [branch'])
+                                            branches-after]))
+              ;; mapv-f maps f over a vector of branches
+              mapv-f (fn [branches'] (mapv #(f %) branches'))
+              ;; map-mapv-f maps mapv-f over a map from actions to vectors of branches
+              map-mapv-f (fn [m] (map (fn [[k v]] {k (mapv-f v)}) m))]
+          (merge {} (reduce merge (map-mapv-f (successors branch)))))))
 
     ;; If
     (= (:type ast) :if)

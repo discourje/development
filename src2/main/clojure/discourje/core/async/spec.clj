@@ -111,6 +111,9 @@
 (defn bisimilar? [lts1 lts2]
   (lts/bisimilar? lts1 lts2))
 
+(defn not-bisimilar? [lts1 lts2]
+  (not (bisimilar? lts1 lts2)))
+
 (defn println [lts]
   (clojure.core/println (.toString lts)))
 
