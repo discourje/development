@@ -231,9 +231,18 @@
         (if (= i (count branches))
           result
           (let [branch (nth branches i)
-                m (successors branch)
-                f #(ast/parallel (into (subvec branches 0 i) (into [%] (subvec branches (inc i) (count branches)))))]
-            (recur (inc i) (merge-with into result (if (empty? m) {} (update-in m (keys m) f))))))))
+                ;; f inserts an "evaluated" branch into "unevaluated" branches
+                f (fn [branch'] (ast/parallel (reduce into
+                                                      [(subvec branches 0 i)
+                                                       [branch']
+                                                       (subvec branches (inc i) (count branches))])))
+                ;; mapv-f maps f over a vector of branches
+                mapv-f (fn [branches'] (mapv #(f %) branches'))
+                ;; map-mapv-f maps mapv-f over a map from actions to vectors of branches
+                map-mapv-f (fn [m] (map (fn [[k v]] {k (mapv-f v)}) m))]
+            (recur (inc i) (merge-with into
+                                       result
+                                       (merge {} (reduce merge (map-mapv-f (successors branch))))))))))
 
     ;; Vector
     (vector? ast)
