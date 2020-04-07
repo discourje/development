@@ -400,6 +400,8 @@
                             source (nth transition 0)
                             label (nth transition 1)
                             target (nth transition 2)]
-                        (if (contains? result source)
-                          (update result source #(merge % {label target}))
-                          (merge result {source {label target}}))))))))
+
+                        (if (and (contains? result source)
+                                 (contains? (get result source) label))
+                          (update result source #(merge-with into % {label [target]}))
+                          (merge-with into result {source {label [target]}}))))))))

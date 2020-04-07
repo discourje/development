@@ -196,7 +196,7 @@
                (equals [this o] (= (.toString this) (.toString o)))
                (hashCode [this] (.hashCode (.toString this)))
                (toString [_] (str "!(" (:expr (:predicate ast)) "," sender "," receiver ")")))
-             (ast/end)}
+             [(ast/end)]}
             (= (:type ast) :receive)
             {(reify
                Receive
@@ -207,7 +207,7 @@
                (equals [this o] (= (.toString this) (.toString o)))
                (hashCode [this] (.hashCode (.toString this)))
                (toString [_] (str "?(" (:expr (:predicate ast)) "," sender "," receiver ")")))
-             (ast/end)}
+             [(ast/end)]}
             (= (:type ast) :close)
             {(reify
                Close
@@ -217,11 +217,11 @@
                (equals [this o] (= (.toString this) (.toString o)))
                (hashCode [this] (.hashCode (.toString this)))
                (toString [_] (str "C(" sender "," receiver ")")))
-             (ast/end)}))
+             [(ast/end)]}))
 
     ;; Choice
     (= (:type ast) :choice)
-    (reduce merge (map successors (:branches ast)))
+    (reduce (partial merge-with into) (map successors (:branches ast)))
 
     ;; Parallel
     (= (:type ast) :parallel)
@@ -233,7 +233,7 @@
           (let [branch (nth branches i)
                 m (successors branch)
                 f #(ast/parallel (into (subvec branches 0 i) (into [%] (subvec branches (inc i) (count branches)))))]
-            (recur (inc i) (merge result (if (empty? m) {} (update-in m (keys m) f))))))))
+            (recur (inc i) (merge-with into result (if (empty? m) {} (update-in m (keys m) f))))))))
 
     ;; If
     (= (:type ast) :if)
@@ -253,9 +253,12 @@
       {}
       (if (terminated? (first ast))
         (successors (vec (rest ast)))
+
+
+
         (let [m (successors (first ast))]
           (update-in m (keys m)
-                     #(smash (into (if (terminated? %) [] [%]) (rest ast)))))))
+                     (fn [x] (mapv #(smash (into (if (terminated? %) [] [%]) (rest ast))) x))))))
 
     ;; Application
     (seq? ast)
@@ -272,7 +275,7 @@
 
     ;; Aldebaran
     (satisfies? ast/Aldebaran ast)
-    (LTS. (:v0 ast)
+    (LTS. #{(:v0 ast)}
           (reify
             Function
             (apply [_ v]
@@ -292,7 +295,7 @@
 
     ;; Discourje
     :else
-    (LTS. ast
+    (LTS. #{ast}
           (reify
             Function
             (apply [_ ast] (successors ast)))

@@ -1,25 +1,27 @@
 package discourje.core.async.impl.lts;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 
 public class LTS<Spec> {
 
     private Map<Spec, State<Spec>> states = new LinkedHashMap<>();
 
-    private State<Spec> initialState;
+    private Collection<State<Spec>> initialStates;
 
-    private Function<Spec, Map<Action, Spec>> expander;
+    private Function<Spec, Map<Action, Collection<Spec>>> expander;
 
-    public LTS(Spec initialStateSpec, Function<Spec, Map<Action, Spec>> expander, boolean expandRecursively) {
-        this.initialState = newOrGetState(initialStateSpec);
+    public LTS(Collection<Spec> initialStateSpecs, Function<Spec, Map<Action, Collection<Spec>>> expander, boolean expandRecursively) {
+        this.initialStates = new LinkedHashSet<>();
+        for (Spec initialStateSpec : initialStateSpecs) {
+            this.initialStates.add(newOrGetState(initialStateSpec));
+        }
+
         this.expander = expander;
-        
         if (expandRecursively) {
-            this.initialState.expandRecursively();
+            for (State<Spec> initialState : initialStates) {
+                initialState.expandRecursively();
+            }
         }
     }
 
@@ -28,8 +30,22 @@ public class LTS<Spec> {
         return LTSs.toAldebaran(this);
     }
 
-    public State<Spec> getInitialState() {
-        return initialState;
+    public void expandRecursively() {
+        for (State<Spec> s : states.values()) {
+            s.expandRecursively();
+        }
+    }
+
+    public Collection<Action> getActions() {
+        var actions = new LinkedHashSet<Action>();
+        for (State<Spec> s : states.values()) {
+            actions.addAll(s.getTransitionsOrNull().getActions());
+        }
+        return actions;
+    }
+
+    public Collection<State<Spec>> getInitialStates() {
+        return initialStates;
     }
 
     public Collection<State<Spec>> getStates() {
@@ -42,7 +58,7 @@ public class LTS<Spec> {
         if (s == null) {
 
             s = new State<>() {
-                private Map<Action, State<Spec>> transitions = null;
+                private Transitions<Spec> transitions;
 
                 @Override
                 public boolean equals(Object o) {
@@ -65,20 +81,28 @@ public class LTS<Spec> {
                 @Override
                 public void expandRecursively(int bound) {
                     if (bound > 0) {
+                        var targetsToExpand = new LinkedHashSet<State<Spec>>();
+
                         if (transitions == null) {
-                            transitions = new LinkedHashMap<>();
+                            transitions = new Transitions<>();
                             var source = this;
-                            var targetIds = expander.apply(spec);
-                            for (Action a : targetIds.keySet()) {
-                                var targetId = targetIds.get(a);
-                                var target = newOrGetState(targetId);
-                                source.transitions.put(a, target);
+                            var targetSpecs = expander.apply(spec);
+                            for (Map.Entry<Action, Collection<Spec>> e : targetSpecs.entrySet()) {
+                                var a = e.getKey();
+                                var targets = new LinkedHashSet<State<Spec>>();
+                                for (Spec targetSpec : e.getValue()) {
+                                    var target = newOrGetState(targetSpec);
+                                    targets.add(target);
+                                    if (target.getTransitionsOrNull() == null) {
+                                        targetsToExpand.add(target);
+                                    }
+                                }
+                                source.transitions.targets.put(a, targets);
                             }
                         }
-                        for (State<Spec> target : transitions.values()) {
-                            if (!target.isExpanded()) {
-                                target.expandRecursively(bound - 1);
-                            }
+
+                        for (State<Spec> target : targetsToExpand) {
+                            target.expandRecursively(bound - 1);
                         }
                     }
                 }
@@ -89,22 +113,8 @@ public class LTS<Spec> {
                 }
 
                 @Override
-                public Map<Action, State<Spec>> getTransitions() {
-                    if (!isExpanded()) {
-                        throw new IllegalArgumentException();
-                    }
-
-                    return new LinkedHashMap<>(transitions);
-                }
-
-                @Override
-                public State<Spec> makeTransition(Action a) {
-                    return transitions.get(a);
-                }
-
-                @Override
-                public boolean isExpanded() {
-                    return transitions != null;
+                public Transitions<Spec> getTransitionsOrNull() {
+                    return transitions;
                 }
             };
 
@@ -128,10 +138,35 @@ public class LTS<Spec> {
 
         Spec getSpec();
 
-        Map<Action, State<Spec>> getTransitions();
+        Transitions<Spec> getTransitionsOrNull();
+    }
 
-        State<Spec> makeTransition(Action a);
+    public static class Transitions<Spec> {
 
-        boolean isExpanded();
+        private Map<Action, Collection<State<Spec>>> targets = new LinkedHashMap<>();
+
+        public Collection<Action> getActions() {
+            return targets.keySet();
+        }
+
+        public Collection<State<Spec>> getTargetsOrNull(Action a) {
+            if (targets.containsKey(a)) {
+                return new LinkedHashSet<>(targets.get(a));
+            } else {
+                return null;
+            }
+        }
+
+        public boolean isEmpty() {
+            return size() == 0;
+        }
+
+        public int size() {
+            int i = 0;
+            for (Collection<State<Spec>> c : targets.values()) {
+                i += c.size();
+            }
+            return i;
+        }
     }
 }

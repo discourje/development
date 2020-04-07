@@ -9,15 +9,16 @@ import java.util.function.Function;
 public class LTSs {
 
     public static boolean bisimilar(LTS<?> lts1, LTS<?> lts2) {
+        lts1.expandRecursively();
+        lts2.expandRecursively();
 
         var states = new LinkedHashSet<State<?>>();
         states.addAll(lts1.getStates());
         states.addAll(lts2.getStates());
 
         var actions = new HashSet<Action>();
-        for (State<?> s : states) {
-            actions.addAll(s.getTransitions().keySet());
-        }
+        actions.addAll(lts1.getActions());
+        actions.addAll(lts2.getActions());
 
         var partition = new HashSet<Set<State<?>>>();
         partition.add(states);
@@ -36,7 +37,8 @@ public class LTSs {
                         complement.clear();
 
                         for (State<?> s : block) {
-                            if (splitter.contains(s.getTransitions().get(a))) {
+                            var targets = s.getTransitionsOrNull().getTargetsOrNull(a);
+                            if (targets != null && splitter.containsAll(targets)) {
                                 intersection.add(s);
                             } else {
                                 complement.add(s);
@@ -64,20 +66,30 @@ public class LTSs {
             }
         }
 
-        for (Set<State<?>> block : partition) {
-            if (block.contains(lts1.getInitialState())) {
-                return block.contains(lts2.getInitialState());
+        for (State<?> initialState1 : lts1.getInitialStates()) {
+            for (State<?> initialState2 : lts2.getInitialStates()) {
+                var b = false;
+                for (Set<State<?>> block : partition) {
+                    b = block.contains(initialState1) && block.contains(initialState2);
+                    if (b) break;
+                }
+                if (!b) return false;
             }
         }
-        return false;
+
+        return true;
     }
 
     public static String toAldebaran(LTS<?> lts) {
+        if (lts.getInitialStates().size() != 1) {
+            throw new IllegalArgumentException();
+        }
+        var initialState = lts.getInitialStates().iterator().next();
 
         var identifiers = new LinkedHashMap<State<?>, String>();
         var i = 1;
         for (State<?> s : lts.getStates()) {
-            if (Objects.equals(lts.getInitialState(), s)) {
+            if (Objects.equals(initialState, s)) {
                 identifiers.put(s, "0");
             } else {
                 identifiers.put(s, Integer.toString(i++));
@@ -86,17 +98,18 @@ public class LTSs {
 
         Function<State<?>, String> stateToAldebaran = source -> {
             var b = new StringBuilder();
-            var transitions = source.getTransitions();
-            for (Action l : transitions.keySet()) {
-                var target = transitions.get(l);
-                b.append("(");
-                b.append(identifiers.getOrDefault(source, source.getSpec().toString()));
-                b.append(",");
-                b.append("\"").append(l).append("\"");
-                b.append(",");
-                b.append(identifiers.getOrDefault(target, target.getSpec().toString()));
-                b.append(")");
-                b.append(System.lineSeparator());
+            var transitions = source.getTransitionsOrNull();
+            for (Action a : transitions.getActions()) {
+                for (State<?> target : transitions.getTargetsOrNull(a)) {
+                    b.append("(");
+                    b.append(identifiers.getOrDefault(source, source.getSpec().toString()));
+                    b.append(",");
+                    b.append("\"").append(a).append("\"");
+                    b.append(",");
+                    b.append(identifiers.getOrDefault(target, target.getSpec().toString()));
+                    b.append(")");
+                    b.append(System.lineSeparator());
+                }
             }
             b.deleteCharAt(b.length() - 1);
             return b.toString();
@@ -105,11 +118,11 @@ public class LTSs {
         var b = new StringBuilder();
         var n = 0;
         for (State<?> s : lts.getStates()) {
-            n += s.getTransitions().size();
+            n += s.getTransitionsOrNull().size();
         }
         b.append("des (0,").append(n).append(",").append(lts.getStates().size()).append(")");
         for (State<?> s : lts.getStates()) {
-            if (!s.getTransitions().isEmpty()) {
+            if (!s.getTransitionsOrNull().isEmpty()) {
                 b.append(System.lineSeparator());
                 b.append(stateToAldebaran.apply(s));
             }
