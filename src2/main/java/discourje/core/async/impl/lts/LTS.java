@@ -1,11 +1,16 @@
 package discourje.core.async.impl.lts;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 public class LTS<Spec> {
 
-    private Map<Spec, State<Spec>> states = new LinkedHashMap<>();
+    private Map<Spec, State<Spec>> states = new ConcurrentHashMap<>();
 
     private Collection<State<Spec>> initialStates;
 
@@ -51,90 +56,61 @@ public class LTS<Spec> {
         return states.values();
     }
 
-    private synchronized State<Spec> newOrGetState(Spec spec) {
-        var s = states.get(spec);
-        //noinspection Java8MapApi
-        if (s == null) {
+    private State<Spec> newOrGetState(Spec spec) {
+        return states.computeIfAbsent(spec, k -> new State<>() {
 
-            s = new State<>() {
-                private Transitions<Spec> transitions;
+            private AtomicReference<Transitions<Spec>> transitions = new AtomicReference<>(null);
 
-                @Override
-                public boolean equals(Object o) {
-                    if (this == o) return true;
-                    if (o == null || getClass() != o.getClass()) return false;
-                    State<?> state = (State<?>) o;
-                    return Objects.equals(spec, state.getSpec());
-                }
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+                State<?> state = (State<?>) o;
+                return Objects.equals(k, state.getSpec());
+            }
 
-                @Override
-                public int hashCode() {
-                    return Objects.hash(spec);
-                }
+            @Override
+            public int hashCode() {
+                return Objects.hash(k);
+            }
 
-                @Override
-                public String toString() {
-                    return spec.toString();
-                }
+            @Override
+            public String toString() {
+                return k.toString();
+            }
 
-                @Override
-                public synchronized void expandRecursively(int bound) {
-                    if (bound > 0) {
-                        var targetsToExpand = new LinkedHashSet<State<Spec>>();
-
-                        if (transitions == null) {
-                            transitions = new Transitions<>();
-                            var source = this;
-                            var targetSpecs = expander.apply(spec);
-                            for (Map.Entry<Action, Collection<Spec>> e : targetSpecs.entrySet()) {
-                                var a = e.getKey();
-                                for (Spec targetSpec : e.getValue()) {
-                                    var target = newOrGetState(targetSpec);
-                                    source.transitions.addTarget(a, target);
-                                    if (target.getTransitionsOrNull() == null) {
-                                        targetsToExpand.add(target);
-                                    }
-                                }
-                            }
+            @Override
+            public void expandRecursively(int bound) {
+                if (bound > 0 && transitions.get() == null) {
+                    var expansion = new Transitions<Spec>();
+                    var targetSpecs = expander.apply(k);
+                    for (Map.Entry<Action, Collection<Spec>> e : targetSpecs.entrySet()) {
+                        var a = e.getKey();
+                        for (Spec targetSpec : e.getValue()) {
+                            var target = newOrGetState(targetSpec);
+                            expansion.addTarget(a, target);
                         }
+                    }
 
-                        for (State<Spec> target : targetsToExpand) {
+                    transitions.compareAndSet(null, expansion);
+
+                    if (bound > 1) {
+                        for (State<Spec> target : transitions.get().getTargets()) {
                             target.expandRecursively(bound - 1);
                         }
                     }
                 }
+            }
 
-                @Override
-                public Spec getSpec() {
-                    return spec;
-                }
+            @Override
+            public Spec getSpec() {
+                return k;
+            }
 
-                @Override
-                public Transitions<Spec> getTransitionsOrNull() {
-                    return transitions;
-                }
-            };
-
-            states.put(spec, s);
-        }
-
-        return s;
-    }
-
-    public interface State<Spec> {
-
-        default void expand() {
-            expandRecursively(1);
-        }
-
-        default void expandRecursively() {
-            expandRecursively(Integer.MAX_VALUE);
-        }
-
-        void expandRecursively(int bound);
-
-        Spec getSpec();
-
-        Transitions<Spec> getTransitionsOrNull();
+            @Override
+            public Transitions<Spec> getTransitionsOrNull() {
+                return transitions.get();
+            }
+        });
     }
 }

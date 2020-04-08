@@ -13,9 +13,9 @@ public class Transitions<Spec> {
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private Map<String, Map<String, Set<Action>>> closes = new LinkedHashMap<>();
 
-    private Map<Action, Set<LTS.State<Spec>>> targets = new LinkedHashMap<>();
+    private Map<Action, Set<State<Spec>>> targets = new LinkedHashMap<>();
 
-    void addTarget(Action a, LTS.State<Spec> target) {
+    void addTarget(Action a, State<Spec> target) {
         {
             var set = targets.get(a);
             //noinspection Java8MapApi
@@ -52,7 +52,15 @@ public class Transitions<Spec> {
         return targets.keySet();
     }
 
-    public Collection<LTS.State<Spec>> getTargetsOrNull(Action a) {
+    public Collection<State<Spec>> getTargets() {
+        var coll = new LinkedHashSet<State<Spec>>();
+        for (Set<State<Spec>> set : targets.values()) {
+            coll.addAll(set);
+        }
+        return coll;
+    }
+
+    public Collection<State<Spec>> getTargetsOrNull(Action a) {
         if (targets.containsKey(a)) {
             return new LinkedHashSet<>(targets.get(a));
         } else {
@@ -64,7 +72,7 @@ public class Transitions<Spec> {
         return size() == 0;
     }
 
-    public Collection<LTS.State<Spec>> perform(Action.Type type, Object message, String sender, String receiver) {
+    public Collection<State<Spec>> perform(Action.Type type, Object message, String sender, String receiver) {
         var mapMapSet = type.select(sends, receives, closes);
 
         var mapSet = mapMapSet.get(sender);
@@ -77,7 +85,7 @@ public class Transitions<Spec> {
             return Collections.emptySet();
         }
 
-        var result = new LinkedHashSet<LTS.State<Spec>>();
+        var result = new LinkedHashSet<State<Spec>>();
         for (Action a : set) {
             if (a.getPredicate().test(message)) {
                 result.addAll(targets.get(a));
@@ -89,7 +97,7 @@ public class Transitions<Spec> {
 
     public int size() {
         int i = 0;
-        for (Collection<LTS.State<Spec>> c : targets.values()) {
+        for (Collection<State<Spec>> c : targets.values()) {
             i += c.size();
         }
         return i;

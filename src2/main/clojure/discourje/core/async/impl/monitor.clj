@@ -1,10 +1,11 @@
 (ns discourje.core.async.impl.monitor
   (require [discourje.core.async.impl.lts :as lts]))
 
-(deftype Monitor [lts current-states])
+(deftype Monitor [current-states])
 
 (defn monitor [lts]
-  (->Monitor lts (lts/initial-states lts)))
+  (->Monitor (atom (lts/initial-states lts))))
+
 
 
 ;  (require [discourje.core.async.logging :refer :all]

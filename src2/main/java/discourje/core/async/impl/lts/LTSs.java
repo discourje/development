@@ -1,7 +1,5 @@
 package discourje.core.async.impl.lts;
 
-import discourje.core.async.impl.lts.LTS.State;
-
 import java.util.*;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;

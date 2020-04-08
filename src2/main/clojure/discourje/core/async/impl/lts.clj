@@ -3,7 +3,7 @@
             [clojure.set :refer [rename-keys]]
             [discourje.core.async.impl.ast :as ast])
   (:import (java.util.function Function Predicate)
-           (discourje.core.async.impl.lts Action Action$Type LTS LTSs)))
+           (discourje.core.async.impl.lts Action Action$Type LTS State LTSs)))
 
 (defn- smap [ast]
   (zipmap (:vars ast)
@@ -319,6 +319,15 @@
 
 (defn initial-states [lts]
   (.getInitialStates lts))
+
+;(defn perform-send! [states]
+;  (map #(do
+;          (.expand $)
+;          (.perfo)
+;
+;             ) states)
+;
+;  )
 
 (defn bisimilar? [lts1 lts2]
   (LTSs/bisimilar lts1 lts2))
