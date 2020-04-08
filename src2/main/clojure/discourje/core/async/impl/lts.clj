@@ -1,9 +1,9 @@
 (ns discourje.core.async.impl.lts
   (:require [clojure.walk :as w]
-            [clojure.java.shell :refer :all]
+            [clojure.set :refer [rename-keys]]
             [discourje.core.async.impl.ast :as ast])
   (:import (java.util.function Function Predicate)
-           (discourje.core.async.impl.lts Action Send Receive Close LTS LTSs)))
+           (discourje.core.async.impl.lts Action Action$Type LTS LTSs)))
 
 (defn- smap [ast]
   (zipmap (:vars ast)
@@ -154,6 +154,24 @@
 
     :else (throw (Exception.))))
 
+(defn eval-type [type]
+  {:pre [(keyword? type)]}
+  (cond (= type :send)
+        Action$Type/SEND
+        (= type :receive)
+        Action$Type/RECEIVE
+        (= type :close)
+        Action$Type/CLOSE
+        :else (throw (Exception.))))
+
+(defn eval-predicate [predicate]
+  {:pre [(ast/predicate? predicate)]}
+  (let [x (eval (:expr predicate))
+        f (cond
+            (class? x) #(= (type %) x)
+            (fn? x) x)]
+    (reify Predicate (test [_ message] (f message)))))
+
 (defn eval-role [role]
   {:pre [(ast/role? role)]}
   (str (cond
@@ -163,13 +181,6 @@
        (if (empty? (:index-exprs role))
          ""
          (mapv eval (:index-exprs role)))))
-
-(defn eval-predicate [predicate]
-  {:pre [(ast/predicate? predicate)]}
-  (let [x (eval (:expr predicate))]
-    (cond
-      (class? x) #(= (type %) x)
-      (fn? x) x)))
 
 (defn successors [ast]
   ;(println "successors: " (:type ast))
@@ -181,41 +192,19 @@
 
     ;; Action
     (contains? ast/action-types (:type ast))
-    (let [sender (eval-role (:sender ast))
+    (let [predicate (eval-predicate (:predicate ast))
+          sender (eval-role (:sender ast))
           receiver (eval-role (:receiver ast))
-          predicate (eval-predicate (:predicate ast))]
-      (cond (= (:type ast) :send)
-            {(reify
-               Send
-               (getSender [_] (.toString sender))
-               (getReceiver [_] (.toString receiver))
-               (getPredicate [_] (reify Predicate (test [_ message] (predicate message))))
-               Object
-               (equals [this o] (= (.toString this) (.toString o)))
-               (hashCode [this] (.hashCode (.toString this)))
-               (toString [_] (str "!(" (:expr (:predicate ast)) "," sender "," receiver ")")))
-             [(ast/end)]}
-            (= (:type ast) :receive)
-            {(reify
-               Receive
-               (getSender [_] (.toString sender))
-               (getReceiver [_] (.toString receiver))
-               (getPredicate [_] (reify Predicate (test [_ message] (predicate message))))
-               Object
-               (equals [this o] (= (.toString this) (.toString o)))
-               (hashCode [this] (.hashCode (.toString this)))
-               (toString [_] (str "?(" (:expr (:predicate ast)) "," sender "," receiver ")")))
-             [(ast/end)]}
-            (= (:type ast) :close)
-            {(reify
-               Close
-               (getSender [_] (.toString sender))
-               (getReceiver [_] (.toString receiver))
-               Object
-               (equals [this o] (= (.toString this) (.toString o)))
-               (hashCode [this] (.hashCode (.toString this)))
-               (toString [_] (str "C(" sender "," receiver ")")))
-             [(ast/end)]}))
+          type (eval-type (:type ast))
+          name (str (cond (= (:type ast) :send)
+                          "!"
+                          (= (:type ast) :receive)
+                          "?"
+                          (= (:type ast) :close)
+                          "C"
+                          :else (throw (Exception.)))
+                    "(" (if (= (:type ast) :close) "" (str (:expr (:predicate ast)) ",")) sender "," receiver ")")]
+      {(Action. name type predicate sender receiver) [(ast/end)]})
 
     ;; Choice
     (= (:type ast) :choice)
@@ -298,12 +287,18 @@
             (apply [_ v]
               (let [m (get (:edges ast) v)
                     keys (keys m)
-                    vals (map #(reify
-                                 Action
-                                 Object
-                                 (equals [this o] (= (.toString this) (.toString o)))
-                                 (hashCode [this] (.hashCode (.toString this)))
-                                 (toString [_] (str %)))
+                    vals (map #(let [name %
+                                     type (cond (= (first name) \!)
+                                                Action$Type/SEND
+                                                (= (first name) \?)
+                                                Action$Type/RECEIVE
+                                                (= (first name) \C)
+                                                Action$Type/CLOSE
+                                                :else (throw (Exception.)))
+                                     predicate nil
+                                     sender nil
+                                     receiver nil]
+                                 (Action. name type predicate sender receiver))
                               keys)]
                 (if (nil? keys)
                   {}
@@ -321,6 +316,9 @@
    (.expandRecursively lts))
   ([lts bound]
    (.expandRecursively lts bound)))
+
+(defn initial-states [lts]
+  (.getInitialStates lts))
 
 (defn bisimilar? [lts1 lts2]
   (LTSs/bisimilar lts1 lts2))

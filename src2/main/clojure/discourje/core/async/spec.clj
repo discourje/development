@@ -1,5 +1,6 @@
 (ns discourje.core.async.spec
-  (:require [discourje.core.async.impl.ast :as ast]
+  (:require [clojure.java.shell :refer [sh]]
+            [discourje.core.async.impl.ast :as ast]
             [discourje.core.async.impl.lts :as lts]))
 
 ;;;;
