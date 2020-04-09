@@ -39,6 +39,22 @@
 ;;;; Actions
 ;;;;
 
+(deftest -->-tests
+  (let [lts1 (s/lts (s/--> ::alice ::bob))
+        lts2 (s/lts (s/aldebaran des (0, 2, 3)
+                                 (0, "‽(Object,alice,bob)", 1)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (s/lts (s/--> Integer ::alice ::bob))
+        lts2 (s/lts (s/aldebaran des (0, 2, 3)
+                                 (0, "‽(Integer,alice,bob)", 1)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (s/lts (s/--> (fn [x] (= x 4)) ::alice ::bob))
+        lts2 (s/lts (s/aldebaran des (0, 2, 3)
+                                 (0, "‽((fn [x] (= x 4)),alice,bob)", 1)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2))))
+
 (deftest -->>-tests
   (let [lts1 (s/lts (s/-->> ::alice ::bob))
         lts2 (s/lts (s/aldebaran des (0, 2, 3)

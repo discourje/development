@@ -58,10 +58,12 @@ public class Action {
     }
 
     public enum Type {
-        SEND, RECEIVE, CLOSE;
+        SYNC, SEND, RECEIVE, CLOSE;
 
-        public <T> T select(T send, T receive, T close) {
+        public <T> T select(T sync, T send, T receive, T close) {
             switch (this) {
+                case SYNC:
+                    return sync;
                 case SEND:
                     return send;
                 case RECEIVE:

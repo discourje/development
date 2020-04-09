@@ -5,6 +5,9 @@ import java.util.*;
 public class Transitions<Spec> {
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+    private Map<String, Map<String, Set<Action>>> syncs = new LinkedHashMap<>();
+
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private Map<String, Map<String, Set<Action>>> sends = new LinkedHashMap<>();
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
@@ -29,7 +32,7 @@ public class Transitions<Spec> {
             var sender = a.getSender();
             var receiver = a.getReceiver();
 
-            var mapMapSet = a.getType().select(sends, receives, closes);
+            var mapMapSet = a.getType().select(syncs, sends, receives, closes);
             var mapSet = mapMapSet.get(sender);
             //noinspection Java8MapApi
             if (mapSet == null) {
@@ -73,7 +76,7 @@ public class Transitions<Spec> {
     }
 
     public Collection<State<Spec>> perform(Action.Type type, Object message, String sender, String receiver) {
-        var mapMapSet = type.select(sends, receives, closes);
+        var mapMapSet = type.select(syncs, sends, receives, closes);
 
         var mapSet = mapMapSet.get(sender);
         if (mapSet == null) {

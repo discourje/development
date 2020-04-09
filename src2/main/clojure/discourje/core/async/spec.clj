@@ -24,6 +24,14 @@
   [expr]
   `(ast/predicate '~expr))
 
+(defmacro -->
+  ([sender-expr receiver-expr]
+   `(--> ~'Object ~sender-expr ~receiver-expr))
+  ([predicate-expr sender-expr receiver-expr]
+   `(ast/sync (ast/predicate '~predicate-expr)
+              (ast/role '~sender-expr)
+              (ast/role '~receiver-expr))))
+
 (defmacro -->>
   ([sender-expr receiver-expr]
    `(-->> ~'Object ~sender-expr ~receiver-expr))

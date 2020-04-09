@@ -159,21 +159,25 @@
     (let [predicate (ast/eval-predicate (:predicate ast))
           sender (ast/eval-role (:sender ast))
           receiver (ast/eval-role (:receiver ast))
-          type (cond (= (:type ast) :send)
+          type (cond (= (:type ast) :sync)
+                     Action$Type/SYNC
+                     (= (:type ast) :send)
                      Action$Type/SEND
                      (= (:type ast) :receive)
                      Action$Type/RECEIVE
                      (= (:type ast) :close)
                      Action$Type/CLOSE
                      :else (throw (Exception.)))
-          name (str (cond (= (:type ast) :send)
+          name (str (cond (= (:type ast) :sync)
+                          "‽"
+                          (= (:type ast) :send)
                           "!"
                           (= (:type ast) :receive)
                           "?"
                           (= (:type ast) :close)
                           "C"
                           :else (throw (Exception.)))
-                    "(" (if (= (:type ast) :send) (str (:expr (:predicate ast)) ",") "") sender "," receiver ")")]
+                    "(" (if (or (= (:type ast) :sync) (= (:type ast) :send)) (str (:expr (:predicate ast)) ",") "") sender "," receiver ")")]
       {(Action. name type (reify Predicate (test [_ message] (predicate message))) sender receiver) [(ast/end)]})
 
     ;; Choice
@@ -258,7 +262,9 @@
               (let [m (get (:edges ast) v)
                     keys (keys m)
                     vals (map #(let [name %
-                                     type (cond (= (first name) \!)
+                                     type (cond (= (first name) \‽)
+                                                Action$Type/SYNC
+                                                (= (first name) \!)
                                                 Action$Type/SEND
                                                 (= (first name) \?)
                                                 Action$Type/RECEIVE
@@ -306,6 +312,8 @@
           {}
           (recur (rest todo) (clojure.set/union result target-states)))))))
 
+(defn expand-and-sync! [source-states message sender receiver]
+  (expand-and-perform! source-states Action$Type/SYNC message sender receiver))
 (defn expand-and-send! [source-states message sender receiver]
   (expand-and-perform! source-states Action$Type/SEND message sender receiver))
 (defn expand-and-receive! [source-states sender receiver]

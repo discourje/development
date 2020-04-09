@@ -78,7 +78,13 @@
 (defrecord Action [type predicate sender receiver]
   Discourje)
 
-(def action-types #{:send :receive :close})
+(def action-types #{:sync :send :receive :close})
+
+(defn sync [predicate sender receiver]
+  {:pre [(predicate? predicate)
+         (role? sender)
+         (role? receiver)]}
+  (->Action :sync predicate sender receiver))
 
 (defn send [predicate sender receiver]
   {:pre [(predicate? predicate)

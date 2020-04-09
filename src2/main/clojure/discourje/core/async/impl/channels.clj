@@ -3,63 +3,98 @@
             [discourje.core.async.impl.ast :as ast]
             [discourje.core.async.impl.monitors :as monitors]))
 
-(deftype Channel [sender receiver ch ch-ghost1 ch-ghost2 closed? monitor])
+(deftype Channel [sender receiver n ch ch-ghost1 ch-ghost2 closed? monitor])
 
 (defn channel? [x]
   {:pre [true]}
   (= (type x) Channel))
 
 (defn channel [n sender receiver monitor]
-  {:pre [(number? n) (> n 0)
+  {:pre [(number? n) (>= n 0)
          (ast/role? sender)
          (ast/role? receiver)
          (monitors/monitor? monitor)]}
   (->Channel (ast/eval-role sender)
              (ast/eval-role receiver)
-             (a/chan n)
-             (a/chan n)
-             (a/chan n)
+             n
+             (if (= n 0) (a/chan) (a/chan n))
+             (if (= n 0) (a/chan) (a/chan n))
+             (if (= n 0) nil (a/chan n))
              false
              monitor))
 
+(defn buffered? [channel]
+  {:pre [(channel? channel)]}
+  (> (.-n channel) 0))
+
+
 (def token 0)
+(def sync-not-ok (Object.))
 
 ;;;;
 ;;;; put! and take!
 ;;;;
 
 (defn put!
-  ([channel message f]
-   (a/put! (.-ch_ghost1 channel)
-           token
-           #(do %
-                (if (monitors/verify-send! message
-                                           (.-sender channel)
-                                           (.-receiver channel)
-                                           (.-monitor channel))
-                  ;; If ok, commit
-                  (do
-                    (a/put! (.-ch channel) message f)
-                    (a/put! (.-ch_ghost2 channel) token f))
+  [channel message f]
+  {:pre [(channel? channel) (fn? f)]}
+  (if (buffered? channel)
 
-                  ;; If not ok, rollback
-                  (do
-                    (a/take! (.-ch_ghost1 channel) identity)
-                    (throw (RuntimeException.))))))))
-
-(defn take!
-  ([channel f]
-   (a/take! (.-ch_ghost2 channel)
-            #(do %
-                 (if (monitors/verify-receive! (.-sender channel)
+    ;; Buffered channel
+    (a/put! (.-ch_ghost1 channel)
+            token
+            (fn [_] (if (monitors/verify-send! message
+                                               (.-sender channel)
                                                (.-receiver channel)
                                                (.-monitor channel))
-                   ;; If ok, commit
-                   (do
-                     (a/take! (.-ch channel) f)
-                     (a/take! (.-ch_ghost1 channel) f))
+                      ;; If ok, commit
+                      (a/put! (.-ch channel)
+                              message
+                              (fn [x] (a/put! (.-ch_ghost2 channel)
+                                              token
+                                              (fn [_] (f x)))))
 
-                   ;; If not ok, rollback
-                   (do
-                     (a/put! (.-ch_ghost2 channel) token)
-                     (throw (RuntimeException.))))))))
+                      ;; If not ok, rollback
+                      (a/take! (.-ch_ghost1 channel)
+                               (fn [_] (throw (RuntimeException.)))))))
+
+    ;; Unbuffered channel
+    (a/put! (.-ch_ghost1 channel)
+            token
+            (fn [_] (if (monitors/verify-sync! message
+                                               (.-sender channel)
+                                               (.-receiver channel)
+                                               (.-monitor channel))
+                      (a/put! (.-ch channel)
+                              message
+                              f)
+                      (a/put! (.-ch channel)
+                              sync-not-ok
+                              (fn [_] (throw (RuntimeException.)))))))))
+
+(defn take!
+  [channel f]
+  {:pre [(channel? channel) (fn? f)]}
+  (if (buffered? channel)
+
+    ;; Buffered channel
+    (a/take! (.-ch_ghost2 channel)
+             (fn [_] (if (monitors/verify-receive! (.-sender channel)
+                                                   (.-receiver channel)
+                                                   (.-monitor channel))
+                       ;; If ok, commit
+                       (a/take! (.-ch channel)
+                                (fn [x] (a/take! (.-ch_ghost1 channel)
+                                                 (fn [_] (f x)))))
+
+                       ;; If not ok, rollback
+                       (a/put! (.-ch_ghost2 channel)
+                               token
+                               (fn [_] (throw (RuntimeException.)))))))
+
+    ;; Unbuffered channel
+    (a/take! (.-ch_ghost1 channel)
+             (fn [_] (a/take! (.-ch channel)
+                              (fn [x] (if (= x sync-not-ok)
+                                        (throw (RuntimeException.))
+                                        (f x))))))))

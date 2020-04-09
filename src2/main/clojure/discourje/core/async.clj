@@ -6,9 +6,8 @@
 ;;;;
 
 (defn chan
-  (;[sender receiver monitor] TODO
-   [_ _ _]
-   (throw (UnsupportedOperationException.)))
+  ([sender receiver monitor]
+   (chan 0 sender receiver monitor))
   ([buf-or-n sender receiver monitor]
    (channels/channel buf-or-n sender receiver monitor))
   (;[buf-or-n xform sender receiver monitor]
