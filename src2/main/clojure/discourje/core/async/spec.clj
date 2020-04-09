@@ -1,7 +1,8 @@
 (ns discourje.core.async.spec
   (:require [clojure.java.shell :refer [sh]]
             [discourje.core.async.impl.ast :as ast]
-            [discourje.core.async.impl.lts :as lts]))
+            [discourje.core.async.impl.lts :as lts]
+            [discourje.core.async.impl.monitors :as monitors]))
 
 ;;;;
 ;;;; Discourje: Roles
@@ -30,8 +31,7 @@
    [`(ast/send (ast/predicate '~predicate-expr)
                (ast/role '~sender-expr)
                (ast/role '~receiver-expr))
-    `(ast/receive (ast/predicate '~predicate-expr)
-                  (ast/role '~sender-expr)
+    `(ast/receive (ast/role '~sender-expr)
                   (ast/role '~receiver-expr))]))
 
 (defmacro close
@@ -149,18 +149,18 @@
   (future (clojure.java.shell/sh (str mcrl2-root-dir "/bin/ltsgraph") tmp-file)))
 
 ;;;;
-;;;; Temp
+;;;; Monitors
 ;;;;
 
-(ltsgraph (lts (aldebaran des (0, 6, 4)
-                          (0, "!(Object,alice,bob[0])", 1)
-                          (0, "!(Object,alice,bob[1])", 2)
-                          (0, "!(Object,alice,bob[2])", 3)
-                          (1, "?(Object,alice,bob[0])", 0)
-                          (2, "?(Object,alice,bob[1])", 0)
-                          (3, "?(Object,alice,bob[2])", 0)))
-          "/Applications/mCRL2.app/Contents"
-          "/Users/sungshik/Desktop/lts.aut")
+(defn monitor [ast-or-lts]
+  {:pre [(or (ast/ast? ast-or-lts) (lts/lts? ast-or-lts))]}
+  (cond (ast/ast? ast-or-lts)
+        (monitor (lts/lts ast-or-lts))
+
+        (lts/lts? ast-or-lts)
+        (monitors/monitor ast-or-lts)
+
+        :else (throw (IllegalArgumentException.))))
 
 ;;;;
 ;;;; TODO: Everything below is part of monitoring and should be put elsewhere at some point

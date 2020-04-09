@@ -41,8 +41,18 @@
           (vector? index-exprs)]}
    (->Role name-expr index-exprs)))
 
+(defn eval-role [role]
+  {:pre [(role? role)]}
+  (str (cond
+         (string? (:name-expr role)) (:name-expr role)
+         (keyword? (:name-expr role)) (get-role-name (:name-expr role))
+         :else (throw (Exception.)))
+       (if (empty? (:index-exprs role))
+         ""
+         (mapv eval (:index-exprs role)))))
+
 ;;;;
-;;;; Discourje: Actions
+;;;; Discourje: Predicates
 ;;;;
 
 (defrecord Predicate [expr])
@@ -53,6 +63,17 @@
 (defn predicate [expr]
   {:pre []}
   (->Predicate expr))
+
+(defn eval-predicate [predicate]
+  {:pre [(predicate? predicate)]}
+  (let [x (eval (:expr predicate))]
+    (cond
+      (class? x) #(instance? x %)
+      (fn? x) x)))
+
+;;;;
+;;;; Discourje: Actions
+;;;;
 
 (defrecord Action [type predicate sender receiver]
   Discourje)
@@ -65,11 +86,10 @@
          (role? receiver)]}
   (->Action :send predicate sender receiver))
 
-(defn receive [predicate sender receiver]
-  {:pre [(predicate? predicate)
-         (role? sender)
+(defn receive [sender receiver]
+  {:pre [(role? sender)
          (role? receiver)]}
-  (->Action :receive predicate sender receiver))
+  (->Action :receive (predicate '(fn [_] true)) sender receiver))
 
 (defn close [sender receiver]
   {:pre [(role? sender)
@@ -405,3 +425,8 @@
                                  (contains? (get result source) label))
                           (update result source #(merge-with into % {label [target]}))
                           (merge-with into result {source {label [target]}}))))))))
+
+(defn ast? [x]
+  (or (satisfies? Discourje x)
+      (vector? x)
+      (satisfies? Aldebaran x)))

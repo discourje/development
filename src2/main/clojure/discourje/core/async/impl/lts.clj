@@ -3,15 +3,9 @@
             [clojure.set :refer [rename-keys]]
             [discourje.core.async.impl.ast :as ast])
   (:import (java.util.function Function Predicate)
-           (discourje.core.async.impl.lts Action Action$Type LTS State LTSs)))
-
-(defn- smap [ast]
-  (zipmap (:vars ast)
-          ;(map eval (:exprs ast))))
-          (:exprs ast)))
+           (discourje.core.async.impl.lts Action Action$Type State LTS LTSs)))
 
 (defn substitute [ast smap]
-  ;(println ast)
   (cond
 
     ;; End
@@ -60,7 +54,6 @@
     :else (throw (Exception.))))
 
 (defn unfold [loop ast]
-  ;(println "unfold: " ast)
   (cond
 
     ;; End
@@ -137,7 +130,8 @@
 
     ;; Loop
     (= (:type ast) :loop)
-    (terminated? (unfold ast (substitute (:body ast) (smap ast))))
+    (terminated? (unfold ast (substitute (:body ast)
+                                         (zipmap (:vars ast) (:exprs ast)))))
 
     ;; Recur
     (= (:type ast) :recur)
@@ -146,44 +140,14 @@
     ;; Application
     (seq? ast)
     (let [name (first ast)
-          ;vals (map eval (rest ast))
-          vals (rest ast)
-          body (:body (get (get @ast/registry name) (count vals)))
-          vars (:vars (get (get @ast/registry name) (count vals)))]
-      (terminated? (substitute body (zipmap vars vals))))
+          exprs (rest ast)
+          body (:body (get (get @ast/registry name) (count exprs)))
+          vars (:vars (get (get @ast/registry name) (count exprs)))]
+      (terminated? (substitute body (zipmap vars exprs))))
 
     :else (throw (Exception.))))
 
-(defn eval-type [type]
-  {:pre [(keyword? type)]}
-  (cond (= type :send)
-        Action$Type/SEND
-        (= type :receive)
-        Action$Type/RECEIVE
-        (= type :close)
-        Action$Type/CLOSE
-        :else (throw (Exception.))))
-
-(defn eval-predicate [predicate]
-  {:pre [(ast/predicate? predicate)]}
-  (let [x (eval (:expr predicate))
-        f (cond
-            (class? x) #(= (type %) x)
-            (fn? x) x)]
-    (reify Predicate (test [_ message] (f message)))))
-
-(defn eval-role [role]
-  {:pre [(ast/role? role)]}
-  (str (cond
-         (string? (:name-expr role)) (:name-expr role)
-         (keyword? (:name-expr role)) (ast/get-role-name (:name-expr role))
-         :else (throw (Exception.)))
-       (if (empty? (:index-exprs role))
-         ""
-         (mapv eval (:index-exprs role)))))
-
 (defn successors [ast]
-  ;(println "successors: " (:type ast))
   (cond
 
     ;; End
@@ -192,10 +156,16 @@
 
     ;; Action
     (contains? ast/action-types (:type ast))
-    (let [predicate (eval-predicate (:predicate ast))
-          sender (eval-role (:sender ast))
-          receiver (eval-role (:receiver ast))
-          type (eval-type (:type ast))
+    (let [predicate (ast/eval-predicate (:predicate ast))
+          sender (ast/eval-role (:sender ast))
+          receiver (ast/eval-role (:receiver ast))
+          type (cond (= (:type ast) :send)
+                     Action$Type/SEND
+                     (= (:type ast) :receive)
+                     Action$Type/RECEIVE
+                     (= (:type ast) :close)
+                     Action$Type/CLOSE
+                     :else (throw (Exception.)))
           name (str (cond (= (:type ast) :send)
                           "!"
                           (= (:type ast) :receive)
@@ -203,8 +173,8 @@
                           (= (:type ast) :close)
                           "C"
                           :else (throw (Exception.)))
-                    "(" (if (= (:type ast) :close) "" (str (:expr (:predicate ast)) ",")) sender "," receiver ")")]
-      {(Action. name type predicate sender receiver) [(ast/end)]})
+                    "(" (if (= (:type ast) :send) (str (:expr (:predicate ast)) ",") "") sender "," receiver ")")]
+      {(Action. name type (reify Predicate (test [_ message] (predicate message))) sender receiver) [(ast/end)]})
 
     ;; Choice
     (= (:type ast) :choice)
@@ -259,7 +229,8 @@
 
     ;; Loop
     (= (:type ast) :loop)
-    (successors (unfold ast (substitute (:body ast) (smap ast))))
+    (successors (unfold ast (substitute (:body ast)
+                                        (zipmap (:vars ast) (:exprs ast)))))
 
     ;; Recur
     (= (:type ast) :recur)
@@ -268,11 +239,10 @@
     ;; Application
     (seq? ast)
     (let [name (first ast)
-          ;(mapv eval (rest ast))
-          vals (rest ast)
-          body (:body (get (get @ast/registry name) (count vals)))
-          vars (:vars (get (get @ast/registry name) (count vals)))]
-      (successors (substitute body (zipmap vars vals))))
+          exprs (rest ast)
+          body (:body (get (get @ast/registry name) (count exprs)))
+          vars (:vars (get (get @ast/registry name) (count exprs)))]
+      (successors (substitute body (zipmap vars exprs))))
 
     :else (throw (Exception.))))
 
@@ -311,6 +281,9 @@
             Function
             (apply [_ ast] (successors ast))))))
 
+(defn lts? [x]
+  (= (type x) LTS))
+
 (defn expandRecursively!
   ([lts]
    (.expandRecursively lts))
@@ -320,14 +293,25 @@
 (defn initial-states [lts]
   (.getInitialStates lts))
 
-;(defn perform-send! [states]
-;  (map #(do
-;          (.expand $)
-;          (.perfo)
-;
-;             ) states)
-;
-;  )
+(defn- expand-and-perform! [source-states type message sender receiver]
+  (loop [todo source-states
+         result {}]
+    (if (empty? todo)
+      result
+      (let [source-state (first todo)
+            _ (.expand source-state)
+            target-states (.perform (.getTransitionsOrNull source-state)
+                                    type message sender receiver)]
+        (if (empty? target-states)
+          {}
+          (recur (rest todo) (clojure.set/union result target-states)))))))
+
+(defn expand-and-send! [source-states message sender receiver]
+  (expand-and-perform! source-states Action$Type/SEND message sender receiver))
+(defn expand-and-receive! [source-states sender receiver]
+  (expand-and-perform! source-states Action$Type/RECEIVE nil sender receiver))
+(defn expand-and-close! [source-states sender receiver]
+  (expand-and-perform! source-states Action$Type/CLOSE nil sender receiver))
 
 (defn bisimilar? [lts1 lts2]
   (LTSs/bisimilar lts1 lts2))
