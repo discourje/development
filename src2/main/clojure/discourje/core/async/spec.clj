@@ -205,20 +205,6 @@
 ;;;; TODO: Everything below is part of monitoring and should be put elsewhere at some point
 ;;;;
 
-;(defmacro close!
-;  "Close channel pair"
-;  ([sender receiver infrastructure]
-;   `(close-channel! ~sender ~receiver ~infrastructure))
-;  ([channel]
-;   `(close-channel! ~channel)))
-;
-;(defmacro closed?
-;  "Check whether a channel is closed"
-;  ([sender receiver infra]
-;   `(channel-closed? ~sender ~receiver ~infra))
-;  ([channel]
-;   `(channel-closed? ~channel)))
-
 ;(defmacro add-infrastructure
 ;  "adds infrastructure to the mep (channels)"
 ;  ([message-exchange-pattern]
