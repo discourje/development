@@ -1,8 +1,10 @@
 (ns discourje.core.async
-  (:require [discourje.core.async.impl.channels :as channels]))
+  (:require [clojure.core.async :as a]
+            [discourje.core.async.spec :as s]
+            [discourje.core.async.impl.channels :as channels]))
 
 ;;;;
-;;;; role and chan
+;;;; chan
 ;;;;
 
 (defn chan
@@ -36,3 +38,52 @@
   (;[port fn1 on-caller?]
    [_ _ _]
    (throw (UnsupportedOperationException.))))
+
+;;;;
+;;;; >!!, <!!, and thread
+;;;;
+
+(defn >!!
+  [port val]
+  (channels/>!! port val))
+
+(defn <!!
+  [port]
+  (channels/<!! port))
+
+(defmacro thread
+  [& body]
+  `(let [m# (s/monitor (s/* (s/any #{"sender" "receiver"})))
+         c# (channels/channel 1 (s/role "sender") (s/role "receiver") m#)]
+     (a/take! (a/thread-call (^:once fn* [] ~@body))
+              (fn [x#]
+                (if (not (nil? x#))
+                  (channels/>!! c# x#))
+                (channels/close! c#)))
+     c#))
+
+;;;;
+;;;; >!, <!, and go
+;;;;
+
+;; TODO
+
+;;;;
+;;;; dropping-buffer and sliding-buffer
+;;;;
+
+;; TODO
+
+;;;;
+;;;; close!
+;;;;
+
+(defn close!
+  [chan]
+  (channels/close! chan))
+
+;;;;
+;;;; alts! and alts!!
+;;;;
+
+;; TODO
