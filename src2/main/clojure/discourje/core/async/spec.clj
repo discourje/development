@@ -89,7 +89,19 @@
   `(ast/recur '~name '[~@more]))
 
 ;;;;
-;;;; Discourje: Registry operators
+;;;; Discourje: Regex operators
+;;;;
+
+(def ^:private *-counter (atom 0))
+
+(defmacro *
+  [body & more]
+  (let [name (keyword (str "*" (swap! *-counter inc)))]
+    `(ast/loop '~name [] (ast/choice [[~body ~@more (ast/recur '~name [])]
+                                      (ast/end)]))))
+
+;;;;
+;;;; Discourje: Definition operators
 ;;;;
 
 (defmacro def

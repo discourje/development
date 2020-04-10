@@ -196,7 +196,11 @@
                 branches-after (subvec branches (inc i) (count branches))
                 ;; f inserts an "evaluated" branch between (possibly before or after) "unevaluated" branches
                 f (fn [branch'] (ast/parallel (reduce into [branches-before
-                                                            (if (terminated? branch') [] [branch'])
+                                                            ;(if (and (terminated? branch')
+                                                            ;         (empty? (successors branch')))
+                                                            ;  []
+                                                            ;  [branch'])
+                                                            [branch']
                                                             branches-after])))
                 ;; mapv-f maps f over a vector of branches
                 mapv-f (fn [branches'] (mapv #(f %) branches'))
@@ -210,22 +214,28 @@
     (vector? ast)
     (if (empty? ast)
       {}
-      (if (terminated? (first ast))
-        (successors (vec (rest ast)))
-        (let [branch (first ast)
-              branches-after (vec (rest ast))
-              ;; f inserts an "evaluated" branch before "unevaluated" branches
-              f (fn [branch']
-                  (let [branches' (reduce into [(if (terminated? branch') [] [branch'])
-                                                branches-after])]
-                    (if (= 1 (count branches'))
-                      (first branches')
-                      branches')))
-              ;; mapv-f maps f over a vector of branches
-              mapv-f (fn [branches'] (mapv #(f %) branches'))
-              ;; map-mapv-f maps mapv-f over a map from actions to vectors of branches
-              map-mapv-f (fn [m] (map (fn [[k v]] {k (mapv-f v)}) m))]
-          (merge {} (reduce merge (map-mapv-f (successors branch)))))))
+      (merge-with into
+                  (let [branch (first ast)
+                        branches-after (vec (rest ast))
+                        ;; f inserts an "evaluated" branch before "unevaluated" branches
+                        f (fn [branch']
+                            (let [branches' (reduce into [;(if (and (terminated? branch')
+                                                          ;         (empty? (successors branch')))
+                                                          ;  []
+                                                          ;  [branch'])
+                                                          [branch']
+                                                          branches-after])]
+                              (if (= 1 (count branches'))
+                                (first branches')
+                                branches')))
+                        ;; mapv-f maps f over a vector of branches
+                        mapv-f (fn [branches'] (mapv #(f %) branches'))
+                        ;; map-mapv-f maps mapv-f over a map from actions to vectors of branches
+                        map-mapv-f (fn [m] (map (fn [[k v]] {k (mapv-f v)}) m))]
+                    (merge {} (reduce merge (map-mapv-f (successors branch)))))
+                  (if (terminated? (first ast))
+                    (successors (vec (rest ast)))
+                    {})))
 
     ;; If
     (= (:type ast) :if)

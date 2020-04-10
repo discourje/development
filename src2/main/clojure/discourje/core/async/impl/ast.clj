@@ -158,7 +158,7 @@
   (->Recur :recur name exprs))
 
 ;;;;
-;;;; Discourje: Registry operators
+;;;; Discourje: Definition operators
 ;;;;
 
 (def registry (atom {}))

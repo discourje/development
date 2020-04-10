@@ -534,7 +534,53 @@
 (loop-recur-tests)
 
 ;;;;;
-;;;;; Registry operators
+;;;;; Regex operators
+;;;;;
+
+(s/* (s/* (s/-->> ::alice ::bob))
+     (s/-->> ::alice ::carol))
+
+(deftest *-tests
+  (let [lts1 (s/lts (s/* (s/-->> ::alice ::bob)))
+        lts2 (s/lts (s/aldebaran des (0, 2, 2)
+                                 (0, "!(Object,alice,bob)", 1)
+                                 (1, "?(alice,bob)", 0)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (s/lts [(s/* (s/-->> ::alice ::bob))
+                     (s/-->> ::alice ::carol)])
+        lts2 (s/lts (s/aldebaran des (0, 2, 2)
+                                 (0, "!(Object,alice,bob)", 1)
+                                 (1, "?(alice,bob)", 0)
+                                 (0, "!(Object,alice,carol)", 2)
+                                 (2, "?(alice,carol)", 3)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (s/lts (s/* (s/* (s/-->> ::alice ::bob))
+                         (s/-->> ::alice ::carol)))
+        lts2 (s/lts (s/aldebaran des (0, 2, 2)
+                                 (0, "!(Object,alice,bob)", 1)
+                                 (1, "?(alice,bob)", 0)
+                                 (0, "!(Object,alice,carol)", 2)
+                                 (2, "?(alice,carol)", 0)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (s/lts (s/* (s/-->> ::alice ::bob)))
+        lts2 (s/lts [(s/* (s/-->> ::alice ::bob))
+                     (s/* (s/-->> ::alice ::bob))])]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  ;; FIXME: The following should work, but it doesn't. The problem is that s/* is implemented using s/loop and s/recur,
+  ;; but the recursion isn't guarded if stars are nested. Only way to solve this seems to make * a first-class.
+  ;(let [lts1 (s/lts (s/* (s/-->> ::alice ::bob)))
+  ;      lts2 (s/lts (s/* (s/* (s/-->> ::alice ::bob))))]
+  ;  (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+  )
+
+(*-tests)
+
+;;;;;
+;;;;; Definition operators
 ;;;;;
 
 (deftest apply-tests
