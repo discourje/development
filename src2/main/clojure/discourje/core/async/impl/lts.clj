@@ -314,8 +314,8 @@
       result
       (let [source-state (first todo)
             _ (.expand source-state)
-            target-states (.perform (.getTransitionsOrNull source-state)
-                                    type message sender receiver)]
+            target-states (set (.perform (.getTransitionsOrNull source-state)
+                                         type message sender receiver))]
         (if (empty? target-states)
           {}
           (recur (rest todo) (clojure.set/union result target-states)))))))
