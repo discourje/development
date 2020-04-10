@@ -90,6 +90,53 @@
 (close-tests)
 
 ;;;;
+;;;; Nullary operators
+;;;;
+
+(deftest any-tests
+  (let [lts1 (s/lts (s/any #{::alice ::bob}))
+        lts2 (s/lts (s/aldebaran des (0, 8, 2)
+                                 (0, "‽(Object,alice,bob)", 1)
+                                 (0, "!(Object,alice,bob)", 1)
+                                 (0, "?(alice,bob)", 1)
+                                 (0, "C(alice,bob)", 1)
+                                 (0, "‽(Object,bob,alice)", 1)
+                                 (0, "!(Object,bob,alice)", 1)
+                                 (0, "?(bob,alice)", 1)
+                                 (0, "C(bob,alice)", 1)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (s/lts (s/any #{::alice ::bob ::carol}))
+        lts2 (s/lts (s/aldebaran des (0, 24, 2)
+                                 (0, "‽(Object,alice,bob)", 1)
+                                 (0, "C(alice,bob)", 1)
+                                 (0, "!(Object,alice,bob)", 1)
+                                 (0, "?(alice,bob)", 1)
+                                 (0, "‽(Object,alice,carol)", 1)
+                                 (0, "!(Object,alice,carol)", 1)
+                                 (0, "?(alice,carol)", 1)
+                                 (0, "C(alice,carol)", 1)
+                                 (0, "!(Object,bob,alice)", 1)
+                                 (0, "‽(Object,bob,alice)", 1)
+                                 (0, "?(bob,alice)", 1)
+                                 (0, "C(bob,alice)", 1)
+                                 (0, "‽(Object,bob,carol)", 1)
+                                 (0, "!(Object,bob,carol)", 1)
+                                 (0, "?(bob,carol)", 1)
+                                 (0, "C(bob,carol)", 1)
+                                 (0, "‽(Object,carol,alice)", 1)
+                                 (0, "!(Object,carol,alice)", 1)
+                                 (0, "?(carol,alice)", 1)
+                                 (0, "C(carol,alice)", 1)
+                                 (0, "‽(Object,carol,bob)", 1)
+                                 (0, "!(Object,carol,bob)", 1)
+                                 (0, "?(carol,bob)", 1)
+                                 (0, "C(carol,bob)", 1)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2))))
+
+(any-tests)
+
+;;;;
 ;;;; Multiary operators
 ;;;;
 
@@ -536,9 +583,6 @@
 ;;;;;
 ;;;;; Regex operators
 ;;;;;
-
-(s/* (s/* (s/-->> ::alice ::bob))
-     (s/-->> ::alice ::carol))
 
 (deftest *-tests
   (let [lts1 (s/lts (s/* (s/-->> ::alice ::bob)))

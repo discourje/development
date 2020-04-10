@@ -54,6 +54,25 @@
   []
   (ast/end))
 
+(defmacro any
+  [role-exprs]
+  (let [branches (mapv (fn [[sender-expr receiver-expr]]
+                         `(ast/choice [(ast/sync (ast/predicate '~'Object)
+                                                 (ast/role '~sender-expr)
+                                                 (ast/role '~receiver-expr))
+                                       (ast/send (ast/predicate '~'Object)
+                                                 (ast/role '~sender-expr)
+                                                 (ast/role '~receiver-expr))
+                                       (ast/receive (ast/role '~sender-expr)
+                                                    (ast/role '~receiver-expr))
+                                       (ast/close (ast/role '~sender-expr)
+                                                    (ast/role '~receiver-expr))]))
+                       (for [sender role-exprs
+                             receiver role-exprs
+                             :when (not= sender receiver)]
+                         [sender receiver]))]
+    `(ast/choice ~branches)))
+
 ;;;;
 ;;;; Discourje: Multiary operators
 ;;;;
@@ -206,12 +225,6 @@
 ;   `(generate-infrastructure ~message-exchange-pattern))
 ;  ([message-exchange-pattern custom-channels]
 ;   `(generate-infrastructure ~message-exchange-pattern ~custom-channels)))
-;
-;(defmacro thread
-;  "Execute body on thread"
-;  [& body]
-;  ;; copy-pasted from clojure.core.async:
-;  `(clojure.core.async/thread-call (^:once fn* [] ~@body)))
 ;
 ;(defmacro custom-time
 ;  "Evaluates expr and prints the time it took.  Returns the value of expr."
