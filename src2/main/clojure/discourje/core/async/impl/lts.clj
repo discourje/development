@@ -196,11 +196,10 @@
                 branches-after (subvec branches (inc i) (count branches))
                 ;; f inserts an "evaluated" branch between (possibly before or after) "unevaluated" branches
                 f (fn [branch'] (ast/parallel (reduce into [branches-before
-                                                            ;(if (and (terminated? branch')
-                                                            ;         (empty? (successors branch')))
-                                                            ;  []
-                                                            ;  [branch'])
-                                                            [branch']
+                                                            (if (and (terminated? branch')
+                                                                     (empty? (successors branch')))
+                                                              []
+                                                              [branch'])
                                                             branches-after])))
                 ;; mapv-f maps f over a vector of branches
                 mapv-f (fn [branches'] (mapv #(f %) branches'))
@@ -219,11 +218,10 @@
                         branches-after (vec (rest ast))
                         ;; f inserts an "evaluated" branch before "unevaluated" branches
                         f (fn [branch']
-                            (let [branches' (reduce into [;(if (and (terminated? branch')
-                                                          ;         (empty? (successors branch')))
-                                                          ;  []
-                                                          ;  [branch'])
-                                                          [branch']
+                            (let [branches' (reduce into [(if (and (terminated? branch')
+                                                                   (empty? (successors branch')))
+                                                            []
+                                                            [branch'])
                                                           branches-after])]
                               (if (= 1 (count branches'))
                                 (first branches')
