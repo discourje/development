@@ -18,7 +18,7 @@
   {:pre [(> n 0)]}
   (->Buffer :sliding-buffer n))
 
-(defn promise-buffer
+(defn promise-buffer []
   {:pre [true]}
   (->Buffer :promise-buffer 0))
 
@@ -28,7 +28,7 @@
 
 (defn unblocking-buffer? [buffer]
   {:pre [(buffer? buffer)]}
-  (contains? #{:dropping-buffer :sliding-buffer :promise-buffer} (.-type x)))
+  (contains? #{:dropping-buffer :sliding-buffer :promise-buffer} (.-type buffer)))
 
 (defn clojure-core-async-chan [buffer]
   {:pre [(buffer? buffer)]}
