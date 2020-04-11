@@ -1,31 +1,27 @@
 (ns discourje.core.async.impl.channels
   (:require [clojure.core.async :as a]
             [discourje.core.async.impl.ast :as ast]
+            [discourje.core.async.impl.buffers :as buffers]
             [discourje.core.async.impl.monitors :as monitors]))
 
-(deftype Channel [sender receiver n ch ch-ghost1 ch-ghost2 closed? monitor])
+(deftype Channel [buffered ch ch-ghost1 ch-ghost2 sender receiver monitor])
 
 (defn channel? [x]
   {:pre [true]}
   (= (type x) Channel))
 
-(defn channel [n sender receiver monitor]
-  {:pre [(number? n) (>= n 0)
+(defn channel [buffer sender receiver monitor]
+  {:pre [(buffers/buffer? buffer)
          (ast/role? sender)
          (ast/role? receiver)
          (monitors/monitor? monitor)]}
-  (->Channel (ast/eval-role sender)
+  (->Channel (> (buffers/capacity buffer) 0)
+             (buffers/clojure-core-async-chan buffer)
+             (buffers/clojure-core-async-chan buffer)
+             (buffers/clojure-core-async-chan buffer)
+             (ast/eval-role sender)
              (ast/eval-role receiver)
-             n
-             (if (= n 0) (a/chan) (a/chan n))
-             (if (= n 0) (a/chan) (a/chan n))
-             (if (= n 0) nil (a/chan n))
-             false
              monitor))
-
-(defn buffered? [channel]
-  {:pre [(channel? channel)]}
-  (> (.-n channel) 0))
 
 (def token 0)
 (def sync-not-ok (Object.))
@@ -59,7 +55,7 @@
 (defn put!
   [channel message f]
   {:pre [(channel? channel) (fn? f)]}
-  (if (buffered? channel)
+  (if (.-buffered channel)
 
     ;; Buffered channel
     (a/put! (.-ch_ghost1 channel)
@@ -91,7 +87,7 @@
 (defn take!
   [channel f]
   {:pre [(channel? channel) (fn? f)]}
-  (if (buffered? channel)
+  (if (.-buffered channel)
 
     ;; Buffered channel
     (a/take! (.-ch_ghost2 channel)
@@ -121,7 +117,7 @@
 (defn >!!
   [channel message]
   {:pre [(channel? channel)]}
-  (if (buffered? channel)
+  (if (.-buffered channel)
 
     ;; Buffered channel
     (do (a/>!! (.-ch_ghost1 channel) token)
@@ -146,7 +142,7 @@
 (defn <!!
   [channel]
   {:pre [(channel? channel)]}
-  (if (buffered? channel)
+  (if (.-buffered channel)
 
     ;; Buffered channel
     (do (a/<!! (.-ch_ghost2 channel))
@@ -175,7 +171,7 @@
 (defn close!
   [channel]
   {:pre [(channel? channel)]}
-  (if (buffered? channel)
+  (if (.-buffered channel)
 
     ;; Buffered channel
     (if (verify-close! channel)

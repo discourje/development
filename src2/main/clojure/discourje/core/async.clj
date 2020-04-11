@@ -1,6 +1,7 @@
 (ns discourje.core.async
   (:require [clojure.core.async :as a]
             [discourje.core.async.spec :as s]
+            [discourje.core.async.impl.buffers :as buffers]
             [discourje.core.async.impl.channels :as channels]))
 
 ;;;;
@@ -11,7 +12,12 @@
   ([sender receiver monitor]
    (chan 0 sender receiver monitor))
   ([buf-or-n sender receiver monitor]
-   (channels/channel buf-or-n sender receiver monitor))
+   (channels/channel (if (number? buf-or-n)
+                       (buffers/fixed-buffer buf-or-n)
+                       buf-or-n)
+                     sender
+                     receiver
+                     monitor))
   (;[buf-or-n xform sender receiver monitor]
    [_ _ _ _ _]
    (throw (UnsupportedOperationException.)))
@@ -72,7 +78,13 @@
 ;;;; dropping-buffer and sliding-buffer
 ;;;;
 
-;; TODO
+(defn dropping-buffer
+  [n]
+  (buffers/dropping-buffer n))
+
+(defn sliding-buffer
+  [n]
+  (buffers/sliding-buffer n))
 
 ;;;;
 ;;;; close!
