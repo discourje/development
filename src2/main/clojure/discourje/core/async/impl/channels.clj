@@ -23,8 +23,8 @@
              (ast/eval-role receiver)
              monitor))
 
-(def token 0)
-(def sync-not-ok (Object.))
+(defonce token 0)
+(defonce sync-not-ok (Object.))
 
 (defn verify-sync! [message channel]
   (monitors/verify-sync! message
