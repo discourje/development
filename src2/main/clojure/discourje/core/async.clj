@@ -88,15 +88,15 @@
 
 (defn unblocking-buffer?
   [buff]
-  (buffers/unblocking-buffer? buff)
+  (buffers/unblocking-buffer? buff))
 
-  ;;;;
-  ;;;; close!
-  ;;;;
+;;;;
+;;;; close!
+;;;;
 
-  (defn close!
-    [chan]
-    (channels/close! chan)))
+(defn close!
+  [chan]
+  (channels/close! chan))
 
 ;;;;
 ;;;; alts! and alts!!
