@@ -7,19 +7,19 @@
   (= (type x) Buffer))
 
 (defn fixed-buffer [n]
-  {:pre (>= n 0)}
+  {:pre [(>= n 0)]}
   (->Buffer :fixed-buffer n))
 
 (defn dropping-buffer [n]
-  {:pre (> n 0)}
+  {:pre [(> n 0)]}
   (->Buffer :dropping-buffer n))
 
 (defn sliding-buffer [n]
-  {:pre (> n 0)}
+  {:pre [(> n 0)]}
   (->Buffer :sliding-buffer n))
 
 (defn promise-buffer
-  {:pre (> n 0)}
+  {:pre [true]}
   (->Buffer :promise-buffer 0))
 
 (defn capacity [buffer]
@@ -31,7 +31,7 @@
   (contains? #{:dropping-buffer :sliding-buffer :promise-buffer} (.-type x)))
 
 (defn clojure-core-async-chan [buffer]
-  {:pre (buffer? buffer)}
+  {:pre [(buffer? buffer)]}
   (let [type (.-type buffer)
         n (.-n buffer)]
     (case type
