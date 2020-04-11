@@ -86,13 +86,17 @@
   [n]
   (buffers/sliding-buffer n))
 
-;;;;
-;;;; close!
-;;;;
+(defn unblocking-buffer?
+  [buff]
+  (buffers/unblocking-buffer? buff)
 
-(defn close!
-  [chan]
-  (channels/close! chan))
+  ;;;;
+  ;;;; close!
+  ;;;;
+
+  (defn close!
+    [chan]
+    (channels/close! chan)))
 
 ;;;;
 ;;;; alts! and alts!!
