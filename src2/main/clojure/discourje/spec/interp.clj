@@ -162,7 +162,7 @@
 
     :else (throw (Exception.))))
 
-(defn successors [ast f-eval-action]
+(defn successors [ast f-action]
   (cond
 
     ;; End
@@ -171,11 +171,23 @@
 
     ;; Action
     (contains? ast/action-types (:type ast))
-    (f-eval-action ast)
+    (let [sender (eval-role (:sender ast))
+          receiver (eval-role (:receiver ast))]
+      {(f-action (str (case (:type ast)
+                        :sync "‽"
+                        :send "!"
+                        :receive "?"
+                        :close "C"
+                        (throw (Exception.)))
+                      "(" (if (or (= (:type ast) :sync) (= (:type ast) :send)) (str (:expr (:predicate ast)) ",") "") sender "," receiver ")")
+                 (:type ast)
+                 (eval-predicate (:predicate ast))
+                 sender
+                 receiver) [(ast/end)]})
 
     ;; Choice
     (= (:type ast) :choice)
-    (reduce (partial merge-with into) (map #(successors % f-eval-action) (:branches ast)))
+    (reduce (partial merge-with into) (map #(successors % f-action) (:branches ast)))
 
     ;; Parallel
     (= (:type ast) :parallel)
@@ -190,7 +202,7 @@
                 ;; f inserts an "evaluated" branch between (possibly before or after) "unevaluated" branches
                 f (fn [branch'] (ast/parallel (reduce into [branches-before
                                                             (if (and (terminated? branch')
-                                                                     (empty? (successors branch' f-eval-action)))
+                                                                     (empty? (successors branch' f-action)))
                                                               []
                                                               [branch'])
                                                             branches-after])))
@@ -200,7 +212,7 @@
                 map-mapv-f (fn [m] (map (fn [[k v]] {k (mapv-f v)}) m))]
             (recur (inc i) (merge-with into
                                        result
-                                       (merge {} (reduce merge (map-mapv-f (successors branch f-eval-action))))))))))
+                                       (merge {} (reduce merge (map-mapv-f (successors branch f-action))))))))))
 
     ;; Vector
     (vector? ast)
@@ -212,7 +224,7 @@
                         ;; f inserts an "evaluated" branch before "unevaluated" branches
                         f (fn [branch']
                             (let [branches' (reduce into [(if (and (terminated? branch')
-                                                                   (empty? (successors branch' f-eval-action)))
+                                                                   (empty? (successors branch' f-action)))
                                                             []
                                                             [branch'])
                                                           branches-after])]
@@ -223,20 +235,20 @@
                         mapv-f (fn [branches'] (mapv #(f %) branches'))
                         ;; map-mapv-f maps mapv-f over a map from actions to vectors of branches
                         map-mapv-f (fn [m] (map (fn [[k v]] {k (mapv-f v)}) m))]
-                    (merge {} (reduce merge (map-mapv-f (successors branch f-eval-action)))))
+                    (merge {} (reduce merge (map-mapv-f (successors branch f-action)))))
                   (if (terminated? (first ast))
-                    (successors (vec (rest ast)) f-eval-action)
+                    (successors (vec (rest ast)) f-action)
                     {})))
 
     ;; If
     (= (:type ast) :if)
-    (successors (if (eval (:condition ast)) (:branch1 ast) (:branch2 ast)) f-eval-action)
+    (successors (if (eval (:condition ast)) (:branch1 ast) (:branch2 ast)) f-action)
 
     ;; Loop
     (= (:type ast) :loop)
     (successors (unfold ast (substitute (:body ast)
                                         (zipmap (:vars ast) (:exprs ast))))
-                f-eval-action)
+                f-action)
 
     ;; Recur
     (= (:type ast) :recur)
@@ -248,6 +260,6 @@
           exprs (rest ast)
           body (:body (get (get @ast/registry name) (count exprs)))
           vars (:vars (get (get @ast/registry name) (count exprs)))]
-      (successors (substitute body (zipmap vars exprs)) f-eval-action))
+      (successors (substitute body (zipmap vars exprs)) f-action))
 
     :else (throw (Exception.))))

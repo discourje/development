@@ -5,30 +5,22 @@
   (:import (java.util.function Function Predicate)
            (discourje.spec.lts Action Action$Type State LTS LTSs)))
 
-(defn eval-action [ast]
-  (let [predicate (interp/eval-predicate (:predicate ast))
-        sender (interp/eval-role (:sender ast))
-        receiver (interp/eval-role (:receiver ast))
-        type (cond (= (:type ast) :sync)
-                   Action$Type/SYNC
-                   (= (:type ast) :send)
-                   Action$Type/SEND
-                   (= (:type ast) :receive)
-                   Action$Type/RECEIVE
-                   (= (:type ast) :close)
-                   Action$Type/CLOSE
-                   :else (throw (Exception.)))
-        name (str (cond (= (:type ast) :sync)
-                        "‽"
-                        (= (:type ast) :send)
-                        "!"
-                        (= (:type ast) :receive)
-                        "?"
-                        (= (:type ast) :close)
-                        "C"
-                        :else (throw (Exception.)))
-                  "(" (if (or (= (:type ast) :sync) (= (:type ast) :send)) (str (:expr (:predicate ast)) ",") "") sender "," receiver ")")]
-    {(Action. name type (reify Predicate (test [_ message] (predicate message))) sender receiver) [(ast/end)]}))
+(defn action [name type predicate sender receiver]
+  {:pre [(string? name)
+         (keyword? type)
+         (fn? predicate)
+         (string? sender)
+         (string? receiver)]}
+  (Action. name
+           (case type
+             :sync Action$Type/SYNC
+             :send Action$Type/SEND
+             :receive Action$Type/RECEIVE
+             :close Action$Type/CLOSE
+             (throw (Exception.)))
+           (reify Predicate (test [_ message] (predicate message)))
+           sender
+           receiver))
 
 (defn lts [ast]
   (cond
@@ -65,7 +57,7 @@
     (LTS. #{ast}
           (reify
             Function
-            (apply [_ ast] (interp/successors ast eval-action))))))
+            (apply [_ ast] (interp/successors ast action))))))
 
 (defn lts? [x]
   (= (type x) LTS))
