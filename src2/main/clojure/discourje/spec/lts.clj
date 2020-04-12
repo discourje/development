@@ -6,9 +6,9 @@
            (discourje.spec.lts Action Action$Type State LTS LTSs)))
 
 (defn eval-action [ast]
-  (let [predicate (ast/eval-predicate (:predicate ast))
-        sender (ast/eval-role (:sender ast))
-        receiver (ast/eval-role (:receiver ast))
+  (let [predicate (interp/eval-predicate (:predicate ast))
+        sender (interp/eval-role (:sender ast))
+        receiver (interp/eval-role (:receiver ast))
         type (cond (= (:type ast) :sync)
                    Action$Type/SYNC
                    (= (:type ast) :send)

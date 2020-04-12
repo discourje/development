@@ -3,7 +3,22 @@
             [clojure.set :refer [rename-keys]]
             [discourje.spec.ast :as ast]))
 
+(defn eval-predicate [predicate]
+  {:pre [(ast/predicate? predicate)]}
+  (let [x (eval (:expr predicate))]
+    (cond
+      (class? x) #(instance? x %)
+      (fn? x) x)))
 
+(defn eval-role [role]
+  {:pre [(ast/role? role)]}
+  (str (cond
+         (string? (:name-expr role)) (:name-expr role)
+         (keyword? (:name-expr role)) (ast/get-role-name (:name-expr role))
+         :else (throw (Exception.)))
+       (if (empty? (:index-exprs role))
+         ""
+         (mapv eval (:index-exprs role)))))
 
 (defn substitute [ast smap]
   (cond

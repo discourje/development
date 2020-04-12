@@ -1,14 +1,23 @@
 (ns discourje.spec.ast)
 
-(defn println-true [& more]
-  (println more)
-  true)
-
 ;;;;
 ;;;; Discourje
 ;;;;
 
 (defprotocol Discourje)
+
+;;;;
+;;;; Discourje: Predicates
+;;;;
+
+(defrecord Predicate [expr])
+
+(defn predicate? [x]
+  (instance? Predicate x))
+
+(defn predicate [expr]
+  {:pre []}
+  (->Predicate expr))
 
 ;;;;
 ;;;; Discourje: Roles
@@ -40,36 +49,6 @@
    {:pre [(or (string? name-expr) (symbol? name-expr) (keyword? name-expr))
           (vector? index-exprs)]}
    (->Role name-expr index-exprs)))
-
-(defn eval-role [role]
-  {:pre [(role? role)]}
-  (str (cond
-         (string? (:name-expr role)) (:name-expr role)
-         (keyword? (:name-expr role)) (get-role-name (:name-expr role))
-         :else (throw (Exception.)))
-       (if (empty? (:index-exprs role))
-         ""
-         (mapv eval (:index-exprs role)))))
-
-;;;;
-;;;; Discourje: Predicates
-;;;;
-
-(defrecord Predicate [expr])
-
-(defn predicate? [x]
-  (instance? Predicate x))
-
-(defn predicate [expr]
-  {:pre []}
-  (->Predicate expr))
-
-(defn eval-predicate [predicate]
-  {:pre [(predicate? predicate)]}
-  (let [x (eval (:expr predicate))]
-    (cond
-      (class? x) #(instance? x %)
-      (fn? x) x)))
 
 ;;;;
 ;;;; Discourje: Actions
