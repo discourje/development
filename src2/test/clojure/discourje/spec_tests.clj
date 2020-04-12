@@ -1,6 +1,6 @@
-(ns discourje.core.async.spec-tests
+(ns discourje.spec-tests
   (:require [clojure.test :refer :all]
-            [discourje.core.async.spec :as s]))
+            [discourje.spec :as s]))
 
 (defn msg [lts1 lts2]
   (str "\n *** lts1 ***\n\n" lts1 "\n\n *** lts2 ***\n\n" lts2 "\n"))

@@ -1,4 +1,4 @@
-(ns discourje.core.async.impl.ast)
+(ns discourje.spec.ast)
 
 (defn println-true [& more]
   (println more)

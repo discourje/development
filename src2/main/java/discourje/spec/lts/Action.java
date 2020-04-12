@@ -1,4 +1,4 @@
-package discourje.core.async.impl.lts;
+package discourje.spec.lts;
 
 import java.util.Objects;
 import java.util.function.Predicate;

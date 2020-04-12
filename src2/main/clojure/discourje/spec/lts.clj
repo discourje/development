@@ -1,9 +1,9 @@
-(ns discourje.core.async.impl.lts
+(ns discourje.spec.lts
   (:require [clojure.walk :as w]
             [clojure.set :refer [rename-keys]]
-            [discourje.core.async.impl.ast :as ast])
+            [discourje.spec.ast :as ast])
   (:import (java.util.function Function Predicate)
-           (discourje.core.async.impl.lts Action Action$Type State LTS LTSs)))
+           (discourje.spec.lts Action Action$Type State LTS LTSs)))
 
 (defn substitute [ast smap]
   (cond

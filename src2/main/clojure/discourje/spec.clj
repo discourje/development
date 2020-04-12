@@ -1,7 +1,7 @@
-(ns discourje.core.async.spec
+(ns discourje.spec
   (:require [clojure.java.shell :refer [sh]]
-            [discourje.core.async.impl.ast :as ast]
-            [discourje.core.async.impl.lts :as lts]
+            [discourje.spec.ast :as ast]
+            [discourje.spec.lts :as lts]
             [discourje.core.async.impl.monitors :as monitors]))
 
 ;;;;
@@ -135,7 +135,7 @@
 ;;;; Discourje: Patterns
 ;;;;
 
-(require '[discourje.core.async.spec :as s])
+(require '[discourje.spec :as s])
 
 (s/def ::-->>not [t r1 r2]
   (s/-->> (fn [x] (not= (type x) t)) r1 r2))

@@ -1,6 +1,6 @@
 (ns discourje.core.async.impl.channels
   (:require [clojure.core.async :as a]
-            [discourje.core.async.impl.ast :as ast]
+            [discourje.spec.ast :as ast]
             [discourje.core.async.impl.buffers :as buffers]
             [discourje.core.async.impl.monitors :as monitors]))
 

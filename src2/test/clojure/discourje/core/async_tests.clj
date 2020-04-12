@@ -1,7 +1,7 @@
 (ns discourje.core.async-tests
   (:require [clojure.test :refer :all]
             [discourje.core.async :as a]
-            [discourje.core.async.spec :as s]))
+            [discourje.spec :as s]))
 
 (defn defroles [f]
   (s/defrole ::alice "alice")
