@@ -1,9 +1,9 @@
 (ns discourje.spec.interp
   (:require [clojure.walk :as w]
             [clojure.set :refer [rename-keys]]
-            [discourje.spec.ast :as ast])
-  (:import (java.util.function Predicate)
-           (discourje.spec.lts Action Action$Type State LTS LTSs)))
+            [discourje.spec.ast :as ast]))
+
+
 
 (defn substitute [ast smap]
   (cond
@@ -147,7 +147,7 @@
 
     :else (throw (Exception.))))
 
-(defn successors [ast]
+(defn successors [ast f-eval-action]
   (cond
 
     ;; End
@@ -156,33 +156,11 @@
 
     ;; Action
     (contains? ast/action-types (:type ast))
-    (let [predicate (ast/eval-predicate (:predicate ast))
-          sender (ast/eval-role (:sender ast))
-          receiver (ast/eval-role (:receiver ast))
-          type (cond (= (:type ast) :sync)
-                     Action$Type/SYNC
-                     (= (:type ast) :send)
-                     Action$Type/SEND
-                     (= (:type ast) :receive)
-                     Action$Type/RECEIVE
-                     (= (:type ast) :close)
-                     Action$Type/CLOSE
-                     :else (throw (Exception.)))
-          name (str (cond (= (:type ast) :sync)
-                          "‽"
-                          (= (:type ast) :send)
-                          "!"
-                          (= (:type ast) :receive)
-                          "?"
-                          (= (:type ast) :close)
-                          "C"
-                          :else (throw (Exception.)))
-                    "(" (if (or (= (:type ast) :sync) (= (:type ast) :send)) (str (:expr (:predicate ast)) ",") "") sender "," receiver ")")]
-      {(Action. name type (reify Predicate (test [_ message] (predicate message))) sender receiver) [(ast/end)]})
+    (f-eval-action ast)
 
     ;; Choice
     (= (:type ast) :choice)
-    (reduce (partial merge-with into) (map successors (:branches ast)))
+    (reduce (partial merge-with into) (map #(successors % f-eval-action) (:branches ast)))
 
     ;; Parallel
     (= (:type ast) :parallel)
@@ -197,7 +175,7 @@
                 ;; f inserts an "evaluated" branch between (possibly before or after) "unevaluated" branches
                 f (fn [branch'] (ast/parallel (reduce into [branches-before
                                                             (if (and (terminated? branch')
-                                                                     (empty? (successors branch')))
+                                                                     (empty? (successors branch' f-eval-action)))
                                                               []
                                                               [branch'])
                                                             branches-after])))
@@ -207,7 +185,7 @@
                 map-mapv-f (fn [m] (map (fn [[k v]] {k (mapv-f v)}) m))]
             (recur (inc i) (merge-with into
                                        result
-                                       (merge {} (reduce merge (map-mapv-f (successors branch))))))))))
+                                       (merge {} (reduce merge (map-mapv-f (successors branch f-eval-action))))))))))
 
     ;; Vector
     (vector? ast)
@@ -219,7 +197,7 @@
                         ;; f inserts an "evaluated" branch before "unevaluated" branches
                         f (fn [branch']
                             (let [branches' (reduce into [(if (and (terminated? branch')
-                                                                   (empty? (successors branch')))
+                                                                   (empty? (successors branch' f-eval-action)))
                                                             []
                                                             [branch'])
                                                           branches-after])]
@@ -230,19 +208,20 @@
                         mapv-f (fn [branches'] (mapv #(f %) branches'))
                         ;; map-mapv-f maps mapv-f over a map from actions to vectors of branches
                         map-mapv-f (fn [m] (map (fn [[k v]] {k (mapv-f v)}) m))]
-                    (merge {} (reduce merge (map-mapv-f (successors branch)))))
+                    (merge {} (reduce merge (map-mapv-f (successors branch f-eval-action)))))
                   (if (terminated? (first ast))
-                    (successors (vec (rest ast)))
+                    (successors (vec (rest ast)) f-eval-action)
                     {})))
 
     ;; If
     (= (:type ast) :if)
-    (successors (if (eval (:condition ast)) (:branch1 ast) (:branch2 ast)))
+    (successors (if (eval (:condition ast)) (:branch1 ast) (:branch2 ast)) f-eval-action)
 
     ;; Loop
     (= (:type ast) :loop)
     (successors (unfold ast (substitute (:body ast)
-                                        (zipmap (:vars ast) (:exprs ast)))))
+                                        (zipmap (:vars ast) (:exprs ast))))
+                f-eval-action)
 
     ;; Recur
     (= (:type ast) :recur)
@@ -254,6 +233,6 @@
           exprs (rest ast)
           body (:body (get (get @ast/registry name) (count exprs)))
           vars (:vars (get (get @ast/registry name) (count exprs)))]
-      (successors (substitute body (zipmap vars exprs))))
+      (successors (substitute body (zipmap vars exprs)) f-eval-action))
 
     :else (throw (Exception.))))

@@ -2,8 +2,33 @@
   (:require [clojure.set :refer [rename-keys]]
             [discourje.spec.ast :as ast]
             [discourje.spec.interp :as interp])
-  (:import (java.util.function Function)
+  (:import (java.util.function Function Predicate)
            (discourje.spec.lts Action Action$Type State LTS LTSs)))
+
+(defn eval-action [ast]
+  (let [predicate (ast/eval-predicate (:predicate ast))
+        sender (ast/eval-role (:sender ast))
+        receiver (ast/eval-role (:receiver ast))
+        type (cond (= (:type ast) :sync)
+                   Action$Type/SYNC
+                   (= (:type ast) :send)
+                   Action$Type/SEND
+                   (= (:type ast) :receive)
+                   Action$Type/RECEIVE
+                   (= (:type ast) :close)
+                   Action$Type/CLOSE
+                   :else (throw (Exception.)))
+        name (str (cond (= (:type ast) :sync)
+                        "‽"
+                        (= (:type ast) :send)
+                        "!"
+                        (= (:type ast) :receive)
+                        "?"
+                        (= (:type ast) :close)
+                        "C"
+                        :else (throw (Exception.)))
+                  "(" (if (or (= (:type ast) :sync) (= (:type ast) :send)) (str (:expr (:predicate ast)) ",") "") sender "," receiver ")")]
+    {(Action. name type (reify Predicate (test [_ message] (predicate message))) sender receiver) [(ast/end)]}))
 
 (defn lts [ast]
   (cond
@@ -40,7 +65,7 @@
     (LTS. #{ast}
           (reify
             Function
-            (apply [_ ast] (interp/successors ast))))))
+            (apply [_ ast] (interp/successors ast eval-action))))))
 
 (defn lts? [x]
   (= (type x) LTS))
