@@ -1,6 +1,5 @@
 (ns discourje.spec.interp
   (:require [clojure.walk :as w]
-            [clojure.set :refer [rename-keys]]
             [discourje.spec.ast :as ast]))
 
 (defn eval-predicate [predicate]
@@ -18,7 +17,31 @@
          :else (throw (Exception.)))
        (if (empty? (:index-exprs role))
          ""
-         (mapv eval (:index-exprs role)))))
+         (mapv #(let [index (eval %)]
+                  (if (number? index)
+                    index
+                    (throw (Exception.))))
+               (:index-exprs role)))))
+
+(defn eval-action [action f]
+  {:pre [(ast/action? action)]}
+  (let [type (:type action)
+        predicate (eval-predicate (:predicate action))
+        sender (eval-role (:sender action))
+        receiver (eval-role (:receiver action))]
+    (f (str (case (:type action)
+              :sync "‽"
+              :send "!"
+              :receive "?"
+              :close "C"
+              (throw (Exception.))) "("
+            (if (contains? #{:sync :send} (:type action)) (str (:expr (:predicate action)) ",") "")
+            sender ","
+            receiver ")")
+       type
+       predicate
+       sender
+       receiver)))
 
 (defn substitute [ast smap]
   (cond
@@ -28,7 +51,7 @@
     ast
 
     ;; Action
-    (contains? ast/action-types (:type ast))
+    (ast/action? ast)
     (w/postwalk-replace smap ast)
 
     ;; Choice
@@ -66,6 +89,10 @@
     (concat [(first ast)]
             (w/postwalk-replace smap (rest ast)))
 
+    ;; Aldebaran
+    (= (:type ast) :aldebaran)
+    ast
+
     :else (throw (Exception.))))
 
 (defn unfold [loop ast]
@@ -76,7 +103,7 @@
     ast
 
     ;; Action
-    (contains? ast/action-types (:type ast))
+    (ast/action? ast)
     ast
 
     ;; Choice
@@ -114,6 +141,10 @@
     (seq? ast)
     ast
 
+    ;; Aldebaran
+    (= (:type ast) :aldebaran)
+    ast
+
     :else (throw (Exception.))))
 
 (defn terminated? [ast]
@@ -124,7 +155,7 @@
     true
 
     ;; Action
-    (contains? ast/action-types (:type ast))
+    (ast/action? ast)
     false
 
     ;; Choice
@@ -160,6 +191,10 @@
           vars (:vars (get (get @ast/registry name) (count exprs)))]
       (terminated? (substitute body (zipmap vars exprs))))
 
+    ;; Aldebaran
+    (= (:type ast) :aldebaran)
+    (empty? (get (:edges ast) (:v ast)))
+
     :else (throw (Exception.))))
 
 (defn successors [ast f-action]
@@ -170,20 +205,8 @@
     {}
 
     ;; Action
-    (contains? ast/action-types (:type ast))
-    (let [sender (eval-role (:sender ast))
-          receiver (eval-role (:receiver ast))]
-      {(f-action (str (case (:type ast)
-                        :sync "‽"
-                        :send "!"
-                        :receive "?"
-                        :close "C"
-                        (throw (Exception.)))
-                      "(" (if (or (= (:type ast) :sync) (= (:type ast) :send)) (str (:expr (:predicate ast)) ",") "") sender "," receiver ")")
-                 (:type ast)
-                 (eval-predicate (:predicate ast))
-                 sender
-                 receiver) [(ast/end)]})
+    (ast/action? ast)
+    {(eval-action ast f-action) [(ast/end)]}
 
     ;; Choice
     (= (:type ast) :choice)
@@ -261,5 +284,19 @@
           body (:body (get (get @ast/registry name) (count exprs)))
           vars (:vars (get (get @ast/registry name) (count exprs)))]
       (successors (substitute body (zipmap vars exprs)) f-action))
+
+    ;; Aldebaran
+    (= (:type ast) :aldebaran)
+    (let [m (get (:edges ast) (:v ast))
+          keys (map #(eval-action % f-action) (keys m))
+          vals (map (fn [k]
+                      (let [vertices (get m k)]
+                        (if (empty? vertices)
+                          [(ast/end)]
+                          (mapv #(assoc ast :v %) vertices))))
+                    (clojure.core/keys m))]
+      (if (nil? keys)
+        {}
+        (zipmap keys vals)))
 
     :else (throw (Exception.))))

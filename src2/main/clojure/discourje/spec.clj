@@ -3,9 +3,16 @@
             [discourje.spec.ast :as ast]
             [discourje.spec.lts :as lts]
             [discourje.core.async.impl.monitors :as monitors]))
+;;;;
+;;;; Predicates
+;;;;
+
+(defmacro predicate
+  [expr]
+  `(ast/predicate '~expr))
 
 ;;;;
-;;;; Discourje: Roles
+;;;; Roles
 ;;;;
 
 (defn defrole
@@ -17,12 +24,8 @@
   `(ast/role '~name-expr (vec '~index-exprs)))
 
 ;;;;
-;;;; Discourje: Actions
+;;;; Actions
 ;;;;
-
-(defmacro predicate
-  [expr]
-  `(ast/predicate '~expr))
 
 (defmacro -->
   ([sender-expr receiver-expr]
@@ -66,7 +69,7 @@
                                        (ast/receive (ast/role '~sender-expr)
                                                     (ast/role '~receiver-expr))
                                        (ast/close (ast/role '~sender-expr)
-                                                    (ast/role '~receiver-expr))]))
+                                                  (ast/role '~receiver-expr))]))
                        (for [sender role-exprs
                              receiver role-exprs
                              :when (not= sender receiver)]
@@ -74,7 +77,7 @@
     `(ast/choice ~branches)))
 
 ;;;;
-;;;; Discourje: Multiary operators
+;;;; Multiary operators
 ;;;;
 
 (defmacro choice
@@ -86,17 +89,17 @@
   `(ast/parallel [~branch ~@more]))
 
 ;;;;
-;;;; Discourje: Conditional operators
+;;;; Conditional operators
 ;;;;
 
 (defmacro if
   ([condition branch]
-   `(ast/if-then '~condition ~branch))
+   `(ast/if-then-else '~condition ~branch (ast/end)))
   ([condition branch1 branch2]
    `(ast/if-then-else '~condition ~branch1 ~branch2)))
 
 ;;;;
-;;;; Discourje: Recursion operators
+;;;; Recursion operators
 ;;;;
 
 (defmacro loop
@@ -108,7 +111,7 @@
   `(ast/recur '~name '[~@more]))
 
 ;;;;
-;;;; Discourje: Regex operators
+;;;; Regex operators
 ;;;;
 
 (def ^:private *-counter (atom 0))
@@ -120,7 +123,7 @@
                                       (ast/end)]))))
 
 ;;;;
-;;;; Discourje: Definition operators
+;;;; Definition operators
 ;;;;
 
 (defmacro def
@@ -132,7 +135,14 @@
   `(concat ['~name] '~exprs))
 
 ;;;;
-;;;; Discourje: Patterns
+;;;; Aldebaran
+;;;;
+
+(defmacro aldebaran [_ header & more]
+  `(ast/aldebaran (first '~header) '~more))
+
+;;;;
+;;;; Patterns
 ;;;;
 
 (require '[discourje.spec :as s])
@@ -150,14 +160,7 @@
   (s/apply ::pipe [t r-name 0 n]))
 
 ;;;;
-;;;; Aldebaran
-;;;;
-
-(defmacro aldebaran [_ header & more]
-  `(ast/graph (first '~header) '~more))
-
-;;;;
-;;;; LTS tools
+;;;; TODO: Move the following functions elsewhere
 ;;;;
 
 (defn expandRecursively!
@@ -187,19 +190,8 @@
   (spit tmp-file (.toString lts))
   (future (clojure.java.shell/sh (str mcrl2-root-dir "/bin/ltsgraph") tmp-file)))
 
-;;;;
-;;;; Monitors
-;;;;
-
-(defn monitor [ast-or-lts]
-  {:pre [(or (ast/ast? ast-or-lts) (lts/lts? ast-or-lts))]}
-  (cond (ast/ast? ast-or-lts)
-        (monitor (lts/lts ast-or-lts))
-
-        (lts/lts? ast-or-lts)
-        (monitors/monitor ast-or-lts)
-
-        :else (throw (IllegalArgumentException.))))
+(defn monitor [spec]
+  (monitors/monitor (lts/lts spec)))
 
 ;;;;
 ;;;; TODO: Everything below is part of monitoring and should be put elsewhere at some point

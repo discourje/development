@@ -1,13 +1,7 @@
 (ns discourje.spec.ast)
 
 ;;;;
-;;;; Discourje
-;;;;
-
-(defprotocol Discourje)
-
-;;;;
-;;;; Discourje: Predicates
+;;;; Predicates
 ;;;;
 
 (defrecord Predicate [expr])
@@ -20,7 +14,7 @@
   (->Predicate expr))
 
 ;;;;
-;;;; Discourje: Roles
+;;;; Roles
 ;;;;
 
 (def role-names (atom {}))
@@ -51,52 +45,57 @@
    (->Role name-expr index-exprs)))
 
 ;;;;
-;;;; Discourje: Actions
+;;;; Actions
 ;;;;
 
-(defrecord Action [type predicate sender receiver]
-  Discourje)
+(defrecord Action [type predicate sender receiver])
 
-(def action-types #{:sync :send :receive :close})
+(defn action? [x]
+  (= (type x) Action))
+
+(defn action [type predicate sender receiver]
+  {:pre [(contains? #{:sync :send :receive :close} type)
+         (predicate? predicate)
+         (role? sender)
+         (role? receiver)]}
+  (->Action type predicate sender receiver))
 
 (defn sync [predicate sender receiver]
   {:pre [(predicate? predicate)
          (role? sender)
          (role? receiver)]}
-  (->Action :sync predicate sender receiver))
+  (action :sync predicate sender receiver))
 
 (defn send [predicate sender receiver]
   {:pre [(predicate? predicate)
          (role? sender)
          (role? receiver)]}
-  (->Action :send predicate sender receiver))
+  (action :send predicate sender receiver))
 
 (defn receive [sender receiver]
   {:pre [(role? sender)
          (role? receiver)]}
-  (->Action :receive (predicate '(fn [_] true)) sender receiver))
+  (action :receive (predicate '(fn [_] true)) sender receiver))
 
 (defn close [sender receiver]
   {:pre [(role? sender)
          (role? receiver)]}
-  (->Action :close (predicate '(fn [_] true)) sender receiver))
+  (action :close (predicate '(fn [_] true)) sender receiver))
 
 ;;;;
-;;;; Discourje: Nullary operators
+;;;; Nullary operators
 ;;;;
 
-(defrecord Nullary [type]
-  Discourje)
+(defrecord Nullary [type])
 
 (defn end []
   (->Nullary :end))
 
 ;;;;
-;;;; Discourje: Multiary operators
+;;;; Multiary operators
 ;;;;
 
-(defrecord Multiary [type branches]
-  Discourje)
+(defrecord Multiary [type branches])
 
 (defn choice [branches]
   (->Multiary :choice branches))
@@ -104,23 +103,19 @@
   (->Multiary :parallel branches))
 
 ;;;;
-;;;; Discourje: Conditional operators
+;;;; Conditional operators
 ;;;;
 
-(defrecord If [type condition branch1 branch2]
-  Discourje)
+(defrecord If [type condition branch1 branch2])
 
 (defn if-then-else [condition branch1 branch2]
   (->If :if condition branch1 branch2))
-(defn if-then [condition branch]
-  (if-then-else condition branch (end)))
 
 ;;;;
-;;;; Discourje: Recursion operators
+;;;; Recursion operators
 ;;;;
 
-(defrecord Loop [type name vars exprs body]
-  Discourje)
+(defrecord Loop [type name vars exprs body])
 
 (defn loop
   ([name bindings body]
@@ -130,14 +125,13 @@
   ([name vars exprs body]
    (->Loop :loop name vars exprs body)))
 
-(defrecord Recur [type name exprs]
-  Discourje)
+(defrecord Recur [type name exprs])
 
 (defn recur [name exprs]
   (->Recur :recur name exprs))
 
 ;;;;
-;;;; Discourje: Definition operators
+;;;; Definition operators
 ;;;;
 
 (def registry (atom {}))
@@ -148,6 +142,64 @@
            (if (contains? m name)
              (update m name #(into % {(count vars) {:vars vars, :body body}}))
              (into m {name {(count vars) {:vars vars, :body body}}})))))
+
+;;;;
+;;;; Aldebaran
+;;;;
+
+(defrecord Graph [type v edges])
+
+(defn- parse-predicate [s]
+  (predicate (read-string s)))
+
+(defn- parse-role [s]
+  (if (clojure.string/includes? s "[")
+    (let [name-expr (subs s 0 (clojure.string/index-of s "["))
+          index-exprs (mapv read-string
+                            (clojure.string/split (subs s
+                                                        (inc (clojure.string/index-of s "["))
+                                                        (dec (count s)))
+                                                  #"\]\["))]
+      (role name-expr index-exprs))
+    (role s)))
+
+(defn- parse-action
+  ([s]
+   (parse-action (case (first s)
+                   \‽ :sync
+                   \! :send
+                   \? :receive
+                   \C :close
+                   (throw (Exception.)))
+                 (subs s 2 (dec (count s)))))
+  ([type s]
+   (let [s (if (contains? #{:sync :send} type)
+             s
+             (str "(fn [_] true)," s))
+         tokens (clojure.string/split s #"\,")
+         predicate (parse-predicate (nth tokens 0))
+         sender (parse-role (nth tokens 1))
+         receiver (parse-role (nth tokens 2))]
+     (action type predicate sender receiver))))
+
+(defn aldebaran [v0 edges]
+  (->Graph :aldebaran
+           v0
+           (clojure.core/loop [todo edges
+                               result {}]
+             (if (empty? todo)
+               result
+               (recur (rest todo)
+                      (let [transition (first todo)
+                            source (nth transition 0)
+                            label (nth transition 1)
+                            target (nth transition 2)
+                            action (parse-action label)]
+
+                        (if (and (contains? result source)
+                                 (contains? (get result source) label))
+                          (update result source #(merge-with into % {label [target]}))
+                          (merge-with into result {source {action [target]}}))))))))
 
 ;;;;
 ;;;; TODO: Old code, some of which must be salvaged (but probably in a different namespace)
@@ -384,34 +436,3 @@
 ;                    (assoc-last-interaction (first interactions) rec-table)
 ;                    )))]
 ;    (assoc-to-rec-table rec-table inter)))
-
-;;;;
-;;;; Aldebaran
-;;;;
-
-(defprotocol Aldebaran)
-
-(defrecord Graph [v0 edges]
-  Aldebaran)
-
-(defn graph [v0 edges]
-  (->Graph v0
-           (clojure.core/loop [todo edges
-                               result {}]
-             (if (empty? todo)
-               result
-               (recur (rest todo)
-                      (let [transition (first todo)
-                            source (nth transition 0)
-                            label (nth transition 1)
-                            target (nth transition 2)]
-
-                        (if (and (contains? result source)
-                                 (contains? (get result source) label))
-                          (update result source #(merge-with into % {label [target]}))
-                          (merge-with into result {source {label [target]}}))))))))
-
-(defn ast? [x]
-  (or (satisfies? Discourje x)
-      (vector? x)
-      (satisfies? Aldebaran x)))

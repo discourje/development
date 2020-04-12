@@ -1,6 +1,7 @@
 (ns discourje.core.async.impl.channels
   (:require [clojure.core.async :as a]
             [discourje.spec.ast :as ast]
+            [discourje.spec.interp :as interp]
             [discourje.core.async.impl.buffers :as buffers]
             [discourje.core.async.impl.monitors :as monitors]))
 
@@ -19,8 +20,8 @@
              (buffers/clojure-core-async-chan buffer)
              (buffers/clojure-core-async-chan buffer)
              (buffers/clojure-core-async-chan buffer)
-             (ast/eval-role sender)
-             (ast/eval-role receiver)
+             (interp/eval-role sender)
+             (interp/eval-role receiver)
              monitor))
 
 (defonce token 0)

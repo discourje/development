@@ -26,10 +26,8 @@
   (is (= (s/role ::alice) (s/role ::alice)))
   (is (= (s/role ::alice 1) (s/role ::alice 1)))
   (is (= (s/role ::alice 1 2) (s/role ::alice 1 2)))
-  (is (= (s/role ::alice "foo" "bar") (s/role ::alice "foo" "bar")))
   (is (= (s/role ::alice i) (s/role ::alice i)))
   (is (= (s/role ::alice i j) (s/role ::alice i j)))
-  (is (= (s/role ::alice i 1 "foo") (s/role ::alice i 1 "foo")))
   (is (= (s/role ::alice (inc 1)) (s/role ::alice (inc 1))))
   (is (= (s/role ::alice (inc i)) (s/role ::alice (inc i)))))
 
@@ -41,17 +39,17 @@
 
 (deftest -->-tests
   (let [lts1 (s/lts (s/--> ::alice ::bob))
-        lts2 (s/lts (s/aldebaran des (0, 2, 3)
+        lts2 (s/lts (s/aldebaran des (0, 1, 2)
                                  (0, "‽(Object,alice,bob)", 1)))]
     (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
   (let [lts1 (s/lts (s/--> Integer ::alice ::bob))
-        lts2 (s/lts (s/aldebaran des (0, 2, 3)
+        lts2 (s/lts (s/aldebaran des (0, 1, 2)
                                  (0, "‽(Integer,alice,bob)", 1)))]
     (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
   (let [lts1 (s/lts (s/--> (fn [x] (= x 4)) ::alice ::bob))
-        lts2 (s/lts (s/aldebaran des (0, 2, 3)
+        lts2 (s/lts (s/aldebaran des (0, 1, 2)
                                  (0, "‽((fn [x] (= x 4)),alice,bob)", 1)))]
     (is (s/bisimilar? lts1 lts2) (msg lts1 lts2))))
 
@@ -82,9 +80,9 @@
                                  (0, "C(alice,bob)", 1)))]
     (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
-  (let [lts1 (s/lts (s/close (::alice "foo") (::bob (inc 1))))
+  (let [lts1 (s/lts (s/close (::alice 1) (::bob (inc 1))))
         lts2 (s/lts (s/aldebaran des (0, 1, 2)
-                                 (0, "C(alice[\"foo\"],bob[2])", 1)))]
+                                 (0, "C(alice[1],bob[2])", 1)))]
     (is (s/bisimilar? lts1 lts2) (msg lts1 lts2))))
 
 (close-tests)
