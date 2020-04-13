@@ -22,14 +22,14 @@
 
 (deftest role-tests
   (is (= (s/role "alice") (s/role "alice")))
-  (is (= (s/role x) (s/role x)))
+  (is (= (s/role x []) (s/role x [])))
   (is (= (s/role ::alice) (s/role ::alice)))
-  (is (= (s/role ::alice 1) (s/role ::alice 1)))
-  (is (= (s/role ::alice 1 2) (s/role ::alice 1 2)))
-  (is (= (s/role ::alice i) (s/role ::alice i)))
-  (is (= (s/role ::alice i j) (s/role ::alice i j)))
-  (is (= (s/role ::alice (inc 1)) (s/role ::alice (inc 1))))
-  (is (= (s/role ::alice (inc i)) (s/role ::alice (inc i)))))
+  (is (= (s/role ::alice [1]) (s/role ::alice [1])))
+  (is (= (s/role ::alice [1 2]) (s/role ::alice [1 2])))
+  (is (= (s/role ::alice [i]) (s/role ::alice [i])))
+  (is (= (s/role ::alice [i j]) (s/role ::alice [i j])))
+  (is (= (s/role ::alice [(inc 1)]) (s/role ::alice [(inc 1)])))
+  (is (= (s/role ::alice [(inc i)]) (s/role ::alice [(inc i)]))))
 
 (role-tests)
 
@@ -441,8 +441,22 @@
 ;;;;
 
 (deftest loop-recur-tests
-  (let [lts1 (s/lts (s/loop swap [r1 ::alice
-                                  r2 ::bob]
+  (let [lts1 (s/lts (s/loop swap [;; Probably impossible (?) to do this nicer.
+                                  ;; See: https://stackoverflow.com/questions/40161751
+                                  r1 (discourje.spec/role ::alice)
+                                  r2 (discourje.spec/role ::bob)]
+                            (s/--> r1 r2)
+                            (s/--> r2 r1)
+                            (s/recur swap r2 r1)))
+        lts2 (s/lts (s/aldebaran des (0, 4, 5)
+                                 (0, "‽(Object,alice,bob)", 1)
+                                 (1, "‽(Object,bob,alice)", 2)
+                                 (2, "‽(Object,bob,alice)", 3)
+                                 (3, "‽(Object,alice,bob)", 0)))]
+    (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (s/lts (s/loop swap [r1 (discourje.spec/role ::alice)
+                                  r2 (discourje.spec/role ::bob)]
                             (s/-->> r1 r2)
                             (s/-->> r2 r1)
                             (s/recur swap r2 r1)))
@@ -469,11 +483,12 @@
                                  (3, "?(alice[1],alice[2])", 4)))]
     (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
-  (let [lts1 (s/lts (s/loop ring [i 0
+  (let [lts1 (s/lts (s/loop ring [r-name ::alice
+                                  i 0
                                   n 3]
                             (s/if (< i n)
-                              [(s/-->> (::alice i) (::alice (mod (inc i) n)))
-                               (s/recur ring (inc i) n)])))
+                              [(s/-->> (r-name i) (r-name (mod (inc i) n)))
+                               (s/recur ring r-name (inc i) n)])))
         lts2 (s/lts (s/aldebaran des (0, 6, 7)
                                  (0, "!(Object,alice[0],alice[1])", 1)
                                  (1, "?(alice[0],alice[1])", 2)
@@ -484,11 +499,12 @@
     (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
   (let [lts1 (s/lts (s/loop omega []
-                            [(s/loop ring [i 0
+                            [(s/loop ring [r-name ::alice
+                                           i 0
                                            n 3]
                                      (s/if (< i n)
-                                       [(s/-->> (::alice i) (::alice (mod (inc i) n)))
-                                        (s/recur ring (inc i) n)]))
+                                       [(s/-->> (r-name i) (r-name (mod (inc i) n)))
+                                        (s/recur ring r-name (inc i) n)]))
                              (s/recur omega)]))
         lts2 (s/lts (s/aldebaran des (0, 7, 7)
                                  (0, "!(Object,alice[0],alice[1])", 1)
@@ -626,13 +642,16 @@
 ;;;;;
 
 (deftest apply-tests
-  (let [lts1 (s/lts (s/apply ::s/-->>not [Long ::alice ::bob]))
+  (let [lts1 (s/lts (s/apply ::s/-->>not [;; Code needs to be passed quoted
+                                          'Long
+                                          (discourje.spec/role ::alice)
+                                          (discourje.spec/role ::bob)]))
         lts2 (s/lts (s/aldebaran des (0, 2, 3)
                                  (0, "!((fn [x] (not= (type x) Long)),alice,bob)", 1)
                                  (1, "?(alice,bob)", 2)))]
     (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
-  (let [lts1 (s/lts (s/apply ::s/pipe [Long ::alice 10 14]))
+  (let [lts1 (s/lts (s/apply ::s/pipe [(discourje.spec/predicate Long) ::alice 10 14]))
         lts2 (s/lts (s/aldebaran des (0, 6, 7)
                                  (0, "!(Long,alice[10],alice[11])", 1)
                                  (1, "?(alice[10],alice[11])", 2)
@@ -642,7 +661,7 @@
                                  (5, "?(alice[12],alice[13])", 6)))]
     (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
-  (let [lts1 (s/lts (s/apply ::s/pipe [Long ::alice 4]))
+  (let [lts1 (s/lts (s/apply ::s/pipe [(discourje.spec/predicate Long) ::alice 4]))
         lts2 (s/lts (s/aldebaran des (0, 6, 7)
                                  (0, "!(Long,alice[0],alice[1])", 1)
                                  (1, "?(alice[0],alice[1])", 2)

@@ -20,37 +20,77 @@
   (ast/put-role-name! k name))
 
 (defmacro role
-  [name-expr & index-exprs]
-  `(ast/role '~name-expr (vec '~index-exprs)))
+  ([name-expr]
+   `(role ~name-expr []))
+  ([name-expr index-exprs]
+   {:pre [(or (string? name-expr) (keyword? name-expr) (symbol? name-expr))
+          (vector? index-exprs)]}
+   `(ast/role '~name-expr '~index-exprs)))
 
 ;;;;
 ;;;; Actions
 ;;;;
 
+(defn- predicate-form [predicate]
+  (cond
+    ;; predicate is of the form: (predicate expr)
+    (and (seq? predicate) (= 'discourje.spec.ast/predicate (first (macroexpand predicate))))
+    predicate
+
+    ;; predicate is of the form: x
+    (and (symbol? predicate) (not (resolve predicate)))
+    `'~predicate
+
+    ;; predicate is of the form: expr
+    :else (list 'discourje.spec/predicate predicate)))
+
+(defn- role-form [role]
+  (cond
+    ;; role is of the form: (role name-expr index-exprs)
+    (and (seq? role) (= 'discourje.spec.ast/role (first (macroexpand role))))
+    role
+
+    ;; role is of the form: (name-expr & index-exprs)
+    (seq? role)
+    (list 'discourje.spec.ast/role `'~(first role) (mapv (fn [x] `'~x) (rest role)))
+
+    ;; role is of the form: x
+    (symbol? role)
+    `'~role
+
+    ;; role is of the form: "alice" or :alice
+    :else (list 'discourje.spec.ast/role `'~role)))
+
 (defmacro -->
-  ([sender-expr receiver-expr]
-   `(--> ~'Object ~sender-expr ~receiver-expr))
-  ([predicate-expr sender-expr receiver-expr]
-   `(ast/sync (ast/predicate '~predicate-expr)
-              (ast/role '~sender-expr)
-              (ast/role '~receiver-expr))))
+  ([sender receiver]
+   `(--> (predicate ~'Object) ~sender ~receiver))
+  ([predicate sender receiver]
+   (let [predicate (predicate-form predicate)
+         sender (role-form sender)
+         receiver (role-form receiver)]
+     `(ast/sync ~predicate
+                ~sender
+                ~receiver))))
 
 (defmacro -->>
-  ([sender-expr receiver-expr]
-   `(-->> ~'Object ~sender-expr ~receiver-expr))
-  ([predicate-expr sender-expr receiver-expr]
-   [`(ast/send (ast/predicate '~predicate-expr)
-               (ast/role '~sender-expr)
-               (ast/role '~receiver-expr))
-    `(ast/receive (ast/role '~sender-expr)
-                  (ast/role '~receiver-expr))]))
+  ([sender receiver]
+   `(-->> (predicate ~'Object) ~sender ~receiver))
+  ([predicate sender receiver]
+   (let [predicate (predicate-form predicate)
+         sender (role-form sender)
+         receiver (role-form receiver)]
+     [`(ast/send ~predicate
+                 ~sender
+                 ~receiver)
+      `(ast/receive ~sender
+                    ~receiver)])))
 
 (defmacro close
   [sender-expr receiver-expr]
   `(ast/close (ast/role '~sender-expr) (ast/role '~receiver-expr)))
 
 ;;;;
-;;;; Discourje: Nullary operators
+;;;; Nullary operators
 ;;;;
 
 (defmacro end
@@ -157,7 +197,7 @@
              (s/recur pipe (inc i))])))
 
 (s/def ::pipe [t r-name n]
-  (s/apply ::pipe [t r-name 0 n]))
+  (s/apply ::pipe ['t r-name 0 n]))
 
 ;;;;
 ;;;; TODO: Move the following functions elsewhere

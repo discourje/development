@@ -14,7 +14,7 @@
   (str (cond
          (string? (:name-expr role)) (:name-expr role)
          (keyword? (:name-expr role)) (ast/get-role-name (:name-expr role))
-         :else (throw (Exception.)))
+         :else (throw (Exception. (str (type (:name-expr role))))))
        (if (empty? (:index-exprs role))
          ""
          (mapv #(let [index (eval %)]
@@ -177,7 +177,7 @@
     ;; Loop
     (= (:type ast) :loop)
     (terminated? (unfold ast (substitute (:body ast)
-                                         (zipmap (:vars ast) (:exprs ast)))))
+                                         (zipmap (:vars ast) (map eval (:exprs ast))))))
 
     ;; Recur
     (= (:type ast) :recur)
@@ -189,7 +189,7 @@
           exprs (rest ast)
           body (:body (get (get @ast/registry name) (count exprs)))
           vars (:vars (get (get @ast/registry name) (count exprs)))]
-      (terminated? (substitute body (zipmap vars exprs))))
+      (terminated? (substitute body (zipmap vars (map eval exprs)))))
 
     ;; Aldebaran
     (= (:type ast) :aldebaran)
@@ -270,7 +270,7 @@
     ;; Loop
     (= (:type ast) :loop)
     (successors (unfold ast (substitute (:body ast)
-                                        (zipmap (:vars ast) (:exprs ast))))
+                                        (zipmap (:vars ast) (map eval (:exprs ast)))))
                 f-action)
 
     ;; Recur
@@ -283,7 +283,7 @@
           exprs (rest ast)
           body (:body (get (get @ast/registry name) (count exprs)))
           vars (:vars (get (get @ast/registry name) (count exprs)))]
-      (successors (substitute body (zipmap vars exprs)) f-action))
+      (successors (substitute body (zipmap vars (map eval exprs))) f-action))
 
     ;; Aldebaran
     (= (:type ast) :aldebaran)

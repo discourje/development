@@ -55,31 +55,21 @@
 
 (defn action [type predicate sender receiver]
   {:pre [(contains? #{:sync :send :receive :close} type)
-         (predicate? predicate)
-         (role? sender)
-         (role? receiver)]}
+         (or (predicate? predicate) (symbol? predicate))
+         (or (role? sender) (symbol? sender))
+         (or (role? receiver) (symbol? receiver))]}
   (->Action type predicate sender receiver))
 
 (defn sync [predicate sender receiver]
-  {:pre [(predicate? predicate)
-         (role? sender)
-         (role? receiver)]}
   (action :sync predicate sender receiver))
 
 (defn send [predicate sender receiver]
-  {:pre [(predicate? predicate)
-         (role? sender)
-         (role? receiver)]}
   (action :send predicate sender receiver))
 
 (defn receive [sender receiver]
-  {:pre [(role? sender)
-         (role? receiver)]}
   (action :receive (predicate '(fn [_] true)) sender receiver))
 
 (defn close [sender receiver]
-  {:pre [(role? sender)
-         (role? receiver)]}
   (action :close (predicate '(fn [_] true)) sender receiver))
 
 ;;;;

@@ -1,5 +1,6 @@
 (ns discourje.spec.lts
-  (:require [discourje.spec.interp :as interp])
+  (:require [clojure.set :refer [union]]
+            [discourje.spec.interp :as interp])
   (:import (java.util.function Function Predicate)
            (discourje.spec.lts Action Action$Type State LTS LTSs)))
 
