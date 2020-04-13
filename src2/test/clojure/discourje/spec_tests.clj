@@ -441,21 +441,25 @@
 ;;;;
 
 (deftest loop-recur-tests
-  (let [lts1 (s/lts (s/loop swap [;; Probably impossible (?) to do this nicer.
-                                  ;; See: https://stackoverflow.com/questions/40161751
-                                  r1 (discourje.spec/role ::alice)
-                                  r2 (discourje.spec/role ::bob)]
-                            (s/--> r1 r2)
-                            (s/--> r2 r1)
+  (let [lts1 (s/lts (s/loop swap [r1 ::alice
+                                  r2 ::bob]
+                            (s/-->> (s/role r1) (s/role r2))
+                            (s/-->> (s/role r2) (s/role r1))
                             (s/recur swap r2 r1)))
-        lts2 (s/lts (s/aldebaran des (0, 4, 5)
-                                 (0, "‽(Object,alice,bob)", 1)
-                                 (1, "‽(Object,bob,alice)", 2)
-                                 (2, "‽(Object,bob,alice)", 3)
-                                 (3, "‽(Object,alice,bob)", 0)))]
+        lts2 (s/lts (s/aldebaran des (0, 8, 8)
+                                 (0, "!(Object,alice,bob)", 1)
+                                 (1, "?(alice,bob)", 2)
+                                 (2, "!(Object,bob,alice)", 3)
+                                 (3, "?(bob,alice)", 4)
+                                 (4, "!(Object,bob,alice)", 5)
+                                 (5, "?(bob,alice)", 6)
+                                 (6, "!(Object,alice,bob)", 7)
+                                 (7, "?(alice,bob)", 0)))]
     (is (s/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
-  (let [lts1 (s/lts (s/loop swap [r1 (discourje.spec/role ::alice)
+  (let [lts1 (s/lts (s/loop swap [;; Unfortunately, cannot bind to (s/role ::alice) and (s/role ::bob).
+                                  ;; See: https://stackoverflow.com/questions/40161751
+                                  r1 (discourje.spec/role ::alice)
                                   r2 (discourje.spec/role ::bob)]
                             (s/-->> r1 r2)
                             (s/-->> r2 r1)
