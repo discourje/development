@@ -27,28 +27,6 @@
 (defonce token 0)
 (defonce sync-not-ok (Object.))
 
-(defn verify-sync! [message channel]
-  (monitors/verify-sync! message
-                         (.-sender channel)
-                         (.-receiver channel)
-                         (.-monitor channel)))
-
-(defn verify-send! [message channel]
-  (monitors/verify-send! message
-                         (.-sender channel)
-                         (.-receiver channel)
-                         (.-monitor channel)))
-
-(defn verify-receive! [channel]
-  (monitors/verify-receive! (.-sender channel)
-                            (.-receiver channel)
-                            (.-monitor channel)))
-
-(defn verify-close! [channel]
-  (monitors/verify-close! (.-sender channel)
-                          (.-receiver channel)
-                          (.-monitor channel)))
-
 ;;;;
 ;;;; put! and take!
 ;;;;
@@ -61,7 +39,11 @@
     ;; Buffered channel
     (a/put! (.-ch_ghost1 channel)
             token
-            (fn [_] (if (verify-send! message channel)
+            (fn [_] (if (monitors/verify! (.-monitor channel)
+                                          :send
+                                          message
+                                          (.-sender channel)
+                                          (.-receiver channel))
 
                       ;; If ok, commit
                       (a/put! (.-ch channel)
@@ -77,10 +59,16 @@
     ;; Unbuffered channel
     (a/put! (.-ch_ghost1 channel)
             token
-            (fn [_] (if (verify-sync! message channel)
+            (fn [_] (if (monitors/verify! (.-monitor channel)
+                                          :sync
+                                          message
+                                          (.-sender channel)
+                                          (.-receiver channel))
+
                       (a/put! (.-ch channel)
                               message
                               f)
+
                       (a/put! (.-ch channel)
                               sync-not-ok
                               (fn [_] (throw (RuntimeException.)))))))))
@@ -92,7 +80,11 @@
 
     ;; Buffered channel
     (a/take! (.-ch_ghost2 channel)
-             (fn [_] (if (verify-receive! channel)
+             (fn [_] (if (monitors/verify! (.-monitor channel)
+                                           :receive
+                                           nil
+                                           (.-sender channel)
+                                           (.-receiver channel))
 
                        ;; If ok, commit
                        (a/take! (.-ch channel)
@@ -122,7 +114,11 @@
 
     ;; Buffered channel
     (do (a/>!! (.-ch_ghost1 channel) token)
-        (if (verify-send! message channel)
+        (if (monitors/verify! (.-monitor channel)
+                              :send
+                              message
+                              (.-sender channel)
+                              (.-receiver channel))
 
           ;; If ok, commit
           (let [x (a/>!! (.-ch channel) message)
@@ -135,8 +131,14 @@
 
     ;; Unbuffered channel
     (do (a/>!! (.-ch_ghost1 channel) token)
-        (if (verify-sync! message channel)
+        (if (monitors/verify! (.-monitor channel)
+                              :sync
+                              message
+                              (.-sender channel)
+                              (.-receiver channel))
+
           (do (a/>!! (.-ch channel) message))
+
           (do (a/>!! (.-ch channel) sync-not-ok)
               (throw (RuntimeException.)))))))
 
@@ -147,7 +149,11 @@
 
     ;; Buffered channel
     (do (a/<!! (.-ch_ghost2 channel))
-        (if (verify-receive! channel)
+        (if (monitors/verify! (.-monitor channel)
+                              :receive
+                              nil
+                              (.-sender channel)
+                              (.-receiver channel))
 
           ;; If ok, commit
           (let [message (a/<!! (.ch channel))
@@ -175,15 +181,26 @@
   (if (.-buffered channel)
 
     ;; Buffered channel
-    (if (verify-close! channel)
+    (if (monitors/verify! (.-monitor channel)
+                          :close
+                          nil
+                          (.-sender channel)
+                          (.-receiver channel))
+
       (do (a/close! (.-ch_ghost1 channel))
           (a/close! (.-ch channel))
-          (a/close! (.-ch_ghost2 channel))
-          )
-      (fn [_] (throw (RuntimeException.))))
+          (a/close! (.-ch_ghost2 channel)))
+
+      (throw (RuntimeException.)))
 
     ;; Unbuffered channel
-    (if (verify-close! channel)
+    (if (monitors/verify! (.-monitor channel)
+                          :close
+                          nil
+                          (.-sender channel)
+                          (.-receiver channel))
+
       (do (a/close! (.-ch_ghost1 channel))
           (a/close! (.-ch channel)))
-      (fn [_] (throw (RuntimeException.))))))
+
+      (throw (RuntimeException.)))))

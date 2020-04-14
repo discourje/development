@@ -12,24 +12,16 @@
   {:pre [(lts/lts? lts)]}
   (->Monitor (atom (lts/initial-states lts))))
 
-(defn- verify! [monitor f]
+(defn verify! [monitor type message sender receiver]
   (try (do (swap! (.-current_states monitor)
                   (fn [source-states]
-                    (let [target-states (f source-states)]
+                    (let [target-states (lts/expand-then-perform! source-states
+                                                                  type
+                                                                  message
+                                                                  sender
+                                                                  receiver)]
                       (if (empty? target-states)
                         (throw (Exception.))
                         target-states))))
            true)
        (catch Exception _ false)))
-
-(defn verify-sync! [message sender receiver monitor]
-  (verify! monitor (fn [source-states] (lts/expand-and-sync! source-states message sender receiver))))
-
-(defn verify-send! [message sender receiver monitor]
-  (verify! monitor (fn [source-states] (lts/expand-and-send! source-states message sender receiver))))
-
-(defn verify-receive! [sender receiver monitor]
-  (verify! monitor (fn [source-states] (lts/expand-and-receive! source-states sender receiver))))
-
-(defn verify-close! [sender receiver monitor]
-  (verify! monitor (fn [source-states] (lts/expand-and-close! source-states sender receiver))))

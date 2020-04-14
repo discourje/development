@@ -2,11 +2,20 @@
   (:require [clojure.set :refer [union]]
             [discourje.spec.interp :as interp])
   (:import (java.util.function Function Predicate)
-           (discourje.spec.lts Action Action$Type State LTS LTSs)))
+           (discourje.spec.lts Action Action$Type States State LTS LTSs)))
 
 ;;;;
-;;;; Action
+;;;; Actions
 ;;;;
+
+(defn- action-type-keyword-to-enum [keyword]
+  {:pre [(keyword? keyword)]}
+  (case keyword
+    :sync Action$Type/SYNC
+    :send Action$Type/SEND
+    :receive Action$Type/RECEIVE
+    :close Action$Type/CLOSE
+    (throw (Exception.))))
 
 (defn action [name type predicate sender receiver]
   {:pre [(string? name)
@@ -15,28 +24,34 @@
          (string? sender)
          (string? receiver)]}
   (Action. name
-           (case type
-             :sync Action$Type/SYNC
-             :send Action$Type/SEND
-             :receive Action$Type/RECEIVE
-             :close Action$Type/CLOSE
-             (throw (Exception.)))
+           (action-type-keyword-to-enum type)
            (reify Predicate (test [_ message] (predicate message)))
            sender
            receiver))
 
 ;;;;
-;;;; LTS
+;;;; States
 ;;;;
+
+(defn expand-then-perform! [source-states type message sender receiver]
+  (States/expandThenPerform source-states
+                            (action-type-keyword-to-enum type)
+                            message
+                            sender
+                            receiver))
+
+;;;;
+;;;; LTSs
+;;;;
+
+(defn lts? [x]
+  (= (type x) LTS))
 
 (defn lts [ast]
   (LTS. #{ast}
         (reify
           Function
           (apply [_ ast] (interp/successors ast action)))))
-
-(defn lts? [x]
-  (= (type x) LTS))
 
 (defn expandRecursively!
   ([lts]
@@ -49,30 +64,3 @@
 
 (defn bisimilar? [lts1 lts2]
   (LTSs/bisimilar lts1 lts2))
-
-;;;;
-;;;; TODO: Move this to Java
-;;;;
-
-(defn- expand-and-perform! [source-states type message sender receiver]
-  (loop [todo source-states
-         result {}]
-    (if (empty? todo)
-      result
-      (let [source-state (first todo)
-            _ (.expand source-state)
-            target-states (set (.perform (.getTransitionsOrNull source-state)
-                                         type message sender receiver))]
-        (if (empty? target-states)
-          {}
-          (recur (rest todo) (clojure.set/union result target-states)))))))
-
-(defn expand-and-sync! [source-states message sender receiver]
-  (expand-and-perform! source-states Action$Type/SYNC message sender receiver))
-(defn expand-and-send! [source-states message sender receiver]
-  (expand-and-perform! source-states Action$Type/SEND message sender receiver))
-(defn expand-and-receive! [source-states sender receiver]
-  (expand-and-perform! source-states Action$Type/RECEIVE nil sender receiver))
-(defn expand-and-close! [source-states sender receiver]
-  (expand-and-perform! source-states Action$Type/CLOSE nil sender receiver))
-
