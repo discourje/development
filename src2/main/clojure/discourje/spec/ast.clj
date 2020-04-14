@@ -426,3 +426,17 @@
 ;                    (assoc-last-interaction (first interactions) rec-table)
 ;                    )))]
 ;    (assoc-to-rec-table rec-table inter)))
+;
+;(defmacro add-infrastructure
+;  "adds infrastructure to the mep (channels)"
+;  ([message-exchange-pattern]
+;   `(generate-infrastructure ~message-exchange-pattern))
+;  ([message-exchange-pattern custom-channels]
+;   `(generate-infrastructure ~message-exchange-pattern ~custom-channels)))
+;
+;(defmacro custom-time
+;  "Evaluates expr and prints the time it took.  Returns the value of expr."
+;  [_] ;[expr]
+;  `(let [start# (. System (nanoTime))
+;         ];ret# ~expr]
+;     (str "Elapsed time: " (/ (double (- (. System (nanoTime)) start#)) 1000000.0) " msecs")))

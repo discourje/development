@@ -1,8 +1,6 @@
 (ns discourje.spec
-  (:require [clojure.java.shell :refer [sh]]
-            [discourje.spec.ast :as ast]
-            [discourje.spec.lts :as lts]
-            [discourje.core.async.impl.monitors :as monitors]))
+  (:require [discourje.spec.ast :as ast]))
+
 ;;;;
 ;;;; Predicates
 ;;;;
@@ -198,55 +196,3 @@
 
 (s/def ::pipe [t r-name n]
   (s/apply ::pipe ['t r-name 0 n]))
-
-;;;;
-;;;; TODO: Move the following functions elsewhere
-;;;;
-
-(defn expandRecursively!
-  ([lts]
-   (lts/expandRecursively! lts))
-  ([lts bound]
-   (lts/expandRecursively! lts bound)))
-
-(defn lts
-  ([ast]
-   (lts ast true))
-  ([ast expandRecursively]
-   (let [lts (lts/lts ast)]
-     (if expandRecursively (expandRecursively! lts))
-     lts)))
-
-(defn bisimilar? [lts1 lts2]
-  (lts/bisimilar? lts1 lts2))
-
-(defn not-bisimilar? [lts1 lts2]
-  (not (bisimilar? lts1 lts2)))
-
-(defn println [lts]
-  (clojure.core/println (.toString lts)))
-
-(defn ltsgraph [lts mcrl2-root-dir tmp-file]
-  (spit tmp-file (.toString lts))
-  (future (clojure.java.shell/sh (str mcrl2-root-dir "/bin/ltsgraph") tmp-file)))
-
-(defn monitor [spec]
-  (monitors/monitor (lts/lts spec)))
-
-;;;;
-;;;; TODO: Everything below is part of monitoring and should be put elsewhere at some point
-;;;;
-
-;(defmacro add-infrastructure
-;  "adds infrastructure to the mep (channels)"
-;  ([message-exchange-pattern]
-;   `(generate-infrastructure ~message-exchange-pattern))
-;  ([message-exchange-pattern custom-channels]
-;   `(generate-infrastructure ~message-exchange-pattern ~custom-channels)))
-;
-;(defmacro custom-time
-;  "Evaluates expr and prints the time it took.  Returns the value of expr."
-;  [_] ;[expr]
-;  `(let [start# (. System (nanoTime))
-;         ];ret# ~expr]
-;     (str "Elapsed time: " (/ (double (- (. System (nanoTime)) start#)) 1000000.0) " msecs")))

@@ -1,5 +1,6 @@
 (ns discourje.spec.lts
   (:require [clojure.set :refer [union]]
+            [clojure.java.shell :refer [sh]]
             [discourje.spec.interp :as interp])
   (:import (java.util.function Function Predicate)
            (discourje.spec.lts Action Action$Type States LTS LTSs)))
@@ -47,20 +48,30 @@
 (defn lts? [x]
   (= (type x) LTS))
 
-(defn lts [ast]
-  (LTS. #{ast}
-        (reify
-          Function
-          (apply [_ ast] (interp/successors ast action)))))
-
-(defn expandRecursively!
-  ([lts]
-   (.expandRecursively lts))
-  ([lts bound]
-   (.expandRecursively lts bound)))
+(defn lts
+  ([ast]
+   (lts ast true))
+  ([ast expand-recursively]
+   (let [lts (LTS. #{ast}
+                   (reify
+                     Function
+                     (apply [_ ast] (interp/successors ast action))))]
+     (if expand-recursively
+       (.expandRecursively lts))
+     lts)))
 
 (defn initial-states [lts]
   (.getInitialStates lts))
 
 (defn bisimilar? [lts1 lts2]
   (LTSs/bisimilar lts1 lts2))
+
+(defn not-bisimilar? [lts1 lts2]
+  (not (bisimilar? lts1 lts2)))
+
+(defn println [lts]
+  (clojure.core/println (.toString lts)))
+
+(defn ltsgraph [lts mcrl2-root-dir tmp-file]
+  (spit tmp-file (.toString lts))
+  (future (clojure.java.shell/sh (str mcrl2-root-dir "/bin/ltsgraph") tmp-file)))
