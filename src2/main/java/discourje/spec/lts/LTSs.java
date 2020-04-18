@@ -79,12 +79,15 @@ public class LTSs {
     }
 
     public static String toAldebaran(LTS<?> lts) {
-        if (lts.getInitialStates().size() != 1) {
+        return toAldebaran(lts, new LinkedHashMap<>());
+    }
+
+    public static String toAldebaran(LTS<?> lts, Map<State<?>, String> identifiers) {
+        if (lts.getInitialStates().size() != 1 || !identifiers.isEmpty()) {
             throw new IllegalArgumentException();
         }
         var initialState = lts.getInitialStates().iterator().next();
 
-        var identifiers = new LinkedHashMap<State<?>, String>();
         var i = 1;
         for (State<?> s : lts.getStates()) {
             if (Objects.equals(initialState, s)) {

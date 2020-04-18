@@ -1,5 +1,4 @@
-(ns discourje.core.async.impl.buffers
-  (:require [clojure.core.async :as a]))
+(ns discourje.core.async.impl.buffers)
 
 (deftype Buffer [type n])
 
@@ -7,7 +6,7 @@
   (= (type x) Buffer))
 
 (defn fixed-buffer [n]
-  {:pre [(>= n 0)]}
+  {:pre [(> n 0)]}
   (->Buffer :fixed-buffer n))
 
 (defn dropping-buffer [n]
@@ -22,20 +21,14 @@
   {:pre [true]}
   (->Buffer :promise-buffer 0))
 
-(defn capacity [buffer]
+(defn n [buffer]
   {:pre [(buffer? buffer)]}
   (.-n buffer))
+
+(defn type [buffer]
+  {:pre [(buffer? buffer)]}
+  (.-type buffer))
 
 (defn unblocking-buffer? [buffer]
   {:pre [(buffer? buffer)]}
   (contains? #{:dropping-buffer :sliding-buffer :promise-buffer} (.-type buffer)))
-
-(defn clojure-core-async-chan [buffer]
-  {:pre [(buffer? buffer)]}
-  (let [type (.-type buffer)
-        n (.-n buffer)]
-    (case type
-      :fixed-buffer (if (= n 0) (a/chan) (a/chan n))
-      :dropping-buffer (a/dropping-buffer n)
-      :sliding-buffer (a/sliding-buffer n)
-      :promise-buffer (throw (IllegalArgumentException.)))))

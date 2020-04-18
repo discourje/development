@@ -1,9 +1,6 @@
 package discourje.spec.lts;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -28,6 +25,36 @@ public class LTS<Spec> {
     @Override
     public String toString() {
         return LTSs.toAldebaran(this);
+    }
+
+    public String toString(Collection<State<?>> currentStates) {
+        if (currentStates.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+
+        var identifiers = new LinkedHashMap<State<?>, String>();
+        String s = LTSs.toAldebaran(this, identifiers);
+
+        StringBuilder b = new StringBuilder();
+        b.append(" *** Current state(s) ***");
+        b.append(System.lineSeparator());
+        b.append(System.lineSeparator());
+
+        for (State<?> state : currentStates) {
+            if (identifiers.containsKey(state)) {
+                b.append(identifiers.get(state)).append(", ");
+            } else {
+                throw new IllegalArgumentException();
+            }
+        }
+        b.delete(b.length() - 2, b.length());
+        b.append(System.lineSeparator());
+        b.append(System.lineSeparator());
+
+        b.append(" *** Transition(s) *** ");
+        b.append(System.lineSeparator());
+        b.append(s.substring(s.indexOf(System.lineSeparator())));
+        return b.toString();
     }
 
     public void expandRecursively() {
