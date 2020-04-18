@@ -50,7 +50,7 @@
 (defonce sync-not-ok (Object.))
 
 (defn- runtime-exception [type message channel]
-  (ex-info (str "Action "
+  (ex-info (str "[SESSION FAILURE] Action "
                 (case type :sync "‽" :send "!" :receive "?" :close "C" (throw (Exception.)))
                 "("
                 (if (contains? #{:sync :send} type) (str message ",") "")
