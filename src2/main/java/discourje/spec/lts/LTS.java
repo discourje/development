@@ -2,6 +2,7 @@ package discourje.spec.lts;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
@@ -10,6 +11,8 @@ public class LTS<Spec> {
     private Map<Spec, State<Spec>> states = new ConcurrentHashMap<>();
 
     private Collection<State<Spec>> initialStates;
+
+    private AtomicInteger size = new AtomicInteger(0);
 
     private Function<Spec, Map<Action, Collection<Spec>>> expander;
 
@@ -33,7 +36,7 @@ public class LTS<Spec> {
         }
 
         var identifiers = new LinkedHashMap<State<?>, String>();
-        String s = LTSs.toAldebaran(this, identifiers);
+        String s = LTSs.toAldebaran(this);
 
         StringBuilder b = new StringBuilder();
         b.append(" *** Current state(s) ***");
@@ -91,10 +94,13 @@ public class LTS<Spec> {
 
         private Spec spec;
 
+        private int identifier;
+
         private AtomicReference<Transitions<Spec>> transitions = new AtomicReference<>(null);
 
         private SpecState(Spec spec) {
             this.spec = spec;
+            this.identifier = size.getAndIncrement();
         }
 
         @Override
@@ -136,6 +142,11 @@ public class LTS<Spec> {
                     }
                 }
             }
+        }
+
+        @Override
+        public int getIdentifier() {
+            return identifier;
         }
 
         @Override

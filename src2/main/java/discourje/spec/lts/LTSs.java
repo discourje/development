@@ -79,22 +79,13 @@ public class LTSs {
     }
 
     public static String toAldebaran(LTS<?> lts) {
-        return toAldebaran(lts, new LinkedHashMap<>());
-    }
-
-    public static String toAldebaran(LTS<?> lts, Map<State<?>, String> identifiers) {
-        if (lts.getInitialStates().size() != 1 || !identifiers.isEmpty()) {
+        if (lts.getInitialStates().size() != 1) {
             throw new IllegalArgumentException();
         }
-        var initialState = lts.getInitialStates().iterator().next();
 
-        var i = 1;
-        for (State<?> s : lts.getStates()) {
-            if (Objects.equals(initialState, s)) {
-                identifiers.put(s, "0");
-            } else {
-                identifiers.put(s, Integer.toString(i++));
-            }
+        var initialState = lts.getInitialStates().iterator().next();
+        if (initialState.getIdentifier() != 0) {
+            throw new IllegalArgumentException();
         }
 
         Function<State<?>, String> stateToAldebaran = source -> {
@@ -103,11 +94,11 @@ public class LTSs {
             for (Action a : transitions.getActions()) {
                 for (State<?> target : transitions.getTargetsOrNull(a)) {
                     b.append("(");
-                    b.append(identifiers.getOrDefault(source, source.toString()));
+                    b.append(source.getIdentifier());
                     b.append(",");
                     b.append("\"").append(a).append("\"");
                     b.append(",");
-                    b.append(identifiers.getOrDefault(target, target.toString()));
+                    b.append(target.getIdentifier());
                     b.append(")");
                     b.append(System.lineSeparator());
                 }
@@ -127,7 +118,7 @@ public class LTSs {
             var transitions = s.getTransitionsOrNull();
             if (transitions == null) {
                 b.append(System.lineSeparator());
-                b.append(identifiers.get(s)).append(" not yet expanded");
+                b.append("state ").append(s.getIdentifier()).append(" not yet expanded");
             } else if (!transitions.isEmpty()) {
                 b.append(System.lineSeparator());
                 b.append(stateToAldebaran.apply(s));
