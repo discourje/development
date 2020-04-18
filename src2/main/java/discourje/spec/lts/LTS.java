@@ -30,36 +30,6 @@ public class LTS<Spec> {
         return LTSs.toAldebaran(this);
     }
 
-    public String toString(Collection<State<?>> currentStates) {
-        if (currentStates.isEmpty()) {
-            throw new IllegalArgumentException();
-        }
-
-        var identifiers = new LinkedHashMap<State<?>, String>();
-        String s = LTSs.toAldebaran(this);
-
-        StringBuilder b = new StringBuilder();
-        b.append(" *** Current state(s) ***");
-        b.append(System.lineSeparator());
-        b.append(System.lineSeparator());
-
-        for (State<?> state : currentStates) {
-            if (identifiers.containsKey(state)) {
-                b.append(identifiers.get(state)).append(", ");
-            } else {
-                throw new IllegalArgumentException();
-            }
-        }
-        b.delete(b.length() - 2, b.length());
-        b.append(System.lineSeparator());
-        b.append(System.lineSeparator());
-
-        b.append(" *** Transition(s) *** ");
-        b.append(System.lineSeparator());
-        b.append(s.substring(s.indexOf(System.lineSeparator())));
-        return b.toString();
-    }
-
     public void expandRecursively() {
         expandRecursively(Integer.MAX_VALUE);
     }
@@ -118,7 +88,7 @@ public class LTS<Spec> {
 
         @Override
         public String toString() {
-            return spec.toString();
+            return Integer.toString(identifier);
         }
 
         @Override

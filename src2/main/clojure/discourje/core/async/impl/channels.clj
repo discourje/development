@@ -50,19 +50,19 @@
 (defonce sync-not-ok (Object.))
 
 (defn- runtime-exception [type message channel]
-  (RuntimeException. (str "Action "
-                          (case type
-                            :sync "‽"
-                            :send "!"
-                            :receive "?"
-                            :close "C"
-                            (throw (Exception.))) "("
-                          (if (contains? #{:sync :send} type) (str message ",") "")
-                          (.-sender channel) ","
-                          (.-receiver channel) ")"
-                          " is not enabled."
-                          "\n\n"
-                          (.-monitor channel))))
+  (ex-info (str "Action "
+                (case type :sync "‽" :send "!" :receive "?" :close "C" (throw (Exception.)))
+                "("
+                (if (contains? #{:sync :send} type) (str message ",") "")
+                (.-sender channel)
+                ","
+                (.-receiver channel)
+                ") is not enabled in current state(s): "
+                (monitors/str-current-states (.-monitor channel))
+                ". LTS in Aldebaran format (http://cadp.inria.fr/man/aut.html):\n\n"
+                (monitors/str-lts (.-monitor channel)))
+           {:message message
+            :channel channel}))
 
 ;;;;
 ;;;; close!

@@ -1,18 +1,30 @@
 (ns discourje.core.async.impl.monitors
   (:require [discourje.spec.lts :as lts]))
 
-(deftype Monitor [lts current-states]
-  Object
-  (toString [_] (lts/string lts @current-states)))
+(deftype Monitor [lts current-states])
 
-(defn monitor? [x]
+(defn monitor?
+  [x]
   (= (type x) Monitor))
 
-(defn monitor [lts]
+(defn monitor
+  [lts]
   {:pre [(lts/lts? lts)]}
   (->Monitor lts (atom (lts/initial-states lts))))
 
-(defn verify! [monitor type message sender receiver]
+(defn str-lts
+  [monitor]
+  {:pre [(monitor? monitor)]}
+  (str (.-lts monitor)))
+
+(defn str-current-states
+  [monitor]
+  {:pre [(monitor? monitor)]}
+  (let [s (str @(.-current_states monitor))]
+    (subs s 1 (dec (count s)))))
+
+(defn verify!
+  [monitor type message sender receiver]
   (if (nil? monitor)
     true
     (try (do (swap! (.-current_states monitor)

@@ -72,9 +72,6 @@
 (defn println [lts]
   (clojure.core/println (.toString lts)))
 
-(defn string [lts current-states]
-  (.toString lts current-states))
-
 (defn ltsgraph [lts mcrl2-root-dir tmp-file]
   (spit tmp-file (.toString lts))
   (future (clojure.java.shell/sh (str mcrl2-root-dir "/bin/ltsgraph") tmp-file)))
