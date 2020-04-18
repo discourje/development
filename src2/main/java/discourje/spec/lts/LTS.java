@@ -84,60 +84,63 @@ public class LTS<Spec> {
     }
 
     private State<Spec> newOrGetState(Spec spec) {
-        return states.computeIfAbsent(spec, k -> new State<>() {
+        return states.computeIfAbsent(spec, SpecState::new);
+    }
 
-            private AtomicReference<Transitions<Spec>> transitions = new AtomicReference<>(null);
+    private class SpecState implements discourje.spec.lts.State<Spec> {
 
-            @Override
-            public boolean equals(Object o) {
-                if (this == o) return true;
-                if (o == null || getClass() != o.getClass()) return false;
-                State<?> state = (State<?>) o;
-                return Objects.equals(k, state.getSpec());
-            }
+        private Spec spec;
 
-            @Override
-            public int hashCode() {
-                return Objects.hash(k);
-            }
+        private AtomicReference<Transitions<Spec>> transitions = new AtomicReference<>(null);
 
-            @Override
-            public String toString() {
-                return k.toString();
-            }
+        private SpecState(Spec spec) {
+            this.spec = spec;
+        }
 
-            @Override
-            public void expandRecursively(int bound) {
-                if (bound > 0 && transitions.get() == null) {
-                    var expansion = new Transitions<Spec>();
-                    var targetSpecs = expander.apply(k);
-                    for (Map.Entry<Action, Collection<Spec>> e : targetSpecs.entrySet()) {
-                        var a = e.getKey();
-                        for (Spec targetSpec : e.getValue()) {
-                            var target = newOrGetState(targetSpec);
-                            expansion.addTarget(a, target);
-                        }
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            SpecState state = (SpecState) o;
+            return Objects.equals(spec, state.spec);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(spec);
+        }
+
+        @Override
+        public String toString() {
+            return spec.toString();
+        }
+
+        @Override
+        public void expandRecursively(int bound) {
+            if (bound > 0 && transitions.get() == null) {
+                var expansion = new Transitions<Spec>();
+                var targetSpecs = expander.apply(spec);
+                for (Map.Entry<Action, Collection<Spec>> e : targetSpecs.entrySet()) {
+                    var a = e.getKey();
+                    for (Spec targetSpec : e.getValue()) {
+                        var target = newOrGetState(targetSpec);
+                        expansion.addTarget(a, target);
                     }
+                }
 
-                    transitions.compareAndSet(null, expansion);
+                transitions.compareAndSet(null, expansion);
 
-                    if (bound > 1) {
-                        for (State<Spec> target : transitions.get().getTargets()) {
-                            target.expandRecursively(bound - 1);
-                        }
+                if (bound > 1) {
+                    for (discourje.spec.lts.State<Spec> target : transitions.get().getTargets()) {
+                        target.expandRecursively(bound - 1);
                     }
                 }
             }
+        }
 
-            @Override
-            public Spec getSpec() {
-                return k;
-            }
-
-            @Override
-            public Transitions<Spec> getTransitionsOrNull() {
-                return transitions.get();
-            }
-        });
+        @Override
+        public Transitions<Spec> getTransitionsOrNull() {
+            return transitions.get();
+        }
     }
 }

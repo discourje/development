@@ -103,11 +103,11 @@ public class LTSs {
             for (Action a : transitions.getActions()) {
                 for (State<?> target : transitions.getTargetsOrNull(a)) {
                     b.append("(");
-                    b.append(identifiers.getOrDefault(source, source.getSpec().toString()));
+                    b.append(identifiers.getOrDefault(source, source.toString()));
                     b.append(",");
                     b.append("\"").append(a).append("\"");
                     b.append(",");
-                    b.append(identifiers.getOrDefault(target, target.getSpec().toString()));
+                    b.append(identifiers.getOrDefault(target, target.toString()));
                     b.append(")");
                     b.append(System.lineSeparator());
                 }

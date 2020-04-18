@@ -12,7 +12,5 @@ public interface State<Spec> {
 
     void expandRecursively(int bound);
 
-    Spec getSpec();
-
     Transitions<Spec> getTransitionsOrNull();
 }
