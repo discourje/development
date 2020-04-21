@@ -1,6 +1,5 @@
 (ns discourje.core.async
   (:require [clojure.core.async :as a]
-            [discourje.spec :as s]
             [discourje.spec.lts :as lts]
             [discourje.core.async.impl.buffers :as buffers]
             [discourje.core.async.impl.channels :as channels]
@@ -60,8 +59,7 @@
 
 (defmacro thread
   [& body]
-  `(let [m# (monitors/monitor (s/* (s/any #{"sender" "receiver"})))
-         c# (channels/buffered-channel 1 (s/role "sender") (s/role "receiver") m#)]
+  `(let [c# (chan 1)]
      (a/take! (a/thread-call (^:once fn* [] ~@body))
               (fn [x#]
                 (if (not (nil? x#))
@@ -94,25 +92,25 @@
   (buffers/sliding-buffer n))
 
 ;;;;
-;;;; MORE CONCEPTS
+;;;; OTHER
 ;;;;
 
-(defn put!
-  ([port val]
-   (put! port val identity))
-  ([port val fn1]
-   (channels/put! port val fn1))
-  (;[port val fn1 on-caller?]
-   [_ _ _ _]
-   (throw (UnsupportedOperationException.))))
-
-(defn take!
-  ([port fn1]
-   (channels/take! port fn1))
-  (;[port fn1 on-caller?]
-   [_ _ _]
-   (throw (UnsupportedOperationException.))))
-
+;(defn put!
+;  ([port val]
+;   (put! port val identity))
+;  ([port val fn1]
+;   (channels/put! port val fn1))
+;  (;[port val fn1 on-caller?]
+;   [_ _ _ _]
+;   (throw (UnsupportedOperationException.))))
+;
+;(defn take!
+;  ([port fn1]
+;   (channels/take! port fn1))
+;  (;[port fn1 on-caller?]
+;   [_ _ _]
+;   (throw (UnsupportedOperationException.))))
+;
 ;(defn unblocking-buffer?
 ;  [buff]
 ;  (buffers/unblocking-buffer? buff))
