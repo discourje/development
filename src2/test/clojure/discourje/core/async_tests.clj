@@ -153,6 +153,12 @@
 
 ;; TODO
 
+(deftest foo
+  (let [c1 (a/chan 1)
+        c2 (a/chan 2)]
+    (a/alts!! [[c1 "foo"] [c2 "bar"]] :priority true))
+  )
+
 ;;;;
 ;;;; CORE CONCEPTS: dropping-buffer, sliding-buffer
 ;;;;

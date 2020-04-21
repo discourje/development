@@ -103,69 +103,89 @@
 ;;;; >!! and <!!
 ;;;;
 
-(defn >!!
+(defn- >!!-step1
+  [channel]
+  {:pre [(channel? channel)]}
+  (a/>!! (.-ch_ghost1 channel) token))
+
+(defn- >!!-step2
   [channel message]
   {:pre [(channel? channel)]}
   (if (.-buffered channel)
 
     ;; Buffered channel
-    (do (a/>!! (.-ch_ghost1 channel) token)
-        (if (monitors/verify! (.-monitor channel)
-                              :send
-                              message
-                              (.-sender channel)
-                              (.-receiver channel))
+    (if (monitors/verify! (.-monitor channel)
+                          :send
+                          message
+                          (.-sender channel)
+                          (.-receiver channel))
 
-          ;; If ok, commit
-          (let [x (a/>!! (.-ch channel) message)
-                _ (a/>!! (.-ch_ghost2 channel) token)]
-            x)
+      ;; If ok, commit
+      (let [x (a/>!! (.-ch channel) message)
+            _ (a/>!! (.-ch_ghost2 channel) token)]
+        x)
 
-          ;; If not ok, abort
-          (do (a/<!! (.-ch_ghost1 channel))
-              (throw-runtime-exception :send message channel))))
+      ;; If not ok, abort
+      (do (a/<!! (.-ch_ghost1 channel))
+          (throw-runtime-exception :send message channel)))
 
     ;; Unbuffered channel
-    (do (a/>!! (.-ch_ghost1 channel) token)
-        (if (monitors/verify! (.-monitor channel)
-                              :sync
-                              message
-                              (.-sender channel)
-                              (.-receiver channel))
+    (if (monitors/verify! (.-monitor channel)
+                          :sync
+                          message
+                          (.-sender channel)
+                          (.-receiver channel))
 
-          (do (a/>!! (.-ch channel) message))
+      (do (a/>!! (.-ch channel) message))
 
-          (do (a/>!! (.-ch channel) sync-not-ok)
-              (throw-runtime-exception :sync message channel))))))
+      (do (a/>!! (.-ch channel) sync-not-ok)
+          (throw-runtime-exception :sync message channel)))))
 
-(defn <!!
+(defn >!!
+  [channel message]
+  {:pre [(channel? channel)]}
+  (>!!-step1 channel)
+  (>!!-step2 channel message))
+
+(defn <!!-step1
+  [channel]
+  {:pre [(channel? channel)]}
+  (if (.-buffered channel)
+    (a/<!! (.-ch_ghost2 channel))
+    (a/<!! (.-ch_ghost1 channel))))
+
+(defn <!!-step2
   [channel]
   {:pre [(channel? channel)]}
   (if (.-buffered channel)
 
     ;; Buffered channel
-    (do (a/<!! (.-ch_ghost2 channel))
-        (if (monitors/verify! (.-monitor channel)
-                              :receive
-                              nil
-                              (.-sender channel)
-                              (.-receiver channel))
+    (if (monitors/verify! (.-monitor channel)
+                          :receive
+                          nil
+                          (.-sender channel)
+                          (.-receiver channel))
 
-          ;; If ok, commit
-          (let [message (a/<!! (.ch channel))
-                _ (a/<!! (.-ch_ghost1 channel))]
-            message)
+      ;; If ok, commit
+      (let [message (a/<!! (.ch channel))
+            _ (a/<!! (.-ch_ghost1 channel))]
+        message)
 
-          ;; If not ok, abort
-          (do (a/>!! (.-ch_ghost2 channel) token)
-              (throw-runtime-exception :receive nil channel))))
+      ;; If not ok, abort
+      (do (a/>!! (.-ch_ghost2 channel) token)
+          (throw-runtime-exception :receive nil channel)))
 
     ;; Unbuffered channel
-    (do (a/<!! (.-ch_ghost1 channel))
-        (let [message (a/<!! (.-ch channel))]
-          (if (= message sync-not-ok)
-            (throw-runtime-exception :sync nil channel)
-            message)))))
+    (let [message (a/<!! (.-ch channel))]
+      (if (= message sync-not-ok)
+        (throw-runtime-exception :sync nil channel)
+        message))))
+
+(defn <!!
+  [channel]
+  {:pre [(channel? channel)]}
+  (<!!-step1 channel)
+  (<!!-step2 channel))
 
 ;;;;
 ;;;; >! and <!
@@ -177,7 +197,58 @@
 ;;;; alts! and alts!!
 ;;;;
 
-;; TODO
+;; TODO: alts!
+
+(defn alts!!
+  [alternatives opts]
+  {:pre [(every? #(or (and (vector? %) (= 2 (count %)) (channel? (first %)))
+                      (channel? %))
+                 alternatives)]}
+
+  (let [ports (mapv #(if (vector? %)
+                       (let [channel (first %)
+                             port (.-ch_ghost1 channel)]
+                         [port token])
+                       (let [channel %
+                             port (if (.-buffered channel)
+                                    (.-ch_ghost2 channel)
+                                    (.-ch_ghost1 channel))]
+                         [port]))
+                    alternatives)
+
+        [val port] (if (nil? opts)
+                     (a/alts!! ports)
+                     (if (contains? opts :default)
+                       (if (contains? opts :priority)
+                         (a/alts!! ports :default (:default opts) :priority (:priority opts))
+                         (a/alts!! ports :default (:default opts)))
+                       (if (contains? opts :priority)
+                         (a/alts!! ports :priority (:priority opts))
+                         (a/alts!! ports))))
+
+        alternative (if (= port :default)
+                      nil
+                      (loop [todo alternatives]
+                        (if (empty? todo)
+                          (throw (Exception.))
+                          (let [alternative (first todo)]
+                            (if (vector? alternative)
+                              (let [channel (first alternative)]
+                                (if (= port (.-ch_ghost1 channel))
+                                  alternative
+                                  (recur (rest todo))))
+                              (let [channel alternative]
+                                (if (= port (if (.-buffered channel)
+                                              (.-ch_ghost2 channel)
+                                              (.-ch_ghost1 channel)))
+                                  alternative
+                                  (recur (rest todo)))))))))]
+
+    (if (nil? alternative)
+      val
+      (if (vector? alternative)
+        (>!!-step2 (first alternative) (second alternative))
+        (<!!-step2 alternative)))))
 
 ;;;;
 ;;;; put! and take!

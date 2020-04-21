@@ -77,7 +77,12 @@
 ;;;; CORE CONCEPTS: alts!, alts!!, timeout
 ;;;;
 
-;; TODO
+;; TODO: alts!
+;; TODO: timeout
+
+(defn alts!!
+  [ports & {:as opts}]
+  (channels/alts!! ports opts))
 
 ;;;;
 ;;;; CORE CONCEPTS: dropping-buffer, sliding-buffer
@@ -95,6 +100,8 @@
 ;;;; OTHER
 ;;;;
 
+;;; *** Untested code: ***
+;
 ;(defn put!
 ;  ([port val]
 ;   (put! port val identity))
