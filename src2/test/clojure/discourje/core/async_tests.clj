@@ -142,6 +142,40 @@
     (is (not-failed? t2 0))))
 
 ;;;;
+;;;; CORE CONCEPTS: >!, <!, go
+;;;;
+
+;; TODO
+
+;;;;
+;;;; CORE CONCEPTS: alts!, alts!!, timeout
+;;;;
+
+;; TODO
+
+;;;;
+;;;; CORE CONCEPTS: dropping-buffer, sliding-buffer
+;;;;
+
+(deftest chan->!!-<!!-dropping-buffer-tests
+  (let [clj-c (clj/chan (clj/dropping-buffer 1))
+        dcj-c (dcj/chan (dcj/dropping-buffer 1))]
+    (clj/>!! clj-c 0)
+    (clj/>!! clj-c 1)
+    (dcj/>!! dcj-c 0)
+    (dcj/>!! dcj-c 1)
+    (is (= (clj/<!! clj-c) (dcj/<!! dcj-c)))))
+
+(deftest chan->!!-<!!-sliding-buffer-tests
+  (let [clj-c (clj/chan (clj/sliding-buffer 1))
+        dcj-c (dcj/chan (dcj/sliding-buffer 1))]
+    (clj/>!! clj-c 0)
+    (clj/>!! clj-c 1)
+    (dcj/>!! dcj-c 0)
+    (dcj/>!! dcj-c 1)
+    (is (= (clj/<!! clj-c) (dcj/<!! dcj-c)))))
+
+;;;;
 ;;;; CORE CONCEPTS: core.async/examples/walkthrough.clj
 ;;;;
 
