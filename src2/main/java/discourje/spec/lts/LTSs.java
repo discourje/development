@@ -107,14 +107,17 @@ public class LTSs {
             return b.toString();
         };
 
+        var states = new ArrayList<>(lts.getStates());
+        states.sort(Comparator.comparingInt(State::getIdentifier));
+
         var b = new StringBuilder();
         var n = 0;
-        for (State<?> s : lts.getStates()) {
+        for (State<?> s : states) {
             var transitions = s.getTransitionsOrNull();
             n += transitions == null ? 0 : s.getTransitionsOrNull().size();
         }
-        b.append("des (0,").append(n).append(",").append(lts.getStates().size()).append(")");
-        for (State<?> s : lts.getStates()) {
+        b.append("des (0,").append(n).append(",").append(states.size()).append(")");
+        for (State<?> s : states) {
             var transitions = s.getTransitionsOrNull();
             if (transitions == null) {
                 b.append(System.lineSeparator());

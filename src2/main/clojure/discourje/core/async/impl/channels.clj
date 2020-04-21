@@ -53,14 +53,15 @@
   (throw (ex-info (str "[SESSION FAILURE] Action "
                        (case type :sync "‽" :send "!" :receive "?" :close "C" (throw (Exception.)))
                        "("
-                       (if (contains? #{:sync :send} type) (str message ",") "")
+                       (if (nil? message) "" (str message ","))
                        (.-sender channel)
                        ","
                        (.-receiver channel)
                        ") is not enabled in current state(s): "
                        (monitors/str-current-states (.-monitor channel))
                        ". LTS in Aldebaran format (http://cadp.inria.fr/man/aut.html):\n\n"
-                       (monitors/str-lts (.-monitor channel)))
+                       (monitors/str-lts (.-monitor channel))
+                       "\n")
                   {:message message
                    :channel channel})))
 
