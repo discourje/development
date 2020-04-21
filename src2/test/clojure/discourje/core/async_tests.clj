@@ -15,7 +15,7 @@
   (f))
 
 (defroles (fn [] true))
-
+(def thrown?)
 (use-fixtures :once defroles)
 
 (defmacro no-throw [& body]
@@ -141,3 +141,52 @@
     (is (failed? t1))
     (is (not-failed? t2 0))))
 
+;;;;
+;;;; CORE CONCEPTS: core.async/examples/walkthrough.clj
+;;;;
+
+(deftest walkthrough
+
+  ;; chan, close!
+
+  (a/chan)
+  (is true)
+
+  (a/chan 10)
+  (is true)
+
+  (let [c (a/chan)]
+    (a/close! c))
+  (is true)
+
+  ;; >!!, <!!, thread
+
+  (let [m (a/monitor [(s/-->> ::alice ::bob) (s/close ::alice ::bob)])
+        c (a/chan 10 (s/role ::alice) (s/role ::bob) m {})]
+    (a/>!! c "hello")
+    (assert (= "hello" (a/<!! c)))
+    (a/close! c))
+  (is true)
+
+  (let [m (a/monitor [(s/--> ::alice ::bob) (s/close ::alice ::bob)])
+        c (a/chan (s/role ::alice) (s/role ::bob) m {})]
+    (a/thread (a/>!! c "hello"))
+    (assert (= "hello" (a/<!! c)))
+    (a/close! c))
+  (is true)
+
+  ;; >!, <!, go
+
+  ;; TODO
+
+  ;; alts!, alts!!, timeout
+
+  ;; TODO
+
+  ;; dropping-buffer, sliding-buffer
+
+  (a/chan (a/dropping-buffer 10))
+  (is true)
+
+  (a/chan (a/sliding-buffer 10))
+  (is true))
