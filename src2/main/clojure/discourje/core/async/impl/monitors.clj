@@ -1,16 +1,21 @@
 (ns discourje.core.async.impl.monitors
   (:require [discourje.spec.lts :as lts]))
 
-(deftype Monitor [lts current-states])
+(deftype Monitor [lts current-states flag])
 
-(defn monitor?
-  [x]
-  (= (type x) Monitor))
+;; FIXME: current-states should be :volatile-mutable instead of an atom (better perf), but I can't get this to work.
+;; See also https://clojure.atlassian.net/browse/CLJ-2092.
 
 (defn monitor
   [lts]
   {:pre [(lts/lts? lts)]}
-  (->Monitor lts (atom (lts/initial-states lts))))
+  (->Monitor lts
+             (atom (lts/initial-states lts))
+             (atom false)))
+
+(defn monitor?
+  [x]
+  (= (type x) Monitor))
 
 (defn str-lts
   [monitor]
@@ -25,17 +30,30 @@
 
 (defn verify!
   [monitor type message sender receiver]
+  {:pre [(or (monitor? monitor) (nil? monitor))]}
   (if (nil? monitor)
     true
-    (try (do (swap! (.-current_states monitor)
-                    (fn [source-states]
-                      (let [target-states (lts/expand-then-perform! source-states
-                                                                    type
-                                                                    message
-                                                                    sender
-                                                                    receiver)]
-                        (if (empty? target-states)
-                          (throw (Exception.))
-                          target-states))))
-             true)
-         (catch Exception _ false))))
+    (loop []
+      (let [source-states @(.-current_states monitor)
+            target-states (lts/expand-then-perform! source-states
+                                                    type
+                                                    message
+                                                    sender
+                                                    receiver)]
+        (if (empty? target-states)
+          false
+          (if (compare-and-set! (.-flag monitor) false true)
+            (if (compare-and-set! (.-current_states monitor) source-states target-states)
+              true
+              (do
+                (reset! (.-flag monitor) false)
+                (recur)))
+            (recur)))))))
+
+(defn lower-flag!
+  [monitor]
+  {:pre [(or (monitor? monitor) (nil? monitor))]}
+  (if (nil? monitor)
+    nil
+    (do (reset! (.-flag monitor) false)
+        nil)))

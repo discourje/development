@@ -81,8 +81,9 @@
                           (.-sender channel)
                           (.-receiver channel))
 
-      (do (a/close! (.-ch_ghost1 channel))
-          (a/close! (.-ch channel))
+      (do (a/close! (.-ch channel))
+          (monitors/lower-flag! (.-monitor channel))
+          (a/close! (.-ch_ghost1 channel))
           (a/close! (.-ch_ghost2 channel)))
 
       (throw-runtime-exception :close nil channel))
@@ -94,8 +95,9 @@
                           (.-sender channel)
                           (.-receiver channel))
 
-      (do (a/close! (.-ch_ghost1 channel))
-          (a/close! (.-ch channel)))
+      (do (a/close! (.-ch channel))
+          (monitors/lower-flag! (.-monitor channel))
+          (a/close! (.-ch_ghost1 channel)))
 
       (throw-runtime-exception :close nil channel))))
 
@@ -122,6 +124,7 @@
 
       ;; If ok, commit
       (let [x (a/>!! (.-ch channel) message)
+            _ (monitors/lower-flag! (.-monitor channel))
             _ (a/>!! (.-ch_ghost2 channel) token)]
         x)
 
@@ -136,7 +139,9 @@
                           (.-sender channel)
                           (.-receiver channel))
 
-      (do (a/>!! (.-ch channel) message))
+      (let [x (a/>!! (.-ch channel) message)
+            _ (monitors/lower-flag! (.-monitor channel))]
+        x)
 
       (do (a/>!! (.-ch channel) sync-not-ok)
           (throw-runtime-exception :sync message channel)))))
@@ -168,6 +173,7 @@
 
       ;; If ok, commit
       (let [message (a/<!! (.ch channel))
+            _ (monitors/lower-flag! (.-monitor channel))
             _ (a/<!! (.-ch_ghost1 channel))]
         message)
 
@@ -257,6 +263,8 @@
 ;;;;
 
 ;;; *** Untested code: ***
+;
+;;; To do: Add lower-flag! after positive verify!
 ;
 ;(defn put!
 ;  [channel message f]
