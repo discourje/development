@@ -89,8 +89,8 @@
 
 (defn choice [branches]
   (->Multiary :choice branches))
-(defn parallel [branches]
-  (->Multiary :parallel branches))
+(defn par [branches]
+  (->Multiary :par branches))
 
 ;;;;
 ;;;; Conditional operators

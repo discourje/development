@@ -122,9 +122,9 @@
   [branch & more]
   `(ast/choice [~branch ~@more]))
 
-(defmacro parallel
+(defmacro par
   [branch & more]
-  `(ast/parallel [~branch ~@more]))
+  `(ast/par [~branch ~@more]))
 
 ;;;;
 ;;;; Conditional operators

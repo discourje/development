@@ -201,16 +201,16 @@
 
 (choice-tests)
 
-(deftest parallel-tests
+(deftest par-tests
 
-  (let [lts1 (lts/lts (s/parallel (s/-->> ::alice ::bob)))
+  (let [lts1 (lts/lts (s/par (s/-->> ::alice ::bob)))
         lts2 (lts/lts (s/aldebaran des (0, 2, 3)
                                  (0, "!(Object,alice,bob)", 1)
                                  (1, "?(alice,bob)", 2)))]
     (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
-  (let [lts1 (lts/lts (s/parallel (s/-->> ::alice ::bob)
-                                (s/-->> ::alice ::carol)))
+  (let [lts1 (lts/lts (s/par (s/-->> ::alice ::bob)
+                             (s/-->> ::alice ::carol)))
         lts2 (lts/lts (s/aldebaran des (0, 12, 9)
                                  (0, "!(Object,alice,bob)", 1)
                                  (0, "!(Object,alice,carol)", 2)
@@ -226,9 +226,9 @@
                                  (8, "!(Object,alice,bob)", 7)))]
     (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
-  (let [lts1 (lts/lts (s/parallel (s/-->> ::alice ::bob)
-                                (s/-->> ::alice ::carol)
-                                (s/-->> ::alice ::dave)))
+  (let [lts1 (lts/lts (s/par (s/-->> ::alice ::bob)
+                             (s/-->> ::alice ::carol)
+                             (s/-->> ::alice ::dave)))
         lts2 (lts/lts (s/aldebaran des (0, 54, 27)
                                  (0, "!(Object,alice,bob)", 1)
                                  (0, "!(Object,alice,carol)", 2)
@@ -287,37 +287,37 @@
     (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
   ;; Non-idempotence
-  (let [lts1 (lts/lts (s/parallel (s/-->> ::alice ::bob)
-                                (s/-->> ::alice ::bob)))
-        lts2 (lts/lts (s/parallel (s/-->> ::alice ::bob)))]
+  (let [lts1 (lts/lts (s/par (s/-->> ::alice ::bob)
+                             (s/-->> ::alice ::bob)))
+        lts2 (lts/lts (s/par (s/-->> ::alice ::bob)))]
     (is (lts/not-bisimilar? lts1 lts2) (msg lts1 lts2)))
 
   ;; Commutativity
-  (let [lts1 (lts/lts (s/parallel (s/-->> ::alice ::bob)
-                                (s/-->> ::alice ::carol)))
-        lts2 (lts/lts (s/parallel (s/-->> ::alice ::carol)
-                                (s/-->> ::alice ::bob)))]
+  (let [lts1 (lts/lts (s/par (s/-->> ::alice ::bob)
+                             (s/-->> ::alice ::carol)))
+        lts2 (lts/lts (s/par (s/-->> ::alice ::carol)
+                             (s/-->> ::alice ::bob)))]
     (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
   ;; Associativity
-  (let [lts1 (lts/lts (s/parallel (s/-->> ::alice ::bob)
-                                (s/parallel (s/-->> ::alice ::carol)
-                                            (s/-->> ::alice ::dave))))
-        lts2 (lts/lts (s/parallel (s/parallel (s/-->> ::alice ::bob)
-                                            (s/-->> ::alice ::carol))
-                                (s/-->> ::alice ::dave)))]
+  (let [lts1 (lts/lts (s/par (s/-->> ::alice ::bob)
+                             (s/par (s/-->> ::alice ::carol)
+                                    (s/-->> ::alice ::dave))))
+        lts2 (lts/lts (s/par (s/par (s/-->> ::alice ::bob)
+                                    (s/-->> ::alice ::carol))
+                             (s/-->> ::alice ::dave)))]
     (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
   ;; Flattening
-  (let [lts1 (lts/lts (s/parallel (s/-->> ::alice ::bob)
-                                (s/parallel (s/-->> ::alice ::carol)
-                                            (s/-->> ::alice ::dave))))
-        lts2 (lts/lts (s/parallel (s/-->> ::alice ::bob)
-                                (s/-->> ::alice ::carol)
-                                (s/-->> ::alice ::dave)))]
+  (let [lts1 (lts/lts (s/par (s/-->> ::alice ::bob)
+                             (s/par (s/-->> ::alice ::carol)
+                                    (s/-->> ::alice ::dave))))
+        lts2 (lts/lts (s/par (s/-->> ::alice ::bob)
+                             (s/-->> ::alice ::carol)
+                             (s/-->> ::alice ::dave)))]
     (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2))))
 
-(parallel-tests)
+(par-tests)
 
 (deftest vector-tests
   (let [lts1 (lts/lts [(s/-->> ::alice ::bob)])
@@ -399,8 +399,8 @@
                                (s/-->> ::alice ::dave)]))]
     (is (lts/not-bisimilar? lts1 lts2) (msg lts1 lts2)))
 
-  (let [lts1 (lts/lts (s/parallel (s/-->> ::alice ::bob)
-                                (s/-->> ::alice ::carol)))
+  (let [lts1 (lts/lts (s/par (s/-->> ::alice ::bob)
+                             (s/-->> ::alice ::carol)))
         lts2 (lts/lts (s/choice [(s/-->> ::alice ::bob)
                                (s/-->> ::alice ::carol)]
                               [(s/-->> ::alice ::carol)
@@ -523,8 +523,8 @@
   (let [lts1 (lts/lts (s/loop multicast [i 0
                                        n 3]
                             (s/if (< i n)
-                              (s/parallel (s/-->> ::alice (::bob i))
-                                          (s/recur multicast (inc i) n)))))
+                              (s/par (s/-->> ::alice (::bob i))
+                                     (s/recur multicast (inc i) n)))))
         lts2 (lts/lts (s/aldebaran des (0, 54, 27)
                                  (0, "!(Object,alice,bob[0])", 1)
                                  (0, "!(Object,alice,bob[1])", 2)

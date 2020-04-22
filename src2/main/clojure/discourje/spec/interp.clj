@@ -59,8 +59,8 @@
     (ast/choice (mapv #(substitute % smap) (:branches ast)))
 
     ;; Parallel
-    (= (:type ast) :parallel)
-    (ast/parallel (mapv #(substitute % smap) (:branches ast)))
+    (= (:type ast) :par)
+    (ast/par (mapv #(substitute % smap) (:branches ast)))
 
     ;; Vector
     (vector? ast)
@@ -111,8 +111,8 @@
     (ast/choice (mapv #(unfold loop %) (:branches ast)))
 
     ;; Parallel
-    (= (:type ast) :parallel)
-    (ast/parallel (mapv #(unfold loop %) (:branches ast)))
+    (= (:type ast) :par)
+    (ast/par (mapv #(unfold loop %) (:branches ast)))
 
     ;; Vector
     (vector? ast)
@@ -163,7 +163,7 @@
     (not (not-any? terminated? (:branches ast)))
 
     ;; Parallel
-    (= (:type ast) :parallel)
+    (= (:type ast) :par)
     (every? terminated? (:branches ast))
 
     ;; Vector
@@ -213,7 +213,7 @@
     (reduce (partial merge-with into) (map #(successors % f-action) (:branches ast)))
 
     ;; Parallel
-    (= (:type ast) :parallel)
+    (= (:type ast) :par)
     (let [branches (:branches ast)]
       (loop [i 0
              result {}]
@@ -223,7 +223,7 @@
                 branches-before (subvec branches 0 i)
                 branches-after (subvec branches (inc i) (count branches))
                 ;; f inserts an "evaluated" branch between (possibly before or after) "unevaluated" branches
-                f (fn [branch'] (ast/parallel (reduce into [branches-before
+                f (fn [branch'] (ast/par (reduce into [branches-before
                                                             (if (and (terminated? branch')
                                                                      (empty? (successors branch' f-action)))
                                                               []
