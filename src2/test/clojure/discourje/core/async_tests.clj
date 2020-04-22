@@ -555,6 +555,10 @@
     (is (not-failed? t2))
     (is (not-failed? t3))))
 
+(deftest <!!-timeout-tests
+  (is (= (clj/<!! (clj/timeout 100))
+         (dcj/<!! (dcj/timeout 100)))))
+
 ;;;;
 ;;;; CORE CONCEPTS: dropping-buffer, sliding-buffer
 ;;;;
@@ -646,15 +650,17 @@
   ;      (assert (= "hi" v))))
   ;  (println "Read" n "msgs in" (- (System/currentTimeMillis) begin) "ms"))
 
-  ;(let [t (timeout 100)
-  ;      begin (System/currentTimeMillis)]
-  ;  (<!! t)
-  ;  (println "Waited" (- (System/currentTimeMillis) begin)))
+  (let [t (a/timeout 100)
+        begin (System/currentTimeMillis)]
+    (a/<!! t)
+    (println "Waited" (- (System/currentTimeMillis) begin)))
+  (is true)
 
-  ;(let [c (chan)
-  ;      begin (System/currentTimeMillis)]
-  ;  (alts!! [c (timeout 100)])
-  ;  (println "Gave up after" (- (System/currentTimeMillis) begin)))
+  (let [c (a/chan)
+        begin (System/currentTimeMillis)]
+    (a/alts!! [c (a/timeout 100)])
+    (println "Gave up after" (- (System/currentTimeMillis) begin)))
+  (is true)
 
   ;; dropping-buffer, sliding-buffer
 

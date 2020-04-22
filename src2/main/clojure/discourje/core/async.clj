@@ -84,6 +84,12 @@
   [ports & {:as opts}]
   (channels/alts!! ports opts))
 
+(defn timeout
+  [msecs]
+  (let [c (chan 1)]
+    (a/take! (a/timeout msecs) (fn [_] (close! c)))
+    c))
+
 ;;;;
 ;;;; CORE CONCEPTS: dropping-buffer, sliding-buffer
 ;;;;
