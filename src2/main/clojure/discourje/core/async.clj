@@ -59,13 +59,14 @@
 
 (defmacro thread
   [& body]
-  `(let [c# (chan 1)]
-     (a/take! (a/thread-call (^:once fn* [] ~@body))
-              (fn [x#]
-                (if (not (nil? x#))
-                  (channels/>!! c# x#))
-                (channels/close! c#)))
-     c#))
+  (let [clj (macroexpand `(a/thread ~@body))]
+    `(let [c# (chan 1)]
+       (a/take! ~clj
+                (fn [x#]
+                  (if (not (nil? x#))
+                    (channels/>!! c# x#))
+                  (channels/close! c#)))
+       c#)))
 
 ;;;;
 ;;;; CORE CONCEPTS: >!, <!, go
@@ -74,15 +75,14 @@
 ;; TODO
 
 ;;;;
-;;;; CORE CONCEPTS: alts!, alts!!, timeout
+;;;; CORE CONCEPTS: alts!!, alts!, timeout
 ;;;;
-
-;; TODO: alts!
-;; TODO: timeout
 
 (defn alts!!
   [ports & {:as opts}]
   (channels/alts!! ports opts))
+
+;; TODO: alts!
 
 (defn timeout
   [msecs]
