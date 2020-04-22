@@ -15,6 +15,21 @@
 
 (defroles (fn [] true))
 
+(def x nil)
+(def i nil)
+(def j nil)
+(def n nil)
+(def des nil)
+(def r1 nil)
+(def r2 nil)
+(def r-name nil)
+(def swap nil)
+(def pipe nil)
+(def ring nil)
+(def multicast nil)
+(def anycast nil)
+(def omega nil)
+
 (use-fixtures :once defroles)
 
 ;;;;

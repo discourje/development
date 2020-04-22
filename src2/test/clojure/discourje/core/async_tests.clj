@@ -15,7 +15,9 @@
   (f))
 
 (defroles (fn [] true))
+
 (def thrown?)
+
 (use-fixtures :once defroles)
 
 (defmacro no-throw [& body]
