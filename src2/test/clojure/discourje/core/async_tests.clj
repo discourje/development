@@ -27,8 +27,8 @@
 (defn not-failed?
   ([thread]
    (not (failed? thread)))
-  ([thread val]
-   (= (a/<!! thread) val)))
+  ([thread & vals]
+   (contains? (set vals) (a/<!! thread))))
 
 ;;;;
 ;;;; CORE CONCEPTS: chan, close!
@@ -71,13 +71,13 @@
 ;;;;
 
 (deftest chan->!!-tests
-  (let [clj (clj/>!! (clj/chan 1) 0)
-        dcj (dcj/>!! (dcj/chan 1) 0)]
+  (let [clj (clj/>!! (clj/chan 1) "foo")
+        dcj (dcj/>!! (dcj/chan 1) "foo")]
     (is (= clj dcj))))
 
 (deftest chan-<!!-thread-tests
-  (let [clj (clj/thread 0)
-        dcj (dcj/thread 0)]
+  (let [clj (clj/thread 3.14)
+        dcj (dcj/thread 3.14)]
     (is (= (clj/<!! clj) (dcj/<!! dcj)))
     (is (= (clj/<!! clj) (dcj/<!! dcj)))))
 
@@ -86,28 +86,28 @@
   ;; Unbuffered
 
   (let [c (a/chan)
-        t1 (a/thread (no-throw (a/>!! c 0)))
+        t1 (a/thread (no-throw (a/>!! c "foo")))
         t2 (a/thread (no-throw (a/<!! c)))]
     (is (not-failed? t1))
-    (is (not-failed? t2 0)))
+    (is (not-failed? t2 "foo")))
 
   (let [m (a/monitor (s/end))
         c (a/chan (s/role ::alice) (s/role ::bob) m {})
-        t1 (a/thread (no-throw (a/>!! c 0)))
+        t1 (a/thread (no-throw (a/>!! c "foo")))
         t2 (a/thread (no-throw (a/<!! c)))]
     (is (failed? t1))
     (is (failed? t2)))
 
   (let [m (a/monitor (s/--> ::alice ::bob))
         c (a/chan (s/role ::alice) (s/role ::bob) m {})
-        t1 (a/thread (no-throw (a/>!! c 0)))
+        t1 (a/thread (no-throw (a/>!! c "foo")))
         t2 (a/thread (no-throw (a/<!! c)))]
     (is (not-failed? t1))
-    (is (not-failed? t2 0)))
+    (is (not-failed? t2 "foo")))
 
   (let [m (a/monitor (s/--> ::alice ::bob))
         c (a/chan (s/role ::alice) (s/role ::carol) m {})
-        t1 (a/thread (no-throw (a/>!! c 0)))
+        t1 (a/thread (no-throw (a/>!! c "foo")))
         t2 (a/thread (no-throw (a/<!! c)))]
     (is (failed? t1))
     (is (failed? t2)))
@@ -115,31 +115,31 @@
   ;; Buffered
 
   (let [c (a/chan 1)
-        t1 (a/thread (no-throw (a/>!! c 0)))
+        t1 (a/thread (no-throw (a/>!! c "foo")))
         t2 (a/thread (no-throw (a/<!! c)))]
     (is (not-failed? t1))
-    (is (not-failed? t2 0)))
+    (is (not-failed? t2 "foo")))
 
   (let [m (a/monitor (s/end))
         c (a/chan 1 (s/role ::alice) (s/role ::bob) m {})
-        t1 (a/thread (no-throw (a/>!! c 0)))
-        t2 (a/thread (no-throw 0))]
+        t1 (a/thread (no-throw (a/>!! c "foo")))
+        t2 (a/thread (no-throw 3.14))]
     (is (failed? t1))
-    (is (not-failed? t2 0)))
+    (is (not-failed? t2 3.14)))
 
   (let [m (a/monitor (s/-->> ::alice ::bob))
         c (a/chan 1 (s/role ::alice) (s/role ::bob) m {})
-        t1 (a/thread (no-throw (a/>!! c 0)))
+        t1 (a/thread (no-throw (a/>!! c "foo")))
         t2 (a/thread (no-throw (a/<!! c)))]
     (is (not-failed? t1))
-    (is (not-failed? t2 0)))
+    (is (not-failed? t2 "foo")))
 
   (let [m (a/monitor (s/-->> ::alice ::bob))
         c (a/chan 1 (s/role ::alice) (s/role ::carol) m {})
-        t1 (a/thread (no-throw (a/>!! c 0)))
-        t2 (a/thread (no-throw 0))]
+        t1 (a/thread (no-throw (a/>!! c "foo")))
+        t2 (a/thread (no-throw 3.14))]
     (is (failed? t1))
-    (is (not-failed? t2 0))))
+    (is (not-failed? t2 3.14))))
 
 ;;;;
 ;;;; CORE CONCEPTS: >!, <!, go
@@ -151,13 +151,409 @@
 ;;;; CORE CONCEPTS: alts!, alts!!, timeout
 ;;;;
 
-;; TODO
+(deftest chan-alts!!-tests
+  (is (thrown? AssertionError (dcj/alts!! [])))
 
-(deftest foo
+  ;; Unbuffered
+
+  (is (= (clj/alts!! [(clj/chan)] :default -1)
+         (dcj/alts!! [(dcj/chan)] :default -1)))
+
+  (is (= (clj/alts!! [(clj/chan)] :default -1 :priority true)
+         (dcj/alts!! [(dcj/chan)] :default -1 :priority true)))
+
+  (let [c1 (a/chan)
+        c2 (a/chan)
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] [c2 "bar"]])))
+        t2 (a/thread (no-throw (a/alts!! [c1 c2])))]
+    (is (not-failed? t1))
+    (is (not-failed? t2)))
+
+  (let [c1 (a/chan)
+        c2 (a/chan)
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] c2])))
+        t2 (a/thread (no-throw (a/alts!! [c1 [c2 "bar"]])))]
+    (is (not-failed? t1))
+    (is (not-failed? t2)))
+
+  (let [m (a/monitor (s/choice (s/--> ::alice ::bob)
+                               (s/--> ::bob ::alice)))
+        c1 (a/chan (s/role ::alice) (s/role ::bob) m {})
+        c2 (a/chan (s/role ::bob) (s/role ::alice) m {})
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] [c2 "bar"]])))
+        t2 (a/thread (no-throw (a/alts!! [c1 c2])))]
+    (is (not-failed? t1))
+    (is (not-failed? t2)))
+
+  (let [m (a/monitor (s/choice (s/--> ::alice ::bob)
+                               (s/--> ::bob ::alice)))
+        c1 (a/chan (s/role ::alice) (s/role ::bob) m {})
+        c2 (a/chan (s/role ::bob) (s/role ::alice) m {})
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] c2])))
+        t2 (a/thread (no-throw (a/alts!! [c1 [c2 "bar"]])))]
+    (is (not-failed? t1))
+    (is (not-failed? t2)))
+
+  ;; Buffered
+
+  (is (= (first (clj/alts!! [[(clj/chan 1) "foo"]]))
+         (first (dcj/alts!! [[(dcj/chan 1) "foo"]]))))
+
+  (is (= (clj/alts!! [(clj/chan 1)] :default -1)
+         (dcj/alts!! [(dcj/chan 1)] :default -1)))
+
+  (is (= (first (clj/alts!! [[(clj/chan 1) "foo"] [(clj/chan 1) "bar"]] :priority true))
+         (first (dcj/alts!! [[(dcj/chan 1) "foo"] [(dcj/chan 1) "bar"]] :priority true))))
+
+  (is (= (first (clj/alts!! [(clj/chan 1) [(clj/chan 1) "bar"]] :priority true))
+         (first (dcj/alts!! [(dcj/chan 1) [(dcj/chan 1) "bar"]] :priority true))))
+
+  (is (= (first (clj/alts!! [(clj/chan 1) (clj/chan 1)] :default -1 :priority true))
+         (first (dcj/alts!! [(dcj/chan 1) (dcj/chan 1)] :default -1 :priority true))))
+
+  (let [m (a/monitor (s/choice (s/-->> ::alice ::bob)
+                               (s/-->> ::bob ::alice)))
+        c1 (a/chan 1 (s/role ::alice) (s/role ::bob) m {})
+        c2 (a/chan 1 (s/role ::bob) (s/role ::alice) m {})
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] [c2 "bar"]])))
+        t2 (a/thread (no-throw (a/alts!! [c1 c2])))]
+    (is (not-failed? t1))
+    (is (not-failed? t2)))
+
+  ;; Unbuffered and buffered
+
+  (let [m (a/monitor (s/choice (s/--> ::alice ::bob)
+                               (s/-->> ::bob ::alice)))
+        c1 (a/chan (s/role ::alice) (s/role ::bob) m {})
+        c2 (a/chan 1 (s/role ::bob) (s/role ::alice) m {})
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] c2])))
+        t2 (a/thread (no-throw (a/alts!! [c1 [c2 "bar"]])))]
+    (is (not-failed? t1))
+    (is (not-failed? t2))))
+
+(deftest chan->!!-thread-alts!!-tests
+
+  ;; Unbuffered
+
+  (let [c1 (a/chan)
+        c2 (a/chan)
+        t1 (a/thread (no-throw (a/>!! c1 "foo")))
+        t2 (a/thread (no-throw 3.14))
+        t3 (a/thread (no-throw (a/alts!! [c1 c2])))]
+    (is (not-failed? t1))
+    (is (not-failed? t2))
+    (is (not-failed? t3 ["foo" c1])))
+
+  (let [c1 (a/chan)
+        c2 (a/chan)
+        t1 (a/thread (no-throw 3.14))
+        t2 (a/thread (no-throw (a/>!! c2 "foo")))
+        t3 (a/thread (no-throw (a/alts!! [c1 c2])))]
+    (is (not-failed? t1))
+    (is (not-failed? t2))
+    (is (not-failed? t3 ["foo" c2])))
+
+  (let [m (a/monitor (s/choice (s/--> ::alice ::carol)
+                               (s/--> ::bob ::carol)))
+        c1 (a/chan (s/role ::alice) (s/role ::carol) m {})
+        c2 (a/chan (s/role ::bob) (s/role ::carol) m {})
+        t1 (a/thread (no-throw (a/>!! c1 "foo")))
+        t2 (a/thread (no-throw 3.14))
+        t3 (a/thread (no-throw (a/alts!! [c1 c2])))]
+    (is (not-failed? t1))
+    (is (not-failed? t2))
+    (is (not-failed? t3 ["foo" c1])))
+
+  (let [m (a/monitor (s/choice (s/--> ::alice ::carol)
+                               (s/--> ::bob ::carol)))
+        c1 (a/chan (s/role ::alice) (s/role ::carol) m {})
+        c2 (a/chan (s/role ::bob) (s/role ::carol) m {})
+        t1 (a/thread (no-throw 3.14))
+        t2 (a/thread (no-throw (a/>!! c2 "foo")))
+        t3 (a/thread (no-throw (a/alts!! [c1 c2])))]
+    (is (not-failed? t1))
+    (is (not-failed? t2))
+    (is (not-failed? t3 ["foo" c2])))
+
+  ;; Buffered
+
   (let [c1 (a/chan 1)
-        c2 (a/chan 2)]
-    (a/alts!! [[c1 "foo"] [c2 "bar"]] :priority true))
-  )
+        c2 (a/chan 1)
+        t1 (a/thread (no-throw (a/>!! c1 "foo")))
+        t2 (a/thread (no-throw 3.14))
+        t3 (a/thread (no-throw (a/alts!! [c1 c2])))]
+    (is (not-failed? t1))
+    (is (not-failed? t2))
+    (is (not-failed? t3 ["foo" c1])))
+
+  (let [c1 (a/chan 1)
+        c2 (a/chan 1)
+        t1 (a/thread (no-throw 3.14))
+        t2 (a/thread (no-throw (a/>!! c2 "foo")))
+        t3 (a/thread (no-throw (a/alts!! [c1 c2])))]
+    (is (not-failed? t1))
+    (is (not-failed? t2))
+    (is (not-failed? t3 ["foo" c2])))
+
+  (let [m (a/monitor (s/choice (s/-->> ::alice ::carol)
+                               (s/-->> ::bob ::carol)))
+        c1 (a/chan 1 (s/role ::alice) (s/role ::carol) m {})
+        c2 (a/chan 1 (s/role ::bob) (s/role ::carol) m {})
+        t1 (a/thread (no-throw (a/>!! c1 "foo")))
+        t2 (a/thread (no-throw 3.14))
+        t3 (a/thread (no-throw (a/alts!! [c1 c2])))]
+    (is (not-failed? t1))
+    (is (not-failed? t2))
+    (is (not-failed? t3 ["foo" c1])))
+
+  (let [m (a/monitor (s/choice (s/-->> ::alice ::carol)
+                               (s/-->> ::bob ::carol)))
+        c1 (a/chan 1 (s/role ::alice) (s/role ::carol) m {})
+        c2 (a/chan 1 (s/role ::bob) (s/role ::carol) m {})
+        t1 (a/thread (no-throw 3.14))
+        t2 (a/thread (no-throw (a/>!! c2 "foo")))
+        t3 (a/thread (no-throw (a/alts!! [c1 c2])))]
+    (is (not-failed? t1))
+    (is (not-failed? t2))
+    (is (not-failed? t3 ["foo" c2])))
+
+  ;; Unbuffered and buffered
+
+  (let [c1 (a/chan)
+        c2 (a/chan 1)
+        t1 (a/thread (no-throw (a/>!! c1 "foo")))
+        t2 (a/thread (no-throw 3.14))
+        t3 (a/thread (no-throw (a/alts!! [c1 c2])))]
+    (is (not-failed? t1))
+    (is (not-failed? t2))
+    (is (not-failed? t3 ["foo" c1])))
+
+  (let [c1 (a/chan)
+        c2 (a/chan 1)
+        t1 (a/thread (no-throw 3.14))
+        t2 (a/thread (no-throw (a/>!! c2 "foo")))
+        t3 (a/thread (no-throw (a/alts!! [c1 c2])))]
+    (is (not-failed? t1))
+    (is (not-failed? t2))
+    (is (not-failed? t3 ["foo" c2])))
+
+  (let [m (a/monitor (s/choice (s/--> ::alice ::carol)
+                               (s/-->> ::bob ::carol)))
+        c1 (a/chan (s/role ::alice) (s/role ::carol) m {})
+        c2 (a/chan 1 (s/role ::bob) (s/role ::carol) m {})
+        t1 (a/thread (no-throw (a/>!! c1 "foo")))
+        t2 (a/thread (no-throw 3.14))
+        t3 (a/thread (no-throw (a/alts!! [c1 c2])))]
+    (is (not-failed? t1))
+    (is (not-failed? t2))
+    (is (not-failed? t3 ["foo" c1])))
+
+  (let [m (a/monitor (s/choice (s/--> ::alice ::carol)
+                               (s/-->> ::bob ::carol)))
+        c1 (a/chan (s/role ::alice) (s/role ::carol) m {})
+        c2 (a/chan 1 (s/role ::bob) (s/role ::carol) m {})
+        t1 (a/thread (no-throw 3.14))
+        t2 (a/thread (no-throw (a/>!! c2 "foo")))
+        t3 (a/thread (no-throw (a/alts!! [c1 c2])))]
+    (is (not-failed? t1))
+    (is (not-failed? t2))
+    (is (not-failed? t3 ["foo" c2]))))
+
+(deftest chan-<!!-thread-alts!!-tests
+
+  ;; Unbuffered
+
+  (let [c1 (a/chan)
+        c2 (a/chan)
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] [c2 "bar"]])))
+        t2 (a/thread (no-throw (a/<!! c1)))
+        t3 (a/thread (no-throw 3.14))]
+    (is (not-failed? t1 [true c1]))
+    (is (not-failed? t2 "foo"))
+    (is (not-failed? t3)))
+
+  (let [c1 (a/chan)
+        c2 (a/chan)
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] [c2 "bar"]])))
+        t2 (a/thread (no-throw 3.14))
+        t3 (a/thread (no-throw (a/<!! c2)))]
+    (is (not-failed? t1 [true c2]))
+    (is (not-failed? t2))
+    (is (not-failed? t3 "bar")))
+
+  (let [m (a/monitor (s/choice (s/--> ::alice ::bob)
+                               (s/--> ::alice ::carol)))
+        c1 (a/chan (s/role ::alice) (s/role ::bob) m {})
+        c2 (a/chan (s/role ::alice) (s/role ::carol) m {})
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] [c2 "bar"]])))
+        t2 (a/thread (no-throw (a/<!! c1)))
+        t3 (a/thread (no-throw 3.14))]
+    (is (not-failed? t1 [true c1]))
+    (is (not-failed? t2 "foo"))
+    (is (not-failed? t3)))
+
+  (let [m (a/monitor (s/choice (s/--> ::alice ::bob)
+                               (s/--> ::alice ::carol)))
+        c1 (a/chan (s/role ::alice) (s/role ::bob) m {})
+        c2 (a/chan (s/role ::alice) (s/role ::carol) m {})
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] [c2 "bar"]])))
+        t2 (a/thread (no-throw 3.14))
+        t3 (a/thread (no-throw (a/<!! c2)))]
+    (is (not-failed? t1 [true c2]))
+    (is (not-failed? t2))
+    (is (not-failed? t3 "bar")))
+
+  ;; Buffered
+
+  (let [c1 (a/chan 1)
+        c2 (a/chan 1)
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] [c2 "bar"]] :priority true)))
+        t2 (a/thread (no-throw (a/<!! c1)))
+        t3 (a/thread (no-throw 3.14))]
+    (is (not-failed? t1 [true c1]))
+    (is (not-failed? t2 "foo"))
+    (is (not-failed? t3)))
+
+  (let [m (a/monitor (s/choice (s/-->> ::alice ::bob)
+                               (s/-->> ::alice ::carol)))
+        c1 (a/chan 1 (s/role ::alice) (s/role ::bob) m {})
+        c2 (a/chan 1 (s/role ::alice) (s/role ::carol) m {})
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] [c2 "bar"]] :priority true)))
+        t2 (a/thread (no-throw (a/<!! c1)))
+        t3 (a/thread (no-throw 3.14))]
+    (is (not-failed? t1 [true c1]))
+    (is (not-failed? t2 "foo"))
+    (is (not-failed? t3)))
+
+  ;; Unbuffered and buffered
+
+  (let [c1 (a/chan)
+        c2 (a/chan 1)
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] [c2 "bar"]])))
+        t2 (a/thread (no-throw 3.14))
+        t3 (a/thread (no-throw (a/<!! c2)))]
+    (is (not-failed? t1 [true c2]))
+    (is (not-failed? t2))
+    (is (not-failed? t3 "bar")))
+
+  (let [m (a/monitor (s/choice (s/--> ::alice ::bob)
+                               (s/-->> ::alice ::carol)))
+        c1 (a/chan (s/role ::alice) (s/role ::bob) m {})
+        c2 (a/chan 1 (s/role ::alice) (s/role ::carol) m {})
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] [c2 "bar"]])))
+        t2 (a/thread (no-throw 3.14))
+        t3 (a/thread (no-throw (a/<!! c2)))]
+    (is (not-failed? t1 [true c2]))
+    (is (not-failed? t2))
+    (is (not-failed? t3 "bar"))))
+
+(deftest chan-!!>-<!!-thread-alts!!-tests
+
+  ;; Unbuffered
+
+  (let [c1 (a/chan)
+        c2 (a/chan)
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] c2])))
+        t2 (a/thread (no-throw (a/<!! c1)))
+        t3 (a/thread (no-throw 3.14))]
+    (is (not-failed? t1 [true c1]))
+    (is (not-failed? t2 "foo"))
+    (is (not-failed? t3)))
+
+  (let [c1 (a/chan)
+        c2 (a/chan)
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] c2])))
+        t2 (a/thread (no-throw 3.14))
+        t3 (a/thread (no-throw (a/>!! c2 "bar")))]
+    (is (not-failed? t1 ["bar" c2]))
+    (is (not-failed? t2))
+    (is (not-failed? t3)))
+
+  (let [m (a/monitor (s/choice (s/--> ::alice ::bob)
+                               (s/--> ::alice ::carol)))
+        c1 (a/chan (s/role ::alice) (s/role ::bob) m {})
+        c2 (a/chan (s/role ::alice) (s/role ::carol) m {})
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] c2])))
+        t2 (a/thread (no-throw (a/<!! c1)))
+        t3 (a/thread (no-throw 3.14))]
+    (is (not-failed? t1 [true c1]))
+    (is (not-failed? t2 "foo"))
+    (is (not-failed? t3)))
+
+  (let [m (a/monitor (s/choice (s/--> ::alice ::bob)
+                               (s/--> ::alice ::carol)))
+        c1 (a/chan (s/role ::alice) (s/role ::bob) m {})
+        c2 (a/chan (s/role ::alice) (s/role ::carol) m {})
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] c2])))
+        t2 (a/thread (no-throw 3.14))
+        t3 (a/thread (no-throw (a/>!! c2 "bar")))]
+    (is (not-failed? t1 ["bar" c2]))
+    (is (not-failed? t2))
+    (is (not-failed? t3)))
+
+  ;; Buffered
+
+  (let [c1 (a/chan 1)
+        c2 (a/chan 1)
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] c2])))
+        t2 (a/thread (no-throw (a/<!! c1)))
+        t3 (a/thread (no-throw 3.14))]
+    (is (not-failed? t1 [true c1]))
+    (is (not-failed? t2 "foo"))
+    (is (not-failed? t3)))
+
+  (let [m (a/monitor (s/choice (s/-->> ::alice ::bob)
+                               (s/-->> ::alice ::carol)))
+        c1 (a/chan 1 (s/role ::alice) (s/role ::bob) m {})
+        c2 (a/chan 1 (s/role ::alice) (s/role ::carol) m {})
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] c2])))
+        t2 (a/thread (no-throw (a/<!! c1)))
+        t3 (a/thread (no-throw 3.14))]
+    (is (not-failed? t1 [true c1]))
+    (is (not-failed? t2 "foo"))
+    (is (not-failed? t3)))
+
+  ;; Unbuffered and buffered
+
+  (let [c1 (a/chan)
+        c2 (a/chan 1)
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] c2])))
+        t2 (a/thread (no-throw (a/<!! c1)))
+        t3 (a/thread (no-throw 3.14))]
+    (is (not-failed? t1 [true c1]))
+    (is (not-failed? t2 "foo"))
+    (is (not-failed? t3)))
+
+  (let [c1 (a/chan)
+        c2 (a/chan 1)
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] c2])))
+        t2 (a/thread (no-throw 3.14))
+        t3 (a/thread (no-throw (a/>!! c2 "bar")))]
+    (is (not-failed? t1 ["bar" c2]))
+    (is (not-failed? t2))
+    (is (not-failed? t3)))
+
+  (let [m (a/monitor (s/choice (s/--> ::alice ::bob)
+                               (s/-->> ::alice ::carol)))
+        c1 (a/chan (s/role ::alice) (s/role ::bob) m {})
+        c2 (a/chan 1 (s/role ::alice) (s/role ::carol) m {})
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] c2])))
+        t2 (a/thread (no-throw (a/<!! c1)))
+        t3 (a/thread (no-throw 3.14))]
+    (is (not-failed? t1 [true c1]))
+    (is (not-failed? t2 "foo"))
+    (is (not-failed? t3)))
+
+  (let [m (a/monitor (s/choice (s/--> ::alice ::bob)
+                               (s/-->> ::alice ::carol)))
+        c1 (a/chan (s/role ::alice) (s/role ::bob) m {})
+        c2 (a/chan 1 (s/role ::alice) (s/role ::carol) m {})
+        t1 (a/thread (no-throw (a/alts!! [[c1 "foo"] c2])))
+        t2 (a/thread (no-throw 3.14))
+        t3 (a/thread (no-throw (a/>!! c2 "bar")))]
+    (is (not-failed? t1 ["bar" c2]))
+    (is (not-failed? t2))
+    (is (not-failed? t3))))
 
 ;;;;
 ;;;; CORE CONCEPTS: dropping-buffer, sliding-buffer
@@ -217,11 +613,48 @@
 
   ;; >!, <!, go
 
-  ;; TODO
+  ;(let [c (chan)]
+  ;  (go (>! c "hello"))
+  ;  (assert (= "hello" (<!! (go (<! c)))))
+  ;  (close! c))
 
   ;; alts!, alts!!, timeout
 
-  ;; TODO
+  (let [c1 (a/chan)
+        c2 (a/chan)]
+    (a/thread (while true
+                (let [[v ch] (a/alts!! [c1 c2])]
+                  (println "Read" v "from" ch))))
+    (a/>!! c1 "hi")
+    (a/>!! c2 "there"))
+  (is true)
+
+  ;(let [c1 (chan)
+  ;      c2 (chan)]
+  ;  (go (while true
+  ;        (let [[v ch] (alts! [c1 c2])]
+  ;          (println "Read" v "from" ch))))
+  ;  (go (>! c1 "hi"))
+  ;  (go (>! c2 "there")))
+
+  ;(let [n 1000
+  ;      cs (repeatedly n chan)
+  ;      begin (System/currentTimeMillis)]
+  ;  (doseq [c cs] (go (>! c "hi")))
+  ;  (dotimes [i n]
+  ;    (let [[v c] (alts!! cs)]
+  ;      (assert (= "hi" v))))
+  ;  (println "Read" n "msgs in" (- (System/currentTimeMillis) begin) "ms"))
+
+  ;(let [t (timeout 100)
+  ;      begin (System/currentTimeMillis)]
+  ;  (<!! t)
+  ;  (println "Waited" (- (System/currentTimeMillis) begin)))
+
+  ;(let [c (chan)
+  ;      begin (System/currentTimeMillis)]
+  ;  (alts!! [c (timeout 100)])
+  ;  (println "Gave up after" (- (System/currentTimeMillis) begin)))
 
   ;; dropping-buffer, sliding-buffer
 

@@ -213,7 +213,7 @@
                              port (if (.-buffered channel)
                                     (.-ch_ghost2 channel)
                                     (.-ch_ghost1 channel))]
-                         [port]))
+                         port))
                     alternatives)
 
         [val port] (if (nil? opts)
@@ -245,10 +245,12 @@
                                   (recur (rest todo)))))))))]
 
     (if (nil? alternative)
-      val
+      [val :default]
       (if (vector? alternative)
-        (>!!-step2 (first alternative) (second alternative))
-        (<!!-step2 alternative)))))
+        (let [channel (first alternative)]
+          [(>!!-step2 channel (second alternative)) channel])
+        (let [channel alternative]
+          [(<!!-step2 channel) channel])))))
 
 ;;;;
 ;;;; put! and take!
