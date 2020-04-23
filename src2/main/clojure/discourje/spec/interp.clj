@@ -155,7 +155,7 @@
 
     :else (throw (Exception.))))
 
-(defn terminated? [ast]
+(defn terminated? [ast unfolded]
   (cond
 
     ;; End
@@ -168,28 +168,31 @@
 
     ;; Concatenation
     (= (:type ast) :cat)
-    (every? terminated? (:branches ast))
+    (every? #(terminated? % unfolded) (:branches ast))
 
     ;; Alternatives
     (= (:type ast) :alt)
-    (not (not-any? terminated? (:branches ast)))
+    (not (not-any? #(terminated? % unfolded) (:branches ast)))
 
     ;; Parallel
     (= (:type ast) :par)
-    (every? terminated? (:branches ast))
+    (every? #(terminated? % unfolded) (:branches ast))
 
     ;; Vector
     (vector? ast)
-    (every? terminated? ast)
+    (every? #(terminated? % unfolded) ast)
 
     ;; If
     (= (:type ast) :if)
-    (terminated? (if (eval (:condition ast)) (:branch1 ast) (:branch2 ast)))
+    (terminated? (if (eval (:condition ast)) (:branch1 ast) (:branch2 ast)) unfolded)
 
     ;; Loop
     (= (:type ast) :loop)
-    (terminated? (unfold ast (substitute (:body ast)
-                                         (zipmap (:vars ast) (map eval (:exprs ast))))))
+    (if (contains? unfolded ast)
+      false
+      (terminated? (unfold ast (substitute (:body ast)
+                                           (zipmap (:vars ast) (map eval (:exprs ast)))))
+                   (conj unfolded ast)))
 
     ;; Recur
     (= (:type ast) :recur)
@@ -201,7 +204,7 @@
           exprs (rest ast)
           body (:body (get (get @ast/registry name) (count exprs)))
           vars (:vars (get (get @ast/registry name) (count exprs)))]
-      (terminated? (substitute body (zipmap vars (map eval exprs)))))
+      (terminated? (substitute body (zipmap vars (map eval exprs))) unfolded))
 
     ;; Aldebaran
     (= (:type ast) :aldebaran)
@@ -209,131 +212,137 @@
 
     :else (throw (Exception.))))
 
-(defn successors [ast f-action]
-  (cond
+(defn successors
+  ([ast f-action]
+   (successors ast #{} f-action))
+  ([ast unfolded f-action]
+   (cond
 
-    ;; End
-    (= (:type ast) :end)
-    {}
+     ;; End
+     (= (:type ast) :end)
+     {}
 
-    ;; Action
-    (ast/action? ast)
-    {(eval-action ast f-action) [(ast/end)]}
+     ;; Action
+     (ast/action? ast)
+     {(eval-action ast f-action) [(ast/end)]}
 
-    ;; Concatenation
-    (= (:type ast) :cat)
-    (let [branches (:branches ast)]
-      (if (empty? branches)
-        {}
-        (merge-with into
+     ;; Concatenation
+     (= (:type ast) :cat)
+     (let [branches (:branches ast)]
+       (if (empty? branches)
+         {}
+         (merge-with into
 
-                    ;; Rule 1
-                    (let [branch (first branches)
-                          branches-after (rest branches)
-                          ;; f inserts an "evaluated" branch before "unevaluated" branches
-                          f (fn [branch']
-                              (ast/cat (reduce into [[] [branch'] branches-after])))
-                          ;; mapv-f maps f over a vector of branches
-                          mapv-f (fn [branches'] (mapv #(f %) branches'))
-                          ;; map-mapv-f maps mapv-f over a map from actions to vectors of branches
-                          map-mapv-f (fn [m] (map (fn [[k v]] {k (mapv-f v)}) m))]
-                      (merge {} (reduce merge (map-mapv-f (successors branch f-action)))))
+                     ;; Rule 1
+                     (let [branch (first branches)
+                           branches-after (rest branches)
+                           ;; f inserts an "evaluated" branch before "unevaluated" branches
+                           f (fn [branch']
+                               (ast/cat (reduce into [[] [branch'] branches-after])))
+                           ;; mapv-f maps f over a vector of branches
+                           mapv-f (fn [branches'] (mapv #(f %) branches'))
+                           ;; map-mapv-f maps mapv-f over a map from actions to vectors of branches
+                           map-mapv-f (fn [m] (map (fn [[k v]] {k (mapv-f v)}) m))]
+                       (merge {} (reduce merge (map-mapv-f (successors branch unfolded f-action)))))
 
-                    ;; Rule 2
-                    (let [branch (first branches)
-                          branches-after (rest branches)]
-                      (if (and (terminated? branch))
-                        (case (count branches-after)
-                          0 {}
-                          1 (successors (first branches-after) f-action)
-                          (successors (ast/cat (vec branches-after)) f-action))
-                        {})))))
+                     ;; Rule 2
+                     (let [branch (first branches)
+                           branches-after (rest branches)]
+                       (if (terminated? branch #{})
+                         (case (count branches-after)
+                           0 {}
+                           1 (successors (first branches-after) unfolded f-action)
+                           (successors (ast/cat (vec branches-after)) unfolded f-action))
+                         {})))))
 
-    ;; Alternatives
-    (= (:type ast) :alt)
-    (reduce (partial merge-with into) (map #(successors % f-action) (:branches ast)))
+     ;; Alternatives
+     (= (:type ast) :alt)
+     (reduce (partial merge-with into) (map #(successors % unfolded f-action) (:branches ast)))
 
-    ;; Parallel
-    (= (:type ast) :par)
-    (let [branches (:branches ast)]
-      (loop [i 0
-             result {}]
-        (if (= i (count branches))
-          result
-          (let [branch (nth branches i)
-                branches-before (subvec branches 0 i)
-                branches-after (subvec branches (inc i) (count branches))
-                ;; f inserts an "evaluated" branch between (possibly before or after) "unevaluated" branches
-                f (fn [branch']
-                    (ast/par (reduce into [[] branches-before [branch'] branches-after])))
-                ;; mapv-f maps f over a vector of branches
-                mapv-f (fn [branches'] (mapv #(f %) branches'))
-                ;; map-mapv-f maps mapv-f over a map from actions to vectors of branches
-                map-mapv-f (fn [m] (map (fn [[k v]] {k (mapv-f v)}) m))]
-            (recur (inc i) (merge-with into
-                                       result
-                                       (merge {} (reduce merge (map-mapv-f (successors branch f-action))))))))))
+     ;; Parallel
+     (= (:type ast) :par)
+     (let [branches (:branches ast)]
+       (loop [i 0
+              result {}]
+         (if (= i (count branches))
+           result
+           (let [branch (nth branches i)
+                 branches-before (subvec branches 0 i)
+                 branches-after (subvec branches (inc i) (count branches))
+                 ;; f inserts an "evaluated" branch between (possibly before or after) "unevaluated" branches
+                 f (fn [branch']
+                     (ast/par (reduce into [[] branches-before [branch'] branches-after])))
+                 ;; mapv-f maps f over a vector of branches
+                 mapv-f (fn [branches'] (mapv #(f %) branches'))
+                 ;; map-mapv-f maps mapv-f over a map from actions to vectors of branches
+                 map-mapv-f (fn [m] (map (fn [[k v]] {k (mapv-f v)}) m))]
+             (recur (inc i) (merge-with into
+                                        result
+                                        (merge {} (reduce merge (map-mapv-f (successors branch unfolded f-action))))))))))
 
-    ;; Vector
-    (vector? ast)
-    (if (empty? ast)
-      {}
-      (merge-with into
-                  (let [branch (first ast)
-                        branches-after (vec (rest ast))
-                        ;; f inserts an "evaluated" branch before "unevaluated" branches
-                        f (fn [branch']
-                            (let [branches' (reduce into [(if (and (terminated? branch')
-                                                                   (empty? (successors branch' f-action)))
-                                                            []
-                                                            [branch'])
-                                                          branches-after])]
-                              (if (= 1 (count branches'))
-                                (first branches')
-                                branches')))
-                        ;; mapv-f maps f over a vector of branches
-                        mapv-f (fn [branches'] (mapv #(f %) branches'))
-                        ;; map-mapv-f maps mapv-f over a map from actions to vectors of branches
-                        map-mapv-f (fn [m] (map (fn [[k v]] {k (mapv-f v)}) m))]
-                    (merge {} (reduce merge (map-mapv-f (successors branch f-action)))))
-                  (if (terminated? (first ast))
-                    (successors (vec (rest ast)) f-action)
-                    {})))
+     ;; Vector
+     (vector? ast)
+     (if (empty? ast)
+       {}
+       (merge-with into
+                   (let [branch (first ast)
+                         branches-after (vec (rest ast))
+                         ;; f inserts an "evaluated" branch before "unevaluated" branches
+                         f (fn [branch']
+                             (let [branches' (reduce into [(if (and (terminated? branch' #{})
+                                                                    (empty? (successors branch' unfolded f-action)))
+                                                             []
+                                                             [branch'])
+                                                           branches-after])]
+                               (if (= 1 (count branches'))
+                                 (first branches')
+                                 branches')))
+                         ;; mapv-f maps f over a vector of branches
+                         mapv-f (fn [branches'] (mapv #(f %) branches'))
+                         ;; map-mapv-f maps mapv-f over a map from actions to vectors of branches
+                         map-mapv-f (fn [m] (map (fn [[k v]] {k (mapv-f v)}) m))]
+                     (merge {} (reduce merge (map-mapv-f (successors branch unfolded f-action)))))
+                   (if (terminated? (first ast) #{})
+                     (successors (vec (rest ast)) unfolded f-action)
+                     {})))
 
-    ;; If
-    (= (:type ast) :if)
-    (successors (if (eval (:condition ast)) (:branch1 ast) (:branch2 ast)) f-action)
+     ;; If
+     (= (:type ast) :if)
+     (successors (if (eval (:condition ast)) (:branch1 ast) (:branch2 ast)) unfolded f-action)
 
-    ;; Loop
-    (= (:type ast) :loop)
-    (successors (unfold ast (substitute (:body ast)
-                                        (zipmap (:vars ast) (map eval (:exprs ast)))))
-                f-action)
+     ;; Loop
+     (= (:type ast) :loop)
+     (if (contains? unfolded ast)
+       {}
+       (successors (unfold ast (substitute (:body ast)
+                                           (zipmap (:vars ast) (map eval (:exprs ast)))))
+                   (conj unfolded ast)
+                   f-action))
 
-    ;; Recur
-    (= (:type ast) :recur)
-    (throw (Exception.))
+     ;; Recur
+     (= (:type ast) :recur)
+     (throw (Exception.))
 
-    ;; Application
-    (seq? ast)
-    (let [name (eval (first ast))
-          exprs (rest ast)
-          body (:body (get (get @ast/registry name) (count exprs)))
-          vars (:vars (get (get @ast/registry name) (count exprs)))]
-      (successors (substitute body (zipmap vars (map eval exprs))) f-action))
+     ;; Application
+     (seq? ast)
+     (let [name (eval (first ast))
+           exprs (rest ast)
+           body (:body (get (get @ast/registry name) (count exprs)))
+           vars (:vars (get (get @ast/registry name) (count exprs)))]
+       (successors (substitute body (zipmap vars (map eval exprs))) unfolded f-action))
 
-    ;; Aldebaran
-    (= (:type ast) :aldebaran)
-    (let [m (get (:edges ast) (:v ast))
-          keys (map #(eval-action % f-action) (keys m))
-          vals (map (fn [k]
-                      (let [vertices (get m k)]
-                        (if (empty? vertices)
-                          [(ast/end)]
-                          (mapv #(assoc ast :v %) vertices))))
-                    (clojure.core/keys m))]
-      (if (nil? keys)
-        {}
-        (zipmap keys vals)))
+     ;; Aldebaran
+     (= (:type ast) :aldebaran)
+     (let [m (get (:edges ast) (:v ast))
+           keys (map #(eval-action % f-action) (keys m))
+           vals (map (fn [k]
+                       (let [vertices (get m k)]
+                         (if (empty? vertices)
+                           [(ast/end)]
+                           (mapv #(assoc ast :v %) vertices))))
+                     (clojure.core/keys m))]
+       (if (nil? keys)
+         {}
+         (zipmap keys vals)))
 
-    :else (throw (Exception.))))
+     :else (throw (Exception.)))))

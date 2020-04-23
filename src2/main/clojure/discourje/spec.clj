@@ -168,15 +168,16 @@
 ;;;; Regex operators
 ;;;;
 
-(def ^:private *-counter (atom 0))
+(defonce ^:private *-counter (atom 0))
 
 (defmacro *
   [body & more]
   (let [name (keyword (str "*" (swap! *-counter inc)))]
     `(ast/loop (w/postwalk-replace ~(smap &env) '~name)
                []
-               (ast/alt [[~body ~@more
-                          (ast/recur (w/postwalk-replace ~(smap &env) '~name) [])]
+               (ast/alt [(ast/cat [~body
+                                   ~@more
+                                   (ast/recur (w/postwalk-replace ~(smap &env) '~name) [])])
                          (ast/end)]))))
 
 ;;;;

@@ -717,12 +717,9 @@
                        (s/* (s/-->> ::alice ::bob))])]
     (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
-  ;; FIXME: The following should work, but it doesn't. The problem is that s/* is implemented using s/loop and s/recur,
-  ;; but the recursion isn't guarded if stars are nested. Only way to solve this seems to make * a first-class.
-  ;(let [lts1 (lts/lts (s/* (s/-->> ::alice ::bob)))
-  ;      lts2 (lts/lts (s/* (s/* (s/-->> ::alice ::bob))))]
-  ;  (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
-  )
+  (let [lts1 (lts/lts (s/* (s/-->> ::alice ::bob)))
+        lts2 (lts/lts (s/* (s/* (s/-->> ::alice ::bob))))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2))))
 
 (*-tests)
 
