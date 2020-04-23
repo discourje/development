@@ -87,6 +87,8 @@
 
 (defrecord Multiary [type branches])
 
+(defn cat [branches]
+  (->Multiary :cat branches))
 (defn alt [branches]
   (->Multiary :alt branches))
 (defn par [branches]

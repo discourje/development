@@ -123,6 +123,10 @@
 ;;;; Multiary operators
 ;;;;
 
+(defmacro cat
+  [branch & more]
+  `(ast/cat [~branch ~@more]))
+
 (defmacro alt
   [branch & more]
   `(ast/alt [~branch ~@more]))
@@ -153,7 +157,7 @@
   [name bindings body & more]
   `(ast/loop (w/postwalk-replace ~(smap &env) '~name)
              (w/postwalk-replace ~(smap &env) '~bindings)
-             [~body ~@more]))
+             (s/cat ~body ~@more)))
 
 (defmacro recur
   [name & more]
@@ -183,7 +187,7 @@
   [name vars body & more]
   `(ast/register! (w/postwalk-replace ~(smap &env) '~name)
                   (w/postwalk-replace ~(smap &env) '~vars)
-                  [~body ~@more]))
+                  (s/cat ~body ~@more)))
 
 (defmacro apply
   [name exprs]
@@ -209,8 +213,8 @@
 (s/def ::pipe [t r-name min max]
   (s/loop pipe [i min]
           (s/if (< i (dec max))
-            [(s/-->> t (r-name i) (r-name (inc i)))
-             (s/recur pipe (inc i))])))
+            (s/cat (s/-->> t (r-name i) (r-name (inc i)))
+                   (s/recur pipe (inc i))))))
 
 (s/def ::pipe [t r-name n]
   (s/apply ::pipe ['t r-name 0 n]))

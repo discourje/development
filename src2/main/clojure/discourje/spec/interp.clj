@@ -54,6 +54,10 @@
     (ast/action? ast)
     (w/postwalk-replace smap ast)
 
+    ;; Concatenation
+    (= (:type ast) :cat)
+    (ast/cat (mapv #(substitute % smap) (:branches ast)))
+
     ;; Alternatives
     (= (:type ast) :alt)
     (ast/alt (mapv #(substitute % smap) (:branches ast)))
@@ -105,6 +109,10 @@
     ;; Action
     (ast/action? ast)
     ast
+
+    ;; Concatenation
+    (= (:type ast) :cat)
+    (ast/cat (mapv #(unfold loop %) (:branches ast)))
 
     ;; Alternatives
     (= (:type ast) :alt)
@@ -158,6 +166,10 @@
     (ast/action? ast)
     false
 
+    ;; Concatenation
+    (= (:type ast) :cat)
+    (every? terminated? (:branches ast))
+
     ;; Alternatives
     (= (:type ast) :alt)
     (not (not-any? terminated? (:branches ast)))
@@ -208,6 +220,33 @@
     (ast/action? ast)
     {(eval-action ast f-action) [(ast/end)]}
 
+    ;; Concatenation
+    (= (:type ast) :cat)
+    (let [branches (:branches ast)]
+      (if (empty? branches)
+        {}
+        (merge-with into
+                    (let [branch (first branches)
+                          branches-after (vec (rest branches))
+                          ;; f inserts an "evaluated" branch before "unevaluated" branches
+                          f (fn [branch']
+                              (let [branches' (reduce into [(if (and (terminated? branch')
+                                                                     (empty? (successors branch' f-action)))
+                                                              []
+                                                              [branch'])
+                                                            branches-after])]
+                                (if (= 1 (count branches'))
+                                  (first branches')
+                                  branches')))
+                          ;; mapv-f maps f over a vector of branches
+                          mapv-f (fn [branches'] (mapv #(f %) branches'))
+                          ;; map-mapv-f maps mapv-f over a map from actions to vectors of branches
+                          map-mapv-f (fn [m] (map (fn [[k v]] {k (mapv-f v)}) m))]
+                      (merge {} (reduce merge (map-mapv-f (successors branch f-action)))))
+                    (if (terminated? (first branches))
+                      (successors (vec (rest branches)) f-action)
+                      {}))))
+
     ;; Alternatives
     (= (:type ast) :alt)
     (reduce (partial merge-with into) (map #(successors % f-action) (:branches ast)))
@@ -224,11 +263,11 @@
                 branches-after (subvec branches (inc i) (count branches))
                 ;; f inserts an "evaluated" branch between (possibly before or after) "unevaluated" branches
                 f (fn [branch'] (ast/par (reduce into [branches-before
-                                                            (if (and (terminated? branch')
-                                                                     (empty? (successors branch' f-action)))
-                                                              []
-                                                              [branch'])
-                                                            branches-after])))
+                                                       (if (and (terminated? branch')
+                                                                (empty? (successors branch' f-action)))
+                                                         []
+                                                         [branch'])
+                                                       branches-after])))
                 ;; mapv-f maps f over a vector of branches
                 mapv-f (fn [branches'] (mapv #(f %) branches'))
                 ;; map-mapv-f maps mapv-f over a map from actions to vectors of branches
