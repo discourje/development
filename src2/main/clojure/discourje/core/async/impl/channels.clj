@@ -8,9 +8,11 @@
 (definterface MutableSender
   (getSender [])
   (setSender [newSender]))
+
 (definterface MutableReceiver
   (getReceiver [])
   (setReceiver [newReceiver]))
+
 (definterface MutableMonitor
   (getMonitor [])
   (setMonitor [newMonitor]))
@@ -27,9 +29,11 @@
   MutableSender
   (getSender [_] sender)
   (setSender [_ newSender] (set! sender newSender))
+
   MutableReceiver
   (getReceiver [_] receiver)
   (setReceiver [_ newReceiver] (set! receiver newReceiver))
+
   MutableMonitor
   (getMonitor [_] monitor)
   (setMonitor [_ newMonitor] (set! monitor newMonitor)))
