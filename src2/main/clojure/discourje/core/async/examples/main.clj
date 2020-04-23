@@ -13,4 +13,4 @@
        :time config/*time*}
       (catch Throwable t (.printStackTrace t)))))
 
-(run :dcj {:buffered true :k 2 :secs 3} 'discourje.core.async.examples.micro.ring)
+(run :dcj-nil {:buffered true :k 2 :secs 5} 'discourje.core.async.examples.micro.ring)

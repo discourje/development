@@ -10,6 +10,7 @@
 (case config/*lib*
   :clj (alias 'a 'clojure.core.async)
   :dcj (alias 'a 'discourje.core.async)
+  :dcj-nil (alias 'a 'discourje.core.async)
   nil)
 
 ;;;;
@@ -18,19 +19,19 @@
 
 (s/defrole ::worker "worker")
 
-(s/def ::ring-unbuffered [k] (s/loop omega []
-                                     [(s/loop ring [i 0]
-                                              (s/if (< i k)
-                                                [(s/--> (::worker i) (::worker (mod (inc i) k)))
-                                                 (s/recur ring (inc i))]))
-                                      (s/recur omega)]))
+(s/def ::ring-unbuffered
+  [k]
+  (s/* (s/loop ring [i 0]
+               (s/if (< i k)
+                 (s/cat (s/--> (::worker i) (::worker (mod (inc i) k)))
+                        (s/recur ring (inc i)))))))
 
-(s/def ::ring-buffered [k] (s/loop omega []
-                                   [(s/loop ring [i 0]
-                                            (s/if (< i k)
-                                              [(s/-->> (::worker i) (::worker (mod (inc i) k)))
-                                               (s/recur ring (inc i))]))
-                                    (s/recur omega)]))
+(s/def ::ring-buffered
+  [k]
+  (s/* (s/loop ring [i 0]
+               (s/if (< i k)
+                 (s/cat (s/-->> (::worker i) (::worker (mod (inc i) k)))
+                        (s/recur ring (inc i)))))))
 
 ;;;;
 ;;;; Implementation
