@@ -694,9 +694,9 @@
                                    (1, "?(alice,bob)", 0)))]
     (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
-  (let [lts1 (lts/lts [(s/* (s/-->> ::alice ::bob))
-                       (s/-->> ::alice ::carol)])
-        lts2 (lts/lts (s/aldebaran des (0, 2, 2)
+  (let [lts1 (lts/lts (s/cat (s/* (s/-->> ::alice ::bob))
+                             (s/-->> ::alice ::carol)))
+        lts2 (lts/lts (s/aldebaran des (0, 4, 3)
                                    (0, "!(Object,alice,bob)", 1)
                                    (1, "?(alice,bob)", 0)
                                    (0, "!(Object,alice,carol)", 2)
@@ -705,7 +705,7 @@
 
   (let [lts1 (lts/lts (s/* (s/* (s/-->> ::alice ::bob))
                            (s/-->> ::alice ::carol)))
-        lts2 (lts/lts (s/aldebaran des (0, 2, 2)
+        lts2 (lts/lts (s/aldebaran des (0, 4, 3)
                                    (0, "!(Object,alice,bob)", 1)
                                    (1, "?(alice,bob)", 0)
                                    (0, "!(Object,alice,carol)", 2)
@@ -713,8 +713,8 @@
     (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
   (let [lts1 (lts/lts (s/* (s/-->> ::alice ::bob)))
-        lts2 (lts/lts [(s/* (s/-->> ::alice ::bob))
-                       (s/* (s/-->> ::alice ::bob))])]
+        lts2 (lts/lts (s/cat (s/* (s/-->> ::alice ::bob))
+                             (s/* (s/-->> ::alice ::bob))))]
     (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
   (let [lts1 (lts/lts (s/* (s/-->> ::alice ::bob)))
@@ -722,6 +722,42 @@
     (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2))))
 
 (*-tests)
+
+(deftest +-tests
+  (let [lts1 (lts/lts (s/+ (s/-->> ::alice ::bob)))
+        lts2 (lts/lts (s/aldebaran des (0, 3, 3)
+                                   (0, "!(Object,alice,bob)", 1)
+                                   (1, "?(alice,bob)", 2)
+                                   (2, "!(Object,alice,bob)", 1)))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (lts/lts (s/+ (s/-->> ::alice ::bob)
+                           (s/-->> ::alice ::bob)))
+        lts2 (lts/lts (s/cat (s/-->> ::alice ::bob)
+                             (s/+ (s/-->> ::alice ::bob))))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (lts/lts (s/+ (s/-->> ::alice ::bob)))
+        lts2 (lts/lts (s/cat (s/-->> ::alice ::bob)
+                             (s/* (s/-->> ::alice ::bob))))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2))))
+
+(+-tests)
+
+(deftest ?-tests
+  (let [lts1 (lts/lts (s/? (s/-->> ::alice ::bob)))
+        lts2 (lts/lts (s/aldebaran des (0, 2, 2)
+                                   (0, "!(Object,alice,bob)", 1)
+                                   (1, "?(alice,bob)", 2)))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (lts/lts (s/cat (s/? (s/-->> ::alice ::bob))
+                             (s/-->> ::alice ::bob)))
+        lts2 (lts/lts (s/alt (s/-->> ::alice ::bob)
+                             (s/cat (s/-->> ::alice ::bob) (s/-->> ::alice ::bob))))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2))))
+
+(?-tests)
 
 ;;;;;
 ;;;;; Definition operators

@@ -169,16 +169,33 @@
 ;;;;
 
 (defonce ^:private *-counter (atom 0))
+(defonce ^:private +-counter (atom 0))
 
 (defmacro *
   [body & more]
   (let [name (keyword (str "*" (swap! *-counter inc)))]
-    `(ast/loop (w/postwalk-replace ~(smap &env) '~name)
+    `(ast/loop '~name
                []
                (ast/alt [(ast/cat [~body
                                    ~@more
-                                   (ast/recur (w/postwalk-replace ~(smap &env) '~name) [])])
+                                   (ast/recur '~name [])])
                          (ast/end)]))))
+
+(defmacro +
+  [body & more]
+  (let [name (keyword (str "+" (swap! +-counter inc)))]
+    `(ast/cat [~body
+               ~@more
+               (ast/loop '~name
+                         []
+                         (ast/alt [(ast/cat [~body
+                                             ~@more
+                                             (ast/recur '~name [])])
+                                   (ast/end)]))])))
+(defmacro ?
+  [body & more]
+  `(ast/alt [(ast/cat [~body ~@more])
+             (ast/end)]))
 
 ;;;;
 ;;;; Definition operators
