@@ -23,14 +23,14 @@
   [k]
   (s/* (s/loop ring [i 0]
                (s/if (< i k)
-                 (s/cat (s/--> (::worker i) (::worker (mod (inc i) k)))
+                 (s/cat (s/--> Boolean (::worker i) (::worker (mod (inc i) k)))
                         (s/recur ring (inc i)))))))
 
 (s/def ::ring-buffered
   [k]
   (s/* (s/loop ring [i 0]
                (s/if (< i k)
-                 (s/cat (s/-->> (::worker i) (::worker (mod (inc i) k)))
+                 (s/cat (s/-->> Boolean (::worker i) (::worker (mod (inc i) k)))
                         (s/recur ring (inc i)))))))
 
 ;;;;
@@ -92,7 +92,9 @@
 
         ;; Await termination
         output
-        (a/<!! (first workers))
+        (do (doseq [worker (rest workers)]
+              (a/<!! worker))
+            (a/<!! (first workers)))
 
         ;; Stop timer
         end (System/nanoTime)]
