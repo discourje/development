@@ -8,15 +8,20 @@
 (defn monitor [spec]
   (monitors/monitor (lts/lts spec false)))
 
+(defn link [channel sender receiver monitor config]
+  (channels/link channel sender receiver monitor))
+
 ;;;;
 ;;;; CORE CONCEPTS: chan, close!
 ;;;;
 
 (defn chan
   ([]
-   (chan nil nil nil nil))
+   (channels/unbuffered-channel))
   ([buf-or-n]
-   (chan buf-or-n nil nil nil nil))
+   (channels/buffered-channel (if (number? buf-or-n)
+                                (buffers/fixed-buffer buf-or-n)
+                                buf-or-n)))
   (;[buf-or-n xform]
    [_ _]
    (throw (UnsupportedOperationException.)))
@@ -24,16 +29,9 @@
    [_ _ _]
    (throw (UnsupportedOperationException.)))
   ([sender receiver monitor config]
-   (channels/unbuffered-channel sender
-                                receiver
-                                monitor))
+   (link (chan) sender receiver monitor config))
   ([buf-or-n sender receiver monitor config]
-   (channels/buffered-channel (if (number? buf-or-n)
-                                (buffers/fixed-buffer buf-or-n)
-                                buf-or-n)
-                              sender
-                              receiver
-                              monitor))
+   (link (chan buf-or-n) sender receiver monitor config))
   (;[buf-or-n xform sender receiver monitor config]
    [_ _ _ _ _ _]
    (throw (UnsupportedOperationException.)))
