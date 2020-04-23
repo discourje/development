@@ -8,7 +8,7 @@
 (defn monitor [spec]
   (monitors/monitor (lts/lts spec false)))
 
-(defn link [channel sender receiver monitor config]
+(defn link [channel sender receiver monitor _]
   (channels/link channel sender receiver monitor))
 
 ;;;;
