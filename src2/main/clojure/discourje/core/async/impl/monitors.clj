@@ -3,9 +3,6 @@
 
 (deftype Monitor [lts current-states flag])
 
-;; FIXME: current-states should be :volatile-mutable instead of an atom (better perf), but I can't get this to work.
-;; See also https://clojure.atlassian.net/browse/CLJ-2092.
-
 (defn monitor
   [lts]
   {:pre [(lts/lts? lts)]}
