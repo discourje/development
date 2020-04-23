@@ -54,9 +54,9 @@
     (ast/action? ast)
     (w/postwalk-replace smap ast)
 
-    ;; Choice
-    (= (:type ast) :choice)
-    (ast/choice (mapv #(substitute % smap) (:branches ast)))
+    ;; Alternatives
+    (= (:type ast) :alt)
+    (ast/alt (mapv #(substitute % smap) (:branches ast)))
 
     ;; Parallel
     (= (:type ast) :par)
@@ -106,9 +106,9 @@
     (ast/action? ast)
     ast
 
-    ;; Choice
-    (= (:type ast) :choice)
-    (ast/choice (mapv #(unfold loop %) (:branches ast)))
+    ;; Alternatives
+    (= (:type ast) :alt)
+    (ast/alt (mapv #(unfold loop %) (:branches ast)))
 
     ;; Parallel
     (= (:type ast) :par)
@@ -158,8 +158,8 @@
     (ast/action? ast)
     false
 
-    ;; Choice
-    (= (:type ast) :choice)
+    ;; Alternatives
+    (= (:type ast) :alt)
     (not (not-any? terminated? (:branches ast)))
 
     ;; Parallel
@@ -208,8 +208,8 @@
     (ast/action? ast)
     {(eval-action ast f-action) [(ast/end)]}
 
-    ;; Choice
-    (= (:type ast) :choice)
+    ;; Alternatives
+    (= (:type ast) :alt)
     (reduce (partial merge-with into) (map #(successors % f-action) (:branches ast)))
 
     ;; Parallel

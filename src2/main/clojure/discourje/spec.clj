@@ -103,29 +103,29 @@
 (defmacro any
   [role-exprs]
   (let [branches (mapv (fn [[sender-expr receiver-expr]]
-                         `(ast/choice [(ast/sync (ast/predicate '~'Object)
-                                                 (ast/role '~sender-expr)
+                         `(ast/alt [(ast/sync (ast/predicate '~'Object)
+                                              (ast/role '~sender-expr)
+                                              (ast/role '~receiver-expr))
+                                    (ast/send (ast/predicate '~'Object)
+                                              (ast/role '~sender-expr)
+                                              (ast/role '~receiver-expr))
+                                    (ast/receive (ast/role '~sender-expr)
                                                  (ast/role '~receiver-expr))
-                                       (ast/send (ast/predicate '~'Object)
-                                                 (ast/role '~sender-expr)
-                                                 (ast/role '~receiver-expr))
-                                       (ast/receive (ast/role '~sender-expr)
-                                                    (ast/role '~receiver-expr))
-                                       (ast/close (ast/role '~sender-expr)
-                                                  (ast/role '~receiver-expr))]))
+                                    (ast/close (ast/role '~sender-expr)
+                                               (ast/role '~receiver-expr))]))
                        (for [sender role-exprs
                              receiver role-exprs
                              :when (not= sender receiver)]
                          [sender receiver]))]
-    `(ast/choice ~branches)))
+    `(ast/alt ~branches)))
 
 ;;;;
 ;;;; Multiary operators
 ;;;;
 
-(defmacro choice
+(defmacro alt
   [branch & more]
-  `(ast/choice [~branch ~@more]))
+  `(ast/alt [~branch ~@more]))
 
 (defmacro par
   [branch & more]
@@ -171,9 +171,9 @@
   (let [name (keyword (str "*" (swap! *-counter inc)))]
     `(ast/loop (w/postwalk-replace ~(smap &env) '~name)
                []
-               (ast/choice [[~body ~@more
-                             (ast/recur (w/postwalk-replace ~(smap &env) '~name) [])]
-                            (ast/end)]))))
+               (ast/alt [[~body ~@more
+                          (ast/recur (w/postwalk-replace ~(smap &env) '~name) [])]
+                         (ast/end)]))))
 
 ;;;;
 ;;;; Definition operators
