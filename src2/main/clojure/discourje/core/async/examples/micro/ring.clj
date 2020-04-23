@@ -18,32 +18,45 @@
 
 (s/defrole ::worker "worker")
 
-(s/def ::ring [k] (s/loop omega []
-                          [(s/loop ring [i 0]
-                                   (s/if (< i k)
-                                     [(s/-->> (::worker i) (::worker (mod (inc i) k)))
-                                      (s/recur ring (inc i))]))
-                           (s/recur omega)]))
+(s/def ::ring-unbuffered [k] (s/loop omega []
+                                     [(s/loop ring [i 0]
+                                              (s/if (< i k)
+                                                [(s/--> (::worker i) (::worker (mod (inc i) k)))
+                                                 (s/recur ring (inc i))]))
+                                      (s/recur omega)]))
+
+(s/def ::ring-buffered [k] (s/loop omega []
+                                   [(s/loop ring [i 0]
+                                            (s/if (< i k)
+                                              [(s/-->> (::worker i) (::worker (mod (inc i) k)))
+                                               (s/recur ring (inc i))]))
+                                    (s/recur omega)]))
 
 ;;;;
 ;;;; Implementation
 ;;;;
 
 (let [input config/*input*
+      buffered (:buffered input)
       k (:k input)
       secs (:secs input)]
 
-  (let [m (dcj/monitor (s/apply ::ring [k]))
+  (let [;; Start timer
+        begin (System/nanoTime)
 
         ;; Create channels
         workers->workers
-        (case config/*lib*
-          :clj (mapv (fn [_] (a/chan 1)) (range k))
-          :dcj (mapv (fn [i] (a/chan 1
-                                     (s/role ::worker [i])
-                                     (s/role ::worker [(mod (inc i) k)])
-                                     m {})) (range k))
-          nil)
+        (mapv (fn [_] (if buffered (a/chan 1) (a/chan))) (range k))
+
+        ;; Link monitor [optional]
+        _
+        (if (= config/*lib* :dcj)
+          (let [s (s/apply (if buffered ::ring-buffered ::ring-unbuffered) [k])
+                m (dcj/monitor s)]
+            (doseq [i (range k)] (dcj/link (nth workers->workers i)
+                                           (s/role ::worker [i])
+                                           (s/role ::worker [(mod (inc i) k)])
+                                           m))))
 
         ;; Spawn threads
         workers
@@ -51,10 +64,10 @@
 
                  ;; Worker 0
                  (= % 0)
-                 (a/thread (let [begin (System/nanoTime)
-                                 deadline (+ begin (* secs 1000 1000 1000))
-                                 in (nth workers->workers (dec k))
-                                 out (nth workers->workers 0)]
+                 (a/thread (let [in (nth workers->workers (dec k))
+                                 out (nth workers->workers 0)
+                                 begin (System/nanoTime)
+                                 deadline (+ begin (* secs 1000 1000 1000))]
                              (loop [n-iter 0]
                                (if (< (System/nanoTime) deadline)
                                  (do (a/>!! out true)
@@ -78,6 +91,10 @@
 
         ;; Await termination
         output
-        (a/<!! (first workers))]
+        (a/<!! (first workers))
 
-    (set! config/*output* output)))
+        ;; Stop timer
+        end (System/nanoTime)]
+
+    (set! config/*output* output)
+    (set! config/*time* (- end begin))))

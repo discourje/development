@@ -5,3 +5,5 @@
 (def ^:dynamic *input* nil)
 
 (def ^:dynamic *output* nil)
+
+(def ^:dynamic *time* nil)
