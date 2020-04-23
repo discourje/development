@@ -1,5 +1,6 @@
 (ns discourje.spec
-  (:require [discourje.spec.ast :as ast]))
+  (:require [clojure.walk :as w]
+            [discourje.spec.ast :as ast]))
 
 ;;;;
 ;;;; Predicates
@@ -23,7 +24,9 @@
   ([name-expr index-exprs]
    {:pre [(or (string? name-expr) (keyword? name-expr) (symbol? name-expr))
           (vector? index-exprs)]}
-   `(ast/role '~name-expr '~index-exprs)))
+   (let [smap `(zipmap '~(keys &env) [~@(keys &env)])]
+     `(ast/role (w/postwalk-replace ~smap '~name-expr)
+                (w/postwalk-replace ~smap '~index-exprs)))))
 
 ;;;;
 ;;;; Actions

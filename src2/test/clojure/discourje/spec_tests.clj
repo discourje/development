@@ -45,7 +45,15 @@
   (is (= (s/role ::alice [i]) (s/role ::alice [i])))
   (is (= (s/role ::alice [i j]) (s/role ::alice [i j])))
   (is (= (s/role ::alice [(inc 1)]) (s/role ::alice [(inc 1)])))
-  (is (= (s/role ::alice [(inc i)]) (s/role ::alice [(inc i)]))))
+  (is (= (s/role ::alice [(inc i)]) (s/role ::alice [(inc i)])))
+
+  (let [x 1
+        y (inc 1)
+        z (inc y)]
+    (is (= (s/role ::alice [x]) (s/role ::alice [1])))
+    (is (= (s/role ::alice [(inc x)]) (s/role ::alice [(inc 1)])))
+    (is (= (s/role ::alice [y]) (s/role ::alice [2])))
+    (is (= (s/role ::alice [z]) (s/role ::alice [3])))))
 
 (role-tests)
 
