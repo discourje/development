@@ -121,7 +121,7 @@ public class LTSs {
             var transitions = s.getTransitionsOrNull();
             if (transitions == null) {
                 b.append(System.lineSeparator());
-                b.append("state ").append(s.getIdentifier()).append(" not yet expanded");
+                b.append("*** state ").append(s.getIdentifier()).append(" not yet expanded ***");
             } else if (!transitions.isEmpty()) {
                 b.append(System.lineSeparator());
                 b.append(stateToAldebaran.apply(s));
