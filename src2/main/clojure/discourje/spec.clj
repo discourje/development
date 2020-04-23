@@ -2,6 +2,9 @@
   (:require [clojure.walk :as w]
             [discourje.spec.ast :as ast]))
 
+(defn smap [env]
+  `(zipmap '~(keys env) [~@(keys env)]))
+
 ;;;;
 ;;;; Predicates
 ;;;;
@@ -24,9 +27,8 @@
   ([name-expr index-exprs]
    {:pre [(or (string? name-expr) (keyword? name-expr) (symbol? name-expr))
           (vector? index-exprs)]}
-   (let [smap `(zipmap '~(keys &env) [~@(keys &env)])]
-     `(ast/role (w/postwalk-replace ~smap '~name-expr)
-                (w/postwalk-replace ~smap '~index-exprs)))))
+   `(ast/role (w/postwalk-replace ~(smap &env) '~name-expr)
+              (w/postwalk-replace ~(smap &env) '~index-exprs))))
 
 ;;;;
 ;;;; Actions
@@ -135,9 +137,13 @@
 
 (defmacro if
   ([condition branch]
-   `(ast/if-then-else '~condition ~branch (ast/end)))
+   `(ast/if-then-else (w/postwalk-replace ~(smap &env) '~condition)
+                      ~branch
+                      (ast/end)))
   ([condition branch1 branch2]
-   `(ast/if-then-else '~condition ~branch1 ~branch2)))
+   `(ast/if-then-else (w/postwalk-replace ~(smap &env) '~condition)
+                      ~branch1
+                      ~branch2)))
 
 ;;;;
 ;;;; Recursion operators
@@ -145,11 +151,14 @@
 
 (defmacro loop
   [name bindings body & more]
-  `(ast/loop '~name '~bindings [~body ~@more]))
+  `(ast/loop (w/postwalk-replace ~(smap &env) '~name)
+             (w/postwalk-replace ~(smap &env) '~bindings)
+             [~body ~@more]))
 
 (defmacro recur
   [name & more]
-  `(ast/recur '~name '[~@more]))
+  `(ast/recur (w/postwalk-replace ~(smap &env) '~name)
+              '[~@more]))
 
 ;;;;
 ;;;; Regex operators
@@ -160,8 +169,11 @@
 (defmacro *
   [body & more]
   (let [name (keyword (str "*" (swap! *-counter inc)))]
-    `(ast/loop '~name [] (ast/choice [[~body ~@more (ast/recur '~name [])]
-                                      (ast/end)]))))
+    `(ast/loop (w/postwalk-replace ~(smap &env) '~name)
+               []
+               (ast/choice [[~body ~@more
+                             (ast/recur (w/postwalk-replace ~(smap &env) '~name) [])]
+                            (ast/end)]))))
 
 ;;;;
 ;;;; Definition operators
@@ -169,11 +181,14 @@
 
 (defmacro def
   [name vars body & more]
-  `(ast/register! '~name '~vars [~body ~@more]))
+  `(ast/register! (w/postwalk-replace ~(smap &env) '~name)
+                  (w/postwalk-replace ~(smap &env) '~vars)
+                  [~body ~@more]))
 
 (defmacro apply
   [name exprs]
-  `(concat ['~name] '~exprs))
+  `(concat [(w/postwalk-replace ~(smap &env) '~name)]
+           (w/postwalk-replace ~(smap &env) '~exprs)))
 
 ;;;;
 ;;;; Aldebaran
