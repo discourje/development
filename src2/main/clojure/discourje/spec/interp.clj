@@ -279,7 +279,7 @@
 
     ;; Application
     (seq? ast)
-    (let [name (first ast)
+    (let [name (eval (first ast))
           exprs (rest ast)
           body (:body (get (get @ast/registry name) (count exprs)))
           vars (:vars (get (get @ast/registry name) (count exprs)))]

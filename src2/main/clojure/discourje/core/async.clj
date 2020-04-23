@@ -8,8 +8,11 @@
 (defn monitor [spec]
   (monitors/monitor (lts/lts spec false)))
 
-(defn link [channel sender receiver monitor _]
-  (channels/link channel sender receiver monitor))
+(defn link
+  ([channel sender receiver monitor]
+   (link channel sender receiver monitor nil))
+  ([channel sender receiver monitor config]
+   (channels/link channel sender receiver monitor)))
 
 ;;;;
 ;;;; CORE CONCEPTS: chan, close!
