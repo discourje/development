@@ -77,6 +77,7 @@ public class LTS<Spec> {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
+            @SuppressWarnings("unchecked")
             SpecState state = (SpecState) o;
             return Objects.equals(spec, state.spec);
         }
