@@ -21,10 +21,4 @@
 (defn start [ns lib input]
   (.start (Thread. (fn [] (prn (run ns lib input))))))
 
-;(start :dcj {:buffered true :k 2 :secs 3} 'discourje.core.async.examples.micro.ring)
-;(start :dcj {:buffered true :ordered-sends true :k 2 :secs 3} 'discourje.core.async.examples.micro.star)
-;(start :dcj {:buffered false :k 2 :secs 3} 'discourje.core.async.examples.micro.master-worker)
-
-
-;(start :dcj {:k 4 :secs 3} 'discourje.core.async.examples.micro.merge)
-;(start :dcj {:k 2 :secs 3} 'discourje.core.async.examples.micro.client-server)
+(start 'discourje.core.async.examples.micro.mesh :clj {:buffered true :k 4 :secs 3})

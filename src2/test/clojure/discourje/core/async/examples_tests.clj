@@ -21,6 +21,18 @@
                     {:buffered false :k 2 :secs 1}))
   (is true)
 
+  ;; Mesh
+
+  (print (e/compare 'discourje.core.async.examples.micro.mesh
+                    [:clj :dcj]
+                    {:buffered true :k 2 :secs 1}))
+  (is true)
+
+  (print (e/compare 'discourje.core.async.examples.micro.mesh
+                    [:clj :dcj]
+                    {:buffered false :k 2 :secs 1}))
+  (is true)
+
   ;; Star
 
   (print (e/compare 'discourje.core.async.examples.micro.star
@@ -51,8 +63,4 @@
   (print (e/compare 'discourje.core.async.examples.micro.star
                     [:clj :dcj]
                     {:buffered false :ordered-sends false :k 2 :secs 1}))
-  (is true)
-
-  ;; Mesh - TODO
-
-  )
+  (is true))
