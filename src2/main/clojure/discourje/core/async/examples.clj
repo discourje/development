@@ -19,6 +19,4 @@
   (mapv #(run ns % input) libs))
 
 (defn start [ns lib input]
-  (.start (Thread. (fn [] (prn (run ns lib input))))))
-
-(start 'discourje.core.async.examples.micro.mesh :clj {:buffered true :k 4 :secs 3})
+  (.start (Thread. ^Runnable (fn [] (prn (run ns lib input))))))
