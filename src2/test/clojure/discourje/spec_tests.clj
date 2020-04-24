@@ -687,6 +687,28 @@
 ;;;;; Regex operators
 ;;;;;
 
+(deftest ω-tests
+  (let [lts1 (lts/lts (s/ω (s/-->> ::alice ::bob)))
+        lts2 (lts/lts (s/aldebaran des (0, 2, 2)
+                                   (0, "!(Object,alice,bob)", 1)
+                                   (1, "?(alice,bob)", 0)))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (lts/lts (s/ω (s/-->> ::alice ::bob)))
+        lts2 (lts/lts (s/cat (s/ω (s/-->> ::alice ::bob))
+                             (s/-->> ::alice ::carol)))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (lts/lts (s/ω (s/-->> ::alice ::bob)))
+        lts2 (lts/lts (s/ω (s/ω (s/-->> ::alice ::bob))))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (lts/lts (s/ω (s/-->> ::alice ::bob)))
+        lts2 (lts/lts (s/omega (s/-->> ::alice ::bob)))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2))))
+
+(ω-tests)
+
 (deftest *-tests
   (let [lts1 (lts/lts (s/* (s/-->> ::alice ::bob)))
         lts2 (lts/lts (s/aldebaran des (0, 2, 2)

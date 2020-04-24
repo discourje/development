@@ -168,8 +168,22 @@
 ;;;; Regex operators
 ;;;;
 
+(defonce ^:private ω-counter (atom 0))
 (defonce ^:private *-counter (atom 0))
 (defonce ^:private +-counter (atom 0))
+
+(defmacro ω
+  [body & more]
+  (let [name (keyword (str "ω" (swap! ω-counter inc)))]
+    `(ast/loop '~name
+               []
+               (ast/cat [~body
+                         ~@more
+                         (ast/recur '~name [])]))))
+
+(defmacro omega
+  [body & more]
+  `(ω ~body ~@more))
 
 (defmacro *
   [body & more]
