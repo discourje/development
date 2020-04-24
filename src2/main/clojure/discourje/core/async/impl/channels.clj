@@ -41,32 +41,23 @@
 (defn channel? [x]
   (= (type x) Channel))
 
-(defn- clojure-core-async-chan
-  ([]
-   (a/chan))
-  ([buffer]
-   {:pre [(buffers/buffer? buffer)]}
-   (case (buffers/type buffer)
-     :fixed-buffer (a/chan (buffers/n buffer))
-     :dropping-buffer (a/chan (a/dropping-buffer (buffers/n buffer)))
-     :sliding-buffer (a/chan (a/sliding-buffer (buffers/n buffer)))
-     :promise-buffer (throw (IllegalArgumentException.)))))
+(defn- channel [buffered ch ch-ghost1 ch-ghost2]
+  {:pre []}
+  (->Channel buffered ch ch-ghost1 ch-ghost2 nil nil nil))
 
 (defn unbuffered-channel []
   {:pre []}
-  (->Channel false
-             (clojure-core-async-chan)
-             (clojure-core-async-chan)
-             nil
-             nil nil nil))
+  (channel false (a/chan) (a/chan) nil))
 
 (defn buffered-channel [buffer]
   {:pre [(buffers/buffer? buffer)]}
-  (->Channel true
-             (clojure-core-async-chan buffer)
-             (clojure-core-async-chan buffer)
-             (clojure-core-async-chan buffer)
-             nil nil nil))
+  (let [chan (fn [buffer]
+               (case (buffers/type buffer)
+                 :fixed-buffer (a/chan (buffers/n buffer))
+                 :dropping-buffer (a/chan (a/dropping-buffer (buffers/n buffer)))
+                 :sliding-buffer (a/chan (a/sliding-buffer (buffers/n buffer)))
+                 :promise-buffer (throw (IllegalArgumentException.))))]
+    (channel true (chan buffer) (chan buffer) (chan buffer))))
 
 (defn link [this r1 r2 m]
   {:pre [(channel? this)
@@ -78,24 +69,8 @@
   (.setMonitor this m)
   this)
 
-(defonce token 0)
-(defonce sync-not-ok (Object.))
-
-(defn- throw-runtime-exception [type message channel]
-  (throw (ex-info (str "[SESSION FAILURE] Action "
-                       (case type :sync "‽" :send "!" :receive "?" :close "C" (throw (Exception.)))
-                       "("
-                       (if (nil? message) "" (str message ","))
-                       (.getSender channel)
-                       ","
-                       (.getReceiver channel)
-                       ") is not enabled in current state(s): "
-                       (monitors/str-current-states (.getMonitor channel))
-                       ". LTS in Aldebaran format:\n\n"
-                       (monitors/str-lts (.getMonitor channel))
-                       "\n\n")
-                  {:message message
-                   :channel channel})))
+(defonce ^:private token 0)
+(defonce ^:private sync-not-ok (Object.))
 
 ;;;;
 ;;;; close!
@@ -104,34 +79,36 @@
 (defn close!
   [channel]
   {:pre [(channel? channel)]}
-  (if (.-buffered channel)
 
-    ;; Buffered channel
-    (if (monitors/verify! (.getMonitor channel)
-                          :close
-                          nil
-                          (.getSender channel)
-                          (.getReceiver channel))
+  (let [result (monitors/verify! (.getMonitor channel)
+                                 :close
+                                 nil
+                                 (.getSender channel)
+                                 (.getReceiver channel))]
+    (if (.-buffered channel)
 
-      (do (a/close! (.-ch channel))
-          (monitors/lower-flag! (.getMonitor channel))
-          (a/close! (.-ch_ghost1 channel))
-          (a/close! (.-ch_ghost2 channel)))
+      ;; Buffered channel
+      (if (true? result)
 
-      (throw-runtime-exception :close nil channel))
+        ;; Commit
+        (do (a/close! (.-ch channel))
+            (monitors/lower-flag! (.getMonitor channel))
+            (a/close! (.-ch_ghost1 channel))
+            (a/close! (.-ch_ghost2 channel)))
 
-    ;; Unbuffered channel
-    (if (monitors/verify! (.getMonitor channel)
-                          :close
-                          nil
-                          (.getSender channel)
-                          (.getReceiver channel))
+        ;; Abort
+        (throw result))
 
-      (do (a/close! (.-ch channel))
-          (monitors/lower-flag! (.getMonitor channel))
-          (a/close! (.-ch_ghost1 channel)))
+      ;; Unbuffered channel
+      (if (true? result)
 
-      (throw-runtime-exception :close nil channel))))
+        ;; Commit
+        (do (a/close! (.-ch channel))
+            (monitors/lower-flag! (.getMonitor channel))
+            (a/close! (.-ch_ghost1 channel)))
+
+        ;; Abort
+        (throw result)))))
 
 ;;;;
 ;;;; >!! and <!!
@@ -148,35 +125,40 @@
   (if (.-buffered channel)
 
     ;; Buffered channel
-    (if (monitors/verify! (.getMonitor channel)
-                          :send
-                          message
-                          (.getSender channel)
-                          (.getReceiver channel))
+    (let [result (monitors/verify! (.getMonitor channel)
+                                   :send
+                                   message
+                                   (.getSender channel)
+                                   (.getReceiver channel))]
+      (if (true? result)
 
-      ;; If ok, commit
-      (let [x (a/>!! (.-ch channel) message)
-            _ (monitors/lower-flag! (.getMonitor channel))
-            _ (a/>!! (.-ch_ghost2 channel) token)]
-        x)
+        ;; Commit
+        (let [x (a/>!! (.-ch channel) message)
+              _ (monitors/lower-flag! (.getMonitor channel))
+              _ (a/>!! (.-ch_ghost2 channel) token)]
+          x)
 
-      ;; If not ok, abort
-      (do (a/<!! (.-ch_ghost1 channel))
-          (throw-runtime-exception :send message channel)))
+        ;; Abort
+        (do (a/<!! (.-ch_ghost1 channel))
+            (throw result))))
 
     ;; Unbuffered channel
-    (if (monitors/verify! (.getMonitor channel)
-                          :sync
-                          message
-                          (.getSender channel)
-                          (.getReceiver channel))
+    (let [result (monitors/verify! (.getMonitor channel)
+                                   :sync
+                                   message
+                                   (.getSender channel)
+                                   (.getReceiver channel))]
+      (if (true? result)
 
-      (let [x (a/>!! (.-ch channel) message)
-            _ (monitors/lower-flag! (.getMonitor channel))]
-        x)
+        ;; Commit
+        (let [x (a/>!! (.-ch channel) message)
+              _ (monitors/lower-flag! (.getMonitor channel))]
+          x)
 
-      (do (a/>!! (.-ch channel) sync-not-ok)
-          (throw-runtime-exception :sync message channel)))))
+        ;; Abort
+        (do (a/>!! (.-ch channel) sync-not-ok)
+            (a/>!! (.-ch channel) result)
+            (throw result))))))
 
 (defn >!!
   [channel message]
@@ -197,26 +179,27 @@
   (if (.-buffered channel)
 
     ;; Buffered channel
-    (if (monitors/verify! (.getMonitor channel)
-                          :receive
-                          nil
-                          (.getSender channel)
-                          (.getReceiver channel))
+    (let [result (monitors/verify! (.getMonitor channel)
+                                   :receive
+                                   nil
+                                   (.getSender channel)
+                                   (.getReceiver channel))]
+      (if (true? result)
 
-      ;; If ok, commit
-      (let [message (a/<!! (.ch channel))
-            _ (monitors/lower-flag! (.getMonitor channel))
-            _ (a/<!! (.-ch_ghost1 channel))]
-        message)
+        ;; Commit
+        (let [message (a/<!! (.ch channel))
+              _ (monitors/lower-flag! (.getMonitor channel))
+              _ (a/<!! (.-ch_ghost1 channel))]
+          message)
 
-      ;; If not ok, abort
-      (do (a/>!! (.-ch_ghost2 channel) token)
-          (throw-runtime-exception :receive nil channel)))
+        ;; Abort
+        (do (a/>!! (.-ch_ghost2 channel) token)
+            (throw result))))
 
     ;; Unbuffered channel
     (let [message (a/<!! (.-ch channel))]
       (if (= message sync-not-ok)
-        (throw-runtime-exception :sync nil channel)
+        (throw (a/<!! (.-ch channel)))
         message))))
 
 (defn <!!
