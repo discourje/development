@@ -8,9 +8,16 @@
             config/*time* nil]
     (try
       (require ns :reload)
-      {:input config/*input*
+      {:lib lib
+       :input config/*input*
        :output config/*output*
        :time config/*time*}
       (catch Throwable t (.printStackTrace t)))))
 
-(run :dcj-nil {:buffered true :k 2 :secs 5} 'discourje.core.async.examples.micro.ring)
+(defn start [lib input ns]
+  (.start (Thread. (fn [] (prn (run lib input ns))))))
+
+(start :dcj {:buffered true :k 8 :secs 3} 'discourje.core.async.examples.micro.ring)
+;(start :dcj {:k 8 :secs 3} 'discourje.core.async.examples.micro.merge)
+;(start :dcj {:k 8 :secs 3} 'discourje.core.async.examples.micro.route)
+;(start :dcj {:k 8 :secs 3} 'discourje.core.async.examples.micro.replicate)
