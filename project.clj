@@ -8,14 +8,18 @@
                  [org.clojure/tools.nrepl "0.2.13"]
                  [str-to-argv "0.1.1"]
                  [clojure-complete "0.2.5"]]
-  :source-paths ["src"]
-  :java-source-paths ["src"]
-  :profiles {:discourje {:main discourje.main
-                         :aot  [discourje.main]
+  :source-paths ["src2/main/clojure"]
+  :test-paths ["src2/test/clojure"]
+  :java-source-paths ["src2/main/java"]
+  :profiles {:discourje {:main         discourje.main
+                         :aot          [discourje.main]
                          :uberjar-name "discourje.jar"}
              :tacas2020 {:main         discourje.examples.tacas2020.main
                          :aot          [discourje.examples.tacas2020.main]
-                         :uberjar-name "tacas2020.jar"}})
+                         :uberjar-name "tacas2020.jar"}
+             :examples  {:main         discourje.core.async.examples
+                         :aot          [discourje.core.async.examples]
+                         :uberjar-name "discourje-examples.jar"}})
 
 ;; $ lein with-profile discourje uberjar
 ;; $ lein with-profile tacas2020 uberjar
