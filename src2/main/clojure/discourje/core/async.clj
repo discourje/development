@@ -1,4 +1,5 @@
 (ns discourje.core.async
+  (:gen-class)
   (:require [clojure.core.async :as a]
             [discourje.spec.lts :as lts]
             [discourje.core.async.impl.buffers :as buffers]
