@@ -1,9 +1,10 @@
-(ns discourje.core.async.impl.buffers)
+(ns discourje.core.async.impl.buffers
+  (:refer-clojure :exclude [type]))
 
 (deftype Buffer [type n])
 
 (defn buffer? [x]
-  (= (type x) Buffer))
+  (= (clojure.core/type x) Buffer))
 
 (defn fixed-buffer [n]
   {:pre [(> n 0)]}

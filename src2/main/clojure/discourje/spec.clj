@@ -1,4 +1,5 @@
 (ns discourje.spec
+  (:refer-clojure :exclude [cat loop * + apply])
   (:require [clojure.walk :as w]
             [discourje.spec.ast :as ast]))
 

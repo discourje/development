@@ -5,25 +5,25 @@
             [discourje.core.async.examples.config :as config])
   (:import (java.time LocalDateTime)))
 
-(defn run [ns lib input]
+(defn run [lib ns input]
   (binding [config/*lib* lib
             config/*input* input
             config/*output* nil
             config/*time* nil]
     (try
       (require ns :reload)
-      {:ns     ns
-       :lib    lib
+      {:lib    lib
+       :ns     ns
        :input  config/*input*
        :output config/*output*
        :time   config/*time*}
       (catch Throwable t (.printStackTrace t)))))
 
-(defn compare [ns libs input]
-  (mapv #(run ns % input) libs))
+(defn compare [libs ns input]
+  (mapv #(run % ns input) libs))
 
-(defn start [ns lib input]
-  (.start (Thread. ^Runnable (fn [] (prn (run ns lib input))))))
+(defn start [lib ns input]
+  (.start (Thread. ^Runnable (fn [] (println (run lib ns input))))))
 
 (defmacro version []
   (str (LocalDateTime/now)))
@@ -46,7 +46,7 @@
                           ns))
         (throw (ex-info "" {::message "Unknown program"})))
 
-      (println (run ns lib input)))
+      (println (run lib ns input)))
 
     (catch Throwable t
       (let [m (ex-data t)]

@@ -1,4 +1,5 @@
-(ns discourje.spec.ast)
+(ns discourje.spec.ast
+  (:refer-clojure :exclude [sync send cat loop]))
 
 ;;;;
 ;;;; Predicates

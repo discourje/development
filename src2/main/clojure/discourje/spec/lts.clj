@@ -69,9 +69,6 @@
 (defn not-bisimilar? [lts1 lts2]
   (not (bisimilar? lts1 lts2)))
 
-(defn println [lts]
-  (clojure.core/println (.toString lts)))
-
 (defn ltsgraph [lts mcrl2-root-dir tmp-file]
   (spit tmp-file (.toString lts))
   (future (clojure.java.shell/sh (str mcrl2-root-dir "/bin/ltsgraph") tmp-file)))
