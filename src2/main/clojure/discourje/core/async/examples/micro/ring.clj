@@ -19,19 +19,19 @@
 
 (s/defrole ::worker "worker")
 
-(s/def ::ring-unbuffered
+(s/def ::spec-unbuffered
   [k]
-  (s/* (s/loop ring [i 0]
+  (s/ω (s/loop spec [i 0]
                (s/if (< i k)
                  (s/cat (s/--> Boolean (::worker i) (::worker (mod (inc i) k)))
-                        (s/recur ring (inc i)))))))
+                        (s/recur spec (inc i)))))))
 
-(s/def ::ring-buffered
+(s/def ::spec-buffered
   [k]
-  (s/* (s/loop ring [i 0]
+  (s/ω (s/loop spec [i 0]
                (s/if (< i k)
                  (s/cat (s/-->> Boolean (::worker i) (::worker (mod (inc i) k)))
-                        (s/recur ring (inc i)))))))
+                        (s/recur spec (inc i)))))))
 
 ;;;;
 ;;;; Implementation
@@ -52,7 +52,7 @@
         ;; Link monitor [optional]
         _
         (if (= config/*lib* :dcj)
-          (let [s (s/apply (if buffered ::ring-buffered ::ring-unbuffered) [k])
+          (let [s (s/apply (if buffered ::spec-buffered ::spec-unbuffered) [k])
                 m (dcj/monitor s)]
             (doseq [i (range k)] (dcj/link (nth workers->workers i)
                                            (s/role ::worker [i])
@@ -60,41 +60,33 @@
                                            m))))
 
         ;; Spawn threads
-        workers
-        (mapv #(cond
+        worker0
+        (a/thread (let [in (nth workers->workers (dec k))
+                        out (nth workers->workers 0)
+                        begin (System/nanoTime)
+                        deadline (+ begin (* secs 1000 1000 1000))]
+                    (loop [n-iter 0
+                           not-done true]
+                      (a/>!! out not-done)
+                      (a/<!! in)
+                      (if not-done
+                        (recur (inc n-iter) (< (System/nanoTime) deadline))
+                        [(- (System/nanoTime) begin) n-iter]))))
 
-                 ;; Worker 0
-                 (= % 0)
-                 (a/thread (let [in (nth workers->workers (dec k))
-                                 out (nth workers->workers 0)
-                                 begin (System/nanoTime)
-                                 deadline (+ begin (* secs 1000 1000 1000))]
-                             (loop [n-iter 0]
-                               (if (< (System/nanoTime) deadline)
-                                 (do (a/>!! out true)
-                                     (a/<!! in)
-                                     (recur (inc n-iter)))
-                                 (do (a/>!! out false)
-                                     (a/<!! in)
-                                     [(- (System/nanoTime) begin) n-iter])))))
-
-                 ;; Worker i (0 < i < k)
-                 (< 0 % k)
-                 (a/thread (let [in (nth workers->workers (dec %))
-                                 out (nth workers->workers %)]
-                             (loop []
-                               (if (a/<!! in)
-                                 (do (a/>!! out true)
-                                     (recur))
-                                 (do (a/>!! out false)))))))
-
-              (range k))
+        workers'
+        (map #(a/thread (let [in (nth workers->workers (dec %))
+                              out (nth workers->workers %)]
+                          (loop []
+                            (let [v (a/<!! in)
+                                  _ (a/>!! out v)]
+                              (if v (recur))))))
+             (range 1 k))
 
         ;; Await termination
         output
-        (do (doseq [worker (rest workers)]
+        (do (doseq [worker workers']
               (a/<!! worker))
-            (a/<!! (first workers)))
+            (a/<!! worker0))
 
         ;; Stop timer
         end (System/nanoTime)]
