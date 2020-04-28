@@ -19,7 +19,7 @@
        :time   config/*time*}
       (catch Throwable t (.printStackTrace t)))))
 
-(defn compare [libs ns input]
+(defn run-all [libs ns input]
   (mapv #(run % ns input) libs))
 
 (defn start [lib ns input]
