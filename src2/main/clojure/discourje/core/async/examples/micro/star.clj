@@ -2,6 +2,7 @@
   (:require [clojure.core.async]
             [discourje.core.async :as dcj]
             [discourje.core.async.examples.config :as config]
+            [discourje.core.async.examples.timer :as timer]
             [discourje.spec :as s]))
 
 (if (contains? (ns-aliases *ns*) 'a)
@@ -49,6 +50,7 @@
 ;;;;
 
 (let [input config/*input*
+      resolution (:resolution input)
       buffered (:buffered input)
       ordered-sends (:ordered-sends input)
       ordered-receives (:ordered-receives input)
@@ -86,26 +88,25 @@
 
         ;; Spawn threads
         master
-        (a/thread (let [begin (System/nanoTime)
-                        deadline (+ begin (* secs 1000 1000 1000))]
+        (a/thread (let [deadline (+ begin (* secs 1000 1000 1000))]
                     (cond
 
                       ;; Buffered, ordered sends, ordered receives
                       (and buffered ordered-sends ordered-receives)
-                      (loop [n-iter 0
-                             not-done true]
+                      (loop [not-done true
+                             timer (timer/timer resolution)]
                         (doseq [out master->workers]
                           (a/>!! out not-done))
                         (doseq [in workers->master]
                           (a/<!! in))
                         (if not-done
-                          (recur (inc n-iter) (< (System/nanoTime) deadline))
-                          [(- (System/nanoTime) begin) n-iter]))
+                          (recur (< (System/nanoTime) deadline) (timer/tick timer))
+                          timer))
 
                       ;; Buffered, ordered sends, unordered receives
                       (and buffered ordered-sends (not ordered-receives))
-                      (loop [n-iter 0
-                             not-done true]
+                      (loop [not-done true
+                             timer (timer/timer resolution)]
                         (doseq [out master->workers]
                           (a/>!! out not-done))
                         (loop [ins workers->master]
@@ -113,13 +114,13 @@
                             (let [[_ in] (a/alts!! ins)]
                               (recur (remove #(= in %) ins)))))
                         (if not-done
-                          (recur (inc n-iter) (< (System/nanoTime) deadline))
-                          [(- (System/nanoTime) begin) n-iter]))
+                          (recur (< (System/nanoTime) deadline) (timer/tick timer))
+                          timer))
 
                       ;; Buffered, unordered sends, ordered receives
                       (and buffered (not ordered-sends) ordered-receives)
-                      (loop [n-iter 0
-                             not-done true]
+                      (loop [not-done true
+                             timer (timer/timer resolution)]
                         (loop [outs master->workers]
                           (if (not (empty? outs))
                             (let [[_ out] (a/alts!! (mapv #(vector % not-done) outs))]
@@ -127,13 +128,13 @@
                         (doseq [in workers->master]
                           (a/<!! in))
                         (if not-done
-                          (recur (inc n-iter) (< (System/nanoTime) deadline))
-                          [(- (System/nanoTime) begin) n-iter]))
+                          (recur (< (System/nanoTime) deadline) (timer/tick timer))
+                          timer))
 
                       ;; Buffered, unordered sends, unordered receives
                       (and buffered (not ordered-sends) (not ordered-receives))
-                      (loop [n-iter 0
-                             not-done true]
+                      (loop [not-done true
+                             timer (timer/timer resolution)]
                         (loop [outs master->workers]
                           (if (not (empty? outs))
                             (let [[_ out] (a/alts!! (mapv #(vector % not-done) outs))]
@@ -143,24 +144,24 @@
                             (let [[_ in] (a/alts!! ins)]
                               (recur (remove #(= in %) ins)))))
                         (if not-done
-                          (recur (inc n-iter) (< (System/nanoTime) deadline))
-                          [(- (System/nanoTime) begin) n-iter]))
+                          (recur (< (System/nanoTime) deadline) (timer/tick timer))
+                          timer))
 
                       ;; Unbuffered, ordered sends
                       (and (not buffered) ordered-sends)
-                      (loop [n-iter 0
-                             not-done true]
+                      (loop [not-done true
+                             timer (timer/timer resolution)]
                         (doseq [i (range k)]
                           (a/>!! (nth master->workers i) not-done)
                           (a/<!! (nth workers->master i)))
                         (if not-done
-                          (recur (inc n-iter) (< (System/nanoTime) deadline))
-                          [(- (System/nanoTime) begin) n-iter]))
+                          (recur (< (System/nanoTime) deadline) (timer/tick timer))
+                          timer))
 
                       ;; Unbuffered, unordered sends
                       (and (not buffered) (not ordered-sends))
-                      (loop [n-iter 0
-                             not-done true]
+                      (loop [not-done true
+                             timer (timer/timer resolution)]
                         (loop [outs-ins (zipmap master->workers workers->master)]
                           (if (not (empty? outs-ins))
                             (let [[_ out] (a/alts!! (mapv #(vector % not-done) (keys outs-ins)))
@@ -168,8 +169,8 @@
                               (a/<!! in)
                               (recur (dissoc outs-ins out)))))
                         (if not-done
-                          (recur (inc n-iter) (< (System/nanoTime) deadline))
-                          [(- (System/nanoTime) begin) n-iter])))))
+                          (recur (< (System/nanoTime) deadline) (timer/tick timer))
+                          timer)))))
 
         workers
         (mapv #(a/thread (let [in (nth master->workers %)
@@ -184,7 +185,7 @@
         output
         (do (doseq [worker workers]
               (a/<!! worker))
-            (a/<!! master))
+            (timer/report (a/<!! master)))
 
         ;; Stop timer
         end (System/nanoTime)]

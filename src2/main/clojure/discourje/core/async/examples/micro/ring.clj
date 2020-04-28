@@ -2,6 +2,7 @@
   (:require [clojure.core.async]
             [discourje.core.async :as dcj]
             [discourje.core.async.examples.config :as config]
+            [discourje.core.async.examples.timer :as timer]
             [discourje.spec :as s]))
 
 (if (contains? (ns-aliases *ns*) 'a)
@@ -38,6 +39,7 @@
 ;;;;
 
 (let [input config/*input*
+      resolution (:resolution input)
       buffered (:buffered input)
       k (:k input)
       secs (:secs input)]
@@ -63,15 +65,14 @@
         worker0
         (a/thread (let [in (nth workers->workers (dec k))
                         out (nth workers->workers 0)
-                        begin (System/nanoTime)
                         deadline (+ begin (* secs 1000 1000 1000))]
-                    (loop [n-iter 0
-                           not-done true]
+                    (loop [not-done true
+                           timer (timer/timer resolution)]
                       (a/>!! out not-done)
                       (a/<!! in)
                       (if not-done
-                        (recur (inc n-iter) (< (System/nanoTime) deadline))
-                        [(- (System/nanoTime) begin) n-iter]))))
+                        (recur (< (System/nanoTime) deadline) (timer/tick timer))
+                        timer))))
 
         workers'
         (map #(a/thread (let [in (nth workers->workers (dec %))
@@ -86,7 +87,7 @@
         output
         (do (doseq [worker workers']
               (a/<!! worker))
-            (a/<!! worker0))
+            (timer/report (a/<!! worker0)))
 
         ;; Stop timer
         end (System/nanoTime)]

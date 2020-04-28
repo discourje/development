@@ -2,6 +2,7 @@
   (:require [clojure.core.async]
             [discourje.core.async :as dcj]
             [discourje.core.async.examples.config :as config]
+            [discourje.core.async.examples.timer :as timer]
             [discourje.spec :as s]))
 
 (if (contains? (ns-aliases *ns*) 'a)
@@ -44,6 +45,7 @@
 ;;;;
 
 (let [input config/*input*
+      resolution (:resolution input)
       buffered (:buffered input)
       k (:k input)
       secs (:secs input)]
@@ -72,27 +74,20 @@
         workers
         (map (fn [i] (a/thread (let [ins (filterv (complement nil?) (mapv #(nth % i) workers->workers))
                                      outs (filterv (complement nil?) (nth workers->workers i))
-                                     begin (System/nanoTime)
                                      deadline (+ begin (* secs 1000 1000 1000))]
-                                 (loop [n-iter 0]
+                                 (loop [timer (timer/timer resolution)]
                                    (if (< (System/nanoTime) deadline)
                                      (if (first (a/alts!! (reduce into [(mapv #(vector % true) outs)
                                                                         ins
                                                                         [(a/timeout 100)]])))
-                                       (recur (inc n-iter))
-                                       (recur n-iter))
-                                     [begin (System/nanoTime) n-iter])))))
+                                       (recur (timer/tick timer))
+                                       (recur timer))
+                                     timer)))))
              (range k))
 
         ;; Await termination
         output
-        (let [[begin end n-iter] (reduce (fn [[begin1 end1 n-iter1]
-                                              [begin2 end2 n-iter2]]
-                                           [(min begin1 begin2)
-                                            (max end1 end2)
-                                            (+ n-iter1 n-iter2)])
-                                         (map #(a/<!! %) workers))]
-          [(- end begin) (quot n-iter 2)])
+        (timer/report (apply timer/aggregate (map #(a/<!! %) workers)))
 
         ;; Stop timer
         end (System/nanoTime)]

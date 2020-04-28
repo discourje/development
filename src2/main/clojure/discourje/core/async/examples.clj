@@ -7,7 +7,7 @@
 
 (defn run [lib ns input]
   (binding [config/*lib* lib
-            config/*input* input
+            config/*input* (merge {:resolution 1} input)
             config/*output* nil
             config/*time* nil]
     (try
@@ -46,7 +46,7 @@
                           ns))
         (throw (ex-info "" {::message "Unknown program"})))
 
-      (println (run lib ns input)))
+      (prn (run lib ns input)))
 
     (catch Throwable t
       (let [m (ex-data t)]
@@ -59,3 +59,5 @@
               (println (str "  <program> \u2208 {micro.ring, micro.mesh, micro.star}")))
           (.printStackTrace t))
         (println)))))
+
+(-main "dcj" "micro.mesh" "{:buffered false :k 2 :secs 3}")
