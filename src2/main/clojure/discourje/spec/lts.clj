@@ -3,7 +3,7 @@
             [clojure.java.shell :refer [sh]]
             [discourje.spec.interp :as interp])
   (:import (java.util.function Function Predicate)
-           (discourje.spec.lts Action Action$Type States LTS LTSs)))
+           (discourje.lts Action Action$Type States LTS LTSs)))
 
 ;;;;
 ;;;; Actions

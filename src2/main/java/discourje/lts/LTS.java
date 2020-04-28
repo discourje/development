@@ -1,4 +1,4 @@
-package discourje.spec.lts;
+package discourje.lts;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -60,7 +60,7 @@ public class LTS<Spec> {
         return states.computeIfAbsent(spec, SpecState::new);
     }
 
-    private class SpecState implements discourje.spec.lts.State<Spec> {
+    private class SpecState implements State<Spec> {
 
         private Spec spec;
 
@@ -108,7 +108,7 @@ public class LTS<Spec> {
                 transitions.compareAndSet(null, expansion);
 
                 if (bound > 1) {
-                    for (discourje.spec.lts.State<Spec> target : transitions.get().getTargets()) {
+                    for (State<Spec> target : transitions.get().getTargets()) {
                         target.expandRecursively(bound - 1);
                     }
                 }

@@ -1,4 +1,4 @@
-package discourje.spec.lts;
+package discourje.lts;
 
 import java.util.*;
 
