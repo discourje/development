@@ -78,10 +78,18 @@
 
           (prn (run lib program input))))
 
-      "configs"
+      "benchmark"
       (let [args (rest args)]
-        (doseq [config (configs (read-string (join " " args)))]
-          (prn config)))
+        (if (< (count args) 1)
+          (throw (ex-info "" {::message "Not enough arguments"})))
+
+        (let [n-samples (read-string (first args))]
+          (doseq [config (configs (read-string (join " " (rest args))))]
+            (doseq [_ (range n-samples)]
+              (println (str "java -jar discourje-examples.jar run "
+                            (name (:lib config)) " "
+                            (clojure.string/replace (str (:program config)) "discourje.core.async.examples." "") " "
+                            (:input config)))))))
 
       (throw (ex-info "" {::message "Unknown command"})))
 
@@ -94,6 +102,6 @@
               (println (str "Usage 1: java -jar discourje-examples.jar run <lib> <program> <input>"))
               (println (str "  <lib>     \u2208 {clj, dcj, dcj-nil}"))
               (println (str "  <program> \u2208 {micro.ring, micro.mesh, micro.star}"))
-              (println (str "Usage 2: java -jar discourje-examples.jar configs <m>")))
+              (println (str "Usage 2: java -jar discourje-examples.jar benchmark <n-samples> <m>")))
           (.printStackTrace t))
         (println)))))
