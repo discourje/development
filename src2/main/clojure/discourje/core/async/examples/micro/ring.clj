@@ -41,8 +41,8 @@
 (let [input config/*input*
       resolution (:resolution input)
       buffered (:buffered input)
-      k (:k input)
-      secs (:secs input)]
+      secs (:secs input)
+      k (:k input)]
 
   (let [;; Start timer
         begin (System/nanoTime)

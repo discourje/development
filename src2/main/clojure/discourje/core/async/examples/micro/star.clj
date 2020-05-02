@@ -54,8 +54,8 @@
       buffered (:buffered input)
       ordered-sends (:ordered-sends input)
       ordered-receives (:ordered-receives input)
-      k (:k input)
-      secs (:secs input)]
+      secs (:secs input)
+      k (:k input)]
 
   (let [;; Start timer
         begin (System/nanoTime)
