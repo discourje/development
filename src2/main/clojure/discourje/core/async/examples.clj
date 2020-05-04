@@ -213,8 +213,6 @@
 \\end{tikzpicture}
 \\end{document}")))
 
-(println (chart nil '{[discourje.core.async.examples.micro.ring {:buffered true, :secs 10, :k 2}] {[:clj :dcj-nil] {:μ-hat 1.5242262, :σ2-hat 3.1103522E-5, :confidence 0.011389861746674834}, [:clj :dcj] {:μ-hat 1.7601341, :σ2-hat 2.87667E-4, :confidence 0.03463847050718687}}, [discourje.core.async.examples.micro.ring {:buffered true, :secs 10, :k 3}] {[:clj :dcj-nil] {:μ-hat 1.5784104, :σ2-hat 1.2164457E-4, :confidence 0.02252475315033561}, [:clj :dcj] {:μ-hat 1.85297, :σ2-hat 4.5212702E-4, :confidence 0.0434254081842686}}, [discourje.core.async.examples.micro.ring {:buffered true, :secs 10, :k 4}] {[:clj :dcj-nil] {:μ-hat 1.5907134, :σ2-hat 1.3422611E-4, :confidence 0.02366094981944861}, [:clj :dcj] {:μ-hat 1.8445338, :σ2-hat 1.9847706E-4, :confidence 0.028771919560185332}}}))
-
 ;;;;
 ;;;; Main
 ;;;;
