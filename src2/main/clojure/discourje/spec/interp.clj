@@ -333,7 +333,17 @@
      (if (contains? unfolded ast)
        {}
        (successors (unfold ast (substitute (:body ast)
-                                           (zipmap (:vars ast) (map eval (:exprs ast)))))
+                                           (loop [vars (:vars ast)
+                                                  exprs (:exprs ast)
+                                                  smap {}]
+                                             (if (empty? vars)
+                                               smap
+                                               (let [var (first vars)
+                                                     expr (first exprs)
+                                                     val (eval (w/postwalk-replace smap expr))]
+                                                 (recur (rest vars)
+                                                        (rest exprs)
+                                                        (assoc smap var val)))))))
                    (conj unfolded ast)
                    f-action))
 

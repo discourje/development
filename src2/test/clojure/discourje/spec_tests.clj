@@ -786,6 +786,12 @@
                                    (1, "?(alice,bob[0])", 4)
                                    (2, "?(alice,bob[1])", 4)
                                    (3, "?(alice,bob[2])", 4)))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (lts/lts (s/loop next [i 5
+                                    j (inc i)]
+                              (s/-->> (::alice i) (::alice j))))
+        lts2 (lts/lts (s/-->> (::alice 5) (::alice 6)))]
     (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2))))
 
 (loop-recur-tests)
