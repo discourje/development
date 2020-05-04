@@ -84,11 +84,11 @@
    (let [predicate (predicate-form predicate)
          sender (role-form sender)
          receiver (role-form receiver)]
-     [`(ast/send ~predicate
-                 ~sender
-                 ~receiver)
-      `(ast/receive ~sender
-                    ~receiver)])))
+     `(ast/cat [(ast/send ~predicate
+                          ~sender
+                          ~receiver)
+                (ast/receive ~sender
+                             ~receiver)]))))
 
 (defmacro close
   [sender-expr receiver-expr]
