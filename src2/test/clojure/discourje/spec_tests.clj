@@ -493,6 +493,89 @@
 
 (multiary-tests)
 
+(deftest cat-every-tests
+  (let [lts1 (lts/lts (s/cat-every [i (range 1)] (s/-->> ::alice ::bob)))
+        lts2 (lts/lts (s/-->> ::alice ::bob))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (lts/lts (s/cat-every [i (range 3)] (s/-->> ::alice ::bob)))
+        lts2 (lts/lts (s/cat (s/-->> ::alice ::bob)
+                             (s/-->> ::alice ::bob)
+                             (s/-->> ::alice ::bob)))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (lts/lts (s/cat-every [i (range 3)] (s/-->> (::alice i) ::bob)))
+        lts2 (lts/lts (s/cat (s/-->> (::alice 0) ::bob)
+                             (s/-->> (::alice 1) ::bob)
+                             (s/-->> (::alice 2) ::bob)))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (lts/lts (s/cat-every [i (range 2)
+                                    j (range 2)]
+                                   (s/-->> (::alice i) (::bob j))))
+        lts2 (lts/lts (s/cat (s/-->> (::alice 0) (::bob 0))
+                             (s/-->> (::alice 0) (::bob 1))
+                             (s/-->> (::alice 1) (::bob 0))
+                             (s/-->> (::alice 1) (::bob 1))))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2))))
+
+(cat-every-tests)
+
+(deftest alt-every-tests
+  (let [lts1 (lts/lts (s/alt-every [i (range 1)] (s/-->> ::alice ::bob)))
+        lts2 (lts/lts (s/-->> ::alice ::bob))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (lts/lts (s/alt-every [i (range 3)] (s/-->> ::alice ::bob)))
+        lts2 (lts/lts (s/alt (s/-->> ::alice ::bob)
+                             (s/-->> ::alice ::bob)
+                             (s/-->> ::alice ::bob)))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (lts/lts (s/alt-every [i (range 3)] (s/-->> (::alice i) ::bob)))
+        lts2 (lts/lts (s/alt (s/-->> (::alice 0) ::bob)
+                             (s/-->> (::alice 1) ::bob)
+                             (s/-->> (::alice 2) ::bob)))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (lts/lts (s/alt-every [i (range 2)
+                                    j (range 2)]
+                                   (s/-->> (::alice i) (::bob j))))
+        lts2 (lts/lts (s/alt (s/-->> (::alice 0) (::bob 0))
+                             (s/-->> (::alice 0) (::bob 1))
+                             (s/-->> (::alice 1) (::bob 0))
+                             (s/-->> (::alice 1) (::bob 1))))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2))))
+
+(alt-every-tests)
+
+(deftest par-every-tests
+  (let [lts1 (lts/lts (s/par-every [i (range 1)] (s/-->> ::alice ::bob)))
+        lts2 (lts/lts (s/-->> ::alice ::bob))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (lts/lts (s/par-every [i (range 3)] (s/-->> ::alice ::bob)))
+        lts2 (lts/lts (s/par (s/-->> ::alice ::bob)
+                             (s/-->> ::alice ::bob)
+                             (s/-->> ::alice ::bob)))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (lts/lts (s/par-every [i (range 3)] (s/-->> (::alice i) ::bob)))
+        lts2 (lts/lts (s/par (s/-->> (::alice 0) ::bob)
+                             (s/-->> (::alice 1) ::bob)
+                             (s/-->> (::alice 2) ::bob)))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (lts/lts (s/par-every [i (range 2)
+                                    j (range 2)] (s/-->> (::alice i) (::bob j))))
+        lts2 (lts/lts (s/par (s/-->> (::alice 0) (::bob 0))
+                             (s/-->> (::alice 0) (::bob 1))
+                             (s/-->> (::alice 1) (::bob 0))
+                             (s/-->> (::alice 1) (::bob 1))))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2))))
+
+(par-every-tests)
+
 ;;;;
 ;;;; Conditional operators
 ;;;;

@@ -95,6 +95,16 @@
 (defn par [branches]
   (->Multiary :par branches))
 
+(defrecord EveryMultiary [type ast-f vars exprs branch])
+
+(defn every
+  ([ast-f bindings branch]
+   (let [vars (take-nth 2 bindings)
+         exprs (take-nth 2 (rest bindings))]
+     (every ast-f vars exprs branch)))
+  ([ast-f vars exprs branch]
+   (->EveryMultiary :every ast-f vars exprs branch)))
+
 ;;;;
 ;;;; Conditional operators
 ;;;;

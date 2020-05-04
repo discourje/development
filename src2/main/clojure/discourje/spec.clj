@@ -137,6 +137,24 @@
   [branch & more]
   `(ast/par [~branch ~@more]))
 
+(defmacro cat-every
+  [bindings branch]
+  `(ast/every ast/cat
+              (w/postwalk-replace ~(smap &env) '~bindings)
+              ~branch))
+
+(defmacro alt-every
+  [bindings branch]
+  `(ast/every ast/alt
+              (w/postwalk-replace ~(smap &env) '~bindings)
+              ~branch))
+
+(defmacro par-every
+  [bindings branch]
+  `(ast/every ast/par
+              (w/postwalk-replace ~(smap &env) '~bindings)
+              ~branch))
+
 ;;;;
 ;;;; Conditional operators
 ;;;;
