@@ -517,6 +517,14 @@
                              (s/-->> (::alice 0) (::bob 1))
                              (s/-->> (::alice 1) (::bob 0))
                              (s/-->> (::alice 1) (::bob 1))))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (lts/lts (s/cat-every [i (range 3)
+                                    j (range i)]
+                                   (s/-->> (::alice i) (::bob j))))
+        lts2 (lts/lts (s/cat (s/-->> (::alice 1) (::bob 0))
+                             (s/-->> (::alice 2) (::bob 0))
+                             (s/-->> (::alice 2) (::bob 1))))]
     (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2))))
 
 (cat-every-tests)
@@ -545,6 +553,14 @@
                              (s/-->> (::alice 0) (::bob 1))
                              (s/-->> (::alice 1) (::bob 0))
                              (s/-->> (::alice 1) (::bob 1))))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (lts/lts (s/alt-every [i (range 3)
+                                    j (range i)]
+                                   (s/-->> (::alice i) (::bob j))))
+        lts2 (lts/lts (s/alt (s/-->> (::alice 1) (::bob 0))
+                             (s/-->> (::alice 2) (::bob 0))
+                             (s/-->> (::alice 2) (::bob 1))))]
     (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2))))
 
 (alt-every-tests)
@@ -572,6 +588,14 @@
                              (s/-->> (::alice 0) (::bob 1))
                              (s/-->> (::alice 1) (::bob 0))
                              (s/-->> (::alice 1) (::bob 1))))]
+    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
+
+  (let [lts1 (lts/lts (s/par-every [i (range 3)
+                                    j (range i)]
+                                   (s/-->> (::alice i) (::bob j))))
+        lts2 (lts/lts (s/par (s/-->> (::alice 1) (::bob 0))
+                             (s/-->> (::alice 2) (::bob 0))
+                             (s/-->> (::alice 2) (::bob 1))))]
     (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2))))
 
 (par-every-tests)

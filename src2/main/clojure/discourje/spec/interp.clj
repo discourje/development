@@ -280,7 +280,7 @@
                                         result
                                         (merge {} (reduce merge (map-mapv-f (successors branch unfolded f-action))))))))))
 
-     ;; Concatenation (quantified)
+     ;; Every
      (= (:type ast) :every)
      (let [smaps (loop [vars (:vars ast)
                         exprs (:exprs ast)
@@ -289,14 +289,12 @@
                      smaps
                      (let [var (first vars)
                            expr (first exprs)
-                           vals (eval expr)]
+                           f (fn [smap] (mapv (fn [val]
+                                                (assoc smap var val))
+                                              (eval (w/postwalk-replace smap expr))))]
                        (recur (rest vars)
                               (rest exprs)
-                              (reduce into (mapv (fn [smap]
-                                                   (mapv (fn [val]
-                                                           (assoc smap var val))
-                                                         vals))
-                                                 smaps))))))
+                              (reduce into (mapv f smaps))))))
            branches (mapv #(substitute (:branch ast) %) smaps)]
        (successors ((:ast-f ast) branches) unfolded f-action))
 
