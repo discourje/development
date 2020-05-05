@@ -173,6 +173,12 @@
 ;;;; Recursion operators
 ;;;;
 
+(defmacro let
+  [bindings body & more]
+  `(ast/loop nil
+             (w/postwalk-replace ~(smap &env) '~bindings)
+             (s/cat ~body ~@more)))
+
 (defmacro loop
   [name bindings body & more]
   `(ast/loop (w/postwalk-replace ~(smap &env) '~name)
@@ -195,11 +201,11 @@
 (defmacro ω
   [body & more]
   (let [name (keyword (str "ω" (swap! ω-counter inc)))]
-    `(ast/loop '~name
-               []
-               (ast/cat [~body
-                         ~@more
-                         (ast/recur '~name [])]))))
+       `(ast/loop '~name
+                  []
+                  (ast/cat [~body
+                            ~@more
+                            (ast/recur '~name [])]))))
 
 (defmacro omega
   [body & more]
@@ -208,24 +214,24 @@
 (defmacro *
   [body & more]
   (let [name (keyword (str "*" (swap! *-counter inc)))]
-    `(ast/loop '~name
-               []
-               (ast/alt [(ast/cat [~body
-                                   ~@more
-                                   (ast/recur '~name [])])
-                         (ast/end)]))))
+       `(ast/loop '~name
+                  []
+                  (ast/alt [(ast/cat [~body
+                                      ~@more
+                                      (ast/recur '~name [])])
+                            (ast/end)]))))
 
 (defmacro +
   [body & more]
   (let [name (keyword (str "+" (swap! +-counter inc)))]
-    `(ast/cat [~body
-               ~@more
-               (ast/loop '~name
-                         []
-                         (ast/alt [(ast/cat [~body
-                                             ~@more
-                                             (ast/recur '~name [])])
-                                   (ast/end)]))])))
+       `(ast/cat [~body
+                  ~@more
+                  (ast/loop '~name
+                            []
+                            (ast/alt [(ast/cat [~body
+                                                ~@more
+                                                (ast/recur '~name [])])
+                                      (ast/end)]))])))
 (defmacro ?
   [body & more]
   `(ast/alt [(ast/cat [~body ~@more])
