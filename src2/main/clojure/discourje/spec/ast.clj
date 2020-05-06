@@ -188,18 +188,18 @@
 (defn aldebaran [v0 edges]
   (->Graph :aldebaran
            v0
-           (clojure.core/loop [todo edges
-                               result {}]
-             (if (empty? todo)
-               result
-               (recur (rest todo)
-                      (let [transition (first todo)
+           (clojure.core/loop [edges edges
+                               source->action->targets {}]
+             (if (empty? edges)
+               source->action->targets
+               (recur (rest edges)
+                      (let [transition (first edges)
                             source (nth transition 0)
                             label (nth transition 1)
                             target (nth transition 2)
                             action (parse-action label)]
-
-                        (if (and (contains? result source)
-                                 (contains? (get result source) label))
-                          (update result source #(merge-with into % {label [target]}))
-                          (merge-with into result {source {action [target]}}))))))))
+                        (if-let [action->targets (get source->action->targets source)]
+                          (if-let [targets (get action->targets action)]
+                            (assoc source->action->targets source (assoc action->targets action (conj targets target)))
+                            (assoc source->action->targets source (assoc action->targets action [target])))
+                          (assoc source->action->targets source {action [target]}))))))))
