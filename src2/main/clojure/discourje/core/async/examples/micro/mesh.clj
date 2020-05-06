@@ -20,9 +20,9 @@
 
 (s/defrole ::worker "worker")
 
-(s/def ::spec-unbuffered
-  [k]
-  (s/ω (s/loop spec-outer [i 0]
+(s/defsession ::spec-unbuffered
+              [k]
+              (s/ω (s/loop spec-outer [i 0]
                (s/if (< i k)
                  (s/alt (s/loop spec-inner [j 0]
                                 (s/if (< j k)
@@ -30,9 +30,9 @@
                                          (s/recur spec-inner (inc j)))))
                         (s/recur spec-outer (inc i)))))))
 
-(s/def ::spec-buffered
-  [k]
-  (s/loop spec-outer [i 0]
+(s/defsession ::spec-buffered
+              [k]
+              (s/loop spec-outer [i 0]
           (s/if (< i k)
             (s/par (s/loop spec-inner [j 0]
                            (s/if (< j k)

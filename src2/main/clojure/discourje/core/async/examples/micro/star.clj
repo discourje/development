@@ -21,25 +21,25 @@
 (s/defrole ::master "master")
 (s/defrole ::worker "worker")
 
-(s/def ::spec-cat
-  [k]
-  (s/ω (s/loop spec [i 0]
+(s/defsession ::spec-cat
+              [k]
+              (s/ω (s/loop spec [i 0]
                (s/if (< i k)
                  (s/cat (s/cat (s/--> Boolean ::master (::worker i))
                                (s/--> Boolean (::worker i) ::master))
                         (s/recur spec (inc i)))))))
 
-(s/def ::spec-alt
-  [k]
-  (s/ω (s/loop spec [i 0]
+(s/defsession ::spec-alt
+              [k]
+              (s/ω (s/loop spec [i 0]
                (s/if (< i k)
                  (s/alt (s/cat (s/--> Boolean ::master (::worker i))
                                (s/--> Boolean (::worker i) ::master))
                         (s/recur spec (inc i)))))))
 
-(s/def ::spec-par
-  [k]
-  (s/ω (s/loop spec [i 0]
+(s/defsession ::spec-par
+              [k]
+              (s/ω (s/loop spec [i 0]
                (s/if (< i k)
                  (s/par (s/cat (s/-->> Boolean ::master (::worker i))
                                (s/-->> Boolean (::worker i) ::master))

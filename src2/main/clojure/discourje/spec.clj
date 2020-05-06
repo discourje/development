@@ -239,7 +239,7 @@
 ;;;; Definition operators
 ;;;;
 
-(defmacro def
+(defmacro defsession
   [name vars & body]
   `(ast/register! (w/postwalk-replace ~(smap &env) '~name)
                   (w/postwalk-replace ~(smap &env) '~vars)
@@ -261,14 +261,14 @@
 ;;;; Patterns
 ;;;;
 
-(s/def ::-->>not [t r1 r2]
-  (s/-->> (fn [x] (not= (type x) t)) r1 r2))
+(s/defsession ::-->>not [t r1 r2]
+              (s/-->> (fn [x] (not= (type x) t)) r1 r2))
 
-(s/def ::pipe [t r-name min max]
-  (s/loop pipe [i min]
-          (s/if (< i (dec max))
-            (s/cat (s/-->> t (r-name i) (r-name (inc i)))
-                   (s/recur pipe (inc i))))))
+(s/defsession ::pipe [t r-name min max]
+              (s/loop pipe [i min]
+                      (s/if (< i (dec max))
+                        (s/cat (s/-->> t (r-name i) (r-name (inc i)))
+                               (s/recur pipe (inc i))))))
 
-(s/def ::pipe [t r-name n]
-  (s/apply ::pipe ['t r-name 0 n]))
+(s/defsession ::pipe [t r-name n]
+              (s/apply ::pipe ['t r-name 0 n]))
