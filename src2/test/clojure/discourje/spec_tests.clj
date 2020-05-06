@@ -796,9 +796,9 @@
 
 (loop-recur-tests)
 
-;;;;;
-;;;;; Regex operators
-;;;;;
+;;;;
+;;;; Regex operators
+;;;;
 
 (deftest ω-tests
   (let [lts1 (lts/lts (s/ω (s/-->> ::alice ::bob)))
@@ -894,9 +894,9 @@
 
 (?-tests)
 
-;;;;;
-;;;;; Definition operators
-;;;;;
+;;;;
+;;;; Definition operators
+;;;;
 
 (deftest apply-tests
   (let [lts1 (lts/lts (s/apply ::s/-->>not [;; Code needs to be passed quoted
