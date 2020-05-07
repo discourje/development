@@ -1,0 +1,200 @@
+(ns discourje.spec.mcrl2
+  (:require [discourje.spec :as s]
+            [discourje.spec.lts :as lts]
+            [clojure.string :refer [join]]
+            [clojure.java.shell :refer [sh]]
+            [clojure.pprint :refer [pprint]])
+  (:import (java.io File)))
+
+(def ^:dynamic *mcrl2-bin* nil)
+
+(defn mcrl2 [tool]
+  (if *mcrl2-bin*
+    (str *mcrl2-bin* File/separator (name tool))
+    (throw (Exception.))))
+
+(defn ltsgraph [lts temp-dir]
+  (future
+    (let [aut-file (str temp-dir File/separator "ltsgraph-" (System/currentTimeMillis) ".aut")]
+      (spit aut-file (str lts))
+      (sh (mcrl2 :ltsgraph) aut-file))))
+
+(defn lts2pbes-pbes2bool [lts formulas temp-dir]
+  (future
+    (let [timestamp (System/currentTimeMillis)
+          aut-file (str temp-dir File/separator "lts2pbes-pbes2bool-" timestamp ".aut")
+          mcrl2-file (str temp-dir File/separator "lts2pbes-pbes2bool-" timestamp ".mcrl2")
+          mcf-file (str temp-dir File/separator "lts2pbes-pbes2bool-" timestamp ".mcf")
+          pbes-file (str temp-dir File/separator "lts2pbes-pbes2bool-" timestamp ".pbes")]
+
+      ;; TODO: How to deal with non-numeric labels?
+
+      (let [lts-string (str lts)
+            lts-string (clojure.string/replace lts-string "‽" "handshake")
+            lts-string (clojure.string/replace lts-string "!" "send")
+            lts-string (clojure.string/replace lts-string "?" "receive")
+            lts-string (clojure.string/replace lts-string "C" "close")]
+        (spit aut-file lts-string))
+
+      (spit mcrl2-file (join "\n" ["sort Role = struct " (join " | " (sort (lts/roles lts))) ";"
+                                   "act"
+                                   "  handshake, send, receive: Nat # Role # Role;"
+                                   "  close: Role # Role;"]))
+
+      (loop [formulas formulas
+             bools {}]
+        (if (empty? formulas)
+          (pprint bools)
+          (let [[name formula] (first formulas)
+                _ (spit mcf-file formula)
+                _ (sh (mcrl2 :lts2pbes) "-D" mcrl2-file "-f" mcf-file aut-file pbes-file)
+                pbes2bool (sh (mcrl2 :pbes2bool) pbes-file)
+                bool (read-string (:out pbes2bool))]
+            (recur (rest formulas)
+                   (assoc bools name bool)))))
+
+      (clojure.java.io/delete-file mcf-file)
+      (clojure.java.io/delete-file mcrl2-file)
+      (clojure.java.io/delete-file pbes-file))))
+
+;;;;
+;;;; Example
+;;;;
+
+(s/defrole ::alice "alice")
+(s/defrole ::bob "bob")
+(s/defrole ::carol "carol")
+(s/defrole ::dave "dave")
+
+(s/defsession ::election-init [p network initiators]
+              (s/par-every [q (get (:edges network) p)]
+                           (s/apply ::election [(get (:nodes network) p) p q network initiators])))
+
+(s/defsession ::election [id p q network initiators]
+              (s/--> (s/predicate id) p q)
+              (s/let [receives (vec (filter #(and (= (:type %) :sync)
+                                                  (= (:receiver %) q))
+                                            &hist))
+                      max-id (apply max (concat (map #(:expr (:predicate %)) receives)
+                                                (if (contains? initiators q)
+                                                  [(get (:nodes network) q)]
+                                                  [])))
+                      max-id-receives (vec (filter #(= (:expr (:predicate %)) max-id) receives))
+                      n (count max-id-receives)
+                      parent (if (= max-id (get (:nodes network) q))
+                               nil
+                               (:sender (first max-id-receives)))]
+
+                     (s/if (= id max-id)
+                       (s/if parent
+                         (s/cat (s/if (= n 1)
+                                  (s/par-every [r (disj (get (:edges network) q) parent)]
+                                               (s/apply ::election [id q r network initiators])))
+                                (s/if (= n (count (get (:edges network) q)))
+                                  (s/apply ::election [id q parent network initiators])))
+                         (s/if (= n (count (get (:edges network) q)))
+                           (s/--> (s/predicate id) q ::dave))))))
+
+(try (let [s (s/let [network {:nodes {(s/role ::alice) 0
+                                      (s/role ::bob)   1
+                                      (s/role ::carol) 2}
+                              :edges {(s/role ::alice) #{(s/role ::bob)}
+                                      (s/role ::bob)   #{(s/role ::alice) (s/role ::carol)}
+                                      (s/role ::carol) #{(s/role ::bob)}}}
+                     initiators #{(s/role ::alice) (s/role ::carol)}]
+                    (s/par-every [p initiators] (s/apply ::election-init [p network initiators])))
+
+           lts (lts/lts s :history true)]
+
+       (binding [*mcrl2-bin* "/Applications/mCRL2.app/Contents/bin"]
+         (ltsgraph lts "/Users/sungshik/Desktop/temp")
+
+         (lts2pbes-pbes2bool lts
+                             {:deadlock-freedom                "[true*] <true> true"
+                              :deadlock-freedom-or-termination "[true*] (<true> true || [true] false)"
+                              :election-greatest               (str "forall i1,i2:Nat, r1,r2,r3:Role. (val(i1 < 3) && val(i2 < 3)) => ("
+                                                                    "[true* . handshake(i1,r1,r2) . true* . handshake(i2,r3,dave)] val(i1 <= i2))")
+                              :election-unique                 (str "forall i1:Nat, r1:Role. val(i1 < 3) => ("
+                                                                    "[true* . handshake(i1,r1,dave)] forall i2:Nat, r2:Role. val(i2 < 3) => ("
+                                                                    "[true* . handshake(i2,r2,dave)] false))")}
+                             "/Users/sungshik/Desktop/temp")))
+
+     (catch Throwable t (.printStackTrace t)))
+
+
+
+
+
+
+
+
+;; Plan:
+;;  1. Implement bounded expansion (unfold and linearize, up to some finite depth). This is a syntactic procedure,
+;;  *except* linearization of ast/every...
+;;  2. Write election spec.
+
+;(def mem (atom {::alice {:parent nil :leader-id -1 :n 0},
+;                ::bob   {:parent nil :leader-id -1 :n 0},
+;                ::carol {:parent nil :leader-id -1 :n 0}}))
+;
+;(def network {::alice [::bob]
+;              ::bob   [::alice ::carol]
+;              ::carol [::bob]})
+;
+;(s/defsession ::election [p q id]
+;              (s/-->> #(= % id) p q)
+;              (s/let [m (swap! mem #(let [mem-q (get % q)]
+;                                      (cond (> id (:leader-id mem-q)) (assoc % q {:parent    p
+;                                                                                  :leader-id id
+;                                                                                  :n         0})
+;                                            (= id (:leader-id mem-q)) (assoc % q {:parent    (:parent mem-q)
+;                                                                                  :leader-id (:leader-id mem-q)
+;                                                                                  :n         (inc (:n mem-q))})
+;                                            (< id (:leader-id mem-q) %))))
+;                      parent (:parent (get m q))
+;                      n (:n (get m q))]
+;
+;                     (s/if (= n 1)
+;                       (s/par-every [r (get network q)] (s/apply ::election [q r id]))
+;                       (s/if (= n (count (get network q)))
+;                         (s/-->> id q parent)))))
+
+
+
+
+
+
+;(s/defsession ::election [p q id]
+;              (s/-->> #(= % id) p q)
+;              (s/let [env-q (get &env (symbol q))
+;
+;                      parent (:parent env-q)
+;                      leader-id (:leader-id env-q)
+;                      n (:n env-q)
+;
+;                      parent' (cond (> id leader-id) p
+;                                    (= id leader-id) parent
+;                                    (< id leader-id) parent)
+;                      leader-id' (cond (> id leader-id) id
+;                                       (= id leader-id) leader-id
+;                                       (< id leader-id) leader-id)
+;                      n' (cond (> id leader-id) 1
+;                               (= id leader-id) (inc n)
+;                               (< id leader-id) n)
+;
+;                      network (get &env 'network)]
+;
+;                     (s/with-bindings {(symbol q) {:parent parent' :leader-id leader-id' :n n'}}
+;                                      (s/if (= n' 1)
+;                                        (s/par-every [r (get network q)] (s/apply ::election [q r id]))
+;                                        (s/if (= n' (count (get network q)))
+;                                          (s/-->> id q parent))))))
+;
+;(s/with-bindings {alice   {:parent nil :leader-id -1 :n 0},
+;                  bob     {:parent nil :leader-id -1 :n 0},
+;                  carol   {:parent nil :leader-id -1 :n 0}
+;                  network {::alice [::bob]
+;                           ::bob   [::alice ::carol]
+;                           ::carol [::bob]}}
+;                 (s/apply ::election [::alice ::bob 0]))
+
