@@ -1,13 +1,28 @@
 (ns discourje.spec.interp
+  (:refer-clojure :exclude [eval])
   (:require [clojure.walk :as w]
             [discourje.spec.ast :as ast]))
 
+(def ^:dynamic *hist* nil)
+
+(defn eval [expr]
+  (clojure.core/eval (if *hist*
+                       (w/postwalk-replace {'&hist 'discourje.spec.interp/*hist*} expr)
+                       expr)))
+
+(defonce ^:private eval-predicate-cache (atom (hash-map)))
+
 (defn eval-predicate [predicate]
   {:pre [(ast/predicate? predicate)]}
-  (let [x (eval (:expr predicate))]
-    (cond
-      (class? x) #(instance? x %)
-      (fn? x) x)))
+  (if-let [f (get @eval-predicate-cache predicate)]
+    f
+    (let [x (eval (:expr predicate))
+          f (cond
+              (fn? x) x
+              (class? x) #(instance? x %)
+              :else (fn [message] (= message x)))
+          _ (swap! eval-predicate-cache #(assoc % predicate f))]
+      f)))
 
 (defn eval-role [role]
   {:pre [(ast/role? role)]}
@@ -23,25 +38,36 @@
                     (throw (Exception.))))
                (:index-exprs role)))))
 
-(defn eval-action [action f]
-  {:pre [(ast/action? action)]}
-  (let [type (:type action)
-        predicate (eval-predicate (:predicate action))
-        sender (eval-role (:sender action))
-        receiver (eval-role (:receiver action))]
-    (f (str (case (:type action)
-              :sync "‽"
-              :send "!"
-              :receive "?"
-              :close "C"
-              (throw (Exception.))) "("
-            (if (contains? #{:sync :send} (:type action)) (str (:expr (:predicate action)) ",") "")
-            sender ","
-            receiver ")")
-       type
-       predicate
-       sender
-       receiver)))
+(defrecord Action [name type predicate sender receiver])
+
+(defn action? [x]
+  (= (type x) Action))
+
+(defn action
+  ([ast-action]
+   {:pre [(ast/action? ast-action)]}
+   (let [type (:type ast-action)
+         predicate (eval-predicate (:predicate ast-action))
+         sender (eval-role (:sender ast-action))
+         receiver (eval-role (:receiver ast-action))
+         name (str (case (:type ast-action)
+                     :sync "‽"
+                     :send "!"
+                     :receive "?"
+                     :close "C"
+                     (throw (Exception.))) "("
+                   (if (contains? #{:sync :send} (:type ast-action)) (str (:expr (:predicate ast-action)) ",") "")
+                   sender ","
+                   receiver ")")]
+     (action name type predicate sender receiver)))
+
+  ([name type predicate sender receiver]
+   {:pre [(string? name)
+          (contains? #{:sync :send :receive :close} type)
+          (fn? predicate)
+          (string? sender)
+          (string? receiver)]}
+   (->Action name type predicate sender receiver)))
 
 (defn substitute [ast smap]
   (cond
@@ -65,6 +91,13 @@
     ;; Parallel
     (= (:type ast) :par)
     (ast/par (mapv #(substitute % smap) (:branches ast)))
+
+    ;; Every
+    (= (:type ast) :every)
+    (ast/every (:ast-f ast)
+               (:vars ast)
+               (w/postwalk-replace smap (:exprs ast))
+               (substitute (:branch ast) (apply dissoc smap (:vars ast))))
 
     ;; Vector
     (vector? ast)
@@ -122,6 +155,10 @@
     (= (:type ast) :par)
     (ast/par (mapv #(unfold loop %) (:branches ast)))
 
+    ;; Every
+    (= (:type ast) :every)
+    (ast/every (:ast-f ast) (:vars ast) (:exprs ast) (unfold loop (:branch ast)))
+
     ;; Vector
     (vector? ast)
     (mapv #(unfold loop %) ast)
@@ -178,6 +215,24 @@
     (= (:type ast) :par)
     (every? #(terminated? % unfolded) (:branches ast))
 
+    ;; Every
+    (= (:type ast) :every)
+    (let [smaps (loop [vars (:vars ast)
+                       exprs (:exprs ast)
+                       smaps [{}]]
+                  (if (empty? vars)
+                    smaps
+                    (let [var (first vars)
+                          expr (first exprs)
+                          f (fn [smap] (mapv (fn [val]
+                                               (assoc smap var val))
+                                             (eval (w/postwalk-replace smap expr))))]
+                      (recur (rest vars)
+                             (rest exprs)
+                             (reduce into (mapv f smaps))))))
+          branches (mapv #(substitute (:branch ast) %) smaps)]
+      (terminated? ((:ast-f ast) branches) unfolded))
+
     ;; Vector
     (vector? ast)
     (every? #(terminated? % unfolded) ast)
@@ -191,7 +246,17 @@
     (if (contains? unfolded ast)
       false
       (terminated? (unfold ast (substitute (:body ast)
-                                           (zipmap (:vars ast) (map eval (:exprs ast)))))
+                                           (loop [vars (:vars ast)
+                                                  exprs (:exprs ast)
+                                                  smap {}]
+                                             (if (empty? vars)
+                                               smap
+                                               (let [var (first vars)
+                                                     expr (first exprs)
+                                                     val (eval (w/postwalk-replace smap expr))]
+                                                 (recur (rest vars)
+                                                        (rest exprs)
+                                                        (assoc smap var val)))))))
                    (conj unfolded ast)))
 
     ;; Recur
@@ -213,9 +278,9 @@
     :else (throw (Exception.))))
 
 (defn successors
-  ([ast f-action]
-   (successors ast #{} f-action))
-  ([ast unfolded f-action]
+  ([ast]
+   (successors ast #{}))
+  ([ast unfolded]
    (cond
 
      ;; End
@@ -224,7 +289,7 @@
 
      ;; Action
      (ast/action? ast)
-     {(eval-action ast f-action) [(ast/end)]}
+     {ast [(ast/end)]}
 
      ;; Concatenation
      (= (:type ast) :cat)
@@ -243,7 +308,7 @@
                            mapv-f (fn [branches'] (mapv #(f %) branches'))
                            ;; map-mapv-f maps mapv-f over a map from actions to vectors of branches
                            map-mapv-f (fn [m] (map (fn [[k v]] {k (mapv-f v)}) m))]
-                       (merge {} (reduce merge (map-mapv-f (successors branch unfolded f-action)))))
+                       (merge {} (reduce merge (map-mapv-f (successors branch unfolded)))))
 
                      ;; Rule 2
                      (let [branch (first branches)
@@ -251,13 +316,14 @@
                        (if (terminated? branch #{})
                          (case (count branches-after)
                            0 {}
-                           1 (successors (first branches-after) unfolded f-action)
-                           (successors (ast/cat (vec branches-after)) unfolded f-action))
+                           1 (successors (first branches-after) unfolded)
+                           (successors (ast/cat (vec branches-after)) unfolded))
                          {})))))
 
      ;; Alternatives
      (= (:type ast) :alt)
-     (reduce (partial merge-with into) (map #(successors % unfolded f-action) (:branches ast)))
+     (let [branches (:branches ast)]
+       (reduce (partial merge-with into) (map #(successors % unfolded) branches)))
 
      ;; Parallel
      (= (:type ast) :par)
@@ -278,7 +344,7 @@
                  map-mapv-f (fn [m] (map (fn [[k v]] {k (mapv-f v)}) m))]
              (recur (inc i) (merge-with into
                                         result
-                                        (merge {} (reduce merge (map-mapv-f (successors branch unfolded f-action))))))))))
+                                        (merge {} (reduce merge (map-mapv-f (successors branch unfolded))))))))))
 
      ;; Every
      (= (:type ast) :every)
@@ -296,7 +362,7 @@
                               (rest exprs)
                               (reduce into (mapv f smaps))))))
            branches (mapv #(substitute (:branch ast) %) smaps)]
-       (successors ((:ast-f ast) branches) unfolded f-action))
+       (successors ((:ast-f ast) branches) unfolded))
 
      ;; Vector
      (vector? ast)
@@ -308,7 +374,7 @@
                          ;; f inserts an "evaluated" branch before "unevaluated" branches
                          f (fn [branch']
                              (let [branches' (reduce into [(if (and (terminated? branch' #{})
-                                                                    (empty? (successors branch' unfolded f-action)))
+                                                                    (empty? (successors branch' unfolded)))
                                                              []
                                                              [branch'])
                                                            branches-after])]
@@ -319,14 +385,14 @@
                          mapv-f (fn [branches'] (mapv #(f %) branches'))
                          ;; map-mapv-f maps mapv-f over a map from actions to vectors of branches
                          map-mapv-f (fn [m] (map (fn [[k v]] {k (mapv-f v)}) m))]
-                     (merge {} (reduce merge (map-mapv-f (successors branch unfolded f-action)))))
+                     (merge {} (reduce merge (map-mapv-f (successors branch unfolded)))))
                    (if (terminated? (first ast) #{})
-                     (successors (vec (rest ast)) unfolded f-action)
+                     (successors (vec (rest ast)) unfolded)
                      {})))
 
      ;; If
      (= (:type ast) :if)
-     (successors (if (eval (:condition ast)) (:branch1 ast) (:branch2 ast)) unfolded f-action)
+     (successors (if (eval (:condition ast)) (:branch1 ast) (:branch2 ast)) unfolded)
 
      ;; Loop
      (= (:type ast) :loop)
@@ -344,8 +410,7 @@
                                                  (recur (rest vars)
                                                         (rest exprs)
                                                         (assoc smap var val)))))))
-                   (conj unfolded ast)
-                   f-action))
+                   (conj unfolded ast)))
 
      ;; Recur
      (= (:type ast) :recur)
@@ -357,20 +422,33 @@
            exprs (rest ast)
            body (:body (get (get @ast/registry name) (count exprs)))
            vars (:vars (get (get @ast/registry name) (count exprs)))]
-       (successors (substitute body (zipmap vars (map eval exprs))) unfolded f-action))
+       (successors (substitute body (zipmap vars (map eval exprs))) unfolded))
 
      ;; Aldebaran
      (= (:type ast) :aldebaran)
      (let [m (get (:edges ast) (:v ast))
-           keys (map #(eval-action % f-action) (keys m))
+           ks (keys m)
            vals (map (fn [k]
                        (let [vertices (get m k)]
                          (if (empty? vertices)
                            [(ast/end)]
                            (mapv #(assoc ast :v %) vertices))))
-                     (clojure.core/keys m))]
-       (if (nil? keys)
+                     (keys m))]
+       (if (nil? (keys m))
          {}
-         (zipmap keys vals)))
+         (zipmap ks vals)))
 
      :else (throw (Exception.)))))
+
+(defn successors-with-hist
+  [ast hist]
+  (binding [*hist* hist]
+    (loop [successors (successors ast #{})
+           successors-with-hist {}]
+      (if (empty? successors)
+        successors-with-hist
+        (let [[ast-action asts] (first successors)]
+          (recur (rest successors)
+                 (assoc successors-with-hist
+                   ast-action
+                   (mapv (fn [ast] [ast (conj hist ast-action)]) asts))))))))

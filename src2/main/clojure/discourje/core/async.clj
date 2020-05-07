@@ -6,13 +6,14 @@
             [discourje.core.async.impl.channels :as channels]
             [discourje.core.async.impl.monitors :as monitors]))
 
-(defn monitor [spec]
-  (monitors/monitor (lts/lts spec false)))
+(defn monitor [spec & {:keys [on-the-fly history]
+                       :or   {on-the-fly true, history false}}]
+  (monitors/monitor (lts/lts spec :on-the-fly on-the-fly :history history)))
 
 (defn link
   ([channel sender receiver monitor]
    (link channel sender receiver monitor nil))
-  ([channel sender receiver monitor config]
+  ([channel sender receiver monitor options]
    (channels/link channel sender receiver monitor)))
 
 ;;;;
@@ -32,14 +33,14 @@
   (;[buf-or-n xform ex-handler]
    [_ _ _]
    (throw (UnsupportedOperationException.)))
-  ([sender receiver monitor config]
-   (link (chan) sender receiver monitor config))
-  ([buf-or-n sender receiver monitor config]
-   (link (chan buf-or-n) sender receiver monitor config))
-  (;[buf-or-n xform sender receiver monitor config]
+  ([sender receiver monitor options]
+   (link (chan) sender receiver monitor options))
+  ([buf-or-n sender receiver monitor options]
+   (link (chan buf-or-n) sender receiver monitor options))
+  (;[buf-or-n xform sender receiver monitor options]
    [_ _ _ _ _ _]
    (throw (UnsupportedOperationException.)))
-  (;[buf-or-n xform ex-handler sender receiver monitor config]
+  (;[buf-or-n xform ex-handler sender receiver monitor options]
    [_ _ _ _ _ _ _]
    (throw (UnsupportedOperationException.))))
 

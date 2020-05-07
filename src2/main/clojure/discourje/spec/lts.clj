@@ -3,7 +3,7 @@
             [clojure.java.shell :refer [sh]]
             [discourje.spec.interp :as interp])
   (:import (java.util.function Function Predicate)
-           (discourje.lts Action Action$Type States LTS LTSs)))
+           (discourje.lts Action Action$Type State States LTS LTSs)))
 
 ;;;;
 ;;;; Actions
@@ -18,17 +18,13 @@
     :close Action$Type/CLOSE
     (throw (Exception.))))
 
-(defn action [name type predicate sender receiver]
-  {:pre [(string? name)
-         (keyword? type)
-         (fn? predicate)
-         (string? sender)
-         (string? receiver)]}
-  (Action. name
-           (action-type-keyword-to-enum type)
-           (reify Predicate (test [_ message] (predicate message)))
-           sender
-           receiver))
+(defn action [interp-action]
+  {:pre [(interp/action? interp-action)]}
+  (Action. (:name interp-action)
+           (action-type-keyword-to-enum (:type interp-action))
+           (reify Predicate (test [_ message] ((:predicate interp-action) message)))
+           (:sender interp-action)
+           (:receiver interp-action)))
 
 ;;;;
 ;;;; States
@@ -48,27 +44,40 @@
 (defn lts? [x]
   (= (type x) LTS))
 
-(defn lts
-  ([ast]
-   (lts ast true))
-  ([ast expand-recursively]
-   (let [lts (LTS. #{ast}
+(defn lts [ast & {:keys [on-the-fly history]
+                  :or   {on-the-fly false, history false}}]
+  (let [initial (if history [ast []] ast)
+        expander (if history
                    (reify
                      Function
-                     (apply [_ ast] (interp/successors ast action))))]
-     (if expand-recursively
-       (.expandRecursively lts))
-     lts)))
+                     (apply [_ [ast hist]]
+                       (let [successors (interp/successors-with-hist ast hist)]
+                         (zipmap (map #(action (interp/action %)) (keys successors))
+                                 (vals successors)))))
+                   (reify
+                     Function
+                     (apply [_ ast]
+                       (let [successors (interp/successors ast)]
+                         (zipmap (map #(action (interp/action %)) (keys successors))
+                                 (vals successors))))))
+        lts (LTS. #{initial} expander)]
+    (if (not on-the-fly)
+      (.expandRecursively lts))
+    lts))
 
 (defn initial-states [lts]
   (.getInitialStates lts))
+
+(defn roles [lts]
+  (reduce clojure.set/union
+          (map (fn [^State s]
+                 (reduce clojure.set/union
+                         (map (fn [a] #{(.getSender a) (.getReceiver a)})
+                              (.getActions (.getTransitionsOrNull s)))))
+               (.getStates lts))))
 
 (defn bisimilar? [lts1 lts2]
   (LTSs/bisimilar lts1 lts2))
 
 (defn not-bisimilar? [lts1 lts2]
   (not (bisimilar? lts1 lts2)))
-
-(defn ltsgraph [lts mcrl2-root-dir tmp-file]
-  (spit tmp-file (.toString lts))
-  (future (clojure.java.shell/sh (str mcrl2-root-dir "/bin/ltsgraph") tmp-file)))
