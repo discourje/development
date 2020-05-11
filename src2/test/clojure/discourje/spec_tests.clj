@@ -388,66 +388,66 @@
 
 (par-tests)
 
-(deftest vector-tests
-  (let [lts1 (lts/lts [(s/-->> ::alice ::bob)])
-        lts2 (lts/lts (s/aldebaran des (0, 2, 3)
-                                   (0, "!(Object,alice,bob)", 1)
-                                   (1, "?(alice,bob)", 2)))]
-    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
-
-  (let [lts1 (lts/lts [(s/-->> ::alice ::bob)
-                       (s/-->> ::alice ::carol)])
-        lts2 (lts/lts (s/aldebaran des (0, 4, 5)
-                                   (0, "!(Object,alice,bob)", 1)
-                                   (1, "?(alice,bob)", 2)
-                                   (2, "!(Object,alice,carol)", 3)
-                                   (3, "?(alice,carol)", 4)))]
-    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
-
-  (let [lts1 (lts/lts [(s/-->> ::alice ::bob)
-                       (s/-->> ::alice ::carol)
-                       (s/-->> ::alice ::dave)])
-        lts2 (lts/lts (s/aldebaran des (0, 6, 7)
-                                   (0, "!(Object,alice,bob)", 1)
-                                   (1, "?(alice,bob)", 2)
-                                   (2, "!(Object,alice,carol)", 3)
-                                   (3, "?(alice,carol)", 4)
-                                   (4, "!(Object,alice,dave)", 5)
-                                   (5, "?(alice,dave)", 6)))]
-    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
-
-  ;; Non-idempotence
-  (let [lts1 (lts/lts [(s/-->> ::alice ::bob)
-                       (s/-->> ::alice ::bob)])
-        lts2 (lts/lts [(s/-->> ::alice ::bob)])]
-    (is (lts/not-bisimilar? lts1 lts2) (msg lts1 lts2)))
-
-  ;; Non-commutativity
-  (let [lts1 (lts/lts [(s/-->> ::alice ::bob)
-                       (s/-->> ::alice ::carol)])
-        lts2 (lts/lts [(s/-->> ::alice ::carol)
-                       (s/-->> ::alice ::bob)])]
-    (is (lts/not-bisimilar? lts1 lts2) (msg lts1 lts2)))
-
-  ;; Associativity
-  (let [lts1 (lts/lts [(s/-->> ::alice ::bob)
-                       [(s/-->> ::alice ::carol)
-                        (s/-->> ::alice ::dave)]])
-        lts2 (lts/lts [[(s/-->> ::alice ::bob)
-                        (s/-->> ::alice ::carol)]
-                       (s/-->> ::alice ::dave)])]
-    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
-
-  ;; Flattening
-  (let [lts1 (lts/lts [(s/-->> ::alice ::bob)
-                       [(s/-->> ::alice ::carol)
-                        (s/-->> ::alice ::dave)]])
-        lts2 (lts/lts [(s/-->> ::alice ::bob)
-                       (s/-->> ::alice ::carol)
-                       (s/-->> ::alice ::dave)])]
-    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2))))
-
-(vector-tests)
+;(deftest vector-tests
+;  (let [lts1 (lts/lts [(s/-->> ::alice ::bob)])
+;        lts2 (lts/lts (s/aldebaran des (0, 2, 3)
+;                                   (0, "!(Object,alice,bob)", 1)
+;                                   (1, "?(alice,bob)", 2)))]
+;    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
+;
+;  (let [lts1 (lts/lts [(s/-->> ::alice ::bob)
+;                       (s/-->> ::alice ::carol)])
+;        lts2 (lts/lts (s/aldebaran des (0, 4, 5)
+;                                   (0, "!(Object,alice,bob)", 1)
+;                                   (1, "?(alice,bob)", 2)
+;                                   (2, "!(Object,alice,carol)", 3)
+;                                   (3, "?(alice,carol)", 4)))]
+;    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
+;
+;  (let [lts1 (lts/lts [(s/-->> ::alice ::bob)
+;                       (s/-->> ::alice ::carol)
+;                       (s/-->> ::alice ::dave)])
+;        lts2 (lts/lts (s/aldebaran des (0, 6, 7)
+;                                   (0, "!(Object,alice,bob)", 1)
+;                                   (1, "?(alice,bob)", 2)
+;                                   (2, "!(Object,alice,carol)", 3)
+;                                   (3, "?(alice,carol)", 4)
+;                                   (4, "!(Object,alice,dave)", 5)
+;                                   (5, "?(alice,dave)", 6)))]
+;    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
+;
+;  ;; Non-idempotence
+;  (let [lts1 (lts/lts [(s/-->> ::alice ::bob)
+;                       (s/-->> ::alice ::bob)])
+;        lts2 (lts/lts [(s/-->> ::alice ::bob)])]
+;    (is (lts/not-bisimilar? lts1 lts2) (msg lts1 lts2)))
+;
+;  ;; Non-commutativity
+;  (let [lts1 (lts/lts [(s/-->> ::alice ::bob)
+;                       (s/-->> ::alice ::carol)])
+;        lts2 (lts/lts [(s/-->> ::alice ::carol)
+;                       (s/-->> ::alice ::bob)])]
+;    (is (lts/not-bisimilar? lts1 lts2) (msg lts1 lts2)))
+;
+;  ;; Associativity
+;  (let [lts1 (lts/lts [(s/-->> ::alice ::bob)
+;                       [(s/-->> ::alice ::carol)
+;                        (s/-->> ::alice ::dave)]])
+;        lts2 (lts/lts [[(s/-->> ::alice ::bob)
+;                        (s/-->> ::alice ::carol)]
+;                       (s/-->> ::alice ::dave)])]
+;    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
+;
+;  ;; Flattening
+;  (let [lts1 (lts/lts [(s/-->> ::alice ::bob)
+;                       [(s/-->> ::alice ::carol)
+;                        (s/-->> ::alice ::dave)]])
+;        lts2 (lts/lts [(s/-->> ::alice ::bob)
+;                       (s/-->> ::alice ::carol)
+;                       (s/-->> ::alice ::dave)])]
+;    (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2))))
+;
+;(vector-tests)
 
 (deftest multiary-tests
   (let [lts1 (lts/lts (s/cat (s/alt (s/-->> ::alice ::bob)
