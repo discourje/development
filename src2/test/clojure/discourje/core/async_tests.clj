@@ -603,14 +603,16 @@
 
   ;; >!!, <!!, thread
 
-  (let [m (a/monitor [(s/-->> ::alice ::bob) (s/close ::alice ::bob)])
+  (let [m (a/monitor (s/cat (s/-->> ::alice ::bob)
+                            (s/close ::alice ::bob)))
         c (a/chan 10 (s/role ::alice) (s/role ::bob) m {})]
     (a/>!! c "hello")
     (assert (= "hello" (a/<!! c)))
     (a/close! c))
   (is true)
 
-  (let [m (a/monitor [(s/--> ::alice ::bob) (s/close ::alice ::bob)])
+  (let [m (a/monitor (s/cat (s/--> ::alice ::bob)
+                            (s/close ::alice ::bob)))
         c (a/chan (s/role ::alice) (s/role ::bob) m {})]
     (a/thread (a/>!! c "hello"))
     (assert (= "hello" (a/<!! c)))
