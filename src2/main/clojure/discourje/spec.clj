@@ -93,8 +93,10 @@
                              ~receiver)]))))
 
 (defmacro close
-  [sender-expr receiver-expr]
-  `(ast/close (ast/role '~sender-expr) (ast/role '~receiver-expr)))
+  [sender receiver]
+  (clojure.core/let [sender (role-form sender)
+                     receiver (role-form receiver)]
+    `(ast/close ~sender ~receiver)))
 
 ;;;;
 ;;;; Nullary operators
