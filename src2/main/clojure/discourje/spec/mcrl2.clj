@@ -99,7 +99,7 @@
 
 (s/defsession ::election-init [p]
               (s/par-every [q (neighbours p)]
-                           (s/apply ::election [(id p) p q])))
+                           (s/session ::election [(id p) p q])))
 
 (s/defsession ::election [wave-id p q]
               (s/--> (s/predicate wave-id) p q)
@@ -114,10 +114,10 @@
                        (s/if parent
                          (s/cat (s/if (= n 1)
                                   (s/par-every [r (disj (neighbours q) p)]
-                                               (s/apply ::election [wave-id q r])))
+                                               (s/session ::election [wave-id q r])))
 
                                 (s/if (= n (count (neighbours q)))
-                                  (s/apply ::election [wave-id q parent])))
+                                  (s/session ::election [wave-id q parent])))
 
                          (s/if (= n (count (neighbours q)))
                            (s/--> (s/predicate wave-id) q ::dave))))))
@@ -136,7 +136,7 @@
                          carol #{bob}}]
 
       (let [s (s/par-every [p (initiators)]
-                           (s/apply ::election-init [p]))
+                           (s/session ::election-init [p]))
             lts (lts/lts s :history true)]
 
         (binding [*mcrl2-bin* "/Applications/mCRL2.app/Contents/bin"]

@@ -60,7 +60,7 @@
         ;; Link monitor [optional]
         _
         (if (= config/*lib* :dcj)
-          (let [s (s/apply (if buffered ::spec-buffered ::spec-unbuffered) [k])
+          (let [s (s/session (if buffered ::spec-buffered ::spec-unbuffered) [k])
                 m (dcj/monitor s)]
             (doseq [i (range k)
                     j (range k)]

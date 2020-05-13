@@ -69,13 +69,13 @@
         ;; Link monitor [optional]
         _
         (if (= config/*lib* :dcj)
-          (let [s (s/apply (cond (and buffered)
-                                 ::spec-par
-                                 (and (not buffered) ordered-sends)
-                                 ::spec-cat
-                                 (and (not buffered) (not ordered-sends))
-                                 ::spec-alt)
-                           [k])
+          (let [s (s/session (cond (and buffered)
+                                   ::spec-par
+                                   (and (not buffered) ordered-sends)
+                                   ::spec-cat
+                                   (and (not buffered) (not ordered-sends))
+                                   ::spec-alt)
+                             [k])
                 m (dcj/monitor s)]
             (doseq [i (range k)] (dcj/link (nth master->workers i)
                                            (s/role ::master)

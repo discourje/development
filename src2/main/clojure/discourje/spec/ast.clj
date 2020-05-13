@@ -2,6 +2,43 @@
   (:refer-clojure :exclude [sync send cat loop]))
 
 ;;;;
+;;;; Registries
+;;;;
+
+(def role-names (atom (hash-map)))
+
+(defn put-role-name! [k name]
+  {:pre [(keyword? k)
+         (string? name)]}
+  (swap! role-names (fn [m] (into m {k name}))))
+
+(defn get-role-name [k]
+  {:pre [(keyword? k)]}
+  (if-let [name (get @role-names k)]
+    name
+    (throw (Exception. (str "Unable to resolve key: " k " in registry of role names")))))
+
+(def asts (atom (hash-map)))
+
+(defn put-ast! [k vars body]
+  {:pre [(keyword? k)]}
+  (swap! asts
+         (fn [m]
+           (if (contains? m k)
+             (update m k #(into % {(count vars) {:vars vars, :body body}}))
+             (into m {k {(count vars) {:vars vars, :body body}}})))))
+
+(defn get-ast
+  [k n]
+  {:pre [(keyword? k)
+         (number? n)]}
+  (if-let [m (get @asts k)]
+    (if-let [ast (get m n)]
+      ast
+      (throw (Exception. (str "Wrong number of args (" n ") passed to: " k))))
+    (throw (Exception. (str "Unable to resolve key: " k " in registry of sessions")))))
+
+;;;;
 ;;;; Predicates
 ;;;;
 
@@ -17,16 +54,6 @@
 ;;;;
 ;;;; Roles
 ;;;;
-
-(def role-names (atom {}))
-
-(defn put-role-name! [k name]
-  {:pre [(keyword? k)
-         (string? name)]}
-  (swap! role-names (fn [m] (into m {k name}))))
-
-(defn get-role-name [k]
-  (get @role-names k))
 
 (defrecord Role [name-expr index-exprs])
 
@@ -95,7 +122,7 @@
 (defn par [branches]
   (->Multiary :par branches))
 
-(defrecord EveryMultiary [type ast-f vars exprs branch])
+(defrecord Every [type ast-f vars exprs branch])
 
 (defn every
   ([ast-f bindings branch]
@@ -103,20 +130,16 @@
          exprs (take-nth 2 (rest bindings))]
      (every ast-f vars exprs branch)))
   ([ast-f vars exprs branch]
-   (->EveryMultiary :every ast-f vars exprs branch)))
+   (->Every :every ast-f vars exprs branch)))
 
 ;;;;
-;;;; Conditional operators
+;;;; "Special forms" operators
 ;;;;
 
-(defrecord If [type condition branch1 branch2])
+(defrecord If [type test-expr then else])
 
-(defn if-then-else [condition branch1 branch2]
-  (->If :if condition branch1 branch2))
-
-;;;;
-;;;; Recursion operators
-;;;;
+(defn if [test-expr then else]
+  (->If :if test-expr then else))
 
 (defrecord Loop [type name vars exprs body])
 
@@ -134,23 +157,8 @@
   (->Recur :recur name exprs))
 
 ;;;;
-;;;; Definition operators
+;;;; Misc operators
 ;;;;
-
-(def registry (atom {}))
-
-(defn register! [name vars body]
-  (swap! registry
-         (fn [m]
-           (if (contains? m name)
-             (update m name #(into % {(count vars) {:vars vars, :body body}}))
-             (into m {name {(count vars) {:vars vars, :body body}}})))))
-
-;;;;
-;;;; Aldebaran
-;;;;
-
-(defrecord Graph [type v edges])
 
 (defn- parse-predicate [s]
   (predicate (read-string s)))
@@ -185,8 +193,10 @@
          receiver (parse-role (nth tokens 2))]
      (action type predicate sender receiver))))
 
-(defn aldebaran [v0 edges]
-  (->Graph :aldebaran
+(defrecord Graph [type v edges])
+
+(defn graph [v0 edges]
+  (->Graph :graph
            v0
            (clojure.core/loop [edges edges
                                source->action->targets {}]
@@ -203,3 +213,12 @@
                             (assoc source->action->targets source (assoc action->targets action (conj targets target)))
                             (assoc source->action->targets source (assoc action->targets action [target])))
                           (assoc source->action->targets source {action [target]}))))))))
+
+;;;;
+;;;; Sessions
+;;;;
+
+(defrecord Session [type name exprs])
+
+(defn session [name exprs]
+  (->Session :session name exprs))

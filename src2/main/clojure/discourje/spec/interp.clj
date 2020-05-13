@@ -99,15 +99,11 @@
                (w/postwalk-replace smap (:exprs ast))
                (substitute (:branch ast) (apply dissoc smap (:vars ast))))
 
-    ;; Vector
-    (vector? ast)
-    (mapv #(substitute % smap) ast)
-
     ;; If
     (= (:type ast) :if)
-    (ast/if-then-else (w/postwalk-replace smap (:condition ast))
-                      (substitute (:branch1 ast) smap)
-                      (substitute (:branch2 ast) smap))
+    (ast/if (w/postwalk-replace smap (:test-expr ast))
+      (substitute (:then ast) smap)
+      (substitute (:else ast) smap))
 
     ;; Loop
     (= (:type ast) :loop)
@@ -121,14 +117,14 @@
     (ast/recur (:name ast)
                (w/postwalk-replace smap (:exprs ast)))
 
-    ;; Application
-    (seq? ast)
-    (concat [(first ast)]
-            (w/postwalk-replace smap (rest ast)))
-
-    ;; Aldebaran
-    (= (:type ast) :aldebaran)
+    ;; Graph
+    (= (:type ast) :graph)
     ast
+
+    ;; Session
+    (= (:type ast) :session)
+    (ast/session (:name ast)
+                 (w/postwalk-replace smap (:exprs ast)))
 
     :else (throw (Exception.))))
 
@@ -159,15 +155,11 @@
     (= (:type ast) :every)
     (ast/every (:ast-f ast) (:vars ast) (:exprs ast) (unfold (:branch ast) ast-loop))
 
-    ;; Vector
-    (vector? ast)
-    (mapv #(unfold % ast-loop) ast)
-
     ;; If
     (= (:type ast) :if)
-    (ast/if-then-else (:condition ast)
-                      (unfold (:branch1 ast) ast-loop)
-                      (unfold (:branch2 ast) ast-loop))
+    (ast/if (:test-expr ast)
+      (unfold (:then ast) ast-loop)
+      (unfold (:else ast) ast-loop))
 
     ;; Loop
     (= (:type ast) :loop)
@@ -182,12 +174,12 @@
       (ast/loop (:name ast-loop) (:vars ast-loop) (:exprs ast) (:body ast-loop))
       ast)
 
-    ;; Application
-    (seq? ast)
+    ;; Graph
+    (= (:type ast) :graph)
     ast
 
-    ;; Aldebaran
-    (= (:type ast) :aldebaran)
+    ;; Session
+    (= (:type ast) :session)
     ast
 
     :else (throw (Exception.))))
@@ -233,13 +225,9 @@
           branches (mapv #(substitute (:branch ast) %) smaps)]
       ((:ast-f ast) branches))
 
-    ;; Vector
-    (vector? ast)
-    (throw (Exception.))
-
     ;; If
     (= (:type ast) :if)
-    (if (eval (:condition ast)) (:branch1 ast) (:branch2 ast))
+    (if (eval (:test-expr ast)) (:then ast) (:else ast))
 
     ;; Loop
     (= (:type ast) :loop)
@@ -260,17 +248,17 @@
     (= (:type ast) :recur)
     (throw (Exception.))
 
-    ;; Application
-    (seq? ast)
-    (let [name (eval (first ast))
-          exprs (rest ast)
-          body (:body (get (get @ast/registry name) (count exprs)))
-          vars (:vars (get (get @ast/registry name) (count exprs)))]
-      (substitute body (zipmap vars (map eval exprs))))
-
-    ;; Aldebaran
-    (= (:type ast) :aldebaran)
+    ;; Graph
+    (= (:type ast) :graph)
     (throw (Exception.))
+
+    ;; Session
+    (= (:type ast) :session)
+    (let [name (:name ast)
+          exprs (:exprs ast)
+          body (:body (ast/get-ast name (count exprs)))
+          vars (:vars (ast/get-ast name (count exprs)))]
+      (substitute body (zipmap vars (map eval exprs))))
 
     :else (throw (Exception.))))
 
@@ -306,10 +294,6 @@
     (= (:type ast) :every)
     (subjects (eval-ast ast))
 
-    ;; Vector
-    (vector? ast)
-    (reduce into (map #(subjects %) ast))
-
     ;; If
     (= (:type ast) :if)
     (subjects (eval-ast ast))
@@ -322,12 +306,12 @@
     (= (:type ast) :recur)
     (throw (Exception.))
 
-    ;; Application
-    (seq? ast)
+    ;; Graph
+    (= (:type ast) :graph)
     (throw (Exception.))
 
-    ;; Aldebaran
-    (= (:type ast) :aldebaran)
+    ;; Session
+    (= (:type ast) :session)
     (throw (Exception.))
 
     :else (throw (Exception.))))
@@ -359,10 +343,6 @@
     (= (:type ast) :every)
     (terminated? (eval-ast ast) unfolded)
 
-    ;; Vector
-    (vector? ast)
-    (every? #(terminated? % unfolded) ast)
-
     ;; If
     (= (:type ast) :if)
     (terminated? (eval-ast ast) unfolded)
@@ -377,13 +357,13 @@
     (= (:type ast) :recur)
     (throw (Exception.))
 
-    ;; Application
-    (seq? ast)
-    (terminated? (eval-ast ast) unfolded)
-
-    ;; Aldebaran
-    (= (:type ast) :aldebaran)
+    ;; Graph
+    (= (:type ast) :graph)
     (empty? (get (:edges ast) (:v ast)))
+
+    ;; Session
+    (= (:type ast) :session)
+    (terminated? (eval-ast ast) unfolded)
 
     :else (throw (Exception.))))
 
@@ -435,29 +415,29 @@
            m
            (recur (inc i) (merge-with into m (successors ast i unfolded))))))
 
+     ;;; Prefix
+     ;(= (:type ast) :dot)
+     ;(let [branches ast]
+     ;  (if (empty? branches)
+     ;    {}
+     ;    (merge-with into
+     ;
+     ;                ;; Rule 1
+     ;                (successors ast 0 unfolded)
+     ;
+     ;                ;; Rule 2
+     ;                (let [branch (first branches)
+     ;                      branches-after (rest branches)
+     ;                      roles (subjects branch)]
+     ;                  (filter (fn [[ast-action _]] (empty? (clojure.set/intersection roles (subjects ast-action))))
+     ;                          (case (count branches-after)
+     ;                            0 {}
+     ;                            1 (successors (first branches-after) unfolded)
+     ;                            (successors (ast/cat (vec branches-after)) unfolded)))))))
+
      ;; Every
      (= (:type ast) :every)
      (successors (eval-ast ast) unfolded)
-
-     ;; Vector
-     (vector? ast)
-     (let [branches ast]
-       (if (empty? branches)
-         {}
-         (merge-with into
-
-                     ;; Rule 1
-                     (successors ast 0 unfolded)
-
-                     ;; Rule 2
-                     (let [branch (first branches)
-                           branches-after (rest branches)
-                           roles (subjects branch)]
-                       (filter (fn [[ast-action _]] (empty? (clojure.set/intersection roles (subjects ast-action))))
-                               (case (count branches-after)
-                                 0 {}
-                                 1 (successors (first branches-after) unfolded)
-                                 (successors (ast/cat (vec branches-after)) unfolded)))))))
 
      ;; If
      (= (:type ast) :if)
@@ -473,12 +453,8 @@
      (= (:type ast) :recur)
      (throw (Exception.))
 
-     ;; Application
-     (seq? ast)
-     (successors (eval-ast ast) unfolded)
-
-     ;; Aldebaran
-     (= (:type ast) :aldebaran)
+     ;; Graph
+     (= (:type ast) :graph)
      (let [m (get (:edges ast) (:v ast))
            ks (keys m)
            vals (map (fn [k]
@@ -490,6 +466,10 @@
        (if (nil? (keys m))
          {}
          (zipmap ks vals)))
+
+     ;; Session
+     (= (:type ast) :session)
+     (successors (eval-ast ast) unfolded)
 
      :else (throw (Exception.))))
 

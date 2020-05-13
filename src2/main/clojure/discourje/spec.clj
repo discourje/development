@@ -1,13 +1,60 @@
 (ns discourje.spec
   (:gen-class)
-  (:refer-clojure :exclude [cat let loop * + apply])
+  (:refer-clojure :exclude [if do let loop cat * + apply])
   (:require [clojure.walk :as w]
             [discourje.spec.ast :as ast]))
 
 (require '[discourje.spec :as s])
 
-(defn smap [env]
+(defn- smap [env]
   `(zipmap '~(keys env) [~@(keys env)]))
+
+;;;;
+;;;; Desugaring
+;;;;
+
+(defn- desugared-predicate [form]
+  (cond
+    ;; form ::= (predicate expr)
+    (and (seq? form) (= 'discourje.spec.ast/predicate (first (macroexpand form))))
+    form
+
+    ;; form ::= x
+    (and (symbol? form) (not (resolve form)))
+    `'~form
+
+    ;; form ::= expr
+    :else `(predicate ~form)))
+
+(defn- desugared-role [form]
+  (cond
+    ;; form ::= (role name-expr index-exprs)
+    (and (seq? form) (= 'discourje.spec.ast/role (first (macroexpand form))))
+    form
+
+    ;; form ::= (name-expr index-expr1 index-expr2 ...)
+    (seq? form)
+    `(role ~(first form) ~(vec (rest form)))
+
+    ;; form ::= x
+    (symbol? form)
+    `'~form
+
+    ;; form ::= expr
+    :else `(role ~form)))
+
+(defn- desugared-spec [form]
+  (cond
+    ;; form ::= (:session x y z)
+    (and (seq? form) (keyword? (first form)))
+    `(session ~(first form) ~(vec (rest form)))
+
+    ;; form ::= [x y z]
+    (and (vector? form))
+    `(cat ~@form)
+
+    ;; form ::= ...
+    :else form))
 
 ;;;;
 ;;;; Predicates
@@ -29,8 +76,6 @@
   ([name-expr]
    `(role ~name-expr []))
   ([name-expr index-exprs]
-   {:pre [(or (string? name-expr) (keyword? name-expr) (symbol? name-expr))
-          (vector? index-exprs)]}
    `(ast/role (w/postwalk-replace ~(smap &env) '~name-expr)
               (w/postwalk-replace ~(smap &env) '~index-exprs))))
 
@@ -38,54 +83,22 @@
 ;;;; Actions
 ;;;;
 
-(defn- predicate-form [predicate]
-  (cond
-    ;; predicate is of the form: (predicate expr)
-    (and (seq? predicate) (= 'discourje.spec.ast/predicate (first (macroexpand predicate))))
-    predicate
-
-    ;; predicate is of the form: x
-    (and (symbol? predicate) (not (resolve predicate)))
-    `'~predicate
-
-    ;; predicate is of the form: expr
-    :else (list 'discourje.spec/predicate predicate)))
-
-(defn- role-form [role]
-  (cond
-    ;; role is of the form: (role name-expr index-exprs)
-    (and (seq? role) (= 'discourje.spec.ast/role (first (macroexpand role))))
-    role
-
-    ;; role is of the form: (name-expr & index-exprs)
-    (seq? role)
-    (list 'discourje.spec.ast/role `'~(first role) (mapv (fn [x] `'~x) (rest role)))
-
-    ;; role is of the form: x
-    (symbol? role)
-    `'~role
-
-    ;; role is of the form: "alice" or :alice
-    :else (list 'discourje.spec.ast/role `'~role)))
-
 (defmacro -->
   ([sender receiver]
-   `(--> (predicate ~'Object) ~sender ~receiver))
+   `(--> ~'Object ~sender ~receiver))
   ([predicate sender receiver]
-   (clojure.core/let [predicate (predicate-form predicate)
-                      sender (role-form sender)
-                      receiver (role-form receiver)]
-     `(ast/sync ~predicate
-                ~sender
-                ~receiver))))
+   (clojure.core/let [predicate (desugared-predicate predicate)
+                      sender (desugared-role sender)
+                      receiver (desugared-role receiver)]
+     `(ast/sync ~predicate ~sender ~receiver))))
 
 (defmacro -->>
   ([sender receiver]
-   `(-->> (predicate ~'Object) ~sender ~receiver))
+   `(-->> ~'Object ~sender ~receiver))
   ([predicate sender receiver]
-   (clojure.core/let [predicate (predicate-form predicate)
-                      sender (role-form sender)
-                      receiver (role-form receiver)]
+   (clojure.core/let [predicate (desugared-predicate predicate)
+                      sender (desugared-role sender)
+                      receiver (desugared-role receiver)]
      `(ast/cat [(ast/send ~predicate
                           ~sender
                           ~receiver)
@@ -94,8 +107,8 @@
 
 (defmacro close
   [sender receiver]
-  (clojure.core/let [sender (role-form sender)
-                     receiver (role-form receiver)]
+  (clojure.core/let [sender (desugared-role sender)
+                     receiver (desugared-role receiver)]
     `(ast/close ~sender ~receiver)))
 
 ;;;;
@@ -104,111 +117,31 @@
 
 (defmacro end
   []
-  (ast/end))
+  `(ast/end))
 
 (defmacro any
-  [role-exprs]
-  (clojure.core/let [branches (mapv (fn [[sender-expr receiver-expr]]
-                                      `(ast/alt [(ast/sync (ast/predicate '~'Object)
-                                                           (ast/role '~sender-expr)
-                                                           (ast/role '~receiver-expr))
-                                                 (ast/send (ast/predicate '~'Object)
-                                                           (ast/role '~sender-expr)
-                                                           (ast/role '~receiver-expr))
-                                                 (ast/receive (ast/role '~sender-expr)
-                                                              (ast/role '~receiver-expr))
-                                                 (ast/close (ast/role '~sender-expr)
-                                                            (ast/role '~receiver-expr))]))
-                                    (for [sender role-exprs
-                                          receiver role-exprs
+  [roles]
+  (clojure.core/let [object (ast/predicate 'Object)
+                     roles (map desugared-role roles)
+                     branches (mapv (fn [[sender receiver]]
+                                      `(ast/alt [(ast/sync ~object ~sender ~receiver)
+                                                 (ast/send ~object ~sender ~receiver)
+                                                 (ast/receive ~sender ~receiver)
+                                                 (ast/close ~sender ~receiver)]))
+                                    (for [sender roles
+                                          receiver roles
                                           :when (not= sender receiver)]
                                       [sender receiver]))]
     `(ast/alt ~branches)))
 
 ;;;;
-;;;; Multiary operators
+;;;; Unary operators
 ;;;;
-
-(defmacro cat
-  [branch & more]
-  `(ast/cat [~branch ~@more]))
-
-(defmacro alt
-  [branch & more]
-  `(ast/alt [~branch ~@more]))
-
-(defmacro par
-  [branch & more]
-  `(ast/par [~branch ~@more]))
-
-(defmacro cat-every
-  [bindings branch]
-  `(ast/every ast/cat
-              (w/postwalk-replace ~(smap &env) '~bindings)
-              ~branch))
-
-(defmacro alt-every
-  [bindings branch]
-  `(ast/every ast/alt
-              (w/postwalk-replace ~(smap &env) '~bindings)
-              ~branch))
-
-(defmacro par-every
-  [bindings branch]
-  `(ast/every ast/par
-              (w/postwalk-replace ~(smap &env) '~bindings)
-              ~branch))
-
-;;;;
-;;;; Conditional operators
-;;;;
-
-(defmacro if
-  ([condition branch]
-   `(ast/if-then-else (w/postwalk-replace ~(smap &env) '~condition)
-                      ~branch
-                      (ast/end)))
-  ([condition branch1 branch2]
-   `(ast/if-then-else (w/postwalk-replace ~(smap &env) '~condition)
-                      ~branch1
-                      ~branch2)))
-
-;;;;
-;;;; Recursion operators
-;;;;
-
-(defmacro let
-  [bindings & body]
-  `(ast/loop nil
-             (w/postwalk-replace ~(smap &env) '~bindings)
-             (ast/cat [~@body])))
-
-(defmacro loop
-  [name bindings & body]
-  `(ast/loop (w/postwalk-replace ~(smap &env) '~name)
-             (w/postwalk-replace ~(smap &env) '~bindings)
-             (ast/cat [~@body])))
-
-(defmacro recur
-  [name & exprs]
-  `(ast/recur (w/postwalk-replace ~(smap &env) '~name)
-              '[~@exprs]))
-
-;;;;
-;;;; Regex operators
-;;;;
-
-(defonce ^:private ω-counter (atom 0))
-(defonce ^:private *-counter (atom 0))
-(defonce ^:private +-counter (atom 0))
 
 (defmacro ω
   [& body]
-  (clojure.core/let [name (keyword (str "ω" (swap! ω-counter inc)))]
-    `(ast/loop '~name
-               []
-               (ast/cat [~@body
-                         (ast/recur '~name [])]))))
+  (clojure.core/let [name `ω#]
+    `(loop ~name [] ~@body (s/recur ~name))))
 
 (defmacro omega
   [& body]
@@ -216,52 +149,116 @@
 
 (defmacro *
   [& body]
-  (clojure.core/let [name (keyword (str "*" (swap! *-counter inc)))]
-    `(ast/loop '~name
-               []
-               (ast/alt [(ast/cat [~@body
-                                   (ast/recur '~name [])])
-                         (ast/end)]))))
+  (clojure.core/let [name `*#]
+    `(loop ~name [] (alt (cat ~@body (s/recur ~name)) (end)))))
 
 (defmacro +
   [& body]
-  (clojure.core/let [name (keyword (str "+" (swap! +-counter inc)))]
-    `(ast/cat [~@body
-               (ast/loop '~name
-                         []
-                         (ast/alt [(ast/cat [~@body
-                                             (ast/recur '~name [])])
-                                   (ast/end)]))])))
+  `(cat ~@body (* ~@body)))
+
 (defmacro ?
   [& body]
-  `(ast/alt [(ast/cat [~@body])
-             (ast/end)]))
+  `(alt (cat ~@body) (end)))
 
 ;;;;
-;;;; Definition operators
+;;;; Multiary operators
+;;;;
+
+;; TODO: Merge/shuffle on trajectories
+;; TODO: Prefixing (. x y z)
+
+(defn- multiary [f branches]
+  (clojure.core/let [branches (mapv (comp macroexpand desugared-spec) branches)]
+    (case (count branches)
+      0 `(end)
+      1 (first branches)
+      `(~f ~branches))))
+
+(defmacro cat
+  [& branches]
+  (multiary `ast/cat branches))
+
+(defmacro alt
+  [& branches]
+  (multiary `ast/alt branches))
+
+(defmacro par
+  [& branches]
+  (multiary `ast/par branches))
+
+(defn- every [f bindings branch]
+  (clojure.core/let [branch (macroexpand (desugared-spec branch))]
+    `(ast/every ~f ~bindings ~branch)))
+
+(defmacro cat-every
+  [bindings branch]
+  (every `ast/cat `(w/postwalk-replace ~(smap &env) '~bindings) branch))
+
+(defmacro alt-every
+  [bindings branch]
+  (every `ast/alt `(w/postwalk-replace ~(smap &env) '~bindings) branch))
+
+(defmacro par-every
+  [bindings branch]
+  (every `ast/par `(w/postwalk-replace ~(smap &env) '~bindings) branch))
+
+;;;;
+;;;; "Special forms" operators
+;;;;
+
+(defmacro if
+  ([test-expr then]
+   `(s/if ~test-expr ~then (end)))
+  ([test-expr then else]
+   (clojure.core/let [then (macroexpand (desugared-spec then))
+                      else (macroexpand (desugared-spec else))]
+     `(ast/if (w/postwalk-replace ~(smap &env) '~test-expr) ~then ~else))))
+
+(defmacro do
+  [& body]
+  `(cat ~@body))
+
+(defmacro let
+  [bindings & body]
+  (clojure.core/let [body (macroexpand `(cat ~@body))]
+    `(ast/loop nil
+               (w/postwalk-replace ~(smap &env) '~bindings)
+               ~body)))
+
+(defmacro loop
+  [name bindings & body]
+  (clojure.core/let [body (macroexpand `(cat ~@body))]
+    `(ast/loop (w/postwalk-replace ~(smap &env) '~name)
+               (w/postwalk-replace ~(smap &env) '~bindings)
+               ~body)))
+
+(defmacro recur
+  [name & exprs]
+  `(ast/recur (w/postwalk-replace ~(smap &env) '~name)
+              (w/postwalk-replace ~(smap &env) '[~@exprs])))
+
+;;;;
+;;;; Misc operators
+;;;;
+
+(defmacro graph [_ header & more]
+  `(ast/graph (first '~header) '~more))
+
+;;;;
+;;;; Sessions
 ;;;;
 
 (defmacro defsession
-  [name vars & body]
-  `(ast/register! (w/postwalk-replace ~(smap &env) '~name)
-                  (w/postwalk-replace ~(smap &env) '~vars)
-                  (ast/cat [~@body])))
+  [k vars & body]
+  (clojure.core/let [body (macroexpand `(cat ~@body))]
+    `(ast/put-ast! (w/postwalk-replace ~(smap &env) ~k)
+                   (w/postwalk-replace ~(smap &env) '~vars)
+                   ~body)))
 
-(defmacro apply
-  [name exprs]
-  `(concat [(w/postwalk-replace ~(smap &env) '~name)]
-           (w/postwalk-replace ~(smap &env) '~exprs)))
-
-;;;;
-;;;; Aldebaran
-;;;;
-
-(defmacro aldebaran [_ header & more]
-  `(ast/aldebaran (first '~header) '~more))
-
-;;;;
-;;;; Patterns
-;;;;
+(defmacro session
+  [k exprs]
+  `(ast/session (w/postwalk-replace ~(smap &env) ~k)
+                (w/postwalk-replace ~(smap &env) '~exprs)))
 
 (s/defsession ::-->>not [t r1 r2]
               (s/-->> (fn [x] (not= (type x) t)) r1 r2))
@@ -273,4 +270,4 @@
                                (s/recur pipe (inc i))))))
 
 (s/defsession ::pipe [t r-name n]
-              (s/apply ::pipe ['t r-name 0 n]))
+              (s/session ::pipe ['t r-name 0 n]))
