@@ -66,7 +66,6 @@
    (cond
      (not (coll? expr)) (role expr [])
      (seq? expr) (role (first expr) (vec (rest expr)))))
-
   ([name-expr index-exprs]
    {:pre [(or (string? name-expr) (symbol? name-expr) (keyword? name-expr))
           (vector? index-exprs)]}

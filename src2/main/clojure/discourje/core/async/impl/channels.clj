@@ -61,8 +61,8 @@
 
 (defn link [this r1 r2 m]
   {:pre [(channel? this)
-         (ast/role? r1)
-         (ast/role? r2)
+         (or (ast/role? r1) (fn? r1))
+         (or (ast/role? r2) (fn? r2))
          (monitors/monitor? m)]}
   (.setSender this (interp/eval-role r1))
   (.setReceiver this (interp/eval-role r2))

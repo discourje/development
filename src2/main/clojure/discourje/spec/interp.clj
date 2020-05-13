@@ -25,18 +25,19 @@
       f)))
 
 (defn eval-role [role]
-  {:pre [(ast/role? role)]}
-  (str (cond
-         (string? (:name-expr role)) (:name-expr role)
-         (keyword? (:name-expr role)) (ast/get-role-name (:name-expr role))
-         :else (throw (Exception. (str (type (:name-expr role))))))
-       (if (empty? (:index-exprs role))
-         ""
-         (mapv #(let [index (eval %)]
-                  (if (number? index)
-                    index
-                    (throw (Exception.))))
-               (:index-exprs role)))))
+  {:pre [(or (ast/role? role) (fn? role))]}
+  (let [role (if (fn? role) (role) role)]
+    (str (cond
+           (string? (:name-expr role)) (:name-expr role)
+           (keyword? (:name-expr role)) (ast/get-role-name (:name-expr role))
+           :else (throw (Exception. (str (type (:name-expr role))))))
+         (if (empty? (:index-exprs role))
+           ""
+           (mapv #(let [index (eval %)]
+                    (if (number? index)
+                      index
+                      (throw (Exception.))))
+                 (:index-exprs role))))))
 
 (defrecord Action [name type predicate sender receiver])
 

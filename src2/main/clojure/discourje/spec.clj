@@ -70,7 +70,14 @@
 
 (defn defrole
   [k name]
-  (ast/put-role-name! k name))
+  (ast/put-role-name! k name)
+  (when-let [ns (namespace k)]
+    (ns-unmap (symbol ns) (symbol (clojure.core/name k)))
+    (intern (symbol ns)
+            (symbol (clojure.core/name k))
+            (fn [& indices]
+              (clojure.core/let [indices (vec indices)]
+                (role k indices))))))
 
 (defmacro role
   ([name-expr]
@@ -250,15 +257,21 @@
 
 (defmacro defsession
   [k vars & body]
+
+  (when-let [ns (namespace k)]
+    (ns-unmap (symbol ns) (symbol (clojure.core/name k)))
+    (intern (symbol ns)
+            (symbol (clojure.core/name k))
+            (fn [& vals]
+              (clojure.core/let [indices (vec vals)]
+                (session k indices)))))
+
   (clojure.core/let [body (macroexpand `(cat ~@body))]
-    `(ast/put-ast! (w/postwalk-replace ~(smap &env) ~k)
-                   (w/postwalk-replace ~(smap &env) '~vars)
-                   ~body)))
+    `(ast/put-ast! ~k (w/postwalk-replace ~(smap &env) '~vars) ~body)))
 
 (defmacro session
   [k exprs]
-  `(ast/session (w/postwalk-replace ~(smap &env) ~k)
-                (w/postwalk-replace ~(smap &env) '~exprs)))
+  `(ast/session ~k (w/postwalk-replace ~(smap &env) '~exprs)))
 
 (s/defsession ::-->>not [t r1 r2]
               (s/-->> (fn [x] (not= (type x) t)) r1 r2))
