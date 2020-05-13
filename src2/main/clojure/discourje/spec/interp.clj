@@ -274,7 +274,9 @@
     :graph (empty? (get (:edges ast) (:v ast)))
 
     ;; Sessions
-    :session (terminated? (eval-ast ast) unfolded)
+    :session (if (contains? unfolded ast)
+               false
+               (terminated? (eval-ast ast) (conj unfolded ast)))
 
     (throw (Exception.))))
 
@@ -355,7 +357,9 @@
                 (zipmap ks vals)))
 
      ;; Sessions
-     :session (successors (eval-ast ast) unfolded)
+     :session (if (contains? unfolded ast)
+                {}
+                (successors (eval-ast ast) (conj unfolded ast)))
 
      (throw (Exception.))))
   ([ast-multiary i unfolded]
