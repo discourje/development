@@ -70,409 +70,293 @@
    (->Action name type predicate sender receiver)))
 
 (defn substitute [ast smap]
-  (cond
+  (case (:type ast)
 
-    ;; End
-    (= (:type ast) :end)
-    ast
+    ;; Actions
+    :sync (w/postwalk-replace smap ast)
+    :send (w/postwalk-replace smap ast)
+    :receive (w/postwalk-replace smap ast)
+    :close (w/postwalk-replace smap ast)
 
-    ;; Action
-    (ast/action? ast)
-    (w/postwalk-replace smap ast)
+    ;; Unary operators
+    :end ast
 
-    ;; Concatenation
-    (= (:type ast) :cat)
-    (ast/cat (mapv #(substitute % smap) (:branches ast)))
+    ;; Multiary operators
+    :cat (ast/cat (mapv #(substitute % smap) (:branches ast)))
+    :alt (ast/alt (mapv #(substitute % smap) (:branches ast)))
+    :par (ast/par (mapv #(substitute % smap) (:branches ast)))
+    :every (ast/every (:ast-f ast)
+                      (:vars ast)
+                      (w/postwalk-replace smap (:exprs ast))
+                      (substitute (:branch ast) (apply dissoc smap (:vars ast))))
 
-    ;; Alternatives
-    (= (:type ast) :alt)
-    (ast/alt (mapv #(substitute % smap) (:branches ast)))
+    ;; "Special forms" operators
+    :if (ast/if (w/postwalk-replace smap (:test-expr ast))
+          (substitute (:then ast) smap)
+          (substitute (:else ast) smap))
+    :loop (ast/loop (:name ast)
+                    (:vars ast)
+                    (w/postwalk-replace smap (:exprs ast))
+                    (substitute (:body ast) (apply dissoc smap (:vars ast))))
+    :recur (ast/recur (:name ast)
+                      (w/postwalk-replace smap (:exprs ast)))
 
-    ;; Parallel
-    (= (:type ast) :par)
-    (ast/par (mapv #(substitute % smap) (:branches ast)))
+    ;; Misc operators
+    :graph ast
 
-    ;; Every
-    (= (:type ast) :every)
-    (ast/every (:ast-f ast)
-               (:vars ast)
-               (w/postwalk-replace smap (:exprs ast))
-               (substitute (:branch ast) (apply dissoc smap (:vars ast))))
+    ;; Sessions
+    :session (ast/session (:name ast)
+                          (w/postwalk-replace smap (:exprs ast)))
 
-    ;; If
-    (= (:type ast) :if)
-    (ast/if (w/postwalk-replace smap (:test-expr ast))
-      (substitute (:then ast) smap)
-      (substitute (:else ast) smap))
-
-    ;; Loop
-    (= (:type ast) :loop)
-    (ast/loop (:name ast)
-              (:vars ast)
-              (w/postwalk-replace smap (:exprs ast))
-              (substitute (:body ast) (apply dissoc smap (:vars ast))))
-
-    ;; Recur
-    (= (:type ast) :recur)
-    (ast/recur (:name ast)
-               (w/postwalk-replace smap (:exprs ast)))
-
-    ;; Graph
-    (= (:type ast) :graph)
-    ast
-
-    ;; Session
-    (= (:type ast) :session)
-    (ast/session (:name ast)
-                 (w/postwalk-replace smap (:exprs ast)))
-
-    :else (throw (Exception.))))
+    (throw (Exception.))))
 
 (defn unfold [ast ast-loop]
-  (cond
+  (case (:type ast)
 
-    ;; End
-    (= (:type ast) :end)
-    ast
+    ;; Actions
+    :sync ast
+    :send ast
+    :receive ast
+    :close ast
 
-    ;; Action
-    (ast/action? ast)
-    ast
+    ;; Nullary operators
+    :end ast
 
-    ;; Concatenation
-    (= (:type ast) :cat)
-    (ast/cat (mapv #(unfold % ast-loop) (:branches ast)))
+    ;; Multiary operators
+    :cat (ast/cat (mapv #(unfold % ast-loop) (:branches ast)))
+    :alt (ast/alt (mapv #(unfold % ast-loop) (:branches ast)))
+    :par (ast/par (mapv #(unfold % ast-loop) (:branches ast)))
+    :every (ast/every (:ast-f ast)
+                      (:vars ast)
+                      (:exprs ast)
+                      (unfold (:branch ast) ast-loop))
 
-    ;; Alternatives
-    (= (:type ast) :alt)
-    (ast/alt (mapv #(unfold % ast-loop) (:branches ast)))
+    ;; "Special forms" operators
+    :if (ast/if (:test-expr ast)
+          (unfold (:then ast) ast-loop)
+          (unfold (:else ast) ast-loop))
+    :loop (ast/loop (:name ast)
+                    (:vars ast)
+                    (:exprs ast)
+                    (if (= (:name ast-loop) (:name ast))
+                      (:body ast)
+                      (unfold (:body ast) ast-loop)))
+    :recur (if (= (:name ast-loop) (:name ast))
+             (ast/loop (:name ast-loop) (:vars ast-loop) (:exprs ast) (:body ast-loop))
+             ast)
 
-    ;; Parallel
-    (= (:type ast) :par)
-    (ast/par (mapv #(unfold % ast-loop) (:branches ast)))
+    ;; Misc operators
+    :graph ast
 
-    ;; Every
-    (= (:type ast) :every)
-    (ast/every (:ast-f ast) (:vars ast) (:exprs ast) (unfold (:branch ast) ast-loop))
+    ;; Sessions
+    :session ast
 
-    ;; If
-    (= (:type ast) :if)
-    (ast/if (:test-expr ast)
-      (unfold (:then ast) ast-loop)
-      (unfold (:else ast) ast-loop))
-
-    ;; Loop
-    (= (:type ast) :loop)
-    (ast/loop (:name ast)
-              (:vars ast)
-              (:exprs ast)
-              (if (= (:name ast-loop) (:name ast)) (:body ast) (unfold (:body ast) ast-loop)))
-
-    ;; Recur
-    (= (:type ast) :recur)
-    (if (= (:name ast-loop) (:name ast))
-      (ast/loop (:name ast-loop) (:vars ast-loop) (:exprs ast) (:body ast-loop))
-      ast)
-
-    ;; Graph
-    (= (:type ast) :graph)
-    ast
-
-    ;; Session
-    (= (:type ast) :session)
-    ast
-
-    :else (throw (Exception.))))
+    (throw (Exception.))))
 
 (defn eval-ast [ast]
-  (cond
+  (case (:type ast)
 
-    ;; End
-    (= (:type ast) :end)
-    (throw (Exception.))
+    ;; Actions
+    :sync (throw (Exception.))
+    :send (throw (Exception.))
+    :receive (throw (Exception.))
+    :close (throw (Exception.))
 
-    ;; Action
-    (ast/action? ast)
-    (throw (Exception.))
-
-    ;; Concatenation
-    (= (:type ast) :cat)
-    (throw (Exception.))
-
-    ;; Alternatives
-    (= (:type ast) :alt)
-    (throw (Exception.))
-
-    ;; Parallel
-    (= (:type ast) :par)
-    (throw (Exception.))
-
-    ;; Every
-    (= (:type ast) :every)
-    (let [smaps (loop [vars (:vars ast)
-                       exprs (:exprs ast)
-                       smaps [{}]]
-                  (if (empty? vars)
-                    smaps
-                    (let [var (first vars)
-                          expr (first exprs)
-                          f (fn [smap] (mapv (fn [val]
-                                               (assoc smap var val))
-                                             (eval (w/postwalk-replace smap expr))))]
-                      (recur (rest vars)
-                             (rest exprs)
-                             (reduce into (mapv f smaps))))))
-          branches (mapv #(substitute (:branch ast) %) smaps)]
-      ((:ast-f ast) branches))
-
-    ;; If
-    (= (:type ast) :if)
-    (if (eval (:test-expr ast)) (:then ast) (:else ast))
-
-    ;; Loop
-    (= (:type ast) :loop)
-    (let [smap (loop [vars (:vars ast)
-                      exprs (:exprs ast)
-                      smap {}]
-                 (if (empty? vars)
-                   smap
-                   (let [var (first vars)
-                         expr (first exprs)
-                         val (eval (w/postwalk-replace smap expr))]
-                     (recur (rest vars)
-                            (rest exprs)
-                            (assoc smap var val)))))]
-      (unfold (substitute (:body ast) smap) ast))
-
-    ;; Recur
-    (= (:type ast) :recur)
-    (throw (Exception.))
-
-    ;; Graph
-    (= (:type ast) :graph)
-    (throw (Exception.))
-
-    ;; Session
-    (= (:type ast) :session)
-    (let [name (:name ast)
-          exprs (:exprs ast)
-          body (:body (ast/get-ast name (count exprs)))
-          vars (:vars (ast/get-ast name (count exprs)))]
-      (substitute body (zipmap vars (map eval exprs))))
-
-    :else (throw (Exception.))))
-
-(defn subjects [ast]
-  (cond
-
-    ;; End
-    (= (:type ast) :end)
-    #{}
-
-    ;; Action
-    (ast/action? ast)
-    (case (:type ast)
-      :sync #{(:sender ast) (:receiver ast)}
-      :send #{(:sender ast)}
-      :receive #{(:receiver ast)}
-      :close #{(:sender ast) (:receiver ast)}
-      (throw (Exception.)))
+    ;; Nullary operators
+    :end (throw (Exception.))
 
     ;; Concatenation
-    (= (:type ast) :cat)
-    (reduce into (map #(subjects %) (:branches ast)))
+    :cat (throw (Exception.))
+    :alt (throw (Exception.))
+    :par (throw (Exception.))
+    :every (let [smaps (loop [vars (:vars ast)
+                              exprs (:exprs ast)
+                              smaps [{}]]
+                         (if (empty? vars)
+                           smaps
+                           (let [var (first vars)
+                                 expr (first exprs)
+                                 f (fn [smap] (mapv (fn [val]
+                                                      (assoc smap var val))
+                                                    (eval (w/postwalk-replace smap expr))))]
+                             (recur (rest vars)
+                                    (rest exprs)
+                                    (reduce into (mapv f smaps))))))
+                 branches (mapv #(substitute (:branch ast) %) smaps)]
+             ((:ast-f ast) branches))
 
-    ;; Alternatives
-    (= (:type ast) :alt)
-    (reduce into (map #(subjects %) (:branches ast)))
+    ;; "Special forms" operators
+    :if (if (eval (:test-expr ast)) (:then ast) (:else ast))
+    :loop (let [smap (loop [vars (:vars ast)
+                            exprs (:exprs ast)
+                            smap {}]
+                       (if (empty? vars)
+                         smap
+                         (let [var (first vars)
+                               expr (first exprs)
+                               val (eval (w/postwalk-replace smap expr))]
+                           (recur (rest vars)
+                                  (rest exprs)
+                                  (assoc smap var val)))))]
+            (unfold (substitute (:body ast) smap) ast))
+    :recur (throw (Exception.))
 
-    ;; Parallel
-    (= (:type ast) :par)
-    (reduce into (map #(subjects %) (:branches ast)))
+    ;; Misc operators
+    :graph (throw (Exception.))
 
-    ;; Every
-    (= (:type ast) :every)
-    (subjects (eval-ast ast))
+    ;; Sessions
+    :session (let [name (:name ast)
+                   exprs (:exprs ast)
+                   body (:body (ast/get-ast name (count exprs)))
+                   vars (:vars (ast/get-ast name (count exprs)))]
+               (substitute body (zipmap vars (map eval exprs))))
 
-    ;; If
-    (= (:type ast) :if)
-    (subjects (eval-ast ast))
+    (throw (Exception.))))
 
-    ;; Loop
-    (= (:type ast) :loop)
-    (subjects (eval-ast ast))
-
-    ;; Recur
-    (= (:type ast) :recur)
-    (throw (Exception.))
-
-    ;; Graph
-    (= (:type ast) :graph)
-    (throw (Exception.))
-
-    ;; Session
-    (= (:type ast) :session)
-    (throw (Exception.))
-
-    :else (throw (Exception.))))
+;(defn subjects [ast]
+;  (case (:type ast)
+;
+;    ;; Actions
+;    :sync #{(:sender ast) (:receiver ast)}
+;    :send #{(:sender ast)}
+;    :receive #{(:receiver ast)}
+;    :close #{(:sender ast) (:receiver ast)}
+;
+;    ;; Unary operators
+;    (= (:type ast) :end)
+;    #{}
+;
+;    ;; Multiary operators
+;    :cat (reduce into (map #(subjects %) (:branches ast)))
+;    :alt (reduce into (map #(subjects %) (:branches ast)))
+;    :par (reduce into (map #(subjects %) (:branches ast)))
+;    :every (subjects (eval-ast ast))
+;
+;    ;; "Special forms" operators
+;    :if (subjects (eval-ast ast))
+;    :loop (subjects (eval-ast ast))
+;    :recur (throw (Exception.))
+;
+;    ;; Misc operators
+;    :graph (throw (Exception.))
+;
+;    ;; Sessions
+;    :session (throw (Exception.))
+;    (throw (Exception.))))
 
 (defn terminated? [ast unfolded]
-  (cond
+  (case (:type ast)
 
-    ;; End
-    (= (:type ast) :end)
-    true
+    ;; Actions
+    :sync false
+    :send false
+    :receive false
+    :close false
 
-    ;; Action
-    (ast/action? ast)
-    false
+    ;; Nullary operators
+    :end true
 
-    ;; Concatenation
-    (= (:type ast) :cat)
-    (every? #(terminated? % unfolded) (:branches ast))
+    ;; Multiary operators
+    :cat (every? #(terminated? % unfolded) (:branches ast))
+    :alt (not (not-any? #(terminated? % unfolded) (:branches ast)))
+    :par (every? #(terminated? % unfolded) (:branches ast))
+    :every (terminated? (eval-ast ast) unfolded)
 
-    ;; Alternatives
-    (= (:type ast) :alt)
-    (not (not-any? #(terminated? % unfolded) (:branches ast)))
+    ;; "Special forms" operators
+    :if (terminated? (eval-ast ast) unfolded)
+    :loop (if (contains? unfolded ast)
+            false
+            (terminated? (eval-ast ast) (conj unfolded ast)))
+    :recur (throw (Exception.))
 
-    ;; Parallel
-    (= (:type ast) :par)
-    (every? #(terminated? % unfolded) (:branches ast))
+    ;; Misc operators
+    :graph (empty? (get (:edges ast) (:v ast)))
 
-    ;; Every
-    (= (:type ast) :every)
-    (terminated? (eval-ast ast) unfolded)
+    ;; Sessions
+    :session (terminated? (eval-ast ast) unfolded)
 
-    ;; If
-    (= (:type ast) :if)
-    (terminated? (eval-ast ast) unfolded)
-
-    ;; Loop
-    (= (:type ast) :loop)
-    (if (contains? unfolded ast)
-      false
-      (terminated? (eval-ast ast) (conj unfolded ast)))
-
-    ;; Recur
-    (= (:type ast) :recur)
-    (throw (Exception.))
-
-    ;; Graph
-    (= (:type ast) :graph)
-    (empty? (get (:edges ast) (:v ast)))
-
-    ;; Session
-    (= (:type ast) :session)
-    (terminated? (eval-ast ast) unfolded)
-
-    :else (throw (Exception.))))
+    (throw (Exception.))))
 
 (defn successors
   ([ast]
    (successors ast #{}))
   ([ast unfolded]
-   (cond
+   (case (:type ast)
 
-     ;; End
-     (= (:type ast) :end)
-     {}
+     ;; Actions
+     :sync {ast [(ast/end)]}
+     :send {ast [(ast/end)]}
+     :receive {ast [(ast/end)]}
+     :close {ast [(ast/end)]}
 
-     ;; Action
-     (ast/action? ast)
-     {ast [(ast/end)]}
+     ;; Nullary operators
+     :end {}
 
-     ;; Concatenation
-     (= (:type ast) :cat)
-     (let [branches (:branches ast)]
-       (if (empty? branches)
-         {}
-         (merge-with into
+     ;; Multiary operators
+     :cat (let [branches (:branches ast)]
+            (if (empty? branches)
+              {}
+              (merge-with into
+                          ;; Rule 1
+                          (successors ast 0 unfolded)
+                          ;; Rule 2
+                          (let [branch (first branches)
+                                branches-after (rest branches)]
+                            (if (terminated? branch #{})
+                              (case (count branches-after)
+                                0 {}
+                                1 (successors (first branches-after) unfolded)
+                                (successors (ast/cat (vec branches-after)) unfolded))
+                              {})))))
+     :alt (let [branches (:branches ast)]
+            (reduce (partial merge-with into) (map #(successors % unfolded) branches)))
+     :par (let [branches (:branches ast)]
+            (loop [i 0
+                   m {}]
+              (if (= i (count branches))
+                m
+                (recur (inc i) (merge-with into m (successors ast i unfolded))))))
+     ;:dot (let [branches ast]
+     ;       (if (empty? branches)
+     ;         {}
+     ;         (merge-with into
+     ;                     ;; Rule 1
+     ;                     (successors ast 0 unfolded)
+     ;                     ;; Rule 2
+     ;                     (let [branch (first branches)
+     ;                           branches-after (rest branches)
+     ;                           roles (subjects branch)]
+     ;                       (filter (fn [[ast-action _]] (empty? (clojure.set/intersection roles (subjects ast-action))))
+     ;                               (case (count branches-after)
+     ;                                 0 {}
+     ;                                 1 (successors (first branches-after) unfolded)
+     ;                                 (successors (ast/cat (vec branches-after)) unfolded)))))))
+     :every (successors (eval-ast ast) unfolded)
 
-                     ;; Rule 1
-                     (successors ast 0 unfolded)
+     ;; "Special forms" operators
+     :if (successors (eval-ast ast) unfolded)
+     :loop (if (contains? unfolded ast)
+             {}
+             (successors (eval-ast ast) (conj unfolded ast)))
+     :recur (throw (Exception.))
 
-                     ;; Rule 2
-                     (let [branch (first branches)
-                           branches-after (rest branches)]
-                       (if (terminated? branch #{})
-                         (case (count branches-after)
-                           0 {}
-                           1 (successors (first branches-after) unfolded)
-                           (successors (ast/cat (vec branches-after)) unfolded))
-                         {})))))
+     ;; Misc operators
+     :graph (let [m (get (:edges ast) (:v ast))
+                  ks (keys m)
+                  vals (map (fn [k]
+                              (let [vertices (get m k)]
+                                (if (empty? vertices)
+                                  [(ast/end)]
+                                  (mapv #(assoc ast :v %) vertices))))
+                            (keys m))]
+              (if (nil? (keys m))
+                {}
+                (zipmap ks vals)))
 
-     ;; Alternatives
-     (= (:type ast) :alt)
-     (let [branches (:branches ast)]
-       (reduce (partial merge-with into) (map #(successors % unfolded) branches)))
+     ;; Sessions
+     :session (successors (eval-ast ast) unfolded)
 
-     ;; Parallel
-     (= (:type ast) :par)
-     (let [branches (:branches ast)]
-       (loop [i 0
-              m {}]
-         (if (= i (count branches))
-           m
-           (recur (inc i) (merge-with into m (successors ast i unfolded))))))
-
-     ;;; Prefix
-     ;(= (:type ast) :dot)
-     ;(let [branches ast]
-     ;  (if (empty? branches)
-     ;    {}
-     ;    (merge-with into
-     ;
-     ;                ;; Rule 1
-     ;                (successors ast 0 unfolded)
-     ;
-     ;                ;; Rule 2
-     ;                (let [branch (first branches)
-     ;                      branches-after (rest branches)
-     ;                      roles (subjects branch)]
-     ;                  (filter (fn [[ast-action _]] (empty? (clojure.set/intersection roles (subjects ast-action))))
-     ;                          (case (count branches-after)
-     ;                            0 {}
-     ;                            1 (successors (first branches-after) unfolded)
-     ;                            (successors (ast/cat (vec branches-after)) unfolded)))))))
-
-     ;; Every
-     (= (:type ast) :every)
-     (successors (eval-ast ast) unfolded)
-
-     ;; If
-     (= (:type ast) :if)
-     (successors (eval-ast ast) unfolded)
-
-     ;; Loop
-     (= (:type ast) :loop)
-     (if (contains? unfolded ast)
-       {}
-       (successors (eval-ast ast) (conj unfolded ast)))
-
-     ;; Recur
-     (= (:type ast) :recur)
-     (throw (Exception.))
-
-     ;; Graph
-     (= (:type ast) :graph)
-     (let [m (get (:edges ast) (:v ast))
-           ks (keys m)
-           vals (map (fn [k]
-                       (let [vertices (get m k)]
-                         (if (empty? vertices)
-                           [(ast/end)]
-                           (mapv #(assoc ast :v %) vertices))))
-                     (keys m))]
-       (if (nil? (keys m))
-         {}
-         (zipmap ks vals)))
-
-     ;; Session
-     (= (:type ast) :session)
-     (successors (eval-ast ast) unfolded)
-
-     :else (throw (Exception.))))
-
+     (throw (Exception.))))
   ([ast-multiary i unfolded]
    (let [branches (:branches ast-multiary)
          ast-f (case (:type ast-multiary)
