@@ -313,12 +313,16 @@
                               {})))))
      :alt (let [branches (:branches ast)]
             (reduce (partial merge-with into) (map #(successors % unfolded) branches)))
-     :par (let [branches (:branches ast)]
-            (loop [i 0
-                   m {}]
-              (if (= i (count branches))
-                m
-                (recur (inc i) (merge-with into m (successors ast i unfolded))))))
+     :par (let [branches (:branches ast)
+                branches (filterv (complement #(terminated? % unfolded)) branches)]
+            (case (count branches)
+              0 {}
+              1 (successors (first branches) unfolded)
+              (loop [i 0
+                     m {}]
+                (if (= i (count branches))
+                  m
+                  (recur (inc i) (merge-with into m (successors ast i unfolded)))))))
      ;:dot (let [branches ast]
      ;       (if (empty? branches)
      ;         {}
