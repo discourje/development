@@ -314,15 +314,15 @@
      :alt (let [branches (:branches ast)]
             (reduce (partial merge-with into) (map #(successors % unfolded) branches)))
      :par (let [branches (:branches ast)
-                branches (filterv (complement #(terminated? % unfolded)) branches)]
-            (case (count branches)
+                branches' (filterv #(not (empty? (successors % unfolded))) branches)]
+            (case (count branches')
               0 {}
-              1 (successors (first branches) unfolded)
+              1 (successors (first branches') unfolded)
               (loop [i 0
                      m {}]
-                (if (= i (count branches))
+                (if (= i (count branches'))
                   m
-                  (recur (inc i) (merge-with into m (successors ast i unfolded)))))))
+                  (recur (inc i) (merge-with into m (successors (ast/par branches') i unfolded)))))))
      ;:dot (let [branches ast]
      ;       (if (empty? branches)
      ;         {}
@@ -368,16 +368,16 @@
      (throw (Exception.))))
   ([ast-multiary i unfolded]
    (let [branches (:branches ast-multiary)
-         ast-f (case (:type ast-multiary)
-                 :cat ast/cat
-                 :alt ast/alt
-                 :par ast/par
-                 (throw (Exception.)))
+         f (case (:type ast-multiary)
+             :cat ast/cat
+             :alt ast/alt
+             :par ast/par
+             (throw (Exception.)))
          ith (nth branches i)
          ith-before (subvec branches 0 i)
          ith-after (subvec branches (inc i) (count branches))
          m (successors ith unfolded)]
-     (zipmap (keys m) (mapv #(mapv (fn [ith'] (ast-f (reduce into [ith-before [ith'] ith-after]))) %) (vals m))))))
+     (zipmap (keys m) (mapv #(mapv (fn [ith'] (f (reduce into [ith-before [ith'] ith-after]))) %) (vals m))))))
 
 (defn successors-with-hist
   [ast hist]
