@@ -11,6 +11,7 @@
                        expr)))
 
 (defonce ^:private eval-predicate-cache (atom (hash-map)))
+;(reset! eval-predicate-cache (hash-map))
 
 (defn eval-predicate [predicate]
   {:pre [(ast/predicate? predicate)]}
@@ -21,7 +22,8 @@
               (fn? x) x
               (class? x) #(instance? x %)
               :else (fn [message] (= message x)))
-          _ (swap! eval-predicate-cache #(assoc % predicate f))]
+          _ (if (and (not (fn? x)) (not (class? x)))
+              (swap! eval-predicate-cache #(assoc % predicate f)))]
       f)))
 
 (defn eval-role [role]
