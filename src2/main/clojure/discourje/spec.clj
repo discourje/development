@@ -284,3 +284,17 @@
 
 (s/defsession ::pipe [t r-name n]
               (s/session ::pipe ['t r-name 0 n]))
+
+;;;;
+;;;; Set operations (convenience)
+;;;;
+
+(defn power-set [s]
+  (if (empty? s)
+    #{#{}}
+    (reduce clojure.set/union
+            (map (fn [subset] #{subset (clojure.set/union #{(first s)} subset)})
+                 (power-set (rest s))))))
+
+(def difference clojure.set/difference)
+(def union clojure.set/union)
