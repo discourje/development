@@ -5,55 +5,76 @@
 ;;;; Networks
 ;;;;
 
-(defn- network [type m]
+(defn- network
+  [chs meta]
   (with-meta (fn
-               ([] m)
-               ([i j] (get m [i j])))
-             {:network-type type}))
+               ([] chs)
+               ([i j] (get chs [i j])))
+             (merge {:network true} meta)))
 
-(defn ring [f ids]
+(defn ring [fn-chan ids]
   {:pre [(>= (count ids) 2)]}
-  (network :ring (loop [ids ids
-                        m {[(last ids) (first ids)] (f)
-                           [(first ids) (last ids)] (f)}]
-                   (if (or (empty? ids) (empty? (rest ids)))
-                     m
-                     (recur (rest ids) (merge m {[(first ids) (first (rest ids))] (f)
-                                                 [(first (rest ids)) (first ids)] (f)}))))))
+  (network (loop [ids ids
+                  m {[(last ids) (first ids)] (fn-chan)
+                     [(first ids) (last ids)] (fn-chan)}]
+             (if (or (empty? ids) (empty? (rest ids)))
+               m
+               (recur (rest ids) (merge m {[(first ids) (first (rest ids))] (fn-chan)
+                                           [(first (rest ids)) (first ids)] (fn-chan)}))))
+           {:network-type :ring}))
 
-(defn star [f ids]
+(defn star [fn-chan root-id ids]
   {:pre [(>= (count ids) 2)]}
-  (network :star (reduce merge (for [i (rest ids)]
-                                 {[(first ids) i] (f)
-                                  [i (first ids)] (f)}))))
+  (network (reduce merge (for [i ids]
+                           {[root-id i] (fn-chan)
+                            [i root-id] (fn-chan)}))
+           {:network-type :star
+            :root-id      root-id}))
 
-(defn mesh [f ids]
+(defn mesh [fn-chan ids]
   {:pre [(>= (count ids) 2)]}
-  (network :mesh (reduce merge (for [i ids
-                                     j (remove #{i} ids)]
-                                 {[i j] (f)}))))
+  (network (reduce merge (for [i ids
+                               j (remove #{i} ids)]
+                           {[i j] (fn-chan)}))
+           {:network-type :mesh}))
 
-(defn putter-id [network ch]
-  {:pre [(contains? (meta network) :network-type)]}
-  (first (first (first (filter #(= (second %) ch) (network))))))
+;;;;
+;;;; Operations on networks
+;;;;
 
-(defn getter-id [network ch]
-  {:pre [(contains? (meta network) :network-type)]}
-  (second (first (first (filter #(= (second %) ch) (network))))))
+(defn putter-id [network c]
+  {:pre [(contains? (meta network) :network)]}
+  (first (first (first (filter #(= (second %) c) (network))))))
+
+(defn taker-id [network c]
+  {:pre [(contains? (meta network) :network)]}
+  (second (first (first (filter #(= (second %) c) (network))))))
 
 (defn puts [network [putter-id v] taker-ids]
-  {:pre [(contains? (meta network) :network-type)]}
+  {:pre [(contains? (meta network) :network)]}
   (map (fn [taker-id] [(network putter-id taker-id) v]) taker-ids))
 
 (defn takes [network putter-ids taker-id]
-  {:pre [(contains? (meta network) :network-type)]}
+  {:pre [(contains? (meta network) :network)]}
   (map (fn [putter-id] (network putter-id taker-id)) putter-ids))
 
 ;;;;
 ;;;; Monitors
 ;;;;
 
-(defn link-all [network f monitor]
-  {:pre [(contains? (meta network) :network-type)]}
-  (doseq [[[i j] c] (network)]
-    (a/link c (f i) (f j) monitor)))
+(defn link-all
+  ([network fn-role monitor]
+   {:pre [(contains? #{:ring :mesh} (:network-type (meta network)))]}
+   (doseq [[[i j] c] (network)]
+     (a/link c (fn-role i) (fn-role j) monitor)))
+  ([network fn-role-root fn-role-leaf monitor]
+   {:pre [(contains? #{:star} (:network-type (meta network)))]}
+   (let [root-id (:root-id (meta network))
+         fn-role-root (if (= root-id nil)
+                        (fn [_] (fn-role-root))
+                        fn-role-root)]
+     (doseq [[[i j] c] (network)]
+       (if (= i root-id)
+         (a/link c (fn-role-root i) (fn-role-leaf j) monitor))
+       (if (= j root-id)
+         (a/link c (fn-role-leaf i) (fn-role-root j) monitor))))))
