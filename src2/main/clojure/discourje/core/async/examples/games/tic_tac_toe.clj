@@ -13,9 +13,9 @@
 (s/defrole ::alice)
 (s/defrole ::bob)
 
-(s/defsession ::tic-tac-toe [r1 r2]
-              (s/alt (::tic-tac-toe-turn r1 r2)
-                     (::tic-tac-toe-turn r2 r1)))
+(s/defsession ::tic-tac-toe []
+              (s/alt (::tic-tac-toe-turn ::alice ::bob)
+                     (::tic-tac-toe-turn ::bob ::alice)))
 
 (s/defsession ::tic-tac-toe-turn [r1 r2]
               (s/--> Long r1 r2)
@@ -43,7 +43,7 @@
         i
         (recur (mod (inc i) 9))))))
 
-(def add
+(def put
   (fn [g i x-or-o]
     (try (assoc g i x-or-o)
          (catch Exception e (println g i x-or-o) (.printStackTrace e)))))
@@ -89,20 +89,20 @@
         ;; Link monitor [optional]
         _
         (if (= config/*lib* :dcj)
-          (let [s (tic-tac-toe alice bob)
+          (let [s (s/session ::tic-tac-toe [])
                 m (a/monitor s)]
-            (a/link a->b alice bob m)
-            (a/link b->a bob alice m)))
+            (a/link a->b (s/role ::alice) (s/role ::bob) m)
+            (a/link b->a (s/role ::bob) (s/role ::alice) m)))
 
         ;; Spawn threads
         alice
         (a/thread (loop [g initial-grid]
                     (let [i (get-blank g)
-                          g (add g i cross)]
+                          g (put g i cross)]
                       (a/>!! a->b i)
                       (if (not-final? g)
                         (let [i (a/<!! b->a)
-                              g (add g i nought)]
+                              g (put g i nought)]
                           (if (not-final? g)
                             (recur g)))
                         (println-grid g))))
@@ -111,10 +111,10 @@
         bob
         (a/thread (loop [g initial-grid]
                     (let [i (a/<!! a->b)
-                          g (add g i cross)]
+                          g (put g i cross)]
                       (if (not-final? g)
                         (let [i (get-blank g)
-                              g (add g i nought)]
+                              g (put g i nought)]
                           (a/>!! b->a i)
                           (if (not-final? g)
                             (recur g)

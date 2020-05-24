@@ -1,6 +1,6 @@
 (ns discourje.spec
   (:gen-class)
-  (:refer-clojure :exclude [if do let loop cat * + apply])
+  (:refer-clojure :exclude [if do let loop cat * + apply empty? disj])
   (:require [clojure.walk :as w]
             [discourje.spec.ast :as ast]))
 
@@ -288,6 +288,11 @@
 ;;;;
 ;;;; Set operations (convenience)
 ;;;;
+
+(def empty? clojure.core/empty?)
+(def disj clojure.core/disj)
+
+(def empty-set #{})
 
 (defn power-set [s]
   (if (empty? s)

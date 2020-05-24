@@ -14,17 +14,17 @@
 (s/defrole ::player)
 
 (s/defsession ::rock-paper-scissors [player-ids]
-  (::rock-paper-scissors-round player-ids #{}))
+  (::rock-paper-scissors-round player-ids s/empty-set))
 
 (s/defsession ::rock-paper-scissors-round [player-ids non-player-ids]
-  (s/if (not (empty? player-ids))
+  (s/if (not (s/empty? player-ids))
     (s/alt-every [winner-ids (s/power-set player-ids)]
       (s/let [loser-ids (s/difference player-ids winner-ids)]
         (s/cat (s/par-every [i player-ids
-                             j (disj player-ids i)]
+                             j (s/disj player-ids i)]
                  (s/--> String (::player i) (::player j)))
                (s/par (s/par-every [i loser-ids
-                                    j (disj (s/union player-ids non-player-ids) i)]
+                                    j (s/disj (s/union player-ids non-player-ids) i)]
                         (s/close (::player i) (::player j)))
                       (::rock-paper-scissors-round winner-ids (s/union non-player-ids loser-ids))))))))
 
