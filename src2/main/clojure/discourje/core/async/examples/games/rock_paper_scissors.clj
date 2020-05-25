@@ -13,20 +13,20 @@
 
 (s/defrole ::player)
 
-(s/defsession ::rock-paper-scissors [player-ids]
-  (::rock-paper-scissors-round player-ids s/empty-set))
+(s/defsession ::rock-paper-scissors [ids]
+  (::rock-paper-scissors-round ids s/empty-set))
 
-(s/defsession ::rock-paper-scissors-round [player-ids non-player-ids]
-  (s/if (not (s/empty? player-ids))
-    (s/alt-every [winner-ids (s/power-set player-ids)]
-      (s/let [loser-ids (s/difference player-ids winner-ids)]
-        (s/cat (s/par-every [i player-ids
-                             j (s/disj player-ids i)]
-                 (s/--> String (::player i) (::player j)))
-               (s/par (s/par-every [i loser-ids
-                                    j (s/disj (s/union player-ids non-player-ids) i)]
-                        (s/close (::player i) (::player j)))
-                      (::rock-paper-scissors-round winner-ids (s/union non-player-ids loser-ids))))))))
+(s/defsession ::rock-paper-scissors-round [ids co-ids]
+  (s/if (> (s/count ids) 1)
+    (s/cat (s/par-every [i ids
+                         j (s/disj ids i)]
+             (s/--> String (::player i) (::player j)))
+           (s/alt-every [winner-ids (s/power-set ids)]
+             (s/let [loser-ids (s/difference ids winner-ids)]
+               (s/par (::rock-paper-scissors-round winner-ids (s/union co-ids loser-ids))
+                      (s/par-every [i loser-ids
+                                    j (s/disj (s/union ids co-ids) i)]
+                        (s/close (::player i) (::player j)))))))))
 
 ;;;;
 ;;;; Implementation
@@ -45,7 +45,7 @@
                [scissors paper]}
              [x y]))
 
-(defn winners [round]
+(defn winner-ids [round]
   (let [items (distinct (vals round))
         winning-items (if (= 1 (count items))
                         items
@@ -55,11 +55,11 @@
     (keep (fn [[i item]] (if (some #{item} winning-items) i)) round)))
 
 (defn winner? [round i]
-  (let [winners (winners round)]
+  (let [winners (winner-ids round)]
     (and (some #{i} winners) (= (count winners) 1))))
 
 (defn loser? [round i]
-  (let [winners (winners round)]
+  (let [winners (winner-ids round)]
     (and (not (some #{i} winners)) (>= (count winners) 1))))
 
 (defn winner-or-loser? [round i]
@@ -95,11 +95,11 @@
 
         ;; Spawn threads
         players
-        (mapv (fn [i] (a/thread (loop [player-ids (range k)
+        (mapv (fn [i] (a/thread (loop [ids (range k)
                                        rounds []]
 
                                   (let [item (rock-or-paper-or-scissors)
-                                        opponent-ids (remove #{i} player-ids)
+                                        opponent-ids (remove #{i} ids)
                                         round (loop [actions (into (u/puts players<->players [i item] opponent-ids)
                                                                    (u/takes players<->players opponent-ids i))
                                                      round {}]
@@ -118,7 +118,7 @@
                                       (do (.arriveAndDeregister barrier)
                                           (doseq [j (remove #{i} (range k))]
                                             (a/close! (players<->players i j))))
-                                      (recur (winners round) (conj rounds round)))))))
+                                      (recur (winner-ids round) (conj rounds round)))))))
               (range k))
 
         ;; Await termination

@@ -1,6 +1,6 @@
 (ns discourje.spec
   (:gen-class)
-  (:refer-clojure :exclude [if do let loop cat * + apply empty? disj])
+  (:refer-clojure :exclude [if do let loop cat * + apply count empty? disj])
   (:require [clojure.walk :as w]
             [discourje.spec.ast :as ast]))
 
@@ -178,7 +178,7 @@
 
 (defn- multiary [f branches]
   (clojure.core/let [branches (mapv (comp macroexpand desugared-spec) branches)]
-    (case (count branches)
+    (case (clojure.core/count branches)
       0 `(end)
       1 (first branches)
       `(~f ~branches))))
@@ -290,6 +290,7 @@
 ;;;;
 
 (def empty? clojure.core/empty?)
+(def count clojure.core/count)
 (def disj clojure.core/disj)
 
 (def empty-set #{})
