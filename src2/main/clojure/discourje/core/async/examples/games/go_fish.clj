@@ -31,14 +31,14 @@
 (s/defrole ::player)
 
 (s/defsession ::go-fish [player-ids]
-  (s/par-every [i player-ids]
-    (s/cat-every [_ (range 5)]
-      (s/--> Card ::dealer (::player i))))
-  (s/alt-every [i player-ids]
-    (s/cat (s/--> Turn ::dealer (::player i))
-           (::go-fish-turn i player-ids)))
-  (s/par-every [i player-ids]
-    (s/par (s/cat (s/close ::dealer (::player i))
+  (s/cat (s/par-every [i player-ids]
+           (s/cat-every [_ (range 5)]
+             (s/--> Card ::dealer (::player i))))
+         (s/alt-every [i player-ids]
+           (s/cat (s/--> Turn ::dealer (::player i))
+                  (::go-fish-turn i player-ids)))
+         (s/par-every [i player-ids]
+           (s/cat (s/close ::dealer (::player i))
                   (s/par (s/cat (s/* (s/--> Card (::player i) ::dealer))
                                 (s/close (::player i) ::dealer))
                          (s/par-every [j (disj player-ids i)]
