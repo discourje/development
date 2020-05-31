@@ -1,18 +1,12 @@
 (ns discourje.core.async.examples.micro.mesh
   (:require [clojure.core.async]
-            [discourje.core.async :as dcj]
+            [discourje.core.async]
             [discourje.core.async.examples.config :as config]
             [discourje.core.async.examples.timer :as timer]
+            [discourje.core.util :as u]
             [discourje.spec :as s]))
 
-(if (contains? (ns-aliases *ns*) 'a)
-  (ns-unalias *ns* 'a))
-
-(case config/*lib*
-  :clj (alias 'a 'clojure.core.async)
-  :dcj (alias 'a 'discourje.core.async)
-  :dcj-nil (alias 'a 'discourje.core.async)
-  nil)
+(config/clj-or-dcj)
 
 ;;;;
 ;;;; Specification
@@ -20,25 +14,15 @@
 
 (s/defrole ::worker "worker")
 
-(s/defsession ::spec-unbuffered
-              [k]
-              (s/ω (s/loop spec-outer [i 0]
-               (s/if (< i k)
-                 (s/alt (s/loop spec-inner [j 0]
-                                (s/if (< j k)
-                                  (s/alt (s/--> Boolean (::worker i) (::worker j))
-                                         (s/recur spec-inner (inc j)))))
-                        (s/recur spec-outer (inc i)))))))
+(s/defsession ::mesh-unbuffered [k]
+  (s/* (s/alt-every [i (range k)
+                     j (range k)]
+         (s/--> Boolean (::worker i) (::worker j)))))
 
-(s/defsession ::spec-buffered
-              [k]
-              (s/loop spec-outer [i 0]
-          (s/if (< i k)
-            (s/par (s/loop spec-inner [j 0]
-                           (s/if (< j k)
-                             (s/par (s/ω (s/-->> Boolean (::worker i) (::worker j)))
-                                    (s/recur spec-inner (inc j)))))
-                   (s/recur spec-outer (inc i))))))
+(s/defsession ::mesh-buffered [k]
+  (s/par-every [i (range k)
+                j (range k)]
+    (s/* (s/-->> Boolean (::worker i) (::worker j)))))
 
 ;;;;
 ;;;; Implementation
@@ -54,32 +38,25 @@
         begin (System/nanoTime)
 
         ;; Create channels
-        workers->workers
-        (mapv (fn [i] (mapv (fn [j] (if (not= i j) (if buffered (a/chan 1) (a/chan)))) (range k))) (range k))
+        mesh
+        (u/mesh (if buffered (fn [] (a/chan 1)) a/chan) (range k))
 
         ;; Link monitor [optional]
         _
         (if (= config/*lib* :dcj)
-          (let [s (s/session (if buffered ::spec-buffered ::spec-unbuffered) [k])
-                m (dcj/monitor s)]
-            (doseq [i (range k)
-                    j (range k)]
-              (if (not= i j)
-                (dcj/link (nth (nth workers->workers i) j)
-                          (s/role ::worker [i])
-                          (s/role ::worker [j])
-                          m)))))
+          (let [s (s/session (if buffered ::mesh-buffered ::mesh-unbuffered) [k])
+                m (a/monitor s)]
+            (u/link-mesh mesh worker m)))
 
         ;; Spawn threads
         workers
-        (map (fn [i] (a/thread (let [ins (filterv (complement nil?) (mapv #(nth % i) workers->workers))
-                                     outs (filterv (complement nil?) (nth workers->workers i))
+        (map (fn [i] (a/thread (let [acts (reduce into [(u/puts mesh [i true] (remove #{i} (range k)))
+                                                        (u/takes mesh (remove #{i} (range k)) i)
+                                                        [(a/timeout 100)]])
                                      deadline (+ begin (* secs 1000 1000 1000))]
                                  (loop [timer (timer/timer resolution)]
                                    (if (< (System/nanoTime) deadline)
-                                     (if (first (a/alts!! (reduce into [(mapv #(vector % true) outs)
-                                                                        ins
-                                                                        [(a/timeout 100)]])))
+                                     (if (first (a/alts!! acts))
                                        (recur (timer/tick timer))
                                        (recur timer))
                                      timer)))))
