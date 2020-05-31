@@ -88,6 +88,4 @@
   (print (e/run-all [:clj :dcj]
                     ['discourje.core.async.examples.games.go-fish]
                     {:k [3]}))
-  (is true)
-
-  )
+  (is true))
