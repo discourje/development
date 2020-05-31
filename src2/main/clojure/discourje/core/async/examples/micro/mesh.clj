@@ -44,7 +44,7 @@
         ;; Link monitor [optional]
         _
         (if (= config/*lib* :dcj)
-          (let [s (s/session (if buffered ::mesh-buffered ::mesh-unbuffered) [k])
+          (let [s (apply (if buffered mesh-buffered mesh-unbuffered) [k])
                 m (a/monitor s)]
             (u/link-mesh mesh worker m)))
 
