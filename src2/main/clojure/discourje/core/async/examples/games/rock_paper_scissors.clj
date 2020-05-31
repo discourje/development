@@ -91,7 +91,7 @@
         (if (= config/*lib* :dcj)
           (let [s (rock-paper-scissors (set (range k)))
                 m (a/monitor s)]
-            (u/link-all players<->players player m)))
+            (u/link-mesh players<->players player m)))
 
         ;; Spawn threads
         players
@@ -100,13 +100,13 @@
 
                                   (let [item (rock-or-paper-or-scissors)
                                         opponent-ids (remove #{i} ids)
-                                        round (loop [actions (into (u/puts players<->players [i item] opponent-ids)
-                                                                   (u/takes players<->players opponent-ids i))
+                                        round (loop [acts (into (u/puts players<->players [i item] opponent-ids)
+                                                                (u/takes players<->players opponent-ids i))
                                                      round {}]
-                                                (if (empty? actions)
+                                                (if (empty? acts)
                                                   (assoc round i item)
-                                                  (let [[v c] (a/alts!! actions)]
-                                                    (recur (remove #{[c item] c} actions)
+                                                  (let [[v c] (a/alts!! acts)]
+                                                    (recur (remove #{[c item] c} acts)
                                                            (assoc round (u/putter-id players<->players c) v)))))]
 
                                     (.arriveAndAwaitAdvance barrier)

@@ -23,9 +23,9 @@
                                            [(first (rest ids)) (first ids)] (fn-chan)}))))
            {:network-type :ring}))
 
-(defn star [fn-chan root-id ids]
-  {:pre [(>= (count ids) 2)]}
-  (network (reduce merge (for [i ids]
+(defn star [fn-chan root-id leaf-ids]
+  {:pre [(>= (count leaf-ids) 2)]}
+  (network (reduce merge (for [i leaf-ids]
                            {[root-id i] (fn-chan)
                             [i root-id] (fn-chan)}))
            {:network-type :star
@@ -62,19 +62,24 @@
 ;;;; Monitors
 ;;;;
 
-(defn link-all
-  ([network fn-role monitor]
-   {:pre [(contains? #{:ring :mesh} (:network-type (meta network)))]}
-   (doseq [[[i j] c] (network)]
-     (a/link c (fn-role i) (fn-role j) monitor)))
-  ([network fn-role-root fn-role-leaf monitor]
-   {:pre [(contains? #{:star} (:network-type (meta network)))]}
-   (let [root-id (:root-id (meta network))
-         fn-role-root (if (= root-id nil)
-                        (fn [_] (fn-role-root))
-                        fn-role-root)]
-     (doseq [[[i j] c] (network)]
-       (if (= i root-id)
-         (a/link c (fn-role-root i) (fn-role-leaf j) monitor))
-       (if (= j root-id)
-         (a/link c (fn-role-leaf i) (fn-role-root j) monitor))))))
+(defn link-ring [network fn-role monitor]
+  {:pre [(contains? #{:ring :mesh} (:network-type (meta network)))]}
+  (doseq [[[i j] c] (network)]
+    (a/link c (fn-role i) (fn-role j) monitor)))
+
+(defn link-star [network fn-role-root fn-role-leaf monitor]
+  {:pre [(contains? #{:star} (:network-type (meta network)))]}
+  (let [root-id (:root-id (meta network))
+        fn-role-root (if (= root-id nil)
+                       (fn [_] (fn-role-root))
+                       fn-role-root)]
+    (doseq [[[i j] c] (network)]
+      (if (= i root-id)
+        (a/link c (fn-role-root i) (fn-role-leaf j) monitor))
+      (if (= j root-id)
+        (a/link c (fn-role-leaf i) (fn-role-root j) monitor)))))
+
+(defn link-mesh [network fn-role monitor]
+  {:pre [(contains? #{:ring :mesh} (:network-type (meta network)))]}
+  (doseq [[[i j] c] (network)]
+    (a/link c (fn-role i) (fn-role j) monitor)))

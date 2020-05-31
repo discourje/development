@@ -135,8 +135,8 @@
         (if (= config/*lib* :dcj)
           (let [s (go-fish (set (range k)))
                 m (a/monitor s)]
-            (u/link-all dealer<->players dealer player m)
-            (u/link-all players<->players player m)))
+            (u/link-star dealer<->players dealer player m)
+            (u/link-mesh players<->players player m)))
 
         ;; Spawn threads
         dealer
@@ -153,8 +153,8 @@
 
                     ;; Deal cards (upon request) until the deck runs outs
                     (let [deck (loop [deck (drop (* k 5) deck)]
-                                 (let [actions (u/takes dealer<->players player-ids nil)
-                                       [v c] (a/alts!! actions)
+                                 (let [acts (u/takes dealer<->players player-ids nil)
+                                       [v c] (a/alts!! acts)
                                        player-id (u/putter-id dealer<->players c)]
                                    (condp = (type v)
                                      Fish (do (a/>!! (dealer<->players nil player-id)
@@ -169,15 +169,15 @@
                         (a/close! (dealer<->players nil i)))
 
                       ;; Get final hands
-                      (loop [actions (u/takes dealer<->players player-ids nil)
+                      (loop [acts (u/takes dealer<->players player-ids nil)
                              hands (into {} (map #(vector % (list)) player-ids))]
-                        (if (empty? actions)
+                        (if (empty? acts)
                           (println-hands hands)
-                          (let [[v c] (a/alts!! actions)
+                          (let [[v c] (a/alts!! acts)
                                 player-id (u/putter-id dealer<->players c)]
                             (condp = (type v)
-                              Card (recur actions (update hands player-id #(cons v %)))
-                              nil (recur (remove #{c} actions) hands))))))))
+                              Card (recur acts (update hands player-id #(cons v %)))
+                              nil (recur (remove #{c} acts) hands))))))))
 
         players
         (mapv (fn [i] (a/thread (let [opponent-ids (remove #{i} (range k))
@@ -185,9 +185,9 @@
                                                     (a/<!! (dealer<->players nil i))))]
 
                                   (loop [hand hand]
-                                    (let [actions (into (u/takes dealer<->players [nil] i)
-                                                        (u/takes players<->players opponent-ids i))
-                                          [v c] (a/alts!! actions)]
+                                    (let [acts (into (u/takes dealer<->players [nil] i)
+                                                     (u/takes players<->players opponent-ids i))
+                                          [v c] (a/alts!! acts)]
 
                                       (condp = (type v)
                                         Turn (recur (loop [hand hand]
