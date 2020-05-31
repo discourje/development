@@ -27,8 +27,10 @@
       f)))
 
 (defn eval-role [role]
-  {:pre [(or (ast/role? role) (fn? role))]}
-  (let [role (if (fn? role) (role) role)]
+  {:pre [(or (ast/role? role) (fn? role) (keyword? role))]}
+  (let [role (cond (ast/role? role) role
+                   (fn? role) (role)
+                   (keyword? role) (ast/role role))]
     (str (cond
            (string? (:name-expr role)) (:name-expr role)
            (keyword? (:name-expr role)) (ast/get-role-name (:name-expr role))
