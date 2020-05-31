@@ -57,8 +57,6 @@
 (defn start [lib program input]
   (.start (Thread. ^Runnable (fn [] (println (run lib program input))))))
 
-(start :dcj 'discourje.core.async.examples.games.ttt {})
-
 ;;;;
 ;;;; Post-processing
 ;;;;

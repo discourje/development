@@ -3,8 +3,7 @@
             [discourje.core.async]
             [discourje.core.util :as u]
             [discourje.core.async.examples.config :as config]
-            [discourje.spec :as s]
-            [discourje.core.async :as a]))
+            [discourje.spec :as s]))
 
 (config/clj-or-dcj)
 

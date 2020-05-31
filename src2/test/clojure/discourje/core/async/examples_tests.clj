@@ -65,3 +65,29 @@
                     ['discourje.core.async.examples.micro.star]
                     {:buffered [false] :ordered-sends [false] :k [2] :secs [0.1]}))
   (is true))
+
+(deftest games-tests
+
+  ;; Tic-Tac-Toe
+
+  (print (e/run-all [:clj :dcj]
+                    ['discourje.core.async.examples.games.tic-tac-toe]
+                    {}))
+  (is true)
+
+  ;; Rock-Paper-Scissors
+
+  (print (e/run-all [:clj :dcj]
+                    ['discourje.core.async.examples.games.rock-paper-scissors]
+                    {:k [3]}))
+  (is true)
+
+
+  ;; Go Fish
+
+  (print (e/run-all [:clj :dcj]
+                    ['discourje.core.async.examples.games.go-fish]
+                    {:k [3]}))
+  (is true)
+
+  )
