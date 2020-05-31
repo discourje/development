@@ -1,8 +1,8 @@
 (ns discourje.core.async.examples.games.rock-paper-scissors
   (:require [clojure.core.async]
             [discourje.core.async]
-            [discourje.core.util :as u]
             [discourje.core.async.examples.config :as config]
+            [discourje.core.util :as u]
             [discourje.spec :as s]))
 
 (config/clj-or-dcj)
