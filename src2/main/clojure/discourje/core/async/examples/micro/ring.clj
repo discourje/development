@@ -1,18 +1,12 @@
 (ns discourje.core.async.examples.micro.ring
   (:require [clojure.core.async]
-            [discourje.core.async :as dcj]
+            [discourje.core.async]
             [discourje.core.async.examples.config :as config]
             [discourje.core.async.examples.timer :as timer]
+            [discourje.core.util :as u]
             [discourje.spec :as s]))
 
-(if (contains? (ns-aliases *ns*) 'a)
-  (ns-unalias *ns* 'a))
-
-(case config/*lib*
-  :clj (alias 'a 'clojure.core.async)
-  :dcj (alias 'a 'discourje.core.async)
-  :dcj-nil (alias 'a 'discourje.core.async)
-  nil)
+(config/clj-or-dcj)
 
 ;;;;
 ;;;; Specification
@@ -20,19 +14,13 @@
 
 (s/defrole ::worker "worker")
 
-(s/defsession ::spec-unbuffered
-              [k]
-              (s/ω (s/loop spec [i 0]
-               (s/if (< i k)
-                 (s/cat (s/--> Boolean (::worker i) (::worker (mod (inc i) k)))
-                        (s/recur spec (inc i)))))))
+(s/defsession ::ring-unbuffered [k]
+  (s/* (s/cat-every [i (range k)]
+         (s/--> Boolean (::worker i) (::worker (mod (inc i) k))))))
 
-(s/defsession ::spec-buffered
-              [k]
-              (s/ω (s/loop spec [i 0]
-               (s/if (< i k)
-                 (s/cat (s/-->> Boolean (::worker i) (::worker (mod (inc i) k)))
-                        (s/recur spec (inc i)))))))
+(s/defsession ::ring-buffered [k]
+  (s/* (s/cat-every [i (range k)]
+         (s/-->> Boolean (::worker i) (::worker (mod (inc i) k))))))
 
 ;;;;
 ;;;; Implementation
@@ -48,39 +36,32 @@
         begin (System/nanoTime)
 
         ;; Create channels
-        workers->workers
-        (mapv (fn [_] (if buffered (a/chan 1) (a/chan))) (range k))
+        ring
+        (u/ring (if buffered (fn [] (a/chan 1)) a/chan) (range k))
 
         ;; Link monitor [optional]
         _
         (if (= config/*lib* :dcj)
-          (let [s (s/session (if buffered ::spec-buffered ::spec-unbuffered) [k])
-                m (dcj/monitor s)]
-            (doseq [i (range k)] (dcj/link (nth workers->workers i)
-                                           (s/role ::worker [i])
-                                           (s/role ::worker [(mod (inc i) k)])
-                                           m))))
+          (let [s (apply (if buffered ring-buffered ring-unbuffered) [k])
+                m (a/monitor s)]
+            (u/link-ring ring worker m)))
 
         ;; Spawn threads
         worker0
-        (a/thread (let [in (nth workers->workers (dec k))
-                        out (nth workers->workers 0)
-                        deadline (+ begin (* secs 1000 1000 1000))]
+        (a/thread (let [deadline (+ begin (* secs 1000 1000 1000))]
                     (loop [not-done true
                            timer (timer/timer resolution)]
-                      (a/>!! out not-done)
-                      (a/<!! in)
+                      (a/>!! (ring 0 1) not-done)
+                      (a/<!! (ring (dec k) 0))
                       (if not-done
                         (recur (< (System/nanoTime) deadline) (timer/tick timer))
                         timer))))
 
         workers'
-        (map #(a/thread (let [in (nth workers->workers (dec %))
-                              out (nth workers->workers %)]
-                          (loop []
-                            (let [v (a/<!! in)
-                                  _ (a/>!! out v)]
-                              (if v (recur))))))
+        (map (fn [i] (a/thread (loop []
+                                 (let [v (a/<!! (ring (dec i) i))
+                                       _ (a/>!! (ring i (mod (inc i) k)) v)]
+                                   (if v (recur))))))
              (range 1 k))
 
         ;; Await termination
