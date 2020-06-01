@@ -1,18 +1,12 @@
 (ns discourje.core.async.examples.micro.star
   (:require [clojure.core.async]
-            [discourje.core.async :as dcj]
+            [discourje.core.async]
             [discourje.core.async.examples.config :as config]
             [discourje.core.async.examples.timer :as timer]
+            [discourje.core.util :as u]
             [discourje.spec :as s]))
 
-(if (contains? (ns-aliases *ns*) 'a)
-  (ns-unalias *ns* 'a))
-
-(case config/*lib*
-  :clj (alias 'a 'clojure.core.async)
-  :dcj (alias 'a 'discourje.core.async)
-  :dcj-nil (alias 'a 'discourje.core.async)
-  nil)
+(config/clj-or-dcj)
 
 ;;;;
 ;;;; Specification
@@ -21,29 +15,20 @@
 (s/defrole ::master "master")
 (s/defrole ::worker "worker")
 
-(s/defsession ::spec-cat
-              [k]
-              (s/ω (s/loop spec [i 0]
-               (s/if (< i k)
-                 (s/cat (s/cat (s/--> Boolean ::master (::worker i))
-                               (s/--> Boolean (::worker i) ::master))
-                        (s/recur spec (inc i)))))))
+(s/defsession ::star-cat [k]
+  (s/* (s/cat-every [i (range k)]
+         (s/cat (s/--> Boolean ::master (::worker i))
+                (s/--> Boolean (::worker i) ::master)))))
 
-(s/defsession ::spec-alt
-              [k]
-              (s/ω (s/loop spec [i 0]
-               (s/if (< i k)
-                 (s/alt (s/cat (s/--> Boolean ::master (::worker i))
-                               (s/--> Boolean (::worker i) ::master))
-                        (s/recur spec (inc i)))))))
+(s/defsession ::star-alt [k]
+  (s/* (s/alt-every [i (range k)]
+         (s/cat (s/--> Boolean ::master (::worker i))
+                (s/--> Boolean (::worker i) ::master)))))
 
-(s/defsession ::spec-par
-              [k]
-              (s/ω (s/loop spec [i 0]
-               (s/if (< i k)
-                 (s/par (s/cat (s/-->> Boolean ::master (::worker i))
-                               (s/-->> Boolean (::worker i) ::master))
-                        (s/recur spec (inc i)))))))
+(s/defsession ::star-par [k]
+  (s/* (s/par-every [i (range k)]
+         (s/cat (s/-->> Boolean ::master (::worker i))
+                (s/-->> Boolean (::worker i) ::master)))))
 
 ;;;;
 ;;;; Implementation
@@ -61,30 +46,22 @@
         begin (System/nanoTime)
 
         ;; Create channels
-        master->workers
-        (mapv (fn [_] (if buffered (a/chan 1) (a/chan))) (range k))
-        workers->master
-        (mapv (fn [_] (if buffered (a/chan 1) (a/chan))) (range k))
+        star
+        (u/star (if buffered (fn [] (a/chan 1)) a/chan) nil (range k))
 
         ;; Link monitor [optional]
         _
         (if (= config/*lib* :dcj)
-          (let [s (s/session (cond (and buffered)
-                                   ::spec-par
-                                   (and (not buffered) ordered-sends)
-                                   ::spec-cat
-                                   (and (not buffered) (not ordered-sends))
-                                   ::spec-alt)
-                             [k])
-                m (dcj/monitor s)]
-            (doseq [i (range k)] (dcj/link (nth master->workers i)
-                                           (s/role ::master)
-                                           (s/role ::worker [i])
-                                           m))
-            (doseq [i (range k)] (dcj/link (nth workers->master i)
-                                           (s/role ::worker [i])
-                                           (s/role ::master)
-                                           m))))
+          (let [s (apply (cond (and buffered)
+                               star-par
+                               (and (not buffered) ordered-sends)
+                               star-cat
+                               (and (not buffered) (not ordered-sends))
+                               star-alt)
+                         [k])
+                m (a/monitor s)]
+
+            (u/link-star star master worker m)))
 
         ;; Spawn threads
         master
@@ -95,9 +72,9 @@
                       (and buffered ordered-sends ordered-receives)
                       (loop [not-done true
                              timer (timer/timer resolution)]
-                        (doseq [out master->workers]
+                        (doseq [[out _] (u/puts star [nil nil] (range k))]
                           (a/>!! out not-done))
-                        (doseq [in workers->master]
+                        (doseq [in (u/takes star (range k) nil)]
                           (a/<!! in))
                         (if not-done
                           (recur (< (System/nanoTime) deadline) (timer/tick timer))
@@ -107,12 +84,12 @@
                       (and buffered ordered-sends (not ordered-receives))
                       (loop [not-done true
                              timer (timer/timer resolution)]
-                        (doseq [out master->workers]
+                        (doseq [[out _] (u/puts star [nil nil] (range k))]
                           (a/>!! out not-done))
-                        (loop [ins workers->master]
-                          (if (not (empty? ins))
-                            (let [[_ in] (a/alts!! ins)]
-                              (recur (remove #(= in %) ins)))))
+                        (loop [acts (u/takes star (range k) nil)]
+                          (if (not (empty? acts))
+                            (let [[_ c] (a/alts!! acts)]
+                              (recur (remove #{c} acts)))))
                         (if not-done
                           (recur (< (System/nanoTime) deadline) (timer/tick timer))
                           timer))
@@ -121,11 +98,11 @@
                       (and buffered (not ordered-sends) ordered-receives)
                       (loop [not-done true
                              timer (timer/timer resolution)]
-                        (loop [outs master->workers]
-                          (if (not (empty? outs))
-                            (let [[_ out] (a/alts!! (mapv #(vector % not-done) outs))]
-                              (recur (remove #(= out %) outs)))))
-                        (doseq [in workers->master]
+                        (loop [acts (u/puts star [nil not-done] (range k))]
+                          (if (not (empty? acts))
+                            (let [[_ c] (a/alts!! acts)]
+                              (recur (remove #{[c not-done]} acts)))))
+                        (doseq [in (u/takes star (range k) nil)]
                           (a/<!! in))
                         (if not-done
                           (recur (< (System/nanoTime) deadline) (timer/tick timer))
@@ -135,14 +112,14 @@
                       (and buffered (not ordered-sends) (not ordered-receives))
                       (loop [not-done true
                              timer (timer/timer resolution)]
-                        (loop [outs master->workers]
-                          (if (not (empty? outs))
-                            (let [[_ out] (a/alts!! (mapv #(vector % not-done) outs))]
-                              (recur (remove #(= out %) outs)))))
-                        (loop [ins workers->master]
-                          (if (not (empty? ins))
-                            (let [[_ in] (a/alts!! ins)]
-                              (recur (remove #(= in %) ins)))))
+                        (loop [acts (u/puts star [nil not-done] (range k))]
+                          (if (not (empty? acts))
+                            (let [[_ c] (a/alts!! acts)]
+                              (recur (remove #{[c not-done]} acts)))))
+                        (loop [acts (u/takes star (range k) nil)]
+                          (if (not (empty? acts))
+                            (let [[_ c] (a/alts!! acts)]
+                              (recur (remove #{c} acts)))))
                         (if not-done
                           (recur (< (System/nanoTime) deadline) (timer/tick timer))
                           timer))
@@ -152,8 +129,8 @@
                       (loop [not-done true
                              timer (timer/timer resolution)]
                         (doseq [i (range k)]
-                          (a/>!! (nth master->workers i) not-done)
-                          (a/<!! (nth workers->master i)))
+                          (a/>!! (star nil i) not-done)
+                          (a/<!! (star i nil)))
                         (if not-done
                           (recur (< (System/nanoTime) deadline) (timer/tick timer))
                           timer))
@@ -162,23 +139,20 @@
                       (and (not buffered) (not ordered-sends))
                       (loop [not-done true
                              timer (timer/timer resolution)]
-                        (loop [outs-ins (zipmap master->workers workers->master)]
-                          (if (not (empty? outs-ins))
-                            (let [[_ out] (a/alts!! (mapv #(vector % not-done) (keys outs-ins)))
-                                  in (get outs-ins out)]
-                              (a/<!! in)
-                              (recur (dissoc outs-ins out)))))
+                        (loop [acts (u/puts star [nil not-done] (range k))]
+                          (if (not (empty? acts))
+                            (let [[_ c] (a/alts!! acts)]
+                              (a/<!! (star (u/taker-id star c) nil))
+                              (recur (remove #{[c not-done]} acts)))))
                         (if not-done
                           (recur (< (System/nanoTime) deadline) (timer/tick timer))
                           timer)))))
 
         workers
-        (mapv #(a/thread (let [in (nth master->workers %)
-                               out (nth workers->master %)]
-                           (loop []
-                             (let [v (a/<!! in)
-                                   _ (a/>!! out v)]
-                               (if v (recur))))))
+        (mapv (fn [i] (a/thread (loop []
+                                  (let [v (a/<!! (star nil i))
+                                        _ (a/>!! (star i nil) v)]
+                                    (if v (recur))))))
               (range k))
 
         ;; Await termination
