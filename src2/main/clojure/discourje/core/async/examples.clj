@@ -235,9 +235,12 @@
           (if (not (contains? #{:clj :dcj :dcj-nil} lib))
             (throw (ex-info "" {::message "Unknown lib"})))
 
-          (if (not (contains? #{'discourje.core.async.examples.micro.ring
-                                'discourje.core.async.examples.micro.mesh
-                                'discourje.core.async.examples.micro.star}
+          (if (not (contains? #{'discourje.core.async.examples.micro.mesh
+                                'discourje.core.async.examples.micro.ring
+                                'discourje.core.async.examples.micro.star
+                                'discourje.core.async.examples.games.go-fish
+                                'discourje.core.async.examples.games.rock-paper-scissors
+                                'discourje.core.async.examples.games.tic-tac-toe}
                               program))
             (throw (ex-info "" {::message "Unknown program"})))
 
@@ -295,7 +298,7 @@
               (println (str "Error: " (::message m)))
               (println (str "Usage 1: java -jar discourje-examples.jar run <lib> <program> <input>"))
               (println (str "  <lib>     \u2208 {clj, dcj, dcj-nil}"))
-              (println (str "  <program> \u2208 {micro.ring, micro.mesh, micro.star}"))
+              (println (str "  <program> \u2208 {micro.mesh, micro.ring, micro.star, games.go-fish, games.rock-paper-scissors, games.tic-tac-toe}"))
               (println (str "Usage 2: java -jar discourje-examples.jar script <n> <configs>"))
               (println (str "Usage 3: java -jar discourje-examples.jar chart <data>"))
               (println (str "Usage 4: java -jar discourje-examples.jar experiment <n> <configs>")))
