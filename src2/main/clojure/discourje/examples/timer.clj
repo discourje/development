@@ -71,7 +71,9 @@
     {:ticks     (:ticks t)
      :stats     {:n     (:n stats)
                  :μ-hat (long (:big-m stats))
-                 :σ-hat (long (Math/sqrt (/ (:big-s stats) (dec (:n stats)))))
+                 :σ-hat (if (= (:n stats) 1)
+                          nil
+                          (long (Math/sqrt (/ (:big-s stats) (dec (:n stats))))))
                  :x-min (:x-min stats)
                  :x-max (:x-max stats)}
      :aggregate (:aggregate t)}))
