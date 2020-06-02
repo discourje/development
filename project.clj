@@ -17,10 +17,10 @@
              :tacas2020 {:main         discourje.examples.tacas2020.main
                          :aot          [discourje.examples.tacas2020.main]
                          :uberjar-name "tacas2020.jar"}
-             :examples  {:main         discourje.core.async.examples
+             :examples  {:main         discourje.examples.main
                          :aot          [discourje.core.async
-                                        discourje.core.async.examples
-                                        discourje.spec]
+                                        discourje.core.spec
+                                        discourje.examples.main]
                          :uberjar-name "discourje-examples.jar"}})
 
 ;; $ lein with-profile discourje uberjar
