@@ -1,9 +1,9 @@
-(ns discourje.core.async.examples.games.go-fish
+(ns discourje.examples.games.go-fish
   (:require [clojure.core.async]
             [discourje.core.async]
-            [discourje.core.async.examples.config :as config]
             [discourje.core.util :as u]
-            [discourje.core.spec :as s]))
+            [discourje.core.spec :as s]
+            [discourje.examples.config :as config]))
 
 (config/clj-or-dcj)
 

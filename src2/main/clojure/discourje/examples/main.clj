@@ -1,8 +1,8 @@
-(ns discourje.core.async.examples
+(ns discourje.examples.main
   (:gen-class)
   (:refer-clojure :exclude [compare])
   (:require [clojure.string :refer [join last-index-of]]
-            [discourje.core.async.examples.config :as config])
+            [discourje.examples.config :as config])
   (:import (java.time LocalDateTime)
            (org.apache.commons.math3.distribution TDistribution)))
 
@@ -229,18 +229,18 @@
           (throw (ex-info "" {::message "Not enough arguments"})))
 
         (let [lib (keyword (first args))
-              program (symbol (str "discourje.core.async.examples" "." (second args)))
+              program (symbol (str "discourje.examples" "." (second args)))
               input (read-string (join " " (rest (rest args))))]
 
           (if (not (contains? #{:clj :dcj :dcj-nil} lib))
             (throw (ex-info "" {::message "Unknown lib"})))
 
-          (if (not (contains? #{'discourje.core.async.examples.micro.mesh
-                                'discourje.core.async.examples.micro.ring
-                                'discourje.core.async.examples.micro.star
-                                'discourje.core.async.examples.games.go-fish
-                                'discourje.core.async.examples.games.rock-paper-scissors
-                                'discourje.core.async.examples.games.tic-tac-toe}
+          (if (not (contains? #{'discourje.examples.micro.mesh
+                                'discourje.examples.micro.ring
+                                'discourje.examples.micro.star
+                                'discourje.examples.games.go-fish
+                                'discourje.examples.games.rock-paper-scissors
+                                'discourje.examples.games.tic-tac-toe}
                               program))
             (throw (ex-info "" {::message "Unknown program"})))
 
@@ -256,7 +256,7 @@
             (doseq [_ (range n)]
               (println (str "java -jar discourje-examples.jar run "
                             (name (:lib config)) " "
-                            (clojure.string/replace (str (:program config)) "discourje.core.async.examples." "") " "
+                            (clojure.string/replace (str (:program config)) "discourje.examples." "") " "
                             (:input config)))))))
 
       "chart"

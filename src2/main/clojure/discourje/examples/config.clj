@@ -1,4 +1,4 @@
-(ns discourje.core.async.examples.config)
+(ns discourje.examples.config)
 
 (def ^:dynamic *lib* nil)
 (def ^:dynamic *input* nil)

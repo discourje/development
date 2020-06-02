@@ -1,4 +1,4 @@
-(ns discourje.core.async.examples.timer
+(ns discourje.examples.timer
   (:refer-clojure :exclude [update longs quot]))
 
 ;;;;

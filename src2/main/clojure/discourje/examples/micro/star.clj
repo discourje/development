@@ -1,10 +1,10 @@
-(ns discourje.core.async.examples.micro.star
+(ns discourje.examples.micro.star
   (:require [clojure.core.async]
             [discourje.core.async]
-            [discourje.core.async.examples.config :as config]
-            [discourje.core.async.examples.timer :as timer]
             [discourje.core.util :as u]
-            [discourje.core.spec :as s]))
+            [discourje.core.spec :as s]
+            [discourje.examples.config :as config]
+            [discourje.examples.timer :as timer]))
 
 (config/clj-or-dcj)
 

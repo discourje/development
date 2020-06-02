@@ -1,8 +1,8 @@
-(ns discourje.core.async.examples.games.tic-tac-toe
+(ns discourje.examples.games.tic-tac-toe
   (:require [clojure.core.async]
             [discourje.core.async]
-            [discourje.core.async.examples.config :as config]
-            [discourje.core.spec :as s]))
+            [discourje.core.spec :as s]
+            [discourje.examples.config :as config]))
 
 (config/clj-or-dcj)
 
