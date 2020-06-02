@@ -1,4 +1,4 @@
-(ns discourje.spec.ast
+(ns discourje.core.spec.ast
   (:refer-clojure :exclude [sync send cat loop]))
 
 ;;;;

@@ -1,7 +1,7 @@
 (ns discourje.core.async-tests
   (:require [clojure.test :refer :all]
             [discourje.core.async :as a]
-            [discourje.spec :as s])
+            [discourje.core.spec :as s])
   (:import (clojure.lang ExceptionInfo)))
 
 (alias 'clj 'clojure.core.async)

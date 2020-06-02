@@ -1,5 +1,5 @@
 (ns discourje.core.async.impl.monitors
-  (:require [discourje.spec.lts :as lts]))
+  (:require [discourje.core.spec.lts :as lts]))
 
 (deftype Monitor [lts current-states flag])
 

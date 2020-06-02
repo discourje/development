@@ -2,7 +2,7 @@
   (:require [clojure.core.async]
             [discourje.core.async]
             [discourje.core.async.examples.config :as config]
-            [discourje.spec :as s]))
+            [discourje.core.spec :as s]))
 
 (config/clj-or-dcj)
 

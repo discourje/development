@@ -1,9 +1,8 @@
-(ns discourje.spec.mcrl2
-  (:require [discourje.spec :as s]
-            [discourje.spec.lts :as lts]
-            [clojure.string :refer [join]]
+(ns discourje.core.spec.mcrl2
+  (:require [clojure.string :refer [join]]
             [clojure.java.shell :refer [sh]]
-            [clojure.pprint :refer [pprint]])
+            [clojure.pprint :refer [pprint]]
+            [discourje.core.spec.lts :as lts])
   (:import (java.io File)))
 
 (def ^:dynamic *mcrl2-bin* nil)

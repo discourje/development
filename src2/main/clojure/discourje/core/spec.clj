@@ -1,10 +1,10 @@
-(ns discourje.spec
+(ns discourje.core.spec
   (:gen-class)
   (:refer-clojure :exclude [if do let loop cat * + apply count empty? disj])
   (:require [clojure.walk :as w]
-            [discourje.spec.ast :as ast]))
+            [discourje.core.spec.ast :as ast]))
 
-(require '[discourje.spec :as s])
+(require '[discourje.core.spec :as s])
 
 (defn- smap [env]
   `(zipmap '~(keys env) [~@(keys env)]))
@@ -16,7 +16,7 @@
 (defn- desugared-predicate [form]
   (cond
     ;; form ::= (predicate expr)
-    (and (seq? form) (= 'discourje.spec.ast/predicate (first (macroexpand form))))
+    (and (seq? form) (= 'discourje.core.spec.ast/predicate (first (macroexpand form))))
     form
 
     ;; form ::= x
@@ -29,7 +29,7 @@
 (defn- desugared-role [form]
   (cond
     ;; form ::= (role name-expr index-exprs)
-    (and (seq? form) (= 'discourje.spec.ast/role (first (macroexpand form))))
+    (and (seq? form) (= 'discourje.core.spec.ast/role (first (macroexpand form))))
     form
 
     ;; form ::= (name-expr index-expr1 index-expr2 ...)

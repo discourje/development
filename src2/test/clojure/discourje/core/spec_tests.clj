@@ -1,7 +1,7 @@
-(ns discourje.spec-tests
+(ns discourje.core.spec-tests
   (:require [clojure.test :refer :all]
-            [discourje.spec :as s]
-            [discourje.spec.lts :as lts]))
+            [discourje.core.spec :as s]
+            [discourje.core.spec.lts :as lts]))
 
 (defn msg [lts1 lts2]
   (str "\n *** lts1 ***\n\n" lts1 "\n\n *** lts2 ***\n\n" lts2 "\n"))
@@ -670,8 +670,8 @@
 
   (let [lts1 (lts/lts (s/loop swap [;; Unfortunately, cannot bind to (s/role ::alice) and (s/role ::bob).
                                     ;; See: https://stackoverflow.com/questions/40161751
-                                    r1 (discourje.spec/role ::alice)
-                                    r2 (discourje.spec/role ::bob)]
+                                    r1 (discourje.core.spec/role ::alice)
+                                    r2 (discourje.core.spec/role ::bob)]
                               (s/-->> r1 r2)
                               (s/-->> r2 r1)
                               (s/recur swap r2 r1)))
@@ -822,14 +822,14 @@
 (deftest apply-tests
   (let [lts1 (lts/lts (s/session ::s/-->>not [;; Code needs to be passed quoted
                                               'Long
-                                              (discourje.spec/role ::alice)
-                                              (discourje.spec/role ::bob)]))
+                                              (discourje.core.spec/role ::alice)
+                                              (discourje.core.spec/role ::bob)]))
         lts2 (lts/lts (s/graph des (0, 2, 3)
                                (0, "!((fn [x] (not= (type x) Long)),alice,bob)", 1)
                                (1, "?(alice,bob)", 2)))]
     (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
-  (let [lts1 (lts/lts (s/session ::s/pipe [(discourje.spec/predicate Long) ::alice 10 14]))
+  (let [lts1 (lts/lts (s/session ::s/pipe [(discourje.core.spec/predicate Long) ::alice 10 14]))
         lts2 (lts/lts (s/graph des (0, 6, 7)
                                (0, "!(Long,alice[10],alice[11])", 1)
                                (1, "?(alice[10],alice[11])", 2)
@@ -839,7 +839,7 @@
                                (5, "?(alice[12],alice[13])", 6)))]
     (is (lts/bisimilar? lts1 lts2) (msg lts1 lts2)))
 
-  (let [lts1 (lts/lts (s/session ::s/pipe [(discourje.spec/predicate Long) ::alice 4]))
+  (let [lts1 (lts/lts (s/session ::s/pipe [(discourje.core.spec/predicate Long) ::alice 4]))
         lts2 (lts/lts (s/graph des (0, 6, 7)
                                (0, "!(Long,alice[0],alice[1])", 1)
                                (1, "?(alice[0],alice[1])", 2)

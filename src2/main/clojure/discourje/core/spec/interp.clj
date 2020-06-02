@@ -1,13 +1,13 @@
-(ns discourje.spec.interp
+(ns discourje.core.spec.interp
   (:refer-clojure :exclude [eval])
   (:require [clojure.walk :as w]
-            [discourje.spec.ast :as ast]))
+            [discourje.core.spec.ast :as ast]))
 
 (def ^:dynamic *hist* nil)
 
 (defn eval [expr]
   (clojure.core/eval (if *hist*
-                       (w/postwalk-replace {'&hist 'discourje.spec.interp/*hist*} expr)
+                       (w/postwalk-replace {'&hist 'discourje.core.spec.interp/*hist*} expr)
                        expr)))
 
 (defonce ^:private eval-predicate-cache (atom (hash-map)))
