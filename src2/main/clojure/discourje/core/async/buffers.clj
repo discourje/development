@@ -1,4 +1,4 @@
-(ns discourje.core.async.impl.buffers
+(ns discourje.core.async.buffers
   (:refer-clojure :exclude [type]))
 
 (deftype Buffer [type n])

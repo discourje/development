@@ -1,9 +1,9 @@
 (ns discourje.core.async
   (:gen-class)
   (:require [clojure.core.async :as a]
-            [discourje.core.async.impl.buffers :as buffers]
-            [discourje.core.async.impl.channels :as channels]
-            [discourje.core.async.impl.monitors :as monitors]
+            [discourje.core.async.buffers :as buffers]
+            [discourje.core.async.channels :as channels]
+            [discourje.core.async.monitors :as monitors]
             [discourje.core.spec.lts :as lts]))
 
 (defn monitor [spec & {:keys [on-the-fly history]
