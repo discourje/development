@@ -1,4 +1,4 @@
-package discourje.lts;
+package discourje.core.lts;
 
 public interface State<Spec> {
 

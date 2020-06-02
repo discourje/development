@@ -1,4 +1,4 @@
-package discourje.lts;
+package discourje.core.lts;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;

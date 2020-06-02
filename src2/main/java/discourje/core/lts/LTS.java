@@ -1,4 +1,4 @@
-package discourje.lts;
+package discourje.core.lts;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
