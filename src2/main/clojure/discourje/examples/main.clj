@@ -240,7 +240,11 @@
                                 'discourje.examples.micro.star
                                 'discourje.examples.games.go-fish
                                 'discourje.examples.games.rock-paper-scissors
-                                'discourje.examples.games.tic-tac-toe}
+                                'discourje.examples.games.tic-tac-toe
+                                'discourje.examples.npb3.cg
+                                'discourje.examples.npb3.ft
+                                'discourje.examples.npb3.is
+                                'discourje.examples.npb3.mg}
                               program))
             (throw (ex-info "" {::message "Unknown program"})))
 
@@ -298,7 +302,11 @@
               (println (str "Error: " (::message m)))
               (println (str "Usage 1: java -jar discourje-examples.jar run <lib> <program> <input>"))
               (println (str "  <lib>     \u2208 {clj, dcj, dcj-nil}"))
-              (println (str "  <program> \u2208 {micro.mesh, micro.ring, micro.star, games.go-fish, games.rock-paper-scissors, games.tic-tac-toe}"))
+              (println (str "  <program> \u2208 {"
+                            (join ", " ["micro.mesh" "micro.ring" "micro.star"
+                                        "games.go-fish" "games.rock-paper-scissors" "games.tic-tac-toe"
+                                        "npb3.cg" "npb3.ft" "npb3.is" "npb3.mg"])
+                            "}"))
               (println (str "Usage 2: java -jar discourje-examples.jar script <n> <configs>"))
               (println (str "Usage 3: java -jar discourje-examples.jar chart <data>"))
               (println (str "Usage 4: java -jar discourje-examples.jar experiment <n> <configs>")))
