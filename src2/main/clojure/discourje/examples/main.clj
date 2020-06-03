@@ -238,6 +238,7 @@
           (if (not (contains? #{'discourje.examples.micro.mesh
                                 'discourje.examples.micro.ring
                                 'discourje.examples.micro.star
+                                'discourje.examples.games.chess
                                 'discourje.examples.games.go-fish
                                 'discourje.examples.games.rock-paper-scissors
                                 'discourje.examples.games.tic-tac-toe
@@ -304,7 +305,7 @@
               (println (str "  <lib>     \u2208 {clj, dcj, dcj-nil}"))
               (println (str "  <program> \u2208 {"
                             (join ", " ["micro.mesh" "micro.ring" "micro.star"
-                                        "games.go-fish" "games.rock-paper-scissors" "games.tic-tac-toe"
+                                        "games.chess" "games.go-fish" "games.rock-paper-scissors" "games.tic-tac-toe"
                                         "npb3.cg" "npb3.ft" "npb3.is" "npb3.mg"])
                             "}"))
               (println (str "Usage 2: java -jar discourje-examples.jar script <n> <configs>"))

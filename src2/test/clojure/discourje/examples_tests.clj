@@ -75,6 +75,13 @@
                        {}))
   (is true)
 
+  ;; Chess
+
+  (print (main/run-all [:clj :dcj]
+                       ['discourje.examples.games.chess]
+                       {:os ['mac] :turns-per-player [1] :time-per-player [0]}))
+  (is true)
+
   ;; Rock-Paper-Scissors
 
   (print (main/run-all [:clj :dcj]
