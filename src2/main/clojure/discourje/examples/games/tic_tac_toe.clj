@@ -14,14 +14,14 @@
 (s/defrole ::bob)
 
 (s/defsession ::tic-tac-toe []
-              (s/alt (::tic-tac-toe-turn ::alice ::bob)
-                     (::tic-tac-toe-turn ::bob ::alice)))
+  (s/alt (::tic-tac-toe-turn ::alice ::bob)
+         (::tic-tac-toe-turn ::bob ::alice)))
 
 (s/defsession ::tic-tac-toe-turn [r1 r2]
-              (s/--> Long r1 r2)
-              (s/alt (::tic-tac-toe-turn r2 r1)
-                     (s/par (s/close r1 r2)
-                            (s/close r2 r1))))
+  (s/--> Long r1 r2)
+  (s/alt (::tic-tac-toe-turn r2 r1)
+         (s/par (s/close r1 r2)
+                (s/close r2 r1))))
 
 ;;;;
 ;;;; Implementation
