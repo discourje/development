@@ -91,5 +91,6 @@
         ;; Stop timer
         end (System/nanoTime)]
 
+    (Config/verbose true)
     (set! config/*output* output)
     (set! config/*time* (- end begin))))
