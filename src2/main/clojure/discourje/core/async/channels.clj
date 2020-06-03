@@ -163,8 +163,8 @@
 (defn >!!
   [channel message]
   {:pre [(channel? channel)]}
-  (>!!-step1 channel)
-  (>!!-step2 channel message))
+  (if (>!!-step1 channel)
+    (>!!-step2 channel message)))
 
 (defn <!!-step1
   [channel]
@@ -205,8 +205,8 @@
 (defn <!!
   [channel]
   {:pre [(channel? channel)]}
-  (<!!-step1 channel)
-  (<!!-step2 channel))
+  (if (<!!-step1 channel)
+    (<!!-step2 channel)))
 
 ;;;;
 ;;;; >! and <!
