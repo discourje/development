@@ -27,27 +27,14 @@
 ;;;; Implementation
 ;;;;
 
-(defn set-stockfish-path [os]
-  (set! Engine/STOCKFISH
-        (str (System/getProperty "user.dir") "/"
-             "src2/main/java/"
-             "discourje/examples/games/impl/chess/"
-             (cond (= os "linux")
-                   "stockfish-linux"
-                   (= os "mac")
-                   "stockfish-mac"
-                   (= os "win32")
-                   "stockfish-win32.exe"
-                   (= os "win64'")
-                   "stockfish-win64.exe"))))
-
 (let [input config/*input*
       _ (:resolution input)
-      os (:os input)
+      stockfish (:stockfish input)
       turns-per-player (:turns-per-player input)
       time-per-player (:time-per-player input)]
 
-  (set-stockfish-path (str os))
+  ;; Configure Engine
+  (if stockfish (set! Engine/STOCKFISH stockfish))
   (if turns-per-player (set! Engine/TURNS_PER_PLAYER turns-per-player))
   (if time-per-player (set! Engine/TIME_PER_PLAYER time-per-player))
 

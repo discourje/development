@@ -66,6 +66,19 @@
                        {:buffered [false] :ordered-sends [false] :k [2] :secs [0]}))
   (is true))
 
+(defn- stockfish [os]
+  (str (System/getProperty "user.dir") "/"
+       "src/main/java/"
+       "discourje/examples/games/impl/chess/"
+       (cond (= os "linux")
+             "stockfish-linux"
+             (= os "mac")
+             "stockfish-mac"
+             (= os "win32")
+             "stockfish-win32.exe"
+             (= os "win64'")
+             "stockfish-win64.exe")))
+
 (deftest games-tests
 
   ;; Tic-Tac-Toe
@@ -79,7 +92,7 @@
 
   (print (main/run-all [:clj :dcj]
                        ['discourje.examples.games.chess]
-                       {:os ['mac] :turns-per-player [1] :time-per-player [0]}))
+                       {:stockfish [(stockfish "mac")] :turns-per-player [1] :time-per-player [0]}))
   (is true)
 
   ;; Rock-Paper-Scissors
