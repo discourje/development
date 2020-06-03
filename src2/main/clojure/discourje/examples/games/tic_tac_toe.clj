@@ -36,45 +36,40 @@
    blank blank blank
    blank blank blank])
 
-(def get-blank
-  (fn [g]
-    (loop [i (long (rand-int 9))]
-      (if (= (nth g i) blank)
-        i
-        (recur (mod (inc i) 9))))))
+(defn get-blank [g]
+  (loop [i (long (rand-int 9))]
+    (if (= (nth g i) blank)
+      i
+      (recur (mod (inc i) 9)))))
 
-(def put
-  (fn [g i x-or-o]
-    (try (assoc g i x-or-o)
-         (catch Exception e (println g i x-or-o) (.printStackTrace e)))))
+(defn put [g i x-or-o]
+  (assoc g i x-or-o))
 
-(def not-final?
-  (fn [g]
-    (and (loop [i 0]
-           (cond (= (nth g i) blank) true
-                 (= i 8) false
-                 :else (recur (inc i))))
-         (every? #(= false %) (for [l [(set [(nth g 0) (nth g 1) (nth g 2)])
-                                       (set [(nth g 3) (nth g 4) (nth g 5)])
-                                       (set [(nth g 6) (nth g 7) (nth g 8)])
-                                       (set [(nth g 0) (nth g 3) (nth g 6)])
-                                       (set [(nth g 1) (nth g 4) (nth g 7)])
-                                       (set [(nth g 2) (nth g 5) (nth g 8)])
-                                       (set [(nth g 0) (nth g 4) (nth g 8)])
-                                       (set [(nth g 2) (nth g 4) (nth g 6)])]]
-                                (and (= (count l) 1) (not= (first l) blank)))))))
+(defn not-final? [g]
+  (and (loop [i 0]
+         (cond (= (nth g i) blank) true
+               (= i 8) false
+               :else (recur (inc i))))
+       (every? #(= false %) (for [l [(set [(nth g 0) (nth g 1) (nth g 2)])
+                                     (set [(nth g 3) (nth g 4) (nth g 5)])
+                                     (set [(nth g 6) (nth g 7) (nth g 8)])
+                                     (set [(nth g 0) (nth g 3) (nth g 6)])
+                                     (set [(nth g 1) (nth g 4) (nth g 7)])
+                                     (set [(nth g 2) (nth g 5) (nth g 8)])
+                                     (set [(nth g 0) (nth g 4) (nth g 8)])
+                                     (set [(nth g 2) (nth g 4) (nth g 6)])]]
+                              (and (= (count l) 1) (not= (first l) blank))))))
 
-(def println-grid
-  (fn [g]
-    (println)
-    (println "+---+---+---+")
-    (println "|" (nth g 0) "|" (nth g 1) "|" (nth g 2) "|")
-    (println "+---+---+---+")
-    (println "|" (nth g 3) "|" (nth g 4) "|" (nth g 5) "|")
-    (println "+---+---+---+")
-    (println "|" (nth g 6) "|" (nth g 7) "|" (nth g 8) "|")
-    (println "+---+---+---+")
-    (println)))
+(defn println-grid [g]
+  (println)
+  (println "+---+---+---+")
+  (println "|" (nth g 0) "|" (nth g 1) "|" (nth g 2) "|")
+  (println "+---+---+---+")
+  (println "|" (nth g 3) "|" (nth g 4) "|" (nth g 5) "|")
+  (println "+---+---+---+")
+  (println "|" (nth g 6) "|" (nth g 7) "|" (nth g 8) "|")
+  (println "+---+---+---+")
+  (println))
 
 (let [input config/*input*
       _ (:resolution input)]
@@ -89,10 +84,10 @@
         ;; Link monitor [optional]
         _
         (if (= config/*lib* :dcj)
-          (let [s (s/session ::tic-tac-toe [])
+          (let [s (tic-tac-toe)
                 m (a/monitor s)]
-            (a/link a->b (s/role ::alice) (s/role ::bob) m)
-            (a/link b->a (s/role ::bob) (s/role ::alice) m)))
+            (a/link a->b alice bob m)
+            (a/link b->a bob alice m)))
 
         ;; Spawn threads
         alice
