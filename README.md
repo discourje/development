@@ -1,7 +1,14 @@
-<b>Discourje</b>
+*(The content below should be updated.)*
 
-<b>Introduction:</b>
--
+# Discourje
+
+> [**discourse**](https://www.lexico.com/definition/discourse) /ˈdɪskɔːs/<br>
+> **1** Written or spoken communication or debate.<br>
+> &nbsp;&nbsp;**1.1** A formal discussion of a topic in speech or writing.<br>
+> &nbsp;&nbsp;**1.2** A connected series of utterances; a text or conversation.
+
+## Introduction
+
 Discourje is a library to describe communication between systems as protocols.
 A protocol acts as an agreement on how participants interact with each other.
 All communication between participants is monitored by the protocol to ensure the correct flow of communication.
@@ -10,16 +17,6 @@ When participants deviate from the specified protocol the communication will be 
 Discourje is written in Clojure (v1.10.1) and is built as an abstraction layer on clojure.core.async.
 Discourje extends Core.async channels, put and take functions with validation logic to verify if the correct communication flow is followed. 
 Communication is blocking when desired (configure logging levels) and order among messages, and on channels is preserved.
-
-### Name
-Name: <b>Discourje</b>
-discourse [noun dis-kawrs, -kohrs, dis-kawrs, -kohrs; verb dis-kawrs, -kohrs]
-
-1 - communication of thought by words; talk; conversation: earnest and intelligent discourse.
-
-2 - a formal discussion of a subject in speech or writing, as a dissertation, treatise, sermon, etc.
-
-3 - Linguistics. any unit of connected speech or writing longer than a sentence.
 
 <b>Current supported functionality:</b>
 - 
@@ -45,8 +42,7 @@ This simple protocol embeds all fundamental functionality a protocol language sh
 
 <i>See [TwoBuyerProtocol](src/discourje/TwoBuyerProtocol) for implementation.</i> 
 
-<b>Usage</b>
--
+## Usage
 
 Using Discourje takes three simple steps:
 - Define message exchange pattern
@@ -104,8 +100,8 @@ See [Logging](src/discourje/examples/logging.clj) for an example.
 
 <i>*Logging levels are set as global configurations!</i>
 
-Example: Hello World
--
+## Example: Hello World
+
 ```clojure
 ;"This function will generate a mep with 1 interaction to send and receive the hello world string message and a close."
 (def message-exchange-pattern
