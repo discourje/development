@@ -1,6 +1,4 @@
 <b>Discourje</b>
--
-- [Library Name](LibraryName.md)
 
 <b>Introduction:</b>
 -
@@ -12,6 +10,16 @@ When participants deviate from the specified protocol the communication will be 
 Discourje is written in Clojure (v1.10.1) and is built as an abstraction layer on clojure.core.async.
 Discourje extends Core.async channels, put and take functions with validation logic to verify if the correct communication flow is followed. 
 Communication is blocking when desired (configure logging levels) and order among messages, and on channels is preserved.
+
+### Name
+Name: <b>Discourje</b>
+discourse [noun dis-kawrs, -kohrs, dis-kawrs, -kohrs; verb dis-kawrs, -kohrs]
+
+1 - communication of thought by words; talk; conversation: earnest and intelligent discourse.
+
+2 - a formal discussion of a subject in speech or writing, as a dissertation, treatise, sermon, etc.
+
+3 - Linguistics. any unit of connected speech or writing longer than a sentence.
 
 <b>Current supported functionality:</b>
 - 
