@@ -35,9 +35,11 @@
   (if (empty? statss)
     nil
     (let [n (reduce + (map #(:n %) statss))]
+      (println "FOOOOOO" n)
       (assoc (stats) :n n
-                     :big-m (reduce + (map #(* (/ (:n %) n) (:big-m %)) statss))
-                     :big-s (/ (reduce + (map #(* (dec (:n %)) (:big-s %)) statss)) (- n (count statss)))
+                     :big-m (if (> n 0) (reduce + (map #(* (/ (:n %) n) (:big-m %)) statss)))
+                     :big-s (if (> n (count statss))
+                              (/ (reduce + (map #(* (dec (:n %)) (:big-s %)) statss)) (- n (count statss))))
                      :x-min (apply min (map #(:x-min %) statss))
                      :x-max (apply max (map #(:x-max %) statss))))))
 
@@ -71,8 +73,7 @@
     {:ticks     (:ticks t)
      :stats     {:n     (:n stats)
                  :μ-hat (long (:big-m stats))
-                 :σ-hat (if (= (:n stats) 1)
-                          nil
+                 :σ-hat (if (and (:bis-s stats) (> (:n stats) 1))
                           (long (Math/sqrt (/ (:big-s stats) (dec (:n stats))))))
                  :x-min (:x-min stats)
                  :x-max (:x-max stats)}

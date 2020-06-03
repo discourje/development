@@ -54,12 +54,14 @@
                                                         (u/takes mesh (remove #{i} (range k)) i)
                                                         [(a/timeout 100)]])
                                      deadline (+ begin (* secs 1000 1000 1000))]
-                                 (loop [timer (timer/timer resolution)]
-                                   (if (< (System/nanoTime) deadline)
-                                     (if (first (a/alts!! acts))
-                                       (recur (timer/tick timer))
-                                       (recur timer))
-                                     timer)))))
+                                 (loop [not-done true
+                                        timer (timer/timer resolution)]
+                                   (let [[v _] (a/alts!! acts)]
+                                     (if not-done
+                                       (if v
+                                         (recur (< (System/nanoTime) deadline) (timer/tick timer))
+                                         (recur (< (System/nanoTime) deadline) timer))
+                                       timer))))))
              (range k))
 
         ;; Await termination
