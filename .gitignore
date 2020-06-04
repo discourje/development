@@ -11,11 +11,8 @@ pom.xml.asc
 .hg/
 
 .idea/workspace.xml
-.idea/replstate.xml
-.idea/inspectionProfiles/Project_Default.xml
-.idea/dictionaries
+.idea/usage.statistics.xml
+.idea/tasks.xml
 .idea/shelf
-.idea/libraries
-.idea/modules
-.idea/gradle_extensions.xml
+
 *.iml
