@@ -3,6 +3,14 @@
             [discourje.async.protocolTestData :refer :all]
             [discourje.core.async :refer :all]))
 
+;;;; Sung: Moved here from macroTests.clj
+(deftest create-channel-test
+  (let [fnChan (generate-channel "a" "b" 1)
+        macroChan (chan "a" "b" 1)]
+    (is (= (get-provider fnChan) (get-provider macroChan)))
+    (is (= (get-consumer fnChan) (get-consumer macroChan)))
+    (is (= (get-buffer fnChan) (get-buffer macroChan)))))
+
 (deftest equal-senders-test
   (let [chans[(new-channel 1 2 nil 1 nil)
          (new-channel 1 3 nil 1 nil)

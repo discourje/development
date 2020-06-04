@@ -1,9 +1,14 @@
-<b>Discourje</b>
--
-- [Library Name](LibraryName.md)
+*(The content below should be updated.)*
 
-<b>Introduction:</b>
--
+# Discourje
+
+> [**discourse**](https://www.lexico.com/definition/discourse) /ˈdɪskɔːs/<br>
+> **1** Written or spoken communication or debate.<br>
+> &nbsp;&nbsp;**1.1** A formal discussion of a topic in speech or writing.<br>
+> &nbsp;&nbsp;**1.2** A connected series of utterances; a text or conversation.
+
+## Introduction
+
 Discourje is a library to describe communication between systems as protocols.
 A protocol acts as an agreement on how participants interact with each other.
 All communication between participants is monitored by the protocol to ensure the correct flow of communication.
@@ -37,8 +42,7 @@ This simple protocol embeds all fundamental functionality a protocol language sh
 
 <i>See [TwoBuyerProtocol](src/discourje/TwoBuyerProtocol) for implementation.</i> 
 
-<b>Usage</b>
--
+## Usage
 
 Using Discourje takes three simple steps:
 - Define message exchange pattern
@@ -96,8 +100,8 @@ See [Logging](src/discourje/examples/logging.clj) for an example.
 
 <i>*Logging levels are set as global configurations!</i>
 
-Example: Hello World
--
+## Example: Hello World
+
 ```clojure
 ;"This function will generate a mep with 1 interaction to send and receive the hello world string message and a close."
 (def message-exchange-pattern
