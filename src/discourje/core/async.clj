@@ -106,15 +106,42 @@
      (log-error :invalid-channels "Cannot generate infrastructure, make sure all supplied channels implement the `transportable' protocol!"))))
 
 (defmacro go
-  "Clojure.core.async go macro"
+  "Discourje.core.async go macro"
   [& body]
   `(async/go ~@body))
+
+(defmacro go-loop
+  "Like (go (loop ...))"
+  [bindings & body]
+  `(async/go-loop ~bindings ~@body))
 
 (defn- allow-send!!
   "Allow send message in channel"
   [channel message]
   (async/>!! (get-chan channel) message)
   (release-take channel)
+  channel)
+
+(defn- allow-put!
+  "Allow send message in channel"
+  [channel message callback on-caller?]
+  (async/put! (get-chan channel) message (fn [x] (do (release-take channel) (callback x))) on-caller?)
+  channel)
+
+(defn- allow-puts!
+  "Allow sending message on multiple channels"
+  [channels message callback on-caller?]
+  (let [counter (atom 0)
+        synchronize-fn (fn [x] (do (swap! counter inc)
+                                   (when (== @counter (count channels))
+                                     (callback true))))]
+    (doseq [c channels] (do (acquire-put c) (async/put! (get-chan c) message (fn [x] (do (release-take c) (synchronize-fn x))) on-caller?)))
+    channels))
+
+(defn- allow-take!
+  "Allow a take! on the channel"
+  [channel callback on-caller?]
+  (async/take! (get-chan channel) (fn [channel-val] (do (release-put channel) (callback channel-val))) on-caller?)
   channel)
 
 (defn- allow-receive!!
@@ -180,7 +207,7 @@
       (log-error :incorrect-communication "Trying to send in multicast, but the monitor is not correct for all channels!" (to-string first-chan) message))))
 
 (defn- >E!! [channels message]
-  "Send in multicast"
+  "Send in multicast, blocking"
   (do (loop []
         (when (can-puts? channels) (recur)))
       (loop [send-result (validate-multicast channels message)]
@@ -188,8 +215,17 @@
           (allow-sends!! channels message)
           (recur (validate-multicast channels message))))))
 
+(defn- put-multicast! [channels message callback on-caller?]
+  "Send in multicast, put!"
+  (do (loop []
+        (when (can-puts? channels) (recur)))
+      (loop [send-result (validate-multicast channels message)]
+        (if send-result
+          (allow-puts! channels message callback on-caller?)
+          (recur (validate-multicast channels message))))))
+
 (defmacro >E! [channels message]
-  "Send in multicast"
+  "Send in multicast, in go-block"
   `(do (loop []
          (when (can-puts? ~channels) (recur)))
        (loop [~'send-result (validate-multicast ~channels ~message)]
@@ -202,7 +238,7 @@
            (recur (validate-multicast ~channels ~message))))))
 
 (defn >!!
-  "Put on channel"
+  "Put on channel blocking"
   [channel message]
   (if (vector? channel)
     (>E!! channel message)
@@ -213,7 +249,7 @@
             (recur (validate-send channel message)))))))
 
 (defmacro >!
-  "Put on channel"
+  "Put on channel, in go-block"
   [channel message]
   `(if (vector? ~channel)
      (>E! ~channel ~message)
@@ -225,8 +261,38 @@
                  ~channel)
              (recur (validate-send ~channel ~message)))))))
 
+(defn put!
+  "Put on channel, with callback"
+  ([channel message]
+   (put! channel message nil))
+  ([channel message callback] (put! channel message callback true))
+  ([channel message callback on-caller?]
+   (if (vector? channel)
+     (put-multicast! channel message callback on-caller?)
+     (do (acquire-put channel)
+         (loop [send-result (validate-send channel message)]
+           (if send-result
+             (allow-put! channel message callback on-caller?)
+             (recur (validate-send channel message))))))
+   ))
+
+(defn take!
+  "Take from channel, with callback"
+  ([channel callback] (take! channel callback true))
+  ([channel callback on-caller?]
+   (do (acquire-take channel)
+       (if (nil? (get-active-interaction (get-monitor channel)))
+         (log-error :invalid-monitor "Please activate a monitor, your protocol has not yet started, or it is already finished!")
+         (let [result (peek-channel (get-chan channel))
+               valid-interaction (valid-receive? (get-monitor channel) (get-provider channel) (get-consumer channel) result)]
+           (if-not (is-valid-for-swap? valid-interaction)
+             (log-error :incorrect-communication (format "Atomic-receive communication invalid! sender: %s, receiver: %s with message %s , while active interaction is: %s" (get-provider channel) (get-consumer channel) result (to-string (get-active-interaction (get-monitor channel)))))
+             (do (apply-receive! (get-monitor channel) (get-valid valid-interaction) (get-pre-swap valid-interaction) (get-provider channel) (get-consumer channel) result)
+                 (allow-take! channel callback on-caller?))))))
+   ))
+
 (defn <!!
-  "take form channel"
+  "take form channel blocking"
   [channel]
   (do (acquire-take channel)
       (if (nil? (get-active-interaction (get-monitor channel)))
@@ -240,7 +306,7 @@
                 result))))))
 
 (defmacro <!
-  "take form channel"
+  "take form channel, in go-block"
   [channel]
   `(do (acquire-take ~channel)
        (if (nil? (get-active-interaction (get-monitor ~channel)))
@@ -254,7 +320,8 @@
                  (release-put ~channel)
                  ~'result))))))
 (defn <!!!
-  "take form channel peeking, and delay receive when parallel"
+  "take from channel (blocking) peeking, and delay receive when parallel
+  This synchronizes all receives in a multi-cast"
   [channel]
   (do (acquire-take channel)
       (if (nil? (get-active-interaction (get-monitor channel)))

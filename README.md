@@ -28,6 +28,7 @@ Communication is blocking when desired (configure logging levels) and order amon
 - Validation on closing channels, all examples implement this!
 - Nesting: Parallelism, Recursion and Branching constructs support nesting!
 - Clojure.core.async `go-block` support!
+- Clojure.core.async `put!` & `take!` support!
 
 <i>See examples for each function for more info.</i>
 
@@ -67,6 +68,8 @@ Step 3: Use Discourje put & take abstractions
 - <b><!!! [channel]</b>:  Take operation of channel when used with multicast it blocks until all receivers in the multicast have received their values.
 - <b>>! [channel(s) message]</b>: Go-block Put macro on channel(s), channels can be a vector of channels to support multicast.
 - <b><! [channel]</b>:  Go-block Take macro.
+- <b>put! [channel message callback on-caller?]</b>: Discourje version of Clojure.core.async.put! function with callbacks. Supports all arities that core.async offers.
+- <b>take! [channel callback on-caller?]</b>:  Discourje version of Clojure.core.async.take! function with callbacks. Supports all arities that core.async offers.
 
 Logging
 -
