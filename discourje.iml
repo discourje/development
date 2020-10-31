@@ -9,6 +9,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/clojure" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/resources" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/clojure" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
@@ -16,6 +17,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Leiningen: clojure-complete:0.2.5" level="project" />
     <orderEntry type="library" name="Leiningen: nrepl:0.6.0" level="project" />
+    <orderEntry type="library" name="Leiningen: org.apiguardian/apiguardian-api:1.1.0" level="project" />
     <orderEntry type="library" name="Leiningen: org.clojure/clojure:1.10.1" level="project" />
     <orderEntry type="library" name="Leiningen: org.clojure/core.async:0.4.500" level="project" />
     <orderEntry type="library" name="Leiningen: org.clojure/core.cache:0.6.5" level="project" />
@@ -27,6 +29,13 @@
     <orderEntry type="library" name="Leiningen: org.clojure/tools.analyzer:0.6.9" level="project" />
     <orderEntry type="library" name="Leiningen: org.clojure/tools.nrepl:0.2.13" level="project" />
     <orderEntry type="library" name="Leiningen: org.clojure/tools.reader:1.0.0-beta4" level="project" />
+    <orderEntry type="library" name="Leiningen: org.junit.jupiter/junit-jupiter-api:5.7.0" level="project" />
+    <orderEntry type="library" name="Leiningen: org.junit.jupiter/junit-jupiter-engine:5.7.0" level="project" />
+    <orderEntry type="library" name="Leiningen: org.junit.jupiter/junit-jupiter-params:5.7.0" level="project" />
+    <orderEntry type="library" name="Leiningen: org.junit.jupiter/junit-jupiter:5.7.0" level="project" />
+    <orderEntry type="library" name="Leiningen: org.junit.platform/junit-platform-commons:1.7.0" level="project" />
+    <orderEntry type="library" name="Leiningen: org.junit.platform/junit-platform-engine:1.7.0" level="project" />
+    <orderEntry type="library" name="Leiningen: org.opentest4j/opentest4j:1.2.0" level="project" />
     <orderEntry type="library" name="Leiningen: org.ow2.asm/asm-all:4.2" level="project" />
     <orderEntry type="library" name="Leiningen: str-to-argv:0.1.1" level="project" />
   </component>
