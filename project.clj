@@ -27,6 +27,8 @@
                                         discourje.core.spec
                                         discourje.examples.main]
                          :uberjar-name "discourje-examples.jar"}
-             :dev       {:dependencies [[org.junit.jupiter/junit-jupiter "5.7.0"]]}})
+             :dev       {:dependencies [
+                                        [org.junit.jupiter/junit-jupiter "5.7.0"]
+                                        [org.mockito/mockito-all "1.10.19"]]}})
 
 ;; $ lein with-profile examples uberjar

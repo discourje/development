@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Leiningen: org.mockito/mockito-all:1.10.19">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mockito/mockito-all/1.10.19/mockito-all-1.10.19.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mockito/mockito-all/1.10.19/mockito-all-1.10.19-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

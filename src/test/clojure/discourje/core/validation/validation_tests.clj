@@ -8,45 +8,52 @@
             [discourje.core.validation.message-to-self :as mts]
             [discourje.core.validation.send-after-close :as sac]
             [discourje.core.validation.unclosed-channels :as uc]
-            ))
+            )
+  (:import (discourje.core.validation DiscourjeModel)))
 
 (s/defrole ::white)
 (s/defrole ::black)
 
-(defn print-lts [protocol vars]
-  (let [lts (lts/lts (s/session protocol vars) :on-the-fly false :history true)
-        lts-size (.size (.getStates lts))]
-    (print (str protocol "; #states: " lts-size "\n"))
-    (is (> lts-size 0) )
+(defn print-lts [lts]
+  (let [dm (new DiscourjeModel lts)
+        lts-size (.size (.getStates lts))
+        dm-size (.size (.getStates dm))]
+    (print (str "lts-size: " lts-size "; dm-size: " dm-size "\n"))
+    (is (> lts-size 0))
     )
   )
 
-(deftest validite-test-cases-syntax
+(defn make-lts [protocol vars]
+  (lts/lts (s/session protocol vars) :on-the-fly false :history true))
 
-  (print-lts ::c/protocol-trivial-correct [])
-  (print-lts ::c/protocol-trivial-incorrect [])
-  (print-lts ::c/protocol-non-trivial-correct [])
-  (print-lts ::c/protocol-non-trivial-incorrect [])
-  (print-lts ::cmt/protocol-trivial-correct [])
-  (print-lts ::cmt/protocol-trivial-incorrect [])
-  (print-lts ::cmt/protocol-non-trivial-correct [])
-  (print-lts ::cmt/protocol-non-trivial-incorrect [])
-  (print-lts ::cuc/protocol-trivial-correct [])
-  (print-lts ::cuc/protocol-trivial-incorrect [])
-  (print-lts ::cuc/protocol-non-trivial-correct [])
-  (print-lts ::cuc/protocol-non-trivial-incorrect [])
-  (print-lts ::mts/protocol-trivial-correct [])
-  (print-lts ::mts/protocol-trivial-incorrect [])
-  (print-lts ::mts/protocol-non-trivial-correct [])
-  (print-lts ::mts/protocol-non-trivial-incorrect [])
-  (print-lts ::sac/protocol-trivial-correct [])
-  (print-lts ::sac/protocol-trivial-incorrect [])
-  (print-lts ::sac/protocol-non-trivial-correct [true])
-  (print-lts ::sac/protocol-non-trivial-incorrect [])
-  (print-lts ::uc/protocol-trivial-correct [])
-  (print-lts ::uc/protocol-trivial-incorrect [])
-  (print-lts ::uc/protocol-non-trivial-correct [])
-  (print-lts ::uc/protocol-non-trivial-incorrect [])
+(def lts-list (list
+                (make-lts ::c/protocol-trivial-correct [])
+                (make-lts ::c/protocol-trivial-incorrect [])
+                (make-lts ::c/protocol-non-trivial-correct [])
+                (make-lts ::c/protocol-non-trivial-incorrect [])
+                (make-lts ::cmt/protocol-trivial-correct [])
+                (make-lts ::cmt/protocol-trivial-incorrect [])
+                (make-lts ::cmt/protocol-non-trivial-correct [])
+                (make-lts ::cmt/protocol-non-trivial-incorrect [])
+                (make-lts ::cuc/protocol-trivial-correct [])
+                (make-lts ::cuc/protocol-trivial-incorrect [])
+                (make-lts ::cuc/protocol-non-trivial-correct [])
+                (make-lts ::cuc/protocol-non-trivial-incorrect [])
+                (make-lts ::mts/protocol-trivial-correct [])
+                (make-lts ::mts/protocol-trivial-incorrect [])
+                (make-lts ::mts/protocol-non-trivial-correct [])
+                (make-lts ::mts/protocol-non-trivial-incorrect [])
+                (make-lts ::sac/protocol-trivial-correct [])
+                (make-lts ::sac/protocol-trivial-incorrect [])
+                (make-lts ::sac/protocol-non-trivial-correct [true])
+                (make-lts ::sac/protocol-non-trivial-incorrect [])
+                (make-lts ::uc/protocol-trivial-correct [])
+                (make-lts ::uc/protocol-trivial-incorrect [])
+                (make-lts ::uc/protocol-non-trivial-correct [])
+                (make-lts ::uc/protocol-non-trivial-incorrect [])))
+
+(deftest validite-test-cases-syntax
+  (dorun (map print-lts lts-list))
   (is true)
   )
 
