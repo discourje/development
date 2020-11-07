@@ -52,6 +52,11 @@
                 (make-lts ::uc/protocol-non-trivial-correct [])
                 (make-lts ::uc/protocol-non-trivial-incorrect [])))
 
+(def send-after-close-trivial-correct (make-lts ::sac/protocol-trivial-correct []))
+(def send-after-close-trivial-incorrect (make-lts ::sac/protocol-trivial-incorrect []))
+(def send-after-close-non-trivial-correct (make-lts ::sac/protocol-non-trivial-correct [true]))
+(def send-after-close-non-trivial-incorrect (make-lts ::sac/protocol-non-trivial-incorrect []))
+
 (deftest validite-test-cases-syntax
   (dorun (map print-lts lts-list))
   (is true)

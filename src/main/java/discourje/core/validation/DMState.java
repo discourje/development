@@ -2,15 +2,20 @@ package discourje.core.validation;
 
 import discourje.core.lts.Action;
 import discourje.core.lts.State;
+import discourje.core.validation.operators.CtlOperator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class DMState<Spec> {
     private final State<Spec> state;
     private final Action action;
     private Collection<DMState<Spec>> transitions = new ArrayList<>();
+    private Collection<CtlOperator> labels = new ArrayList<>();
 
     public DMState(State<Spec> state, Action action) {
         this.state = state;
@@ -45,5 +50,30 @@ public class DMState<Spec> {
     @Override
     public int hashCode() {
         return Objects.hash(state, action);
+    }
+
+    public boolean addLabel(CtlOperator operator) {
+        if (labels.contains(operator)) {
+            return false;
+        } else {
+            return labels.add(operator);
+        }
+    }
+
+    public boolean hasLabel(CtlOperator operator) {
+        return labels.contains(operator);
+    }
+
+    public boolean successorsExistAndAllHaveLabel(CtlOperator operator) {
+        long successorsWithLabelCount = transitions.stream()
+                .filter(s -> s.hasLabel(operator))
+                .count();
+        int numSuccessors = transitions.size();
+        return numSuccessors > 0 && numSuccessors == successorsWithLabelCount;
+    }
+
+    public boolean anySuccessorHasLabel(CtlOperator operator) {
+        return transitions.stream()
+                .anyMatch(s -> s.hasLabel(operator));
     }
 }

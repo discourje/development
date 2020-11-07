@@ -1,5 +1,8 @@
 package discourje.core.validation.operators;
 
-interface CtlOperator {
+import discourje.core.validation.DiscourjeModel;
 
+public interface CtlOperator {
+
+    void label(DiscourjeModel<?> model);
 }

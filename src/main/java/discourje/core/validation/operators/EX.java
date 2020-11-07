@@ -3,26 +3,20 @@ package discourje.core.validation.operators;
 import discourje.core.validation.DMState;
 import discourje.core.validation.DiscourjeModel;
 
-class Not implements CtlOperator {
-
+public class EX implements CtlOperator {
     private final CtlOperator arg;
 
-    Not(CtlOperator args) {
-        this.arg = args;
+    public EX(CtlOperator arg) {
+        this.arg = arg;
     }
 
     @Override
     public void label(DiscourjeModel<?> model) {
         arg.label(model);
-
         for (DMState<?> state : model.getStates()) {
-            if (!state.hasLabel(arg)) {
+            if (state.anySuccessorHasLabel(arg)) {
                 state.addLabel(this);
             }
         }
-    }
-
-    public String toString() {
-        return "not(" + arg + ")";
     }
 }
