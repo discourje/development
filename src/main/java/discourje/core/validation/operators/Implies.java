@@ -4,7 +4,6 @@ import discourje.core.validation.DMState;
 import discourje.core.validation.DiscourjeModel;
 
 public class Implies implements CtlOperator {
-
     private CtlOperator lhs;
     private CtlOperator rhs;
 
@@ -23,5 +22,10 @@ public class Implies implements CtlOperator {
                 state.addLabel(this);
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return "(" + lhs + " --> " + rhs + ")";
     }
 }

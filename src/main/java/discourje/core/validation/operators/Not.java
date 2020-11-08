@@ -4,7 +4,6 @@ import discourje.core.validation.DMState;
 import discourje.core.validation.DiscourjeModel;
 
 class Not implements CtlOperator {
-
     private final CtlOperator arg;
 
     Not(CtlOperator args) {

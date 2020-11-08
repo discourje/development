@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 class Or implements CtlOperator {
-
     private final CtlOperator[] args;
 
     Or(CtlOperator... args) {
@@ -25,8 +24,8 @@ class Or implements CtlOperator {
     }
 
     public String toString() {
-        return "(" +
+        return String.format("(%s)",
                 Arrays.stream(args).map(Object::toString).collect(Collectors.joining(" v "))
-                + ")";
+        );
     }
 }

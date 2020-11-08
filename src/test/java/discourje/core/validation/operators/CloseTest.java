@@ -4,7 +4,6 @@ import discourje.core.lts.Action;
 import discourje.core.validation.DMState;
 import discourje.core.validation.DiscourjeModel;
 import org.junit.jupiter.api.Test;
-import static discourje.core.validation.operators.CtlFormulas.close;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -19,7 +18,7 @@ class CloseTest<S> extends AbstractOperatorTest<S> {
         DiscourjeModel<S> model = createModel(s1, s2);
 
         // execute
-        CtlOperator close = close("a", "b");
+        CtlOperator close = new Close("a", "b");
         close.label(model);
 
         // verify

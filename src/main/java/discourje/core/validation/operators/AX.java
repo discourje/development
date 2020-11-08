@@ -2,23 +2,26 @@ package discourje.core.validation.operators;
 
 import discourje.core.validation.DMState;
 import discourje.core.validation.DiscourjeModel;
-import java.util.Arrays;
 
-class And implements CtlOperator {
-    private final CtlOperator[] args;
+public class AX implements CtlOperator {
+    private final CtlOperator arg;
 
-    And(CtlOperator... args) {
-        this.args = args;
+    public AX(CtlOperator arg) {
+        this.arg = arg;
     }
 
     @Override
     public void label(DiscourjeModel<?> model) {
-        Arrays.stream(args).forEach(a -> a.label(model));
-
+        arg.label(model);
         for (DMState<?> state : model.getStates()) {
-            if (Arrays.stream(args).allMatch(state::hasLabel)) {
+            if (state.successorsExistAndAllHaveLabel(arg)) {
                 state.addLabel(this);
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return "AX(" + arg + ")";
     }
 }

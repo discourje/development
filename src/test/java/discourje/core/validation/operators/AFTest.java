@@ -51,6 +51,23 @@ class AFTest<S> extends AbstractOperatorTest<S> {
     }
 
     @Test
+    public void testValidOnOneShortPath() {
+        DMState<S> s1 = createState(Action.Type.SEND, "a", "b");
+        DMState<S> s2a = createState(Action.Type.CLOSE, "a", "b");
+        DMState<S> s2b = createState(Action.Type.SEND, "a", "b");
+
+        s1.addTransition(s2a);
+        s1.addTransition(s2b);
+
+        DiscourjeModel<S> model = createModel(s1, s2a, s2b);
+
+        AF af = new AF(close("a", "b"));
+        af.label(model);
+
+        assertFalse(s1.hasLabel(af));
+    }
+
+    @Test
     public void testValidOnOnePath() {
         DMState<S> s1 = createState(Action.Type.SEND, "a", "b");
         DMState<S> s2a = createState(Action.Type.SEND, "a", "b");

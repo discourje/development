@@ -15,5 +15,4 @@ class First implements CtlOperator {
             }
         }
     }
-
 }

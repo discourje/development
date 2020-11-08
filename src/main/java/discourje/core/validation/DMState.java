@@ -6,16 +6,13 @@ import discourje.core.validation.operators.CtlOperator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
 
 public class DMState<Spec> {
     private final State<Spec> state;
     private final Action action;
-    private Collection<DMState<Spec>> transitions = new ArrayList<>();
-    private Collection<CtlOperator> labels = new ArrayList<>();
+    private final Collection<DMState<Spec>> transitions = new ArrayList<>();
+    private final Collection<CtlOperator> labels = new ArrayList<>();
 
     public DMState(State<Spec> state, Action action) {
         this.state = state;
@@ -75,5 +72,9 @@ public class DMState<Spec> {
     public boolean anySuccessorHasLabel(CtlOperator operator) {
         return transitions.stream()
                 .anyMatch(s -> s.hasLabel(operator));
+    }
+
+    public Collection<CtlOperator> getLabels() {
+        return Collections.unmodifiableCollection(labels);
     }
 }

@@ -1,6 +1,5 @@
 package discourje.core.validation.operators;
 
-import discourje.core.validation.DMState;
 import discourje.core.validation.DiscourjeModel;
 
 public class CtlFormula implements CtlOperator {
@@ -24,5 +23,10 @@ public class CtlFormula implements CtlOperator {
 
     public String getDescription() {
         return description;
+    }
+
+    @Override
+    public String toString() {
+        return name + ": " + formula;
     }
 }

@@ -1,16 +1,11 @@
 package discourje.core.validation;
 
-import clojure.java.api.Clojure;
-import clojure.lang.IFn;
-import clojure.lang.PersistentList;
-import clojure.lang.Var;
 import discourje.core.lts.Action;
 import discourje.core.lts.LTS;
 import discourje.core.lts.State;
 import discourje.core.lts.Transitions;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -103,16 +98,5 @@ class DiscourjeModelTest<Spec> {
                 fail("Unexpected state " + state);
             }
         }
-    }
-
-    @Test
-    public void makeDiscourjeModelForAllTestCases() {
-        IFn require = Clojure.var("clojure.core", "require");
-        require.invoke(Clojure.read("discourje.core.validation.validation-tests"));
-
-        PersistentList ltsList = (PersistentList) ((Var) Clojure.var("discourje.core.validation.validation-tests", "lts-list")).get();
-        ((Stream<LTS<Spec>>) ltsList.stream())
-                .map(DiscourjeModel::new)
-                .forEach(dm -> System.out.println("states: " + dm.getStates().size()));
     }
 }

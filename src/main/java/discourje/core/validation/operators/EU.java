@@ -28,4 +28,9 @@ class EU implements CtlOperator {
             }
         }
     }
+
+    @Override
+    public String toString() {
+        return "E(" + lhs + " U " + rhs + ")";
+    }
 }

@@ -17,8 +17,8 @@ class AU implements CtlOperator {
         lhs.label(model);
         rhs.label(model);
 
-        boolean newLabels = true;
-        while (newLabels) {
+        boolean newLabels;
+        do {
             newLabels = false;
             for (DMState<?> dmState : model.getStates()) {
                 if (dmState.hasLabel(rhs) ||
@@ -26,7 +26,7 @@ class AU implements CtlOperator {
                     newLabels = newLabels || dmState.addLabel(this);
                 }
             }
-        }
+        } while (newLabels);
     }
 
     public String toString() {

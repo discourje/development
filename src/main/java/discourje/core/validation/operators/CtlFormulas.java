@@ -46,7 +46,7 @@ public class CtlFormulas {
         return new CtlFormula(
                 "Closed channels only once",
                 String.format("A channel from %s to %s is closed, but this channel has already been closed before.", r1, r2),
-                AG(implies(close(r1,r2), AG(not(close(r1,r2))))));
+                AG(implies(close(r1,r2), AX(AG(not(close(r1,r2)))))));
     }
 
     public static CtlOperator first() {
@@ -89,12 +89,16 @@ public class CtlFormulas {
         return new Implies(lhs, rhs);
     }
 
+    public static AX AX(CtlOperator arg) {
+        return new AX(arg);
+    }
+
     public static CtlOperator AF(CtlOperator arg) {
         return new AF(arg);
     }
 
     public static CtlOperator AG(CtlOperator arg) {
-        return not(AF(not(arg)));
+        return new AG(arg);
     }
 
     public static CtlOperator AU(CtlOperator lhs, CtlOperator rhs) {
@@ -106,7 +110,7 @@ public class CtlFormulas {
     }
 
     public static CtlOperator EF(CtlOperator arg) {
-        return EU(new True(), arg);
+        return EU(True.TRUE, arg);
     }
 
     public static CtlOperator EU(CtlOperator lhs, CtlOperator rhs) {
