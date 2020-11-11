@@ -1,4 +1,4 @@
-(ns discourje.core.validation.close-unmentioned-channel
+(ns discourje.core.validation.closed-channel-must-be-used-in-protocol
   (:require [discourje.core.spec :as s]))
 
 (s/defrole ::a)

@@ -2,7 +2,7 @@ package discourje.core.validation;
 
 import discourje.core.lts.LTS;
 import discourje.core.validation.formulas.Causality;
-import discourje.core.validation.formulas.CloseChannelsAfterusage;
+import discourje.core.validation.formulas.UsedChannelsMustBeClosed;
 import discourje.core.validation.formulas.CloseChannelsOnlyOnce;
 import discourje.core.validation.formulas.ClosedChannelMustBeUsedInProtocol;
 import discourje.core.validation.formulas.DoNotSendAfterClose;
@@ -21,7 +21,7 @@ public class ModelChecker {
     public List<String> checkModel() {
         return Arrays.stream(new CtlFormula[]{
                 new Causality(),
-                new CloseChannelsAfterusage(),
+                new UsedChannelsMustBeClosed(),
                 new ClosedChannelMustBeUsedInProtocol(),
                 new CloseChannelsOnlyOnce(),
                 new DoNotSendAfterClose(),

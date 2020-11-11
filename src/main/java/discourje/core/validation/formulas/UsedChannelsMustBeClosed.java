@@ -8,7 +8,7 @@ import static discourje.core.validation.operators.CtlOperators.close;
 import static discourje.core.validation.operators.CtlOperators.implies;
 import static discourje.core.validation.operators.CtlOperators.msg;
 
-public class CloseChannelsAfterusage extends CtlFormula {
+public class UsedChannelsMustBeClosed extends CtlFormula {
 
     @Override
     public String createDescription(String r1, String r2) {

@@ -1,4 +1,4 @@
-(ns discourje.core.validation.message-to-self
+(ns discourje.core.validation.do-not-send-to-self
   (:require [discourje.core.spec :as s]))
 
 (s/defrole ::a)
@@ -24,7 +24,7 @@
                (s/close ::b ::b)
                ])
 
-(defn send-and-close [r1 r2]
+(defn send [r1 r2]
   (s/--> (r1) (r2))
   )
 
@@ -34,8 +34,10 @@
                 [r1 ::a
                  r2 ::b
                  r3 ::c])
-              (s/cat (send-and-close ::a ::b)
-                     (send-and-close ::b ::a))
+              (s/cat (send ::a ::b)
+                     (send ::b ::a)
+                     (s/close ::a ::b)
+                     (s/close ::b ::a))
               )
 
 ;; Roles are not given as literals, but as variables passed as parameters
@@ -44,7 +46,9 @@
                 [r1 ::a
                  r2 ::b
                  r3 ::a]
-                [(send-and-close ::a ::b)
-                 (send-and-close ::a ::a)]
+                [(send ::a ::b)
+                 (send ::a ::a)
+                 (s/close ::a ::b)
+                 (s/close ::a ::a)]
                 )
               )

@@ -3,11 +3,11 @@
             [discourje.core.spec :as s]
             [discourje.core.spec.lts :as lts]
             [discourje.core.validation.causality :as c]
-            [discourje.core.validation.close-multiple-times :as cmt]
-            [discourje.core.validation.close-unmentioned-channel :as cuc]
-            [discourje.core.validation.message-to-self :as mts]
-            [discourje.core.validation.send-after-close :as sac]
-            [discourje.core.validation.unclosed-channels :as uc]
+            [discourje.core.validation.close-channels-only-once :as ccoo]
+            [discourje.core.validation.closed-channel-must-be-used-in-protocol :as ccmbuip]
+            [discourje.core.validation.do-not-send-to-self :as dnsts]
+            [discourje.core.validation.do-not-send-after-close :as dnsac]
+            [discourje.core.validation.used-channels-must-be-closed :as ucmbc]
             )
   (:import (discourje.core.validation DiscourjeModel)))
 
@@ -30,23 +30,23 @@
 (def causality-trivial-incorrect (make-lts ::c/protocol-trivial-incorrect []))
 (def causality-non-trivial-correct (make-lts ::c/protocol-non-trivial-correct []))
 (def causality-non-trivial-incorrect (make-lts ::c/protocol-non-trivial-incorrect []))
-(def close-only-once-trivial-correct (make-lts ::cmt/protocol-trivial-correct []))
-(def close-only-once-trivial-incorrect (make-lts ::cmt/protocol-trivial-incorrect []))
-(def close-only-once-non-trivial-correct (make-lts ::cmt/protocol-non-trivial-correct []))
-(def close-only-once-non-trivial-incorrect (make-lts ::cmt/protocol-non-trivial-incorrect []))
-(def close-used-channels-trivial-correct (make-lts ::cuc/protocol-trivial-correct []))
-(def close-used-channels-trivial-incorrect (make-lts ::cuc/protocol-trivial-incorrect []))
-(def close-used-channels-non-trivial-correct (make-lts ::cuc/protocol-non-trivial-correct []))
-(def close-used-channels-non-trivial-incorrect (make-lts ::cuc/protocol-non-trivial-incorrect []))
-(def message-to-self-trivial-correct (make-lts ::mts/protocol-trivial-correct []))
-(def message-to-self-trivial-incorrect (make-lts ::mts/protocol-trivial-incorrect []))
-(def message-to-self-non-trivial-correct (make-lts ::mts/protocol-non-trivial-correct []))
-(def message-to-self-non-trivial-incorrect (make-lts ::mts/protocol-non-trivial-incorrect []))
-(def send-after-close-trivial-correct (make-lts ::sac/protocol-trivial-correct []))
-(def send-after-close-trivial-incorrect (make-lts ::sac/protocol-trivial-incorrect []))
-(def send-after-close-non-trivial-correct (make-lts ::sac/protocol-non-trivial-correct [true]))
-(def send-after-close-non-trivial-incorrect (make-lts ::sac/protocol-non-trivial-incorrect []))
-(def unclosed-channels-trivial-correct (make-lts ::uc/protocol-trivial-correct []))
-(def unclosed-channels-trivial-incorrect (make-lts ::uc/protocol-trivial-incorrect []))
-(def unclosed-channels-non-trivial-correct (make-lts ::uc/protocol-non-trivial-correct []))
-(def unclosed-channels-non-trivial-incorrect (make-lts ::uc/protocol-non-trivial-incorrect []))
+(def close-channels-only-once-trivial-correct (make-lts ::ccoo/protocol-trivial-correct []))
+(def close-channels-only-once-trivial-incorrect (make-lts ::ccoo/protocol-trivial-incorrect []))
+(def close-channels-only-once-non-trivial-correct (make-lts ::ccoo/protocol-non-trivial-correct []))
+(def close-channels-only-once-non-trivial-incorrect (make-lts ::ccoo/protocol-non-trivial-incorrect []))
+(def closed-channel-must-be-used-in-protocol-trivial-correct (make-lts ::ccmbuip/protocol-trivial-correct []))
+(def closed-channel-must-be-used-in-protocol-trivial-incorrect (make-lts ::ccmbuip/protocol-trivial-incorrect []))
+(def closed-channel-must-be-used-in-protocol-non-trivial-correct (make-lts ::ccmbuip/protocol-non-trivial-correct []))
+(def closed-channel-must-be-used-in-protocol-non-trivial-incorrect (make-lts ::ccmbuip/protocol-non-trivial-incorrect []))
+(def do-not-send-to-self-trivial-correct (make-lts ::dnsts/protocol-trivial-correct []))
+(def do-not-send-to-self-trivial-incorrect (make-lts ::dnsts/protocol-trivial-incorrect []))
+(def do-not-send-to-self-non-trivial-correct (make-lts ::dnsts/protocol-non-trivial-correct []))
+(def do-not-send-to-self-non-trivial-incorrect (make-lts ::dnsts/protocol-non-trivial-incorrect []))
+(def do-not-send-after-close-trivial-correct (make-lts ::dnsac/protocol-trivial-correct []))
+(def do-not-send-after-close-trivial-incorrect (make-lts ::dnsac/protocol-trivial-incorrect []))
+(def do-not-send-after-close-non-trivial-correct (make-lts ::dnsac/protocol-non-trivial-correct [true]))
+(def do-not-send-after-close-non-trivial-incorrect (make-lts ::dnsac/protocol-non-trivial-incorrect []))
+(def used-channels-must-be-closed-trivial-correct (make-lts ::ucmbc/protocol-trivial-correct []))
+(def used-channels-must-be-closed-trivial-incorrect (make-lts ::ucmbc/protocol-trivial-incorrect []))
+(def used-channels-must-be-closed-non-trivial-correct (make-lts ::ucmbc/protocol-non-trivial-correct []))
+(def used-channels-must-be-closed-non-trivial-incorrect (make-lts ::ucmbc/protocol-non-trivial-incorrect []))

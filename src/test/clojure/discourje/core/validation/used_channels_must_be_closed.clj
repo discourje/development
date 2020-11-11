@@ -1,4 +1,4 @@
-(ns discourje.core.validation.unclosed-channels
+(ns discourje.core.validation.used-channels-must-be-closed
   (:require [discourje.core.spec :as s]))
 
 (s/defrole ::a)
@@ -51,6 +51,8 @@
                  (s/--> ::d ::a)
                  ])
               (s/close ::a ::b)
+              (s/close ::a ::c)
               (s/close ::b ::c)
+              (s/close ::c ::d)
               (s/close ::c ::a)
               )

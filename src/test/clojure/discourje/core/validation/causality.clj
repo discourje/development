@@ -50,6 +50,6 @@
                  ])
               (s/close ::a ::b)
               (s/close ::b ::c)
-              (s/close ::c ::a)
+              (s/close ::c ::d)
               (s/close ::d ::a)
               )
