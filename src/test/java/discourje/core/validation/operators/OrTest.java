@@ -4,9 +4,9 @@ import discourje.core.lts.Action;
 import discourje.core.validation.DMState;
 import discourje.core.validation.DiscourjeModel;
 import org.junit.jupiter.api.Test;
-import static discourje.core.validation.operators.CtlFormulas.rcv;
-import static discourje.core.validation.operators.CtlFormulas.self;
-import static discourje.core.validation.operators.CtlFormulas.snd;
+import static discourje.core.validation.operators.CtlOperators.rcv;
+import static discourje.core.validation.operators.CtlOperators.self;
+import static discourje.core.validation.operators.CtlOperators.snd;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

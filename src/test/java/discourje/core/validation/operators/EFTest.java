@@ -5,11 +5,9 @@ import discourje.core.validation.DMState;
 import discourje.core.validation.DiscourjeModel;
 import org.junit.jupiter.api.Test;
 import static discourje.core.validation.operators.CtlOperators.close;
-import static discourje.core.validation.operators.CtlOperators.snd;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-class EUTest<S> extends AbstractOperatorTest<S> {
+class EFTest<S> extends AbstractOperatorTest<S> {
 
     @Test
     public void testValidOnAllPathsEarlySplit() {
@@ -26,10 +24,10 @@ class EUTest<S> extends AbstractOperatorTest<S> {
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
-        EU eu = new EU(snd("a"), close("a", "b"));
-        eu.label(model);
+        EF ef = new EF(close("a", "b"));
+        ef.label(model);
 
-        assertTrue(s1.hasLabel(eu));
+        assertTrue(s1.hasLabel(ef));
     }
 
     @Test
@@ -45,10 +43,27 @@ class EUTest<S> extends AbstractOperatorTest<S> {
 
         DiscourjeModel<S> model = createModel(s1, s2, s3a, s3b);
 
-        EU eu = new EU(snd("a"), close("a", "b"));
-        eu.label(model);
+        EF ef = new EF(close("a", "b"));
+        ef.label(model);
 
-        assertTrue(s1.hasLabel(eu));
+        assertTrue(s1.hasLabel(ef));
+    }
+
+    @Test
+    public void testValidOnOneShortPath() {
+        DMState<S> s1 = createState(Action.Type.SEND, "a", "b");
+        DMState<S> s2a = createState(Action.Type.CLOSE, "a", "b");
+        DMState<S> s2b = createState(Action.Type.SEND, "a", "b");
+
+        s1.addTransition(s2a);
+        s1.addTransition(s2b);
+
+        DiscourjeModel<S> model = createModel(s1, s2a, s2b);
+
+        EF ef = new EF(close("a", "b"));
+        ef.label(model);
+
+        assertTrue(s1.hasLabel(ef));
     }
 
     @Test
@@ -66,10 +81,10 @@ class EUTest<S> extends AbstractOperatorTest<S> {
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
-        EU eu = new EU(snd("a"), close("a", "b"));
-        eu.label(model);
+        EF ef = new EF(close("a", "b"));
+        ef.label(model);
 
-        assertTrue(s1.hasLabel(eu));
+        assertTrue(s1.hasLabel(ef));
     }
 
     @Test
@@ -87,9 +102,9 @@ class EUTest<S> extends AbstractOperatorTest<S> {
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
-        EU eu = new EU(snd("a"), close("a", "b"));
-        eu.label(model);
+        EF ef = new EF(close("a", "b"));
+        ef.label(model);
 
-        assertFalse(s1.hasLabel(eu));
+        assertFalse(s1.hasLabel(ef));
     }
 }

@@ -7,7 +7,9 @@ import discourje.core.lts.Transitions;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import org.apache.commons.math3.util.Pair;
 
@@ -22,8 +24,11 @@ public class DiscourjeModel<Spec> {
 
     private final Map<Pair<State<Spec>, Action>, DMState<Spec>> dmStateMap = new HashMap<>();
 
+    private final Collection<Channel> channels = new HashSet<>();
+
     public DiscourjeModel(LTS<Spec> lts) {
-        lts.getInitialStates()
+        lts.getInitialStates().stream()
+                .sorted(Comparator.comparing(State::getIdentifier))
                 .forEach(is -> addState(is, null));
         initialStates = new ArrayList<>(states);
 
@@ -32,6 +37,9 @@ public class DiscourjeModel<Spec> {
             for (Action action : transitions.getActions()) {
                 for (State<Spec> targetState : transitions.getTargetsOrNull(action)) {
                     addState(targetState, action);
+                }
+                if (action.getSender() != null || action.getReceiver() != null) {
+                    channels.add(new Channel(action.getSender(), action.getReceiver()));
                 }
             }
         }
@@ -62,5 +70,9 @@ public class DiscourjeModel<Spec> {
 
     public Collection<DMState<Spec>> getStates() {
         return Collections.unmodifiableCollection(states);
+    }
+
+    public Collection<Channel> getChannels() {
+        return Collections.unmodifiableCollection(channels);
     }
 }

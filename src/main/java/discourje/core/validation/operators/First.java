@@ -15,4 +15,9 @@ class First implements CtlOperator {
             }
         }
     }
+
+    @Override
+    public String toString() {
+        return "first";
+    }
 }

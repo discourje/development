@@ -22,4 +22,8 @@ class Receive implements CtlOperator {
             }
         }
     }
+
+    public String toString() {
+        return "rcv_" + role;
+    }
 }

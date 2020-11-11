@@ -3,6 +3,7 @@ package discourje.core.validation.operators;
 import discourje.core.validation.DMState;
 import discourje.core.validation.DiscourjeModel;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 class And implements CtlOperator {
     private final CtlOperator[] args;
@@ -20,5 +21,11 @@ class And implements CtlOperator {
                 state.addLabel(this);
             }
         }
+    }
+
+    public String toString() {
+        return String.format("(%s)",
+                Arrays.stream(args).map(Object::toString).collect(Collectors.joining(" and "))
+        );
     }
 }

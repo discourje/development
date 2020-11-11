@@ -4,7 +4,7 @@ import discourje.core.lts.Action;
 import discourje.core.validation.DMState;
 import discourje.core.validation.DiscourjeModel;
 import org.junit.jupiter.api.Test;
-import static discourje.core.validation.operators.CtlFormulas.close;
+import static discourje.core.validation.operators.CtlOperators.close;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

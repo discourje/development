@@ -19,4 +19,9 @@ public class EX implements CtlOperator {
             }
         }
     }
+
+    @Override
+    public String toString() {
+        return "EX(" + arg + ")";
+    }
 }

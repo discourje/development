@@ -20,6 +20,7 @@ public class AbstractOperatorTest<S> {
         return new DMState<S>(mock(State.class), action);
     }
 
+    @SafeVarargs
     @SuppressWarnings("unchecked")
     protected final DiscourjeModel<S> createModel(DMState<S>... states) {
         DiscourjeModel<S> model = mock(DiscourjeModel.class);

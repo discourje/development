@@ -25,7 +25,7 @@ class Or implements CtlOperator {
 
     public String toString() {
         return String.format("(%s)",
-                Arrays.stream(args).map(Object::toString).collect(Collectors.joining(" v "))
+                Arrays.stream(args).map(Object::toString).collect(Collectors.joining(" or "))
         );
     }
 }

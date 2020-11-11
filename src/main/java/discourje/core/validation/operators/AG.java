@@ -2,8 +2,8 @@ package discourje.core.validation.operators;
 
 import discourje.core.validation.DMState;
 import discourje.core.validation.DiscourjeModel;
-import static discourje.core.validation.operators.CtlFormulas.EF;
-import static discourje.core.validation.operators.CtlFormulas.not;
+import static discourje.core.validation.operators.CtlOperators.EF;
+import static discourje.core.validation.operators.CtlOperators.not;
 
 public class AG implements CtlOperator {
     private final CtlOperator arg;
