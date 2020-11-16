@@ -22,4 +22,9 @@ class Self implements CtlOperator {
             }
         }
     }
+
+    @Override
+    public String toString() {
+        return String.format("self_%s", role);
+    }
 }

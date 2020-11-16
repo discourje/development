@@ -21,4 +21,9 @@ class Send implements CtlOperator {
             }
         }
     }
+
+    @Override
+    public String toString() {
+        return String.format("send_%s", role);
+    }
 }
