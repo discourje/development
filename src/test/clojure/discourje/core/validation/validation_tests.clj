@@ -8,6 +8,12 @@
             [discourje.core.validation.do-not-send-to-self :as dnsts]
             [discourje.core.validation.do-not-send-after-close :as dnsac]
             [discourje.core.validation.used-channels-must-be-closed :as ucmbc]
+            [discourje.core.validation.causality-async :as ca]
+            [discourje.core.validation.close-channels-only-once-async :as ccooa]
+            [discourje.core.validation.closed-channel-must-be-used-in-protocol-async :as ccmbuipa]
+            [discourje.core.validation.do-not-send-to-self-async :as dnstsa]
+            [discourje.core.validation.do-not-send-after-close-async :as dnsaca]
+            [discourje.core.validation.used-channels-must-be-closed-async :as ucmbca]
             )
   (:import (discourje.core.validation DiscourjeModel)))
 
@@ -50,3 +56,29 @@
 (def used-channels-must-be-closed-trivial-incorrect (make-lts ::ucmbc/protocol-trivial-incorrect []))
 (def used-channels-must-be-closed-non-trivial-correct (make-lts ::ucmbc/protocol-non-trivial-correct []))
 (def used-channels-must-be-closed-non-trivial-incorrect (make-lts ::ucmbc/protocol-non-trivial-incorrect []))
+
+; ASYNC
+(def causality-trivial-correct-async (make-lts ::ca/protocol-trivial-correct []))
+(def causality-trivial-incorrect-async (make-lts ::ca/protocol-trivial-incorrect []))
+(def causality-non-trivial-correct-async (make-lts ::ca/protocol-non-trivial-correct []))
+(def causality-non-trivial-incorrect-async (make-lts ::ca/protocol-non-trivial-incorrect []))
+(def close-channels-only-once-trivial-correct-async (make-lts ::ccooa/protocol-trivial-correct []))
+(def close-channels-only-once-trivial-incorrect-async (make-lts ::ccooa/protocol-trivial-incorrect []))
+(def close-channels-only-once-non-trivial-correct-async (make-lts ::ccooa/protocol-non-trivial-correct []))
+(def close-channels-only-once-non-trivial-incorrect-async (make-lts ::ccooa/protocol-non-trivial-incorrect []))
+(def closed-channel-must-be-used-in-protocol-trivial-correct-async (make-lts ::ccmbuipa/protocol-trivial-correct []))
+(def closed-channel-must-be-used-in-protocol-trivial-incorrect-async (make-lts ::ccmbuipa/protocol-trivial-incorrect []))
+(def closed-channel-must-be-used-in-protocol-non-trivial-correct-async (make-lts ::ccmbuipa/protocol-non-trivial-correct []))
+(def closed-channel-must-be-used-in-protocol-non-trivial-incorrect-async (make-lts ::ccmbuipa/protocol-non-trivial-incorrect []))
+(def do-not-send-to-self-trivial-correct-async (make-lts ::dnstsa/protocol-trivial-correct []))
+(def do-not-send-to-self-trivial-incorrect-async (make-lts ::dnstsa/protocol-trivial-incorrect []))
+(def do-not-send-to-self-non-trivial-correct-async (make-lts ::dnstsa/protocol-non-trivial-correct []))
+(def do-not-send-to-self-non-trivial-incorrect-async (make-lts ::dnstsa/protocol-non-trivial-incorrect []))
+(def do-not-send-after-close-trivial-correct-async (make-lts ::dnsaca/protocol-trivial-correct []))
+(def do-not-send-after-close-trivial-incorrect-async (make-lts ::dnsaca/protocol-trivial-incorrect []))
+(def do-not-send-after-close-non-trivial-correct-async (make-lts ::dnsaca/protocol-non-trivial-correct [true]))
+(def do-not-send-after-close-non-trivial-incorrect-async (make-lts ::dnsaca/protocol-non-trivial-incorrect []))
+(def used-channels-must-be-closed-trivial-correct-async (make-lts ::ucmbca/protocol-trivial-correct []))
+(def used-channels-must-be-closed-trivial-incorrect-async (make-lts ::ucmbca/protocol-trivial-incorrect []))
+(def used-channels-must-be-closed-non-trivial-correct-async (make-lts ::ucmbca/protocol-non-trivial-correct []))
+(def used-channels-must-be-closed-non-trivial-incorrect-async (make-lts ::ucmbca/protocol-non-trivial-incorrect []))
