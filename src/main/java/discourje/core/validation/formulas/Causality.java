@@ -1,6 +1,5 @@
 package discourje.core.validation.formulas;
 
-import discourje.core.validation.Channel;
 import discourje.core.validation.CtlFormula;
 import discourje.core.validation.operators.CtlOperator;
 import static discourje.core.validation.operators.CtlOperators.EF;
