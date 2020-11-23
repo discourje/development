@@ -14,7 +14,7 @@
                 [(s/--> ::a ::c)
                  (s/close ::a ::c)]))
 
-;; Channel a-->b and a-->c are not always used on the path.
+; Channel and a-->c is not used on the path.
 (s/defsession ::protocol-trivial-incorrect []
               (s/--> ::a ::b)
               (s/close ::a ::b)
@@ -29,11 +29,19 @@
                 (s/close ::a ::b)
                 (s/close ::b ::a)))
 
-; For both closed a channel exists where it is used, but also a channel where it is not used
+; Closing  channel a to c in the second branch of the first s/alt is not warranted.
 (s/defsession ::protocol-non-trivial-incorrect []
               (s/alt
-                (s/--> ::a ::b)
-                (s/--> ::a ::c)
+                [(s/alt
+                   (s/--> ::a ::b)
+                   (s/--> ::a ::c))
+                 (s/close ::a ::b)
+                 (s/close ::a ::c)]
+                [(s/alt
+                   (s/--> ::a ::b)
+                   (s/--> ::a ::d))
+                 (s/close ::a ::b)
+                 (s/close ::a ::c)
+                 (s/close ::a ::d)]
                 )
-              (s/close ::a ::b)
-              (s/close ::a ::c))
+              )

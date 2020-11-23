@@ -138,8 +138,7 @@ class ModelCheckerAsyncTest<Spec> {
     @Test
     public void testClosedChannelMustBeUsedInPathNonTrivialIncorrect() {
         List<String> result = getModelCheckerResult("closed-channel-must-be-used-in-path-non-trivial-incorrect-async");
-        assertEquals(2, result.size());
-        assertTrue(result.contains(new ClosedChannelMustBeUsedInPath().createDescription("a", "b")));
+        assertEquals(1, result.size());
         assertTrue(result.contains(new ClosedChannelMustBeUsedInPath().createDescription("a", "c")));
     }
 
