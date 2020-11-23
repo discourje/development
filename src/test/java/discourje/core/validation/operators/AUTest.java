@@ -19,10 +19,10 @@ class AUTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s3a = createState(Action.Type.CLOSE, "a", "b");
         DMState<S> s3b = createState(Action.Type.CLOSE, "a", "b");
 
-        s1.addTransition(s2a);
-        s1.addTransition(s2b);
-        s2a.addTransition(s3a);
-        s2b.addTransition(s3b);
+        s1.addNextState(s2a);
+        s1.addNextState(s2b);
+        s2a.addNextState(s3a);
+        s2b.addNextState(s3b);
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
@@ -39,9 +39,9 @@ class AUTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s3a = createState(Action.Type.CLOSE, "a", "b");
         DMState<S> s3b = createState(Action.Type.CLOSE, "a", "b");
 
-        s1.addTransition(s2);
-        s2.addTransition(s3a);
-        s2.addTransition(s3b);
+        s1.addNextState(s2);
+        s2.addNextState(s3a);
+        s2.addNextState(s3b);
 
         DiscourjeModel<S> model = createModel(s1, s2, s3a, s3b);
 
@@ -59,10 +59,10 @@ class AUTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s3a = createState(Action.Type.CLOSE, "a", "b");
         DMState<S> s3b = createState(Action.Type.CLOSE, "a", "c");
 
-        s1.addTransition(s2a);
-        s1.addTransition(s2b);
-        s2a.addTransition(s3a);
-        s2b.addTransition(s3b);
+        s1.addNextState(s2a);
+        s1.addNextState(s2b);
+        s2a.addNextState(s3a);
+        s2b.addNextState(s3b);
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
@@ -80,10 +80,10 @@ class AUTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s3a = createState(Action.Type.CLOSE, "a", "c");
         DMState<S> s3b = createState(Action.Type.CLOSE, "a", "c");
 
-        s1.addTransition(s2a);
-        s1.addTransition(s2b);
-        s2a.addTransition(s3a);
-        s2b.addTransition(s3b);
+        s1.addNextState(s2a);
+        s1.addNextState(s2b);
+        s2a.addNextState(s3a);
+        s2b.addNextState(s3b);
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 

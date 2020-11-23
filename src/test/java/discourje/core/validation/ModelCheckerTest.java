@@ -6,6 +6,7 @@ import clojure.lang.Var;
 import discourje.core.lts.LTS;
 import discourje.core.validation.formulas.Causality;
 import discourje.core.validation.formulas.CloseChannelsOnlyOnce;
+import discourje.core.validation.formulas.ClosedChannelMustBeUsedInPath;
 import discourje.core.validation.formulas.ClosedChannelMustBeUsedInProtocol;
 import discourje.core.validation.formulas.DoNotSendAfterClose;
 import discourje.core.validation.formulas.DoNotSendToSelf;
@@ -82,7 +83,7 @@ class ModelCheckerTest<Spec> {
     }
 
     @Test
-    public void testCloseUsedChannelsTrivialCorrect() {
+    public void testClosedChannelMustBeUsedInProtocolTrivialCorrect() {
         List<String> result = getModelCheckerResult("closed-channel-must-be-used-in-protocol-trivial-correct");
         assertTrue(result.isEmpty());
     }
@@ -90,21 +91,56 @@ class ModelCheckerTest<Spec> {
     @Test
     public void testClosedChannelMustBeUsedInProtocolTrivialIncorrect() {
         List<String> result = getModelCheckerResult("closed-channel-must-be-used-in-protocol-trivial-incorrect");
-        assertEquals(1, result.size());
-        assertEquals(result.get(0), new ClosedChannelMustBeUsedInProtocol().createDescription("b", "a"));
+        assertEquals(2, result.size());
+        assertTrue(result.contains(new ClosedChannelMustBeUsedInProtocol().createDescription("b", "a")));
+        assertTrue(result.contains(new ClosedChannelMustBeUsedInPath().createDescription("b", "a")));
     }
 
     @Test
     public void testClosedChannelMustBeUsedInProtocolNonTrivialCorrect() {
         List<String> result = getModelCheckerResult("closed-channel-must-be-used-in-protocol-non-trivial-correct");
-        assertTrue(result.isEmpty());
+        // No ClosedChannelMustBeUsedInProtocol errors expected, but we do expect two for ClosedChannelMustBeUsedInPath
+        assertEquals(2, result.size());
+        assertTrue(result.contains(new ClosedChannelMustBeUsedInPath().createDescription("a", "b")));
+        assertTrue(result.contains(new ClosedChannelMustBeUsedInPath().createDescription("b", "a")));
     }
 
     @Test
     public void testClosedChannelMustBeUsedInProtocolNonTrivialIncorrect() {
         List<String> result = getModelCheckerResult("closed-channel-must-be-used-in-protocol-non-trivial-incorrect");
-        assertEquals(1, result.size());
+        assertEquals(3, result.size());
         assertTrue(result.contains(new ClosedChannelMustBeUsedInProtocol().createDescription("b", "c")));
+        assertTrue(result.contains(new ClosedChannelMustBeUsedInPath().createDescription("a", "b")));
+        assertTrue(result.contains(new ClosedChannelMustBeUsedInPath().createDescription("b", "c")));
+
+    }
+
+    @Test
+    public void testClosedChannelMustBeUsedInPathTrivialCorrect() {
+        List<String> result = getModelCheckerResult("closed-channel-must-be-used-in-path-trivial-correct");
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testClosedChannelMustBeUsedInPathTrivialIncorrect() {
+        List<String> result = getModelCheckerResult("closed-channel-must-be-used-in-path-trivial-incorrect");
+        assertEquals(2, result.size());
+        assertTrue(result.contains(new ClosedChannelMustBeUsedInProtocol().createDescription("a", "c")));
+        assertTrue(result.contains(new ClosedChannelMustBeUsedInPath().createDescription("a", "c")));
+    }
+
+    @Test
+    public void testClosedChannelMustBeUsedInPathNonTrivialCorrect() {
+        List<String> result = getModelCheckerResult("closed-channel-must-be-used-in-path-non-trivial-correct");
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testClosedChannelMustBeUsedInPathNonTrivialIncorrect() {
+        List<String> result = getModelCheckerResult("closed-channel-must-be-used-in-path-non-trivial-incorrect");
+        assertEquals(2, result.size());
+        assertTrue(result.contains(new ClosedChannelMustBeUsedInPath().createDescription("a", "b")));
+        assertTrue(result.contains(new ClosedChannelMustBeUsedInPath().createDescription("a", "c")));
     }
 
     @Test

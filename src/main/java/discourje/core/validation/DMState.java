@@ -12,7 +12,8 @@ import java.util.Objects;
 public class DMState<Spec> {
     private final State<Spec> state;
     private final Action action;
-    private final Collection<DMState<Spec>> transitions = new ArrayList<>();
+    private final Collection<DMState<Spec>> nextStates = new ArrayList<>();
+    private final Collection<DMState<Spec>> previousStates = new ArrayList<>();
     private final Collection<CtlOperator> labels = new HashSet<>();
 
     public DMState(State<Spec> state, Action action) {
@@ -28,12 +29,20 @@ public class DMState<Spec> {
         return action;
     }
 
-    public Collection<DMState<Spec>> getTransitions() {
-        return Collections.unmodifiableCollection(transitions);
+    Collection<DMState<Spec>> getNextStates() {
+        return Collections.unmodifiableCollection(nextStates);
     }
 
-    public boolean addTransition(DMState<Spec> target) {
-        return transitions.add(target);
+    public boolean addNextState(DMState<Spec> state) {
+        return nextStates.add(state);
+    }
+
+    Collection<DMState<Spec>> getPreviousStates() {
+        return Collections.unmodifiableCollection(previousStates);
+    }
+
+    public boolean addPreviousState(DMState<Spec> state) {
+        return previousStates.add(state);
     }
 
     @Override
@@ -63,15 +72,28 @@ public class DMState<Spec> {
     }
 
     public boolean successorsExistAndAllHaveLabel(CtlOperator operator) {
-        long successorsWithLabelCount = transitions.stream()
+        long successorsWithLabelCount = nextStates.stream()
                 .filter(s -> s.hasLabel(operator))
                 .count();
-        int numSuccessors = transitions.size();
+        int numSuccessors = nextStates.size();
         return numSuccessors > 0 && numSuccessors == successorsWithLabelCount;
     }
 
     public boolean anySuccessorHasLabel(CtlOperator operator) {
-        return transitions.stream()
+        return nextStates.stream()
+                .anyMatch(s -> s.hasLabel(operator));
+    }
+
+    public boolean predecessorsExistAndAllHaveLabel(CtlOperator operator) {
+        long precedersWithLabelCount = previousStates.stream()
+                .filter(s -> s.hasLabel(operator))
+                .count();
+        int numPreceders = previousStates.size();
+        return numPreceders > 0 && numPreceders == precedersWithLabelCount;
+    }
+
+    public boolean anyPredecessorHasLabel(CtlOperator operator) {
+        return previousStates.stream()
                 .anyMatch(s -> s.hasLabel(operator));
     }
 

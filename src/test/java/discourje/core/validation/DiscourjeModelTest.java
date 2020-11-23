@@ -86,14 +86,30 @@ class DiscourjeModelTest<Spec> {
         assertTrue(model.getStates().contains(_2_recv));
 
         for (DMState<?> state : model.getStates()) {
-            if (state.equals(_1_null) || state.equals(_1_close)) {
-                assertEquals(3, state.getTransitions().size());
-                assertTrue(state.getTransitions().contains(_2_sync));
-                assertTrue(state.getTransitions().contains(_2_send));
-                assertTrue(state.getTransitions().contains(_2_recv));
+            if (state.equals(_1_null)) {
+                assertEquals(3, state.getNextStates().size());
+                assertTrue(state.getNextStates().contains(_2_sync));
+                assertTrue(state.getNextStates().contains(_2_send));
+                assertTrue(state.getNextStates().contains(_2_recv));
+
+                assertEquals(0, state.getPreviousStates().size());
+            } else if (state.equals(_1_close)) {
+                assertEquals(3, state.getNextStates().size());
+                assertTrue(state.getNextStates().contains(_2_sync));
+                assertTrue(state.getNextStates().contains(_2_send));
+                assertTrue(state.getNextStates().contains(_2_recv));
+
+                assertEquals(3, state.getPreviousStates().size());
+                assertTrue(state.getPreviousStates().contains(_2_sync));
+                assertTrue(state.getPreviousStates().contains(_2_send));
+                assertTrue(state.getPreviousStates().contains(_2_recv));
             } else if (state.equals(_2_sync) || state.equals(_2_send) || state.equals(_2_recv)) {
-                assertEquals(1, state.getTransitions().size());
-                assertTrue(state.getTransitions().contains(_1_close));
+                assertEquals(1, state.getNextStates().size());
+                assertTrue(state.getNextStates().contains(_1_close));
+
+                assertEquals(2, state.getPreviousStates().size());
+                assertTrue(state.getPreviousStates().contains(_1_null));
+                assertTrue(state.getPreviousStates().contains(_1_close));
             } else {
                 fail("Unexpected state " + state);
             }

@@ -103,7 +103,7 @@ public class CtlOperators {
     }
 
     /**
-     * Label each state where at least one directly following states are labelled by arg.
+     * Label each state where at least one directly following state is labelled by arg.
      */
     public static CtlOperator EX(CtlOperator arg) {
         return new EX(arg);
@@ -117,10 +117,76 @@ public class CtlOperators {
     }
 
     /**
+     * Label each state where all at least one path exists where all following states are labelled by arg.
+     */
+    public static CtlOperator EG(CtlOperator arg) {
+        return new EG(arg);
+    }
+
+    /**
      * Label each state where a path exists where all next states are labelled by lhs, until a state is labelled by rhs.
      * A state labelled by rhs must occur in this path.
      */
     public static CtlOperator EU(CtlOperator lhs, CtlOperator rhs) {
         return new EU(lhs, rhs);
+    }
+
+    /**
+     * Label each state where all directly preceding states are labelled by arg.
+     * Such a state must exist.
+     */
+    public static CtlOperator AY(CtlOperator arg) {
+        return new AY(arg);
+    }
+
+    /**
+     * Label each state where at all paths a previous state exists that is labelled by arg.
+     */
+    public static CtlOperator AP(CtlOperator arg) {
+        return new AP(arg);
+    }
+
+    /**
+     * Label each state where all previous states on all paths are labelled by arg.
+     */
+    public static CtlOperator AH(CtlOperator arg) {
+        return new AH(arg);
+    }
+
+    /**
+     * Label each state where all previous states are labelled by lhs, until a state that is labelled by rhs.
+     * A state labelled by rhs must occur in each path.
+     */
+    public static CtlOperator AS(CtlOperator lhs, CtlOperator rhs) {
+        return new AS(lhs, rhs);
+    }
+
+    /**
+     * Label each state where at least one directly preceding state is labelled by arg.
+     */
+    public static CtlOperator EY(CtlOperator arg) {
+        return new EY(arg);
+    }
+
+    /**
+     * Label each state where for at least one path a previous state exists that is labelled by arg.
+     */
+    public static CtlOperator EP(CtlOperator arg) {
+        return new EP(arg);
+    }
+
+    /**
+     * Label each state where at least one path exists where all previous states are labelled by arg.
+     */
+    public static CtlOperator EH(CtlOperator arg) {
+        return new EH(arg);
+    }
+
+    /**
+     * Label each state where a path exists where all previous states are labelled by lhs, since a state that is labelled by rhs.
+     * A state labelled by rhs must occur in this path.
+     */
+    public static CtlOperator ES(CtlOperator lhs, CtlOperator rhs) {
+        return new ES(lhs, rhs);
     }
 }

@@ -3,6 +3,7 @@ package discourje.core.validation;
 import discourje.core.lts.LTS;
 import discourje.core.validation.formulas.Causality;
 import discourje.core.validation.formulas.CloseChannelsOnlyOnce;
+import discourje.core.validation.formulas.ClosedChannelMustBeUsedInPath;
 import discourje.core.validation.formulas.ClosedChannelMustBeUsedInProtocol;
 import discourje.core.validation.formulas.DoNotSendAfterClose;
 import discourje.core.validation.formulas.DoNotSendToSelf;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 public class ModelChecker {
     public static final List<CtlFormula> DEFAULT_RULES = Arrays.asList(new Causality(),
             new UsedChannelsMustBeClosed(),
+            new ClosedChannelMustBeUsedInPath(),
             new ClosedChannelMustBeUsedInProtocol(),
             new CloseChannelsOnlyOnce(),
             new DoNotSendAfterClose(),

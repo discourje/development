@@ -2,20 +2,22 @@ package discourje.core.validation.operators;
 
 import discourje.core.validation.DMState;
 import discourje.core.validation.DiscourjeModel;
+import static discourje.core.validation.operators.CtlOperators.not;
+import static discourje.core.validation.operators.CtlOperators.AF;
 
-public class EF implements CtlOperator {
+public class EG implements CtlOperator {
     private final CtlOperator arg;
 
-    public EF(CtlOperator arg) {
+    public EG(CtlOperator arg) {
         this.arg = arg;
     }
 
     @Override
     public void label(DiscourjeModel<?> model) {
-        CtlOperator ef = new EU(True.TRUE, arg);
-        ef.label(model);
+        CtlOperator eg = not(AF(not(arg)));
+        eg.label(model);
         for (DMState<?> state : model.getStates()) {
-            if (state.hasLabel(ef)) {
+            if (state.hasLabel(eg)) {
                 state.addLabel(this);
             }
         }
@@ -23,6 +25,6 @@ public class EF implements CtlOperator {
 
     @Override
     public String toString() {
-        return "EF(" + arg + ")";
+        return "EG(" + arg + ")";
     }
 }

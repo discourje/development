@@ -5,9 +5,10 @@ import discourje.core.validation.DMState;
 import discourje.core.validation.DiscourjeModel;
 import org.junit.jupiter.api.Test;
 import static discourje.core.validation.operators.CtlOperators.close;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class AGTest<S> extends AbstractOperatorTest<S> {
+class EGTest<S> extends AbstractOperatorTest<S> {
 
     @Test
     public void testValidOnAllPathsEarlySplit() {
@@ -24,10 +25,10 @@ class AGTest<S> extends AbstractOperatorTest<S> {
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
-        AG ag = new AG(close("a", "b"));
-        ag.label(model);
+        EG eg = new EG(close("a", "b"));
+        eg.label(model);
 
-        assertTrue(s1.hasLabel(ag));
+        assertTrue(s1.hasLabel(eg));
     }
 
     @Test
@@ -43,10 +44,10 @@ class AGTest<S> extends AbstractOperatorTest<S> {
 
         DiscourjeModel<S> model = createModel(s1, s2, s3a, s3b);
 
-        AG ag = new AG(close("a", "b"));
-        ag.label(model);
+        EG eg = new EG(close("a", "b"));
+        eg.label(model);
 
-        assertTrue(s1.hasLabel(ag));
+        assertTrue(s1.hasLabel(eg));
     }
 
     @Test
@@ -60,10 +61,10 @@ class AGTest<S> extends AbstractOperatorTest<S> {
 
         DiscourjeModel<S> model = createModel(s1, s2, s3);
 
-        AG ag = new AG(close("a", "b"));
-        ag.label(model);
+        EG eg = new EG(close("a", "b"));
+        eg.label(model);
 
-        assertFalse(s1.hasLabel(ag));
+        assertFalse(s1.hasLabel(eg));
     }
 
     @Test
@@ -81,10 +82,10 @@ class AGTest<S> extends AbstractOperatorTest<S> {
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
-        AG ag = new AG(close("a", "b"));
-        ag.label(model);
+        EG eg = new EG(close("a", "b"));
+        eg.label(model);
 
-        assertFalse(s1.hasLabel(ag));
+        assertTrue(s1.hasLabel(eg));
     }
 
     @Test
@@ -102,10 +103,10 @@ class AGTest<S> extends AbstractOperatorTest<S> {
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
-        AG ag = new AG(close("a", "b"));
-        ag.label(model);
+        EG eg = new EG(close("a", "b"));
+        eg.label(model);
 
-        assertFalse(s1.hasLabel(ag));
+        assertFalse(s1.hasLabel(eg));
     }
 
     @Test
@@ -123,9 +124,9 @@ class AGTest<S> extends AbstractOperatorTest<S> {
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
-        AG ag = new AG(close("a", "b"));
-        ag.label(model);
+        EG eg = new EG(close("a", "b"));
+        eg.label(model);
 
-        assertFalse(s1.hasLabel(ag));
+        assertFalse(s1.hasLabel(eg));
     }
 }

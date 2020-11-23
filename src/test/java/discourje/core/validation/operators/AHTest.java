@@ -5,9 +5,10 @@ import discourje.core.validation.DMState;
 import discourje.core.validation.DiscourjeModel;
 import org.junit.jupiter.api.Test;
 import static discourje.core.validation.operators.CtlOperators.close;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class AGTest<S> extends AbstractOperatorTest<S> {
+class AHTest<S> extends AbstractOperatorTest<S> {
 
     @Test
     public void testValidOnAllPathsEarlySplit() {
@@ -17,17 +18,17 @@ class AGTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s3a = createState(Action.Type.CLOSE, "a", "b");
         DMState<S> s3b = createState(Action.Type.CLOSE, "a", "b");
 
-        s1.addNextState(s2a);
-        s1.addNextState(s2b);
-        s2a.addNextState(s3a);
-        s2b.addNextState(s3b);
+        s1.addPreviousState(s2a);
+        s1.addPreviousState(s2b);
+        s2a.addPreviousState(s3a);
+        s2b.addPreviousState(s3b);
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
-        AG ag = new AG(close("a", "b"));
-        ag.label(model);
+        AH ah = new AH(close("a", "b"));
+        ah.label(model);
 
-        assertTrue(s1.hasLabel(ag));
+        assertTrue(s1.hasLabel(ah));
     }
 
     @Test
@@ -37,16 +38,16 @@ class AGTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s3a = createState(Action.Type.CLOSE, "a", "b");
         DMState<S> s3b = createState(Action.Type.CLOSE, "a", "b");
 
-        s1.addNextState(s2);
-        s2.addNextState(s3a);
-        s2.addNextState(s3b);
+        s1.addPreviousState(s2);
+        s2.addPreviousState(s3a);
+        s2.addPreviousState(s3b);
 
         DiscourjeModel<S> model = createModel(s1, s2, s3a, s3b);
 
-        AG ag = new AG(close("a", "b"));
-        ag.label(model);
+        AH ah = new AH(close("a", "b"));
+        ah.label(model);
 
-        assertTrue(s1.hasLabel(ag));
+        assertTrue(s1.hasLabel(ah));
     }
 
     @Test
@@ -55,15 +56,15 @@ class AGTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s2 = createState(Action.Type.SEND, "a", "b");
         DMState<S> s3 = createState(Action.Type.CLOSE, "a", "b");
 
-        s1.addNextState(s2);
-        s2.addNextState(s3);
+        s1.addPreviousState(s2);
+        s2.addPreviousState(s3);
 
         DiscourjeModel<S> model = createModel(s1, s2, s3);
 
-        AG ag = new AG(close("a", "b"));
-        ag.label(model);
+        AH ah = new AH(close("a", "b"));
+        ah.label(model);
 
-        assertFalse(s1.hasLabel(ag));
+        assertFalse(s1.hasLabel(ah));
     }
 
     @Test
@@ -74,17 +75,17 @@ class AGTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s3a = createState(Action.Type.CLOSE, "a", "b");
         DMState<S> s3b = createState(Action.Type.SEND, "a", "c");
 
-        s1.addNextState(s2a);
-        s1.addNextState(s2b);
-        s2a.addNextState(s3a);
-        s2b.addNextState(s3b);
+        s1.addPreviousState(s2a);
+        s1.addPreviousState(s2b);
+        s2a.addPreviousState(s3a);
+        s2b.addPreviousState(s3b);
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
-        AG ag = new AG(close("a", "b"));
-        ag.label(model);
+        AH ah = new AH(close("a", "b"));
+        ah.label(model);
 
-        assertFalse(s1.hasLabel(ag));
+        assertFalse(s1.hasLabel(ah));
     }
 
     @Test
@@ -95,17 +96,17 @@ class AGTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s3a = createState(Action.Type.CLOSE, "a", "c");
         DMState<S> s3b = createState(Action.Type.CLOSE, "a", "c");
 
-        s1.addNextState(s2a);
-        s1.addNextState(s2b);
-        s2a.addNextState(s3a);
-        s2b.addNextState(s3b);
+        s1.addPreviousState(s2a);
+        s1.addPreviousState(s2b);
+        s2a.addPreviousState(s3a);
+        s2b.addPreviousState(s3b);
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
-        AG ag = new AG(close("a", "b"));
-        ag.label(model);
+        AH ah = new AH(close("a", "b"));
+        ah.label(model);
 
-        assertFalse(s1.hasLabel(ag));
+        assertFalse(s1.hasLabel(ah));
     }
 
     @Test
@@ -116,16 +117,16 @@ class AGTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s3a = createState(Action.Type.SEND, "a", "c");
         DMState<S> s3b = createState(Action.Type.SEND, "a", "c");
 
-        s1.addNextState(s2a);
-        s1.addNextState(s2b);
-        s2a.addNextState(s3a);
-        s2b.addNextState(s3b);
+        s1.addPreviousState(s2a);
+        s1.addPreviousState(s2b);
+        s2a.addPreviousState(s3a);
+        s2b.addPreviousState(s3b);
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
-        AG ag = new AG(close("a", "b"));
-        ag.label(model);
+        AH ah = new AH(close("a", "b"));
+        ah.label(model);
 
-        assertFalse(s1.hasLabel(ag));
+        assertFalse(s1.hasLabel(ah));
     }
 }

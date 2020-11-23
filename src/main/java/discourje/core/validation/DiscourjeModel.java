@@ -48,7 +48,9 @@ public class DiscourjeModel<Spec> {
             Transitions<Spec> transitions = dmState.getState().getTransitionsOrNull();
             for (Action action : transitions.getActions()) {
                 for (State<Spec> state : transitions.getTargetsOrNull(action)) {
-                    dmState.addTransition(findState(state, action));
+                    DMState<Spec> nextState = findState(state, action);
+                    dmState.addNextState(nextState);
+                    nextState.addPreviousState(dmState);
                 }
             }
         }

@@ -5,9 +5,10 @@ import discourje.core.validation.DMState;
 import discourje.core.validation.DiscourjeModel;
 import org.junit.jupiter.api.Test;
 import static discourje.core.validation.operators.CtlOperators.close;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class AXTest<S> extends AbstractOperatorTest<S> {
+class AYTest<S> extends AbstractOperatorTest<S> {
 
     @Test
     public void testSelfAndAllSuccessors() {
@@ -15,15 +16,15 @@ class AXTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s2a = createState(Action.Type.CLOSE, "a", "b");
         DMState<S> s2b = createState(Action.Type.CLOSE, "a", "b");
 
-        s1.addNextState(s2a);
-        s1.addNextState(s2b);
+        s1.addPreviousState(s2a);
+        s1.addPreviousState(s2b);
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b);
 
-        AX ax = new AX(close("a", "b"));
-        ax.label(model);
+        AY ay = new AY(close("a", "b"));
+        ay.label(model);
 
-        assertTrue(s1.hasLabel(ax));
+        assertTrue(s1.hasLabel(ay));
     }
 
     @Test
@@ -32,15 +33,15 @@ class AXTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s2a = createState(Action.Type.CLOSE, "a", "b");
         DMState<S> s2b = createState(Action.Type.CLOSE, "a", "b");
 
-        s1.addNextState(s2a);
-        s1.addNextState(s2b);
+        s1.addPreviousState(s2a);
+        s1.addPreviousState(s2b);
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b);
 
-        AX ax = new AX(close("a", "b"));
-        ax.label(model);
+        AY ay = new AY(close("a", "b"));
+        ay.label(model);
 
-        assertTrue(s1.hasLabel(ax));
+        assertTrue(s1.hasLabel(ay));
     }
 
     @Test
@@ -49,15 +50,15 @@ class AXTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s2a = createState(Action.Type.SEND, "a", "b");
         DMState<S> s2b = createState(Action.Type.CLOSE, "a", "b");
 
-        s1.addNextState(s2a);
-        s1.addNextState(s2b);
+        s1.addPreviousState(s2a);
+        s1.addPreviousState(s2b);
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b);
 
-        AX ax = new AX(close("a", "b"));
-        ax.label(model);
+        AY ay = new AY(close("a", "b"));
+        ay.label(model);
 
-        assertFalse(s1.hasLabel(ax));
+        assertFalse(s1.hasLabel(ay));
     }
 
     @Test
@@ -66,14 +67,14 @@ class AXTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s2a = createState(Action.Type.SEND, "a", "b");
         DMState<S> s2b = createState(Action.Type.SEND, "a", "b");
 
-        s1.addNextState(s2a);
-        s1.addNextState(s2b);
+        s1.addPreviousState(s2a);
+        s1.addPreviousState(s2b);
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b);
 
-        AX ax = new AX(close("a", "b"));
-        ax.label(model);
+        AY ay = new AY(close("a", "b"));
+        ay.label(model);
 
-        assertFalse(s1.hasLabel(ax));
+        assertFalse(s1.hasLabel(ay));
     }
 }

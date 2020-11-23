@@ -3,19 +3,19 @@ package discourje.core.validation.operators;
 import discourje.core.validation.DMState;
 import discourje.core.validation.DiscourjeModel;
 
-public class EF implements CtlOperator {
+public class EP implements CtlOperator {
     private final CtlOperator arg;
 
-    public EF(CtlOperator arg) {
+    public EP(CtlOperator arg) {
         this.arg = arg;
     }
 
     @Override
     public void label(DiscourjeModel<?> model) {
-        CtlOperator ef = new EU(True.TRUE, arg);
-        ef.label(model);
+        CtlOperator ep = new ES(True.TRUE, arg);
+        ep.label(model);
         for (DMState<?> state : model.getStates()) {
-            if (state.hasLabel(ef)) {
+            if (state.hasLabel(ep)) {
                 state.addLabel(this);
             }
         }
@@ -23,6 +23,6 @@ public class EF implements CtlOperator {
 
     @Override
     public String toString() {
-        return "EF(" + arg + ")";
+        return "EP(" + arg + ")";
     }
 }

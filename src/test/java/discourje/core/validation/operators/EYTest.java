@@ -4,78 +4,79 @@ import discourje.core.lts.Action;
 import discourje.core.validation.DMState;
 import discourje.core.validation.DiscourjeModel;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class EXTest<S> extends AbstractOperatorTest<S> {
+class EYTest<S> extends AbstractOperatorTest<S> {
 
     @Test
-    public void testEXLine() {
+    public void testEYLine() {
         DMState<S> s1 = createState(Action.Type.SEND, "a", "b");
         DMState<S> s2 = createState(Action.Type.SEND, "b", "c");
         DMState<S> s3 = createState(Action.Type.CLOSE, "a", "b");
         DMState<S> s4 = createState(Action.Type.CLOSE, "b", "c");
-        s1.addNextState(s2);
-        s2.addNextState(s3);
-        s3.addNextState(s4);
+        s1.addPreviousState(s2);
+        s2.addPreviousState(s3);
+        s3.addPreviousState(s4);
         DiscourjeModel<S> model = createModel(s1, s2, s3, s4);
 
-        EX ex = new EX(new Close("a", "b"));
-        ex.label(model);
+        EY ey = new EY(new Close("a", "b"));
+        ey.label(model);
 
-        assertFalse(s1.hasLabel(ex));
-        assertTrue(s2.hasLabel(ex));
-        assertFalse(s3.hasLabel(ex));
-        assertFalse(s4.hasLabel(ex));
+        assertFalse(s1.hasLabel(ey));
+        assertTrue(s2.hasLabel(ey));
+        assertFalse(s3.hasLabel(ey));
+        assertFalse(s4.hasLabel(ey));
     }
 
     @Test
-    public void testEXAllPaths() {
+    public void testEYAllPaths() {
         DMState<S> s1 = createState(Action.Type.SEND, "a", "b");
         DMState<S> s2a = createState(Action.Type.CLOSE, "a", "b");
         DMState<S> s2b = createState(Action.Type.CLOSE, "a", "b");
-        s1.addNextState(s2a);
-        s1.addNextState(s2b);
+        s1.addPreviousState(s2a);
+        s1.addPreviousState(s2b);
         DiscourjeModel<S> model = createModel(s1, s2a, s2b);
 
-        EX ex = new EX(new Close("a", "b"));
-        ex.label(model);
+        EY ey = new EY(new Close("a", "b"));
+        ey.label(model);
 
-        assertTrue(s1.hasLabel(ex));
-        assertFalse(s2a.hasLabel(ex));
-        assertFalse(s2b.hasLabel(ex));
+        assertTrue(s1.hasLabel(ey));
+        assertFalse(s2a.hasLabel(ey));
+        assertFalse(s2b.hasLabel(ey));
     }
 
     @Test
-    public void testEXOnePath() {
+    public void testEYOnePath() {
         DMState<S> s1 = createState(Action.Type.SEND, "a", "b");
         DMState<S> s2a = createState(Action.Type.CLOSE, "a", "b");
         DMState<S> s2b = createState(Action.Type.CLOSE, "b", "c");
-        s1.addNextState(s2a);
-        s1.addNextState(s2b);
+        s1.addPreviousState(s2a);
+        s1.addPreviousState(s2b);
         DiscourjeModel<S> model = createModel(s1, s2a, s2b);
 
-        EX ex = new EX(new Close("a", "b"));
-        ex.label(model);
+        EY ey = new EY(new Close("a", "b"));
+        ey.label(model);
 
-        assertTrue(s1.hasLabel(ex));
-        assertFalse(s2a.hasLabel(ex));
-        assertFalse(s2b.hasLabel(ex));
+        assertTrue(s1.hasLabel(ey));
+        assertFalse(s2a.hasLabel(ey));
+        assertFalse(s2b.hasLabel(ey));
     }
 
     @Test
-    public void testEXNoPath() {
+    public void testEYNoPath() {
         DMState<S> s1 = createState(Action.Type.SEND, "a", "b");
         DMState<S> s2a = createState(Action.Type.CLOSE, "b", "c");
         DMState<S> s2b = createState(Action.Type.CLOSE, "b", "c");
-        s1.addNextState(s2a);
-        s1.addNextState(s2b);
+        s1.addPreviousState(s2a);
+        s1.addPreviousState(s2b);
         DiscourjeModel<S> model = createModel(s1, s2a, s2b);
 
-        EX ex = new EX(new Close("a", "b"));
-        ex.label(model);
+        EY ey = new EY(new Close("a", "b"));
+        ey.label(model);
 
-        assertFalse(s1.hasLabel(ex));
-        assertFalse(s2a.hasLabel(ex));
-        assertFalse(s2b.hasLabel(ex));
+        assertFalse(s1.hasLabel(ey));
+        assertFalse(s2a.hasLabel(ey));
+        assertFalse(s2b.hasLabel(ey));
     }
 }

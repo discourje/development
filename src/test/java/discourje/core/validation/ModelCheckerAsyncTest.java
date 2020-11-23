@@ -6,6 +6,7 @@ import clojure.lang.Var;
 import discourje.core.lts.LTS;
 import discourje.core.validation.formulas.Causality;
 import discourje.core.validation.formulas.CloseChannelsOnlyOnce;
+import discourje.core.validation.formulas.ClosedChannelMustBeUsedInPath;
 import discourje.core.validation.formulas.ClosedChannelMustBeUsedInProtocol;
 import discourje.core.validation.formulas.DoNotSendAfterClose;
 import discourje.core.validation.formulas.DoNotSendToSelf;
@@ -56,7 +57,7 @@ class ModelCheckerAsyncTest<Spec> {
 
     @Test
     public void testCloseChannelsOnlyOnceTrivialCorrect() {
-        List<String> result = getModelCheckerResult("close-channels-only-once-trivial-correct");
+        List<String> result = getModelCheckerResult("close-channels-only-once-trivial-correct-async");
         assertTrue(result.isEmpty());
     }
 
@@ -69,7 +70,7 @@ class ModelCheckerAsyncTest<Spec> {
 
     @Test
     public void testCloseChannelsOnlyOnceNonTrivialCorrect() {
-        List<String> result = getModelCheckerResult("close-channels-only-once-non-trivial-correct");
+        List<String> result = getModelCheckerResult("close-channels-only-once-non-trivial-correct-async");
         assertTrue(result.isEmpty());
     }
 
@@ -82,34 +83,69 @@ class ModelCheckerAsyncTest<Spec> {
     }
 
     @Test
-    public void testCloseUsedChannelsTrivialCorrect() {
-        List<String> result = getModelCheckerResult("closed-channel-must-be-used-in-protocol-trivial-correct");
+    public void testClosedChannelMustBeUsedInProtocolTrivialCorrect() {
+        List<String> result = getModelCheckerResult("closed-channel-must-be-used-in-protocol-trivial-correct-async");
         assertTrue(result.isEmpty());
     }
 
     @Test
     public void testClosedChannelMustBeUsedInProtocolTrivialIncorrect() {
         List<String> result = getModelCheckerResult("closed-channel-must-be-used-in-protocol-trivial-incorrect-async");
-        assertEquals(1, result.size());
-        assertEquals(result.get(0), new ClosedChannelMustBeUsedInProtocol().createDescription("b", "a"));
+        assertEquals(2, result.size());
+        assertTrue(result.contains(new ClosedChannelMustBeUsedInProtocol().createDescription("b", "a")));
+        assertTrue(result.contains(new ClosedChannelMustBeUsedInPath().createDescription("b", "a")));
     }
 
     @Test
     public void testClosedChannelMustBeUsedInProtocolNonTrivialCorrect() {
-        List<String> result = getModelCheckerResult("closed-channel-must-be-used-in-protocol-non-trivial-correct");
-        assertTrue(result.isEmpty());
+        List<String> result = getModelCheckerResult("closed-channel-must-be-used-in-protocol-non-trivial-correct-async");
+        // No ClosedChannelMustBeUsedInProtocol errors expected, but we do expect two for ClosedChannelMustBeUsedInPath
+        assertEquals(2, result.size());
+        assertTrue(result.contains(new ClosedChannelMustBeUsedInPath().createDescription("a", "b")));
+        assertTrue(result.contains(new ClosedChannelMustBeUsedInPath().createDescription("b", "a")));
     }
 
     @Test
     public void testClosedChannelMustBeUsedInProtocolNonTrivialIncorrect() {
         List<String> result = getModelCheckerResult("closed-channel-must-be-used-in-protocol-non-trivial-incorrect-async");
-        assertEquals(1, result.size());
+        assertEquals(3, result.size());
         assertTrue(result.contains(new ClosedChannelMustBeUsedInProtocol().createDescription("b", "c")));
+        assertTrue(result.contains(new ClosedChannelMustBeUsedInPath().createDescription("a", "b")));
+        assertTrue(result.contains(new ClosedChannelMustBeUsedInPath().createDescription("b", "c")));
+
+    }
+
+    @Test
+    public void testClosedChannelMustBeUsedInPathTrivialCorrect() {
+        List<String> result = getModelCheckerResult("closed-channel-must-be-used-in-path-trivial-correct-async");
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testClosedChannelMustBeUsedInPathTrivialIncorrect() {
+        List<String> result = getModelCheckerResult("closed-channel-must-be-used-in-path-trivial-incorrect-async");
+        assertEquals(2, result.size());
+        assertTrue(result.contains(new ClosedChannelMustBeUsedInProtocol().createDescription("a", "c")));
+        assertTrue(result.contains(new ClosedChannelMustBeUsedInPath().createDescription("a", "c")));
+    }
+
+    @Test
+    public void testClosedChannelMustBeUsedInPathNonTrivialCorrect() {
+        List<String> result = getModelCheckerResult("closed-channel-must-be-used-in-path-non-trivial-correct-async");
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testClosedChannelMustBeUsedInPathNonTrivialIncorrect() {
+        List<String> result = getModelCheckerResult("closed-channel-must-be-used-in-path-non-trivial-incorrect-async");
+        assertEquals(2, result.size());
+        assertTrue(result.contains(new ClosedChannelMustBeUsedInPath().createDescription("a", "b")));
+        assertTrue(result.contains(new ClosedChannelMustBeUsedInPath().createDescription("a", "c")));
     }
 
     @Test
     public void testUsedChannelsMustBeClosedTrivialCorrect() {
-        List<String> result = getModelCheckerResult("used-channels-must-be-closed-trivial-correct");
+        List<String> result = getModelCheckerResult("used-channels-must-be-closed-trivial-correct-async");
         assertTrue(result.isEmpty());
     }
 
@@ -121,7 +157,7 @@ class ModelCheckerAsyncTest<Spec> {
 
     @Test
     public void testUsedChannelsMustBeClosedNonTrivialCorrect() {
-        List<String> result = getModelCheckerResult("used-channels-must-be-closed-non-trivial-correct");
+        List<String> result = getModelCheckerResult("used-channels-must-be-closed-non-trivial-correct-async");
         assertTrue(result.isEmpty());
     }
 
@@ -133,7 +169,7 @@ class ModelCheckerAsyncTest<Spec> {
 
     @Test
     public void testDoNotSendAfterCloseTrivialCorrect() {
-        List<String> result = getModelCheckerResult("do-not-send-after-close-trivial-correct");
+        List<String> result = getModelCheckerResult("do-not-send-after-close-trivial-correct-async");
         assertFalse(result.contains(new DoNotSendAfterClose().createDescription("a", "b")));
     }
 
@@ -145,7 +181,7 @@ class ModelCheckerAsyncTest<Spec> {
 
     @Test
     public void testDoNotSendAfterCloseNonTrivialCorrect() {
-        List<String> result = getModelCheckerResult("do-not-send-after-close-non-trivial-correct");
+        List<String> result = getModelCheckerResult("do-not-send-after-close-non-trivial-correct-async");
         assertFalse(result.contains(new DoNotSendAfterClose().createDescription("a", "b")));
     }
 
@@ -157,7 +193,7 @@ class ModelCheckerAsyncTest<Spec> {
 
     @Test
     public void testDoNotSendToSelfTrivialCorrect() {
-        List<String> result = getModelCheckerResult("do-not-send-to-self-trivial-correct");
+        List<String> result = getModelCheckerResult("do-not-send-to-self-trivial-correct-async");
         assertTrue(result.isEmpty());
     }
 
@@ -169,7 +205,7 @@ class ModelCheckerAsyncTest<Spec> {
 
     @Test
     public void testDoNotSendToSelfNonTrivialCorrect() {
-        List<String> result = getModelCheckerResult("do-not-send-to-self-non-trivial-correct");
+        List<String> result = getModelCheckerResult("do-not-send-to-self-non-trivial-correct-async");
         assertTrue(result.isEmpty());
     }
 

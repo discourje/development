@@ -14,10 +14,10 @@ public class AG implements CtlOperator {
 
     @Override
     public void label(DiscourjeModel<?> model) {
-        CtlOperator af = not(EF(not(arg)));
-        af.label(model);
+        CtlOperator ag = not(EF(not(arg)));
+        ag.label(model);
         for (DMState<?> state : model.getStates()) {
-            if (state.hasLabel(af)) {
+            if (state.hasLabel(ag)) {
                 state.addLabel(this);
             }
         }
