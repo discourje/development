@@ -27,6 +27,7 @@ public class DiscourjeModel<Spec> {
     private final Collection<Channel> channels = new HashSet<>();
 
     public DiscourjeModel(LTS<Spec> lts) {
+        lts.expandRecursively();
         lts.getInitialStates().stream()
                 .sorted(Comparator.comparing(State::getIdentifier))
                 .forEach(is -> addState(is, null));

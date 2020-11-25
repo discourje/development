@@ -16,6 +16,7 @@
             [discourje.core.validation.do-not-send-to-self-async :as dnstsa]
             [discourje.core.validation.do-not-send-after-close-async :as dnsaca]
             [discourje.core.validation.used-channels-must-be-closed-async :as ucmbca]
+            [discourje.core.validation.performance :as perf]
             )
   (:import (discourje.core.validation DiscourjeModel)))
 
@@ -32,7 +33,7 @@
   )
 
 (defn make-lts [protocol vars]
-  (lts/lts (s/session protocol vars) :on-the-fly false :history true))
+  (lts/lts (s/session protocol vars) :on-the-fly true))
 
 (def causality-trivial-correct (make-lts ::c/protocol-trivial-correct []))
 (def causality-trivial-incorrect (make-lts ::c/protocol-trivial-incorrect []))
@@ -92,3 +93,5 @@
 (def used-channels-must-be-closed-trivial-incorrect-async (make-lts ::ucmbca/protocol-trivial-incorrect []))
 (def used-channels-must-be-closed-non-trivial-correct-async (make-lts ::ucmbca/protocol-non-trivial-correct []))
 (def used-channels-must-be-closed-non-trivial-incorrect-async (make-lts ::ucmbca/protocol-non-trivial-incorrect []))
+
+(def huge-lts (make-lts ::perf/huge-lts []))

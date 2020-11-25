@@ -29,7 +29,7 @@ public class DMState<Spec> {
         return action;
     }
 
-    Collection<DMState<Spec>> getNextStates() {
+    public Collection<DMState<Spec>> getNextStates() {
         return Collections.unmodifiableCollection(nextStates);
     }
 
@@ -37,7 +37,7 @@ public class DMState<Spec> {
         return nextStates.add(state);
     }
 
-    Collection<DMState<Spec>> getPreviousStates() {
+    public Collection<DMState<Spec>> getPreviousStates() {
         return Collections.unmodifiableCollection(previousStates);
     }
 

@@ -1,9 +1,5 @@
 package discourje.core.validation;
 
-import clojure.java.api.Clojure;
-import clojure.lang.IFn;
-import clojure.lang.Var;
-import discourje.core.lts.LTS;
 import discourje.core.validation.formulas.Causality;
 import discourje.core.validation.formulas.CloseChannelsOnlyOnce;
 import discourje.core.validation.formulas.ClosedChannelMustBeUsedInPath;
@@ -12,22 +8,12 @@ import discourje.core.validation.formulas.DoNotSendAfterClose;
 import discourje.core.validation.formulas.DoNotSendToSelf;
 import discourje.core.validation.formulas.UsedChannelsMustBeClosed;
 import java.util.List;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class ModelCheckerTest<Spec> {
-
-    public static final String NS_VALIDATION = "discourje.core.validation.validation-tests";
-
-    @BeforeAll
-    public static void setUp() {
-        IFn require = Clojure.var("clojure.core", "require");
-        require.invoke(Clojure.read("discourje.core.validation.validation-tests"));
-        require.invoke(Clojure.read(NS_VALIDATION));
-    }
+class ModelCheckerTest<Spec> extends AbstractModelCheckerTest<Spec> {
 
     @Test
     public void testCausalityTrivialCorrect() {
@@ -212,15 +198,5 @@ class ModelCheckerTest<Spec> {
     public void testDoNotSendToSelfNonTrivialIncorrect() {
         List<String> result = getModelCheckerResult("do-not-send-to-self-non-trivial-incorrect");
         assertTrue(result.contains(new DoNotSendToSelf().createDescription("a", "b")));
-    }
-
-    private List<String> getModelCheckerResult(String name) {
-        IFn var = Clojure.var(NS_VALIDATION, name);
-        @SuppressWarnings("unchecked")
-        LTS<Spec> lts = (LTS<Spec>) ((Var) var).get();
-
-        ModelChecker modelChecker = new ModelChecker(lts);
-
-        return modelChecker.checkModel();
     }
 }
