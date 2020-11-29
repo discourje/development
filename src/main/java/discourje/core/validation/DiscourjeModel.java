@@ -4,6 +4,7 @@ import discourje.core.lts.Action;
 import discourje.core.lts.LTS;
 import discourje.core.lts.State;
 import discourje.core.lts.Transitions;
+import discourje.core.validation.operators.CtlOperator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,6 +12,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import org.apache.commons.math3.util.Pair;
 
 /**
@@ -25,6 +27,8 @@ public class DiscourjeModel<Spec> {
     private final Map<Pair<State<Spec>, Action>, DMState<Spec>> dmStateMap = new HashMap<>();
 
     private final Collection<Channel> channels = new HashSet<>();
+
+    private final Set<CtlOperator> labelledBy = new HashSet<>();
 
     public DiscourjeModel(LTS<Spec> lts) {
         lts.expandRecursively();
@@ -77,5 +81,13 @@ public class DiscourjeModel<Spec> {
 
     public Collection<Channel> getChannels() {
         return Collections.unmodifiableCollection(channels);
+    }
+
+    public void setLabelledBy(CtlOperator ctlOperator) {
+        labelledBy.add(ctlOperator);
+    }
+
+    public boolean isLabelledBy(CtlOperator ctlOperator) {
+        return labelledBy.contains(ctlOperator);
     }
 }

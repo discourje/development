@@ -39,6 +39,27 @@ class ModelCheckerPerformanceTest<Spec> extends AbstractModelCheckerTest<Spec> {
         }
     }
 
+    @Test
+    public void testSingleSizeLts() {
+        long t0 = System.currentTimeMillis();
+        int size = 9;
+        LTS<Spec> lts = getHugeLTS(size);
+        lts.expandRecursively();
+        long t1 = System.currentTimeMillis();
+        int ltsSize = lts.getStates().size();
+
+        ModelChecker modelChecker = new ModelChecker(lts);
+        long t2 = System.currentTimeMillis();
+
+        for (int i = 0; i < 5; i++){
+            modelChecker.checkModel();
+        }
+
+        long t3 = System.currentTimeMillis();
+        printHeader();
+        System.out.printf("%s;%s;%s;%s;%s%n", size, ltsSize, (t1 - t0)/1000.0, (t2 - t1)/1000.0, (t3 - t2)/1000.0 );
+    }
+
     public void testPerformanceOnLargeLts(long size) {
         long t0 = System.currentTimeMillis();
         LTS<Spec> lts = getHugeLTS(size);

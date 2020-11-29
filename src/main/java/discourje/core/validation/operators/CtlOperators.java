@@ -5,7 +5,7 @@ public class CtlOperators {
      * Label each state that is the first state in the LTS.
      */
     public static CtlOperator first() {
-        return new First();
+        return First.INSTANCE;
     }
 
     /**

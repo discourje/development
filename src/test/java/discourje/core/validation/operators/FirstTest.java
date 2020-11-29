@@ -16,7 +16,7 @@ class FirstTest<S> extends AbstractOperatorTest<S> {
         DMState<S> secondState = createState(Action.Type.SEND, "a", "b");
         DiscourjeModel<S> model = createModel(firstState, secondState);
 
-        First first = new First();
+        First first = First.INSTANCE;
         first.label(model);
 
         assertTrue(firstState.hasLabel(first));
