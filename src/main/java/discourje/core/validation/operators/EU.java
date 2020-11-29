@@ -2,6 +2,8 @@ package discourje.core.validation.operators;
 
 import discourje.core.validation.DMState;
 import discourje.core.validation.DiscourjeModel;
+import java.util.LinkedList;
+import java.util.Queue;
 
 class EU implements CtlOperator {
     private final CtlOperator lhs;
@@ -17,13 +19,13 @@ class EU implements CtlOperator {
         lhs.label(model);
         rhs.label(model);
 
-        boolean newLabels = true;
-        while (newLabels) {
-            newLabels = false;
-            for (DMState<?> dmState : model.getStates()) {
-                if (dmState.hasLabel(rhs) ||
-                        (dmState.hasLabel(lhs) && dmState.anySuccessorHasLabel(this))) {
-                    newLabels = newLabels || dmState.addLabel(this);
+        Queue<DMState<?>> states = new LinkedList<>(model.getStates());
+        while (!states.isEmpty()) {
+            DMState<?> dmState = states.remove();
+            if (dmState.hasLabel(rhs) ||
+                    (dmState.hasLabel(lhs) && dmState.anySuccessorHasLabel(this))) {
+                if (dmState.addLabel(this)) {
+                    states.addAll(dmState.getPreviousStates());
                 }
             }
         }
