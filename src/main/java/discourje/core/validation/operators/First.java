@@ -15,13 +15,13 @@ class First implements CtlOperator {
     @Override
     public void label(DiscourjeModel<?> model) {
         if (!model.isLabelledBy(this)) {
+            int labelIndex = model.setLabelledBy(this);
             for (DMState<?> state : model.getStates()) {
                 Action action = state.getAction();
                 if (action == null) {
-                    state.addLabel(this);
+                    state.addLabel(labelIndex);
                 }
             }
-            model.setLabelledBy(this);
         }
     }
 

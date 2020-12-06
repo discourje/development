@@ -23,7 +23,7 @@ class AXTest<S> extends AbstractOperatorTest<S> {
         AX ax = new AX(close("a", "b"));
         ax.label(model);
 
-        assertTrue(s1.hasLabel(ax));
+        assertTrue(s1.hasLabel(model.getLabelIndex(ax)));
     }
 
     @Test
@@ -40,7 +40,7 @@ class AXTest<S> extends AbstractOperatorTest<S> {
         AX ax = new AX(close("a", "b"));
         ax.label(model);
 
-        assertTrue(s1.hasLabel(ax));
+        assertTrue(s1.hasLabel(model.getLabelIndex(ax)));
     }
 
     @Test
@@ -57,7 +57,7 @@ class AXTest<S> extends AbstractOperatorTest<S> {
         AX ax = new AX(close("a", "b"));
         ax.label(model);
 
-        assertFalse(s1.hasLabel(ax));
+        assertFalse(s1.hasLabel(model.getLabelIndex(ax)));
     }
 
     @Test
@@ -74,6 +74,6 @@ class AXTest<S> extends AbstractOperatorTest<S> {
         AX ax = new AX(close("a", "b"));
         ax.label(model);
 
-        assertFalse(s1.hasLabel(ax));
+        assertFalse(s1.hasLabel(model.getLabelIndex(ax)));
     }
 }

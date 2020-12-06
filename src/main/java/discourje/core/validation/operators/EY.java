@@ -16,13 +16,14 @@ public class EY implements CtlOperator {
     @Override
     public void label(DiscourjeModel<?> model) {
         if (!model.isLabelledBy(this)) {
+            int labelIndex = model.setLabelledBy(this);
             arg.label(model);
+            int argLabelIndex = model.getLabelIndex(arg);
             for (DMState<?> state : model.getStates()) {
-                if (state.anyPredecessorHasLabel(arg)) {
-                    state.addLabel(this);
+                if (state.anyPredecessorHasLabel(argLabelIndex)) {
+                    state.addLabel(labelIndex);
                 }
             }
-            model.setLabelledBy(this);
         }
     }
 

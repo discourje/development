@@ -31,8 +31,8 @@
                  (s/close ::b ::a)
                  ]
                 [(s/--> ::b ::a)
-                 (s/close ::a ::b)
                  (s/close ::b ::a)
+                 (s/close ::a ::b)
                  ]
                 ))
 

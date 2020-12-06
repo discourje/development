@@ -29,7 +29,7 @@ class AUTest<S> extends AbstractOperatorTest<S> {
         AU au = new AU(snd("a"), close("a", "b"));
         au.label(model);
 
-        assertTrue(s1.hasLabel(au));
+        assertTrue(s1.hasLabel(model.getLabelIndex(au)));
     }
 
     @Test
@@ -48,7 +48,7 @@ class AUTest<S> extends AbstractOperatorTest<S> {
         AU au = new AU(snd("a"), close("a", "b"));
         au.label(model);
 
-        assertTrue(s1.hasLabel(au));
+        assertTrue(s1.hasLabel(model.getLabelIndex(au)));
     }
 
     @Test
@@ -69,7 +69,7 @@ class AUTest<S> extends AbstractOperatorTest<S> {
         AU au = new AU(snd("a"), close("a", "b"));
         au.label(model);
 
-        assertFalse(s1.hasLabel(au));
+        assertFalse(s1.hasLabel(model.getLabelIndex(au)));
     }
 
     @Test
@@ -90,6 +90,6 @@ class AUTest<S> extends AbstractOperatorTest<S> {
         AU au = new AU(snd("a"), close("a", "b"));
         au.label(model);
 
-        assertFalse(s1.hasLabel(au));
+        assertFalse(s1.hasLabel(model.getLabelIndex(au)));
     }
 }

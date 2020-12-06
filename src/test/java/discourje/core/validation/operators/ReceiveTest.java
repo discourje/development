@@ -23,13 +23,13 @@ class ReceiveTest<S> extends AbstractOperatorTest<S> {
         Receive rcv = new Receive("a");
         rcv.label(model);
 
-        assertFalse(s1.hasLabel(rcv));
-        assertFalse(s2.hasLabel(rcv));
-        assertFalse(s3.hasLabel(rcv));
-        assertFalse(s4.hasLabel(rcv));
-        assertTrue(s5.hasLabel(rcv));
-        assertTrue(s6.hasLabel(rcv));
-        assertTrue(s7.hasLabel(rcv));
-        assertFalse(s8.hasLabel(rcv));
+        assertFalse(s1.hasLabel(model.getLabelIndex(rcv)));
+        assertFalse(s2.hasLabel(model.getLabelIndex(rcv)));
+        assertFalse(s3.hasLabel(model.getLabelIndex(rcv)));
+        assertFalse(s4.hasLabel(model.getLabelIndex(rcv)));
+        assertTrue(s5.hasLabel(model.getLabelIndex(rcv)));
+        assertTrue(s6.hasLabel(model.getLabelIndex(rcv)));
+        assertTrue(s7.hasLabel(model.getLabelIndex(rcv)));
+        assertFalse(s8.hasLabel(model.getLabelIndex(rcv)));
     }
 }

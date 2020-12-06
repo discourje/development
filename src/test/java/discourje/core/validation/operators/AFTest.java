@@ -28,7 +28,7 @@ class AFTest<S> extends AbstractOperatorTest<S> {
         AF af = new AF(close("a", "b"));
         af.label(model);
 
-        assertTrue(s1.hasLabel(af));
+        assertTrue(s1.hasLabel(model.getLabelIndex(af)));
     }
 
     @Test
@@ -47,7 +47,7 @@ class AFTest<S> extends AbstractOperatorTest<S> {
         AF af = new AF(close("a", "b"));
         af.label(model);
 
-        assertTrue(s1.hasLabel(af));
+        assertTrue(s1.hasLabel(model.getLabelIndex(af)));
     }
 
     @Test
@@ -64,7 +64,7 @@ class AFTest<S> extends AbstractOperatorTest<S> {
         AF af = new AF(close("a", "b"));
         af.label(model);
 
-        assertFalse(s1.hasLabel(af));
+        assertFalse(s1.hasLabel(model.getLabelIndex(af)));
     }
 
     @Test
@@ -85,7 +85,7 @@ class AFTest<S> extends AbstractOperatorTest<S> {
         AF af = new AF(close("a", "b"));
         af.label(model);
 
-        assertFalse(s1.hasLabel(af));
+        assertFalse(s1.hasLabel(model.getLabelIndex(af)));
     }
 
     @Test
@@ -106,7 +106,7 @@ class AFTest<S> extends AbstractOperatorTest<S> {
         AF af = new AF(close("a", "b"));
         af.label(model);
 
-        assertFalse(s1.hasLabel(af));
+        assertFalse(s1.hasLabel(model.getLabelIndex(af)));
     }
 
 }

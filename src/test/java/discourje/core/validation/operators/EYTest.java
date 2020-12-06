@@ -15,18 +15,18 @@ class EYTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s2 = createState(Action.Type.SEND, "b", "c");
         DMState<S> s3 = createState(Action.Type.CLOSE, "a", "b");
         DMState<S> s4 = createState(Action.Type.CLOSE, "b", "c");
-        s1.addPreviousState(s2);
-        s2.addPreviousState(s3);
-        s3.addPreviousState(s4);
+        s2.addNextState(s1);
+        s3.addNextState(s2);
+        s4.addNextState(s3);
         DiscourjeModel<S> model = createModel(s1, s2, s3, s4);
 
         EY ey = new EY(new Close("a", "b"));
         ey.label(model);
 
-        assertFalse(s1.hasLabel(ey));
-        assertTrue(s2.hasLabel(ey));
-        assertFalse(s3.hasLabel(ey));
-        assertFalse(s4.hasLabel(ey));
+        assertFalse(s1.hasLabel(model.getLabelIndex(ey)));
+        assertTrue(s2.hasLabel(model.getLabelIndex(ey)));
+        assertFalse(s3.hasLabel(model.getLabelIndex(ey)));
+        assertFalse(s4.hasLabel(model.getLabelIndex(ey)));
     }
 
     @Test
@@ -34,16 +34,16 @@ class EYTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s1 = createState(Action.Type.SEND, "a", "b");
         DMState<S> s2a = createState(Action.Type.CLOSE, "a", "b");
         DMState<S> s2b = createState(Action.Type.CLOSE, "a", "b");
-        s1.addPreviousState(s2a);
-        s1.addPreviousState(s2b);
+        s2a.addNextState(s1);
+        s2b.addNextState(s1);
         DiscourjeModel<S> model = createModel(s1, s2a, s2b);
 
         EY ey = new EY(new Close("a", "b"));
         ey.label(model);
 
-        assertTrue(s1.hasLabel(ey));
-        assertFalse(s2a.hasLabel(ey));
-        assertFalse(s2b.hasLabel(ey));
+        assertTrue(s1.hasLabel(model.getLabelIndex(ey)));
+        assertFalse(s2a.hasLabel(model.getLabelIndex(ey)));
+        assertFalse(s2b.hasLabel(model.getLabelIndex(ey)));
     }
 
     @Test
@@ -51,16 +51,16 @@ class EYTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s1 = createState(Action.Type.SEND, "a", "b");
         DMState<S> s2a = createState(Action.Type.CLOSE, "a", "b");
         DMState<S> s2b = createState(Action.Type.CLOSE, "b", "c");
-        s1.addPreviousState(s2a);
-        s1.addPreviousState(s2b);
+        s2a.addNextState(s1);
+        s2b.addNextState(s1);
         DiscourjeModel<S> model = createModel(s1, s2a, s2b);
 
         EY ey = new EY(new Close("a", "b"));
         ey.label(model);
 
-        assertTrue(s1.hasLabel(ey));
-        assertFalse(s2a.hasLabel(ey));
-        assertFalse(s2b.hasLabel(ey));
+        assertTrue(s1.hasLabel(model.getLabelIndex(ey)));
+        assertFalse(s2a.hasLabel(model.getLabelIndex(ey)));
+        assertFalse(s2b.hasLabel(model.getLabelIndex(ey)));
     }
 
     @Test
@@ -68,15 +68,15 @@ class EYTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s1 = createState(Action.Type.SEND, "a", "b");
         DMState<S> s2a = createState(Action.Type.CLOSE, "b", "c");
         DMState<S> s2b = createState(Action.Type.CLOSE, "b", "c");
-        s1.addPreviousState(s2a);
-        s1.addPreviousState(s2b);
+        s2a.addNextState(s1);
+        s2b.addNextState(s1);
         DiscourjeModel<S> model = createModel(s1, s2a, s2b);
 
         EY ey = new EY(new Close("a", "b"));
         ey.label(model);
 
-        assertFalse(s1.hasLabel(ey));
-        assertFalse(s2a.hasLabel(ey));
-        assertFalse(s2b.hasLabel(ey));
+        assertFalse(s1.hasLabel(model.getLabelIndex(ey)));
+        assertFalse(s2a.hasLabel(model.getLabelIndex(ey)));
+        assertFalse(s2b.hasLabel(model.getLabelIndex(ey)));
     }
 }

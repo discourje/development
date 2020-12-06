@@ -2,11 +2,10 @@ package discourje.core.validation;
 
 import discourje.core.lts.Action;
 import discourje.core.lts.State;
-import discourje.core.validation.operators.CtlOperator;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Objects;
 
 public class DMState<Spec> {
@@ -14,7 +13,7 @@ public class DMState<Spec> {
     private final Action action;
     private final Collection<DMState<Spec>> nextStates = new ArrayList<>();
     private final Collection<DMState<Spec>> previousStates = new ArrayList<>();
-    private final Collection<CtlOperator> labels = new HashSet<>();
+    private final BitSet labels = new BitSet();
 
     public DMState(State<Spec> state, Action action) {
         this.state = state;
@@ -33,17 +32,18 @@ public class DMState<Spec> {
         return Collections.unmodifiableCollection(nextStates);
     }
 
-    public boolean addNextState(DMState<Spec> state) {
-        return nextStates.add(state);
+    public void addNextState(DMState<Spec> state) {
+        nextStates.add(state);
+        state.previousStates.add(this);
     }
 
     public Collection<DMState<Spec>> getPreviousStates() {
         return Collections.unmodifiableCollection(previousStates);
     }
 
-    public boolean addPreviousState(DMState<Spec> state) {
-        return previousStates.add(state);
-    }
+//    public boolean addPreviousState(DMState<Spec> state) {
+//        return previousStates.add(state);
+//    }
 
     @Override
     public boolean equals(Object o) {
@@ -59,45 +59,42 @@ public class DMState<Spec> {
         return Objects.hash(state, action);
     }
 
-    public boolean addLabel(CtlOperator operator) {
-        if (labels.contains(operator)) {
+    public boolean addLabel(int labelIndex) {
+        if (labels.get(labelIndex)) {
             return false;
         } else {
-            return labels.add(operator);
+            labels.set(labelIndex);
+            return true;
         }
     }
 
-    public boolean hasLabel(CtlOperator operator) {
-        return labels.contains(operator);
+    public boolean hasLabel(int labelIndex) {
+        return labels.get(labelIndex);
     }
 
-    public boolean successorsExistAndAllHaveLabel(CtlOperator operator) {
+    public boolean successorsExistAndAllHaveLabel(int labelIndex) {
         long successorsWithLabelCount = nextStates.stream()
-                .filter(s -> s.hasLabel(operator))
+                .filter(s -> s.hasLabel(labelIndex))
                 .count();
         int numSuccessors = nextStates.size();
         return numSuccessors > 0 && numSuccessors == successorsWithLabelCount;
     }
 
-    public boolean anySuccessorHasLabel(CtlOperator operator) {
+    public boolean anySuccessorHasLabel(int labelIndex) {
         return nextStates.stream()
-                .anyMatch(s -> s.hasLabel(operator));
+                .anyMatch(s -> s.hasLabel(labelIndex));
     }
 
-    public boolean predecessorsExistAndAllHaveLabel(CtlOperator operator) {
+    public boolean predecessorsExistAndAllHaveLabel(int labelIndex) {
         long precedersWithLabelCount = previousStates.stream()
-                .filter(s -> s.hasLabel(operator))
+                .filter(s -> s.hasLabel(labelIndex))
                 .count();
         int numPreceders = previousStates.size();
         return numPreceders > 0 && numPreceders == precedersWithLabelCount;
     }
 
-    public boolean anyPredecessorHasLabel(CtlOperator operator) {
+    public boolean anyPredecessorHasLabel(int labelIndex) {
         return previousStates.stream()
-                .anyMatch(s -> s.hasLabel(operator));
-    }
-
-    public Collection<CtlOperator> getLabels() {
-        return Collections.unmodifiableCollection(labels);
+                .anyMatch(s -> s.hasLabel(labelIndex));
     }
 }

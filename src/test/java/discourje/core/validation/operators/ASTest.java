@@ -19,17 +19,17 @@ class ASTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s3a = createState(Action.Type.CLOSE, "a", "b");
         DMState<S> s3b = createState(Action.Type.CLOSE, "a", "b");
 
-        s1.addPreviousState(s2a);
-        s1.addPreviousState(s2b);
-        s2a.addPreviousState(s3a);
-        s2b.addPreviousState(s3b);
+        s2a.addNextState(s1);
+        s2b.addNextState(s1);
+        s3a.addNextState(s2a);
+        s3b.addNextState(s2b);
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         AS as = new AS(snd("a"), close("a", "b"));
         as.label(model);
 
-        assertTrue(s1.hasLabel(as));
+        assertTrue(s1.hasLabel(model.getLabelIndex(as)));
     }
 
     @Test
@@ -39,16 +39,16 @@ class ASTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s3a = createState(Action.Type.CLOSE, "a", "b");
         DMState<S> s3b = createState(Action.Type.CLOSE, "a", "b");
 
-        s1.addPreviousState(s2);
-        s2.addPreviousState(s3a);
-        s2.addPreviousState(s3b);
+        s2.addNextState(s1);
+        s3a.addNextState(s2);
+        s3b.addNextState(s2);
 
         DiscourjeModel<S> model = createModel(s1, s2, s3a, s3b);
 
         AS as = new AS(snd("a"), close("a", "b"));
         as.label(model);
 
-        assertTrue(s1.hasLabel(as));
+        assertTrue(s1.hasLabel(model.getLabelIndex(as)));
     }
 
     @Test
@@ -59,17 +59,17 @@ class ASTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s3a = createState(Action.Type.CLOSE, "a", "b");
         DMState<S> s3b = createState(Action.Type.CLOSE, "a", "c");
 
-        s1.addPreviousState(s2a);
-        s1.addPreviousState(s2b);
-        s2a.addPreviousState(s3a);
-        s2b.addPreviousState(s3b);
+        s2a.addNextState(s1);
+        s2b.addNextState(s1);
+        s3a.addNextState(s2a);
+        s3b.addNextState(s2b);
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         AS as = new AS(snd("a"), close("a", "b"));
         as.label(model);
 
-        assertFalse(s1.hasLabel(as));
+        assertFalse(s1.hasLabel(model.getLabelIndex(as)));
     }
 
     @Test
@@ -80,16 +80,16 @@ class ASTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s3a = createState(Action.Type.CLOSE, "a", "c");
         DMState<S> s3b = createState(Action.Type.CLOSE, "a", "c");
 
-        s1.addPreviousState(s2a);
-        s1.addPreviousState(s2b);
-        s2a.addPreviousState(s3a);
-        s2b.addPreviousState(s3b);
+        s2a.addNextState(s1);
+        s2b.addNextState(s1);
+        s3a.addNextState(s2a);
+        s3b.addNextState(s2b);
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         AS as = new AS(snd("a"), close("a", "b"));
         as.label(model);
 
-        assertFalse(s1.hasLabel(as));
+        assertFalse(s1.hasLabel(model.getLabelIndex(as)));
     }
 }

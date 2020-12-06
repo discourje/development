@@ -19,7 +19,7 @@ class FirstTest<S> extends AbstractOperatorTest<S> {
         First first = First.INSTANCE;
         first.label(model);
 
-        assertTrue(firstState.hasLabel(first));
-        assertFalse(secondState.hasLabel(first));
+        assertTrue(firstState.hasLabel(model.getLabelIndex(first)));
+        assertFalse(secondState.hasLabel(model.getLabelIndex(first)));
     }
 }

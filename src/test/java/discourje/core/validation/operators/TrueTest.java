@@ -16,6 +16,6 @@ class TrueTest<S> extends AbstractOperatorTest<S> {
         Send snd = new Send("a");
         snd.label(model);
 
-        assertTrue(s1.hasLabel(snd));
+        assertTrue(s1.hasLabel(model.getLabelIndex(snd)));
     }
 }

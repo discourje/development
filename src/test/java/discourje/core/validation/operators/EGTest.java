@@ -28,7 +28,7 @@ class EGTest<S> extends AbstractOperatorTest<S> {
         EG eg = new EG(close("a", "b"));
         eg.label(model);
 
-        assertTrue(s1.hasLabel(eg));
+        assertTrue(s1.hasLabel(model.getLabelIndex(eg)));
     }
 
     @Test
@@ -47,7 +47,7 @@ class EGTest<S> extends AbstractOperatorTest<S> {
         EG eg = new EG(close("a", "b"));
         eg.label(model);
 
-        assertTrue(s1.hasLabel(eg));
+        assertTrue(s1.hasLabel(model.getLabelIndex(eg)));
     }
 
     @Test
@@ -64,7 +64,7 @@ class EGTest<S> extends AbstractOperatorTest<S> {
         EG eg = new EG(close("a", "b"));
         eg.label(model);
 
-        assertFalse(s1.hasLabel(eg));
+        assertFalse(s1.hasLabel(model.getLabelIndex(eg)));
     }
 
     @Test
@@ -85,7 +85,7 @@ class EGTest<S> extends AbstractOperatorTest<S> {
         EG eg = new EG(close("a", "b"));
         eg.label(model);
 
-        assertTrue(s1.hasLabel(eg));
+        assertTrue(s1.hasLabel(model.getLabelIndex(eg)));
     }
 
     @Test
@@ -106,7 +106,7 @@ class EGTest<S> extends AbstractOperatorTest<S> {
         EG eg = new EG(close("a", "b"));
         eg.label(model);
 
-        assertFalse(s1.hasLabel(eg));
+        assertFalse(s1.hasLabel(model.getLabelIndex(eg)));
     }
 
     @Test
@@ -127,6 +127,6 @@ class EGTest<S> extends AbstractOperatorTest<S> {
         EG eg = new EG(close("a", "b"));
         eg.label(model);
 
-        assertFalse(s1.hasLabel(eg));
+        assertFalse(s1.hasLabel(model.getLabelIndex(eg)));
     }
 }

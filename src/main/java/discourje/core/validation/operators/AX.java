@@ -16,13 +16,14 @@ public class AX implements CtlOperator {
     @Override
     public void label(DiscourjeModel<?> model) {
         if (!model.isLabelledBy(this)) {
+            int labelIndex = model.setLabelledBy(this);
             arg.label(model);
+            int argLabelIndex = model.getLabelIndex(arg);
             for (DMState<?> state : model.getStates()) {
-                if (state.successorsExistAndAllHaveLabel(arg)) {
-                    state.addLabel(this);
+                if (state.successorsExistAndAllHaveLabel(argLabelIndex)) {
+                    state.addLabel(labelIndex);
                 }
             }
-            model.setLabelledBy(this);
         }
     }
 

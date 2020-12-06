@@ -16,15 +16,15 @@ class AYTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s2a = createState(Action.Type.CLOSE, "a", "b");
         DMState<S> s2b = createState(Action.Type.CLOSE, "a", "b");
 
-        s1.addPreviousState(s2a);
-        s1.addPreviousState(s2b);
+        s2a.addNextState(s1);
+        s2b.addNextState(s1);
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b);
 
         AY ay = new AY(close("a", "b"));
         ay.label(model);
 
-        assertTrue(s1.hasLabel(ay));
+        assertTrue(s1.hasLabel(model.getLabelIndex(ay)));
     }
 
     @Test
@@ -33,15 +33,15 @@ class AYTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s2a = createState(Action.Type.CLOSE, "a", "b");
         DMState<S> s2b = createState(Action.Type.CLOSE, "a", "b");
 
-        s1.addPreviousState(s2a);
-        s1.addPreviousState(s2b);
+        s2a.addNextState(s1);
+        s2b.addNextState(s1);
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b);
 
         AY ay = new AY(close("a", "b"));
         ay.label(model);
 
-        assertTrue(s1.hasLabel(ay));
+        assertTrue(s1.hasLabel(model.getLabelIndex(ay)));
     }
 
     @Test
@@ -50,15 +50,15 @@ class AYTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s2a = createState(Action.Type.SEND, "a", "b");
         DMState<S> s2b = createState(Action.Type.CLOSE, "a", "b");
 
-        s1.addPreviousState(s2a);
-        s1.addPreviousState(s2b);
+        s2a.addNextState(s1);
+        s2b.addNextState(s1);
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b);
 
         AY ay = new AY(close("a", "b"));
         ay.label(model);
 
-        assertFalse(s1.hasLabel(ay));
+        assertFalse(s1.hasLabel(model.getLabelIndex(ay)));
     }
 
     @Test
@@ -67,14 +67,14 @@ class AYTest<S> extends AbstractOperatorTest<S> {
         DMState<S> s2a = createState(Action.Type.SEND, "a", "b");
         DMState<S> s2b = createState(Action.Type.SEND, "a", "b");
 
-        s1.addPreviousState(s2a);
-        s1.addPreviousState(s2b);
+        s2a.addNextState(s1);
+        s2b.addNextState(s1);
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b);
 
         AY ay = new AY(close("a", "b"));
         ay.label(model);
 
-        assertFalse(s1.hasLabel(ay));
+        assertFalse(s1.hasLabel(model.getLabelIndex(ay)));
     }
 }

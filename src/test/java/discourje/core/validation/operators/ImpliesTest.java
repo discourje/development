@@ -16,7 +16,7 @@ class ImpliesTest<S> extends AbstractOperatorTest<S> {
         Implies implies = new Implies(True.TRUE, True.TRUE);
         implies.label(model);
 
-        assertTrue(s1.hasLabel(implies));
+        assertTrue(s1.hasLabel(model.getLabelIndex(implies)));
     }
 
     @Test
@@ -27,7 +27,7 @@ class ImpliesTest<S> extends AbstractOperatorTest<S> {
         Implies implies = new Implies(True.TRUE, new Not(True.TRUE));
         implies.label(model);
 
-        assertFalse(s1.hasLabel(implies));
+        assertFalse(s1.hasLabel(model.getLabelIndex(implies)));
     }
 
     @Test
@@ -38,7 +38,7 @@ class ImpliesTest<S> extends AbstractOperatorTest<S> {
         Implies implies = new Implies(True.TRUE, True.TRUE);
         implies.label(model);
 
-        assertTrue(s1.hasLabel(implies));
+        assertTrue(s1.hasLabel(model.getLabelIndex(implies)));
     }
 
     @Test
@@ -49,6 +49,6 @@ class ImpliesTest<S> extends AbstractOperatorTest<S> {
         Implies implies = new Implies(True.TRUE, True.TRUE);
         implies.label(model);
 
-        assertTrue(s1.hasLabel(implies));
+        assertTrue(s1.hasLabel(model.getLabelIndex(implies)));
     }
 }

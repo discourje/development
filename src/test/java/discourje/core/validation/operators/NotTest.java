@@ -17,7 +17,7 @@ class NotTest<S> extends AbstractOperatorTest<S> {
         Not not = new Not(new Send("a"));
         not.label(model);
 
-        assertFalse(s1.hasLabel(not));
-        assertTrue(s2.hasLabel(not));
+        assertFalse(s1.hasLabel(model.getLabelIndex(not)));
+        assertTrue(s2.hasLabel(model.getLabelIndex(not)));
     }
 }

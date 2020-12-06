@@ -12,7 +12,9 @@ public abstract class CtlFormula {
         for (Channel channel : model.getChannels()) {
             CtlOperator ctlOperator = createCtlOperator(channel.getSender(), channel.getReceiver());
             ctlOperator.label(model);
-            if (model.getInitialStates().stream().anyMatch(s -> !s.hasLabel(ctlOperator))) {
+            int labelIndex = model.getLabelIndex(ctlOperator);
+
+            if (model.getInitialStates().stream().anyMatch(s -> !s.hasLabel(labelIndex))) {
                 result.add(createDescription(channel.getSender(), channel.getReceiver()));
             }
         }

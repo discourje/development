@@ -26,15 +26,15 @@ class MessageTest<S> extends AbstractOperatorTest<S> {
         Message msg = new Message("a", "b");
         msg.label(model);
 
-        assertTrue(s1.hasLabel(msg));
-        assertTrue(s2.hasLabel(msg));
-        assertTrue(s3.hasLabel(msg));
-        assertFalse(s4.hasLabel(msg));
-        assertFalse(s5.hasLabel(msg));
-        assertFalse(s6.hasLabel(msg));
-        assertFalse(s7.hasLabel(msg));
-        assertFalse(s8.hasLabel(msg));
-        assertFalse(s9.hasLabel(msg));
-        assertFalse(s10.hasLabel(msg));
+        assertTrue(s1.hasLabel(model.getLabelIndex(msg)));
+        assertTrue(s2.hasLabel(model.getLabelIndex(msg)));
+        assertTrue(s3.hasLabel(model.getLabelIndex(msg)));
+        assertFalse(s4.hasLabel(model.getLabelIndex(msg)));
+        assertFalse(s5.hasLabel(model.getLabelIndex(msg)));
+        assertFalse(s6.hasLabel(model.getLabelIndex(msg)));
+        assertFalse(s7.hasLabel(model.getLabelIndex(msg)));
+        assertFalse(s8.hasLabel(model.getLabelIndex(msg)));
+        assertFalse(s9.hasLabel(model.getLabelIndex(msg)));
+        assertFalse(s10.hasLabel(model.getLabelIndex(msg)));
     }
 }

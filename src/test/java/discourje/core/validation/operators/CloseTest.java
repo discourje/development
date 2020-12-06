@@ -22,8 +22,8 @@ class CloseTest<S> extends AbstractOperatorTest<S> {
         close.label(model);
 
         // verify
-        assertTrue(s1.hasLabel(close));
-        assertFalse(s2.hasLabel(close));
+        assertTrue(s1.hasLabel(model.getLabelIndex(close)));
+        assertFalse(s2.hasLabel(model.getLabelIndex(close)));
     }
 
 }

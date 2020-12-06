@@ -24,9 +24,9 @@ class OrTest<S> extends AbstractOperatorTest<S> {
         or.label(model);
 
         // verify
-        assertTrue(s1.hasLabel(or));
-        assertTrue(s2.hasLabel(or));
-        assertTrue(s3.hasLabel(or));
-        assertFalse(s4.hasLabel(or));
+        assertTrue(s1.hasLabel(model.getLabelIndex(or)));
+        assertTrue(s2.hasLabel(model.getLabelIndex(or)));
+        assertTrue(s3.hasLabel(model.getLabelIndex(or)));
+        assertFalse(s4.hasLabel(model.getLabelIndex(or)));
     }
 }

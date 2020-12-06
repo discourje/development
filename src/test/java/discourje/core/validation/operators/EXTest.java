@@ -22,10 +22,10 @@ class EXTest<S> extends AbstractOperatorTest<S> {
         EX ex = new EX(new Close("a", "b"));
         ex.label(model);
 
-        assertFalse(s1.hasLabel(ex));
-        assertTrue(s2.hasLabel(ex));
-        assertFalse(s3.hasLabel(ex));
-        assertFalse(s4.hasLabel(ex));
+        assertFalse(s1.hasLabel(model.getLabelIndex(ex)));
+        assertTrue(s2.hasLabel(model.getLabelIndex(ex)));
+        assertFalse(s3.hasLabel(model.getLabelIndex(ex)));
+        assertFalse(s4.hasLabel(model.getLabelIndex(ex)));
     }
 
     @Test
@@ -40,9 +40,9 @@ class EXTest<S> extends AbstractOperatorTest<S> {
         EX ex = new EX(new Close("a", "b"));
         ex.label(model);
 
-        assertTrue(s1.hasLabel(ex));
-        assertFalse(s2a.hasLabel(ex));
-        assertFalse(s2b.hasLabel(ex));
+        assertTrue(s1.hasLabel(model.getLabelIndex(ex)));
+        assertFalse(s2a.hasLabel(model.getLabelIndex(ex)));
+        assertFalse(s2b.hasLabel(model.getLabelIndex(ex)));
     }
 
     @Test
@@ -57,9 +57,9 @@ class EXTest<S> extends AbstractOperatorTest<S> {
         EX ex = new EX(new Close("a", "b"));
         ex.label(model);
 
-        assertTrue(s1.hasLabel(ex));
-        assertFalse(s2a.hasLabel(ex));
-        assertFalse(s2b.hasLabel(ex));
+        assertTrue(s1.hasLabel(model.getLabelIndex(ex)));
+        assertFalse(s2a.hasLabel(model.getLabelIndex(ex)));
+        assertFalse(s2b.hasLabel(model.getLabelIndex(ex)));
     }
 
     @Test
@@ -74,8 +74,8 @@ class EXTest<S> extends AbstractOperatorTest<S> {
         EX ex = new EX(new Close("a", "b"));
         ex.label(model);
 
-        assertFalse(s1.hasLabel(ex));
-        assertFalse(s2a.hasLabel(ex));
-        assertFalse(s2b.hasLabel(ex));
+        assertFalse(s1.hasLabel(model.getLabelIndex(ex)));
+        assertFalse(s2a.hasLabel(model.getLabelIndex(ex)));
+        assertFalse(s2b.hasLabel(model.getLabelIndex(ex)));
     }
 }

@@ -18,15 +18,17 @@ public class Implies implements CtlOperator {
     @Override
     public void label(DiscourjeModel<?> model) {
         if (!model.isLabelledBy(this)) {
+            int labelIndex = model.setLabelledBy(this);
             lhs.label(model);
             rhs.label(model);
+            int lhsLabelIndex = model.getLabelIndex(lhs);
+            int rhsLabelIndex = model.getLabelIndex(rhs);
 
             for (DMState<?> state : model.getStates()) {
-                if (!state.hasLabel(lhs) || state.hasLabel(rhs)) {
-                    state.addLabel(this);
+                if (!state.hasLabel(lhsLabelIndex) || state.hasLabel(rhsLabelIndex)) {
+                    state.addLabel(labelIndex);
                 }
             }
-            model.setLabelledBy(this);
         }
     }
 

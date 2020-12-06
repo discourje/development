@@ -24,10 +24,10 @@ class AndTest<S> extends AbstractOperatorTest<S> {
         and.label(model);
 
         // verify
-        assertTrue(s1.hasLabel(and));
-        assertFalse(s2.hasLabel(and));
-        assertFalse(s3.hasLabel(and));
-        assertFalse(s4.hasLabel(and));
+        assertTrue(s1.hasLabel(model.getLabelIndex(and)));
+        assertFalse(s2.hasLabel(model.getLabelIndex(and)));
+        assertFalse(s3.hasLabel(model.getLabelIndex(and)));
+        assertFalse(s4.hasLabel(model.getLabelIndex(and)));
     }
 
 }

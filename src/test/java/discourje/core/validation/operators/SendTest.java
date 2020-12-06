@@ -24,13 +24,14 @@ class SendTest<S> extends AbstractOperatorTest<S> {
         Send snd = new Send("a");
         snd.label(model);
 
-        assertTrue(s1.hasLabel(snd));
-        assertTrue(s2.hasLabel(snd));
-        assertTrue(s3.hasLabel(snd));
-        assertFalse(s4.hasLabel(snd));
-        assertFalse(s5.hasLabel(snd));
-        assertFalse(s6.hasLabel(snd));
-        assertFalse(s7.hasLabel(snd));
-        assertFalse(s8.hasLabel(snd));
+        int labelIndex = model.getLabelIndex(snd);
+        assertTrue(s1.hasLabel(labelIndex));
+        assertTrue(s2.hasLabel(labelIndex));
+        assertTrue(s3.hasLabel(labelIndex));
+        assertFalse(s4.hasLabel(labelIndex));
+        assertFalse(s5.hasLabel(labelIndex));
+        assertFalse(s6.hasLabel(labelIndex));
+        assertFalse(s7.hasLabel(labelIndex));
+        assertFalse(s8.hasLabel(labelIndex));
     }
 }

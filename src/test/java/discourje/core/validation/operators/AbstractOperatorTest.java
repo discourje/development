@@ -23,8 +23,6 @@ public class AbstractOperatorTest<S> {
     @SafeVarargs
     @SuppressWarnings("unchecked")
     protected final DiscourjeModel<S> createModel(DMState<S>... states) {
-        DiscourjeModel<S> model = mock(DiscourjeModel.class);
-        when(model.getStates()).thenReturn(Arrays.asList(states));
-        return model;
+        return new DiscourjeModel<S>(states);
     }
 }

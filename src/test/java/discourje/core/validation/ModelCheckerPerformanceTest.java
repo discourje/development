@@ -40,9 +40,9 @@ class ModelCheckerPerformanceTest<Spec> extends AbstractModelCheckerTest<Spec> {
     }
 
     @Test
-    public void testSingleSizeLts() {
+    public void testSingleSizeLts() throws InterruptedException {
         long t0 = System.currentTimeMillis();
-        int size = 9;
+        int size = 13;
         LTS<Spec> lts = getHugeLTS(size);
         lts.expandRecursively();
         long t1 = System.currentTimeMillis();
@@ -58,6 +58,8 @@ class ModelCheckerPerformanceTest<Spec> extends AbstractModelCheckerTest<Spec> {
         long t3 = System.currentTimeMillis();
         printHeader();
         System.out.printf("%s;%s;%s;%s;%s%n", size, ltsSize, (t1 - t0)/1000.0, (t2 - t1)/1000.0, (t3 - t2)/1000.0 );
+        System.gc();
+        Thread.sleep(2_000);
     }
 
     public void testPerformanceOnLargeLts(long size) {

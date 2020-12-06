@@ -29,7 +29,7 @@ class EUTest<S> extends AbstractOperatorTest<S> {
         EU eu = new EU(snd("a"), close("a", "b"));
         eu.label(model);
 
-        assertTrue(s1.hasLabel(eu));
+        assertTrue(s1.hasLabel(model.getLabelIndex(eu)));
     }
 
     @Test
@@ -48,7 +48,7 @@ class EUTest<S> extends AbstractOperatorTest<S> {
         EU eu = new EU(snd("a"), close("a", "b"));
         eu.label(model);
 
-        assertTrue(s1.hasLabel(eu));
+        assertTrue(s1.hasLabel(model.getLabelIndex(eu)));
     }
 
     @Test
@@ -69,7 +69,7 @@ class EUTest<S> extends AbstractOperatorTest<S> {
         EU eu = new EU(snd("a"), close("a", "b"));
         eu.label(model);
 
-        assertTrue(s1.hasLabel(eu));
+        assertTrue(s1.hasLabel(model.getLabelIndex(eu)));
     }
 
     @Test
@@ -90,6 +90,6 @@ class EUTest<S> extends AbstractOperatorTest<S> {
         EU eu = new EU(snd("a"), close("a", "b"));
         eu.label(model);
 
-        assertFalse(s1.hasLabel(eu));
+        assertFalse(s1.hasLabel(model.getLabelIndex(eu)));
     }
 }

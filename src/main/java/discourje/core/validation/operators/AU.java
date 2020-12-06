@@ -20,20 +20,22 @@ class AU implements CtlOperator {
     @Override
     public void label(DiscourjeModel<?> model) {
         if (!model.isLabelledBy(this)) {
+            int labelIndex = model.setLabelledBy(this);
             lhs.label(model);
             rhs.label(model);
+            int lhsLabelIndex = model.getLabelIndex(lhs);
+            int rhsLabelIndex = model.getLabelIndex(rhs);
 
             Queue<DMState<?>> states = new LinkedList<>(model.getStates());
             while (!states.isEmpty()) {
                 DMState<?> dmState = states.remove();
-                if (dmState.hasLabel(rhs) ||
-                        (dmState.hasLabel(lhs) && dmState.successorsExistAndAllHaveLabel(this))) {
-                    if (dmState.addLabel(this)) {
+                if (dmState.hasLabel(rhsLabelIndex) ||
+                        (dmState.hasLabel(lhsLabelIndex) && dmState.successorsExistAndAllHaveLabel(labelIndex))) {
+                    if (dmState.addLabel(labelIndex)) {
                         states.addAll(dmState.getPreviousStates());
                     }
                 }
             }
-            model.setLabelledBy(this);
         }
     }
 

@@ -6,13 +6,13 @@ import discourje.core.lts.State;
 import discourje.core.lts.Transitions;
 import discourje.core.validation.operators.CtlOperator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import org.apache.commons.math3.util.Pair;
 
 /**
@@ -28,7 +28,9 @@ public class DiscourjeModel<Spec> {
 
     private final Collection<Channel> channels = new HashSet<>();
 
-    private final Set<CtlOperator> labelledBy = new HashSet<>();
+    private int currentLabelIndex = 0;
+
+    private final Map<CtlOperator, Integer> labelIndices = new HashMap<>();
 
     public DiscourjeModel(LTS<Spec> lts) {
         lts.expandRecursively();
@@ -55,10 +57,15 @@ public class DiscourjeModel<Spec> {
                 for (State<Spec> state : transitions.getTargetsOrNull(action)) {
                     DMState<Spec> nextState = findState(state, action);
                     dmState.addNextState(nextState);
-                    nextState.addPreviousState(dmState);
+//                    nextState.addPreviousState(dmState);
                 }
             }
         }
+    }
+
+    public DiscourjeModel(DMState<Spec>[] states) {
+        this.initialStates = Arrays.asList(states);
+        this.states.addAll(Arrays.asList(states));
     }
 
     private void addState(State<Spec> state, Action action) {
@@ -83,11 +90,16 @@ public class DiscourjeModel<Spec> {
         return Collections.unmodifiableCollection(channels);
     }
 
-    public void setLabelledBy(CtlOperator ctlOperator) {
-        labelledBy.add(ctlOperator);
+    public int setLabelledBy(CtlOperator ctlOperator) {
+        labelIndices.put(ctlOperator, currentLabelIndex);
+        return currentLabelIndex++;
     }
 
     public boolean isLabelledBy(CtlOperator ctlOperator) {
-        return labelledBy.contains(ctlOperator);
+        return labelIndices.containsKey(ctlOperator);
+    }
+
+    public int getLabelIndex(CtlOperator ctlOperator) {
+        return labelIndices.get(ctlOperator);
     }
 }

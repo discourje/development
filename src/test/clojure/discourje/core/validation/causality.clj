@@ -53,3 +53,9 @@
               (s/close ::c ::d)
               (s/close ::d ::a)
               )
+
+(s/par [(s/--> ::a ::b)
+        (s/close ::a ::b)]
+       [(s/--> ::a ::c)
+        (s/close ::a ::c)]
+       )

@@ -20,20 +20,22 @@ public class ES implements CtlOperator {
     @Override
     public void label(DiscourjeModel<?> model) {
         if (!model.isLabelledBy(this)) {
+            int labelIndex = model.setLabelledBy(this);
             lhs.label(model);
+            int lhsIndex = model.getLabelIndex(lhs);
             rhs.label(model);
+            int rhsIndex = model.getLabelIndex(rhs);
 
             Queue<DMState<?>> states = new LinkedList<>(model.getStates());
             while (!states.isEmpty()) {
                 DMState<?> dmState = states.remove();
-                if (dmState.hasLabel(rhs) ||
-                        (dmState.hasLabel(lhs) && dmState.anyPredecessorHasLabel(this))) {
-                    if (dmState.addLabel(this)) {
+                if (dmState.hasLabel(rhsIndex) ||
+                        (dmState.hasLabel(lhsIndex) && dmState.anyPredecessorHasLabel(labelIndex))) {
+                    if (dmState.addLabel(labelIndex)) {
                         states.addAll(dmState.getNextStates());
                     }
                 }
             }
-            model.setLabelledBy(this);
         }
     }
 

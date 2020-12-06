@@ -27,7 +27,7 @@ class EFTest<S> extends AbstractOperatorTest<S> {
         EF ef = new EF(close("a", "b"));
         ef.label(model);
 
-        assertTrue(s1.hasLabel(ef));
+        assertTrue(s1.hasLabel(model.getLabelIndex(ef)));
     }
 
     @Test
@@ -46,7 +46,7 @@ class EFTest<S> extends AbstractOperatorTest<S> {
         EF ef = new EF(close("a", "b"));
         ef.label(model);
 
-        assertTrue(s1.hasLabel(ef));
+        assertTrue(s1.hasLabel(model.getLabelIndex(ef)));
     }
 
     @Test
@@ -63,7 +63,7 @@ class EFTest<S> extends AbstractOperatorTest<S> {
         EF ef = new EF(close("a", "b"));
         ef.label(model);
 
-        assertTrue(s1.hasLabel(ef));
+        assertTrue(s1.hasLabel(model.getLabelIndex(ef)));
     }
 
     @Test
@@ -84,7 +84,7 @@ class EFTest<S> extends AbstractOperatorTest<S> {
         EF ef = new EF(close("a", "b"));
         ef.label(model);
 
-        assertTrue(s1.hasLabel(ef));
+        assertTrue(s1.hasLabel(model.getLabelIndex(ef)));
     }
 
     @Test
@@ -105,6 +105,6 @@ class EFTest<S> extends AbstractOperatorTest<S> {
         EF ef = new EF(close("a", "b"));
         ef.label(model);
 
-        assertFalse(s1.hasLabel(ef));
+        assertFalse(s1.hasLabel(model.getLabelIndex(ef)));
     }
 }

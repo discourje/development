@@ -17,14 +17,14 @@ class And implements CtlOperator {
     @Override
     public void label(DiscourjeModel<?> model) {
         if (!model.isLabelledBy(this)) {
+            int labelIndex = model.setLabelledBy(this);
             Arrays.stream(args).forEach(a -> a.label(model));
 
             for (DMState<?> state : model.getStates()) {
-                if (Arrays.stream(args).allMatch(state::hasLabel)) {
-                    state.addLabel(this);
+                if (Arrays.stream(args).allMatch(arg -> state.hasLabel(model.getLabelIndex(arg)))) {
+                    state.addLabel(labelIndex);
                 }
             }
-            model.setLabelledBy(this);
         }
     }
 

@@ -16,14 +16,15 @@ public class AF implements CtlOperator {
     @Override
     public void label(DiscourjeModel<?> model) {
         if (!model.isLabelledBy(this)) {
+            int labelIndex = model.setLabelledBy(this);
             CtlOperator au = new AU(True.TRUE, arg);
             au.label(model);
+            int auIndex = model.getLabelIndex(au);
             for (DMState<?> state : model.getStates()) {
-                if (state.hasLabel(au)) {
-                    state.addLabel(this);
+                if (state.hasLabel(auIndex)) {
+                    state.addLabel(labelIndex);
                 }
             }
-            model.setLabelledBy(this);
         }
     }
 

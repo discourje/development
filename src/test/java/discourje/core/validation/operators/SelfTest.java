@@ -21,12 +21,12 @@ class SelfTest<S> extends AbstractOperatorTest<S> {
         Self self = new Self("a");
         self.label(model);
 
-        assertTrue(s1.hasLabel(self));
-        assertTrue(s2.hasLabel(self));
-        assertTrue(s3.hasLabel(self));
-        assertTrue(s4.hasLabel(self));
-        assertFalse(s5.hasLabel(self));
-        assertFalse(s6.hasLabel(self));
+        assertTrue(s1.hasLabel(model.getLabelIndex(self)));
+        assertTrue(s2.hasLabel(model.getLabelIndex(self)));
+        assertTrue(s3.hasLabel(model.getLabelIndex(self)));
+        assertTrue(s4.hasLabel(model.getLabelIndex(self)));
+        assertFalse(s5.hasLabel(model.getLabelIndex(self)));
+        assertFalse(s6.hasLabel(model.getLabelIndex(self)));
 
     }
 }

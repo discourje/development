@@ -18,14 +18,15 @@ public class EG implements CtlOperator {
     @Override
     public void label(DiscourjeModel<?> model) {
         if (!model.isLabelledBy(this)) {
+            int labelIndex = model.setLabelledBy(this);
             CtlOperator eg = not(AF(not(arg)));
             eg.label(model);
+            int egLabelIndex = model.getLabelIndex(eg);
             for (DMState<?> state : model.getStates()) {
-                if (state.hasLabel(eg)) {
-                    state.addLabel(this);
+                if (state.hasLabel(egLabelIndex)) {
+                    state.addLabel(labelIndex);
                 }
             }
-            model.setLabelledBy(this);
         }
     }
 

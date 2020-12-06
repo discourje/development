@@ -16,14 +16,15 @@ class Not implements CtlOperator {
     @Override
     public void label(DiscourjeModel<?> model) {
         if (!model.isLabelledBy(this)) {
+            int labelIndex = model.setLabelledBy(this);
             arg.label(model);
+            int argLabelIndex = model.getLabelIndex(arg);
 
             for (DMState<?> state : model.getStates()) {
-                if (!state.hasLabel(arg)) {
-                    state.addLabel(this);
+                if (!state.hasLabel(argLabelIndex)) {
+                    state.addLabel(labelIndex);
                 }
             }
-            model.setLabelledBy(this);
         }
     }
 

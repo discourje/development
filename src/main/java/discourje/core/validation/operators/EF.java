@@ -16,14 +16,15 @@ public class EF implements CtlOperator {
     @Override
     public void label(DiscourjeModel<?> model) {
         if (!model.isLabelledBy(this)) {
+            int labelIndex = model.setLabelledBy(this);
             CtlOperator ef = new EU(True.TRUE, arg);
             ef.label(model);
+            int efLabelIndex = model.getLabelIndex(ef);
             for (DMState<?> state : model.getStates()) {
-                if (state.hasLabel(ef)) {
-                    state.addLabel(this);
+                if (state.hasLabel(efLabelIndex)) {
+                    state.addLabel(labelIndex);
                 }
             }
-            model.setLabelledBy(this);
         }
     }
 
