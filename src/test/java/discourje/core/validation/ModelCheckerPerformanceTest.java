@@ -3,34 +3,42 @@ package discourje.core.validation;
 import clojure.java.api.Clojure;
 import clojure.lang.IFn;
 import discourje.core.lts.LTS;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.Test;
 
 class ModelCheckerPerformanceTest<Spec> extends AbstractModelCheckerTest<Spec> {
 
     @Test
-    public void testIncreasingLtsSize() {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        printHeader();
+    public void testIncreasingLtsSize() throws IOException {
+        String java = System.getProperty("java.home") + "/bin/java";
+        String classpath = System.getProperty("java.class.path");
+        println("run #;#states;LTS creation;Model creation;Labelling");
         long i = 1;
         outer:
         while (true) {
             for (int j = 0; j < 3; j++) {
-                long finalI = i;
                 long t0 = System.currentTimeMillis();
-                Future<?> future = executor.submit(() -> testPerformanceOnLargeLts(finalI));
+                String[] command = {java, "-classpath", classpath, "com.intellij.rt.junit.JUnitStarter", "-ideVersion5", "-junit5", "discourje.core.validation.ModelCheckerPerformanceTest,testLtsForSize"};
+                String[] envp = {"discourje.performance.ltssize=" + i};
+                Process process = Runtime.getRuntime().exec(command, envp);
                 try {
-                    future.get(10, TimeUnit.MINUTES);
-                } catch (InterruptedException | ExecutionException e) {
+                    process.waitFor(10, TimeUnit.MINUTES);
+                } catch (InterruptedException e) {
                     e.printStackTrace();
-                } catch (TimeoutException e) {
-                    break outer;
                 }
+
+                BufferedReader output = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                output.lines().forEach(System.out::println);
+
+                BufferedReader outputError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+                outputError.lines().forEach(System.err::println);
+
                 if (System.currentTimeMillis() - t0 > (2 * 60_000)) {
                     break outer;
                 }
@@ -40,30 +48,10 @@ class ModelCheckerPerformanceTest<Spec> extends AbstractModelCheckerTest<Spec> {
     }
 
     @Test
-    public void testSingleSizeLts() throws InterruptedException {
+    public void testLtsForSize() throws FileNotFoundException {
         long t0 = System.currentTimeMillis();
-        int size = 13;
-        LTS<Spec> lts = getHugeLTS(size);
-        lts.expandRecursively();
-        long t1 = System.currentTimeMillis();
-        int ltsSize = lts.getStates().size();
-
-        ModelChecker modelChecker = new ModelChecker(lts);
-        long t2 = System.currentTimeMillis();
-
-        for (int i = 0; i < 5; i++){
-            modelChecker.checkModel();
-        }
-
-        long t3 = System.currentTimeMillis();
-        printHeader();
-        System.out.printf("%s;%s;%s;%s;%s%n", size, ltsSize, (t1 - t0)/1000.0, (t2 - t1)/1000.0, (t3 - t2)/1000.0 );
-        System.gc();
-        Thread.sleep(2_000);
-    }
-
-    public void testPerformanceOnLargeLts(long size) {
-        long t0 = System.currentTimeMillis();
+        String sizeString = System.getenv("discourje.performance.ltssize");
+        int size = sizeString != null ? Integer.parseInt(sizeString) : 1;
         LTS<Spec> lts = getHugeLTS(size);
         lts.expandRecursively();
         long t1 = System.currentTimeMillis();
@@ -73,12 +61,16 @@ class ModelCheckerPerformanceTest<Spec> extends AbstractModelCheckerTest<Spec> {
         long t2 = System.currentTimeMillis();
 
         modelChecker.checkModel();
+
         long t3 = System.currentTimeMillis();
-        System.out.printf("%s;%s;%s;%s;%s%n", size, ltsSize, (t1 - t0)/1000.0, (t2 - t1)/1000.0, (t3 - t2)/1000.0 );
+        String line = String.format("%s;%s;%s;%s;%s", size, ltsSize, (t1 - t0) / 1000.0, (t2 - t1) / 1000.0, (t3 - t2) / 1000.0);
+        println(line);
     }
 
-    private void printHeader() {
-        System.out.println("run #;#states;LTS creation;Model creation;Labelling");
+    private void println(String line) throws FileNotFoundException {
+        PrintStream ps = new PrintStream(new FileOutputStream("test.csv", true));
+        ps.println(line);
+        ps.close();
     }
 
     LTS<Spec> getHugeLTS(long size) {
