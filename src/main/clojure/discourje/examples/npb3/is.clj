@@ -28,6 +28,19 @@
                 (s/par-every [i (range k)]
                   (s/close (::worker i) ::master)))))
 
+;(s/defsession ::is [k]
+;  (s/cat (s/* (s/cat (s/cat-every [i (range k)]
+;                       (s/-->> discourje.examples.npb3.impl.ISThreads.RankMessage ::master (::worker i)))
+;                     (s/cat-every [i (range k)]
+;                       (s/-->> discourje.examples.npb3.impl.DoneMessage (::worker i) ::master))))
+;         (s/cat-every [i (range k)]
+;           (s/cat (s/-->> discourje.examples.npb3.impl.ExitMessage ::master (::worker i))
+;                  (s/-->> discourje.examples.npb3.impl.DoneMessage (::worker i) ::master)))
+;         (s/cat (s/cat-every [i (range k)]
+;                  (s/close ::master (::worker i)))
+;                (s/cat-every [i (range k)]
+;                  (s/close (::worker i) ::master)))))
+
 ;;;;
 ;;;; Implementation
 ;;;;
