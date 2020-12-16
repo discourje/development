@@ -2,8 +2,8 @@ package discourje.core.validation.formulas;
 
 import discourje.core.validation.CtlFormula;
 import discourje.core.validation.operators.CtlOperator;
-import static discourje.core.validation.operators.CtlOperators.AF;
 import static discourje.core.validation.operators.CtlOperators.AG;
+import static discourje.core.validation.operators.CtlOperators.EF;
 import static discourje.core.validation.operators.CtlOperators.EX;
 import static discourje.core.validation.operators.CtlOperators.close;
 import static discourje.core.validation.operators.CtlOperators.implies;
@@ -18,6 +18,6 @@ public class CloseChannelsOnlyOnce extends CtlFormula {
 
     @Override
     public CtlOperator createCtlOperator(String r1, String r2) {
-        return AG(implies(close(r1,r2), not(EX(AF(close(r1, r2))))));
+        return AG(implies(close(r1,r2), not(EX(EF(close(r1, r2))))));
     }
 }
