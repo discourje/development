@@ -41,10 +41,6 @@ public class DMState<Spec> {
         return Collections.unmodifiableCollection(previousStates);
     }
 
-//    public boolean addPreviousState(DMState<Spec> state) {
-//        return previousStates.add(state);
-//    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

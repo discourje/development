@@ -7,7 +7,7 @@
  * This behaviour can be overruled by providing your own set of rules in {@link discourje.core.validation.ModelChecker#ModelChecker(discourje.core.lts.LTS, java.util.Collection)}.
  *
  * You can provide your own rules.
- * They can be created by implementing {@link discourje.core.validation.CtlFormula}.
- * The actual rule can be constructed using the method on {@link discourje.core.validation.operators.CtlOperators}.
+ * They can be created by implementing {@link discourje.core.validation.Rule}.
+ * The actual rule can be constructed using the method on {@link discourje.core.validation.formulas.CtlFormulas}.
  */
 package discourje.core.validation;

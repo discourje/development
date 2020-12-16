@@ -4,7 +4,7 @@ import discourje.core.lts.Action;
 import discourje.core.lts.LTS;
 import discourje.core.lts.State;
 import discourje.core.lts.Transitions;
-import discourje.core.validation.operators.CtlOperator;
+import discourje.core.validation.formulas.CtlFormula;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,7 +30,7 @@ public class DiscourjeModel<Spec> {
 
     private int currentLabelIndex = 0;
 
-    private final Map<CtlOperator, Integer> labelIndices = new HashMap<>();
+    private final Map<CtlFormula, Integer> labelIndices = new HashMap<>();
 
     public DiscourjeModel(LTS<Spec> lts) {
         lts.expandRecursively();
@@ -90,16 +90,16 @@ public class DiscourjeModel<Spec> {
         return Collections.unmodifiableCollection(channels);
     }
 
-    public int setLabelledBy(CtlOperator ctlOperator) {
-        labelIndices.put(ctlOperator, currentLabelIndex);
+    public int setLabelledBy(CtlFormula ctlFormula) {
+        labelIndices.put(ctlFormula, currentLabelIndex);
         return currentLabelIndex++;
     }
 
-    public boolean isLabelledBy(CtlOperator ctlOperator) {
-        return labelIndices.containsKey(ctlOperator);
+    public boolean isLabelledBy(CtlFormula ctlFormula) {
+        return labelIndices.containsKey(ctlFormula);
     }
 
-    public int getLabelIndex(CtlOperator ctlOperator) {
-        return labelIndices.get(ctlOperator);
+    public int getLabelIndex(CtlFormula ctlFormula) {
+        return labelIndices.get(ctlFormula);
     }
 }

@@ -1,12 +1,12 @@
 package discourje.core.validation;
 
-import discourje.core.validation.formulas.Causality;
-import discourje.core.validation.formulas.CloseChannelsOnlyOnce;
-import discourje.core.validation.formulas.ClosedChannelMustBeUsedInPath;
-import discourje.core.validation.formulas.ClosedChannelMustBeUsedInProtocol;
-import discourje.core.validation.formulas.DoNotSendAfterClose;
-import discourje.core.validation.formulas.DoNotSendToSelf;
-import discourje.core.validation.formulas.UsedChannelsMustBeClosed;
+import discourje.core.validation.rules.Causality;
+import discourje.core.validation.rules.CloseChannelsOnlyOnce;
+import discourje.core.validation.rules.ClosedChannelMustBeUsedInPath;
+import discourje.core.validation.rules.ClosedChannelMustBeUsedInProtocol;
+import discourje.core.validation.rules.DoNotSendAfterClose;
+import discourje.core.validation.rules.DoNotSendToSelf;
+import discourje.core.validation.rules.UsedChannelsMustBeClosed;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
