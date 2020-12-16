@@ -11,12 +11,12 @@ import static discourje.core.validation.formulas.CtlFormulas.not;
 public class DoNotSendAfterClose extends Rule {
 
     @Override
-    public String createDescription(String r1, String r2) {
+    public String createErrorDescription(String r1, String r2) {
         return String.format("A message is sent from %s to %s, after the channel between the two is closed.", r1, r2);
     }
 
     @Override
-    public CtlFormula createCtlOperator(String r1, String r2) {
+    public CtlFormula createCtlFormula(String r1, String r2) {
         return AG(implies(close(r1, r2), AG(not(msg(r1, r2)))));
     }
 }

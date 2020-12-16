@@ -14,12 +14,12 @@ import static discourje.core.validation.formulas.CtlFormulas.rcv;
 public class Causality extends Rule {
 
     @Override
-    public String createDescription(String r1, String r2) {
+    public String createErrorDescription(String r1, String r2) {
         return String.format("A message is sent from %s to %s for which no cause could be found.", r1, r2);
     }
 
     @Override
-    public CtlFormula createCtlOperator(String r1, String r2) {
+    public CtlFormula createCtlFormula(String r1, String r2) {
         return implies(EF(msg(r1, r2)), EF(and(EX(msg(r1, r2)), or(first(), rcv(r1)))));
     }
 }

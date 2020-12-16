@@ -9,12 +9,12 @@ import static discourje.core.validation.formulas.CtlFormulas.self;
 public class DoNotSendToSelf extends Rule {
 
     @Override
-    public String createDescription(String r1, String r2) {
+    public String createErrorDescription(String r1, String r2) {
         return String.format("A message is sent from %s to %s.", r1, r1);
     }
 
     @Override
-    public CtlFormula createCtlOperator(String r1, String r2) {
+    public CtlFormula createCtlFormula(String r1, String r2) {
         return AG(not(self(r1)));
     }
 }

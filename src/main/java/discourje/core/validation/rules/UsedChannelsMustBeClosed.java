@@ -11,12 +11,12 @@ import static discourje.core.validation.formulas.CtlFormulas.msg;
 public class UsedChannelsMustBeClosed extends Rule {
 
     @Override
-    public String createDescription(String r1, String r2) {
+    public String createErrorDescription(String r1, String r2) {
         return String.format("A message is sent from %s to %s, but the channel is not closed afterwards.", r1, r2);
     }
 
     @Override
-    public CtlFormula createCtlOperator(String r1, String r2) {
+    public CtlFormula createCtlFormula(String r1, String r2) {
         return AG(implies(msg(r1, r2), AF(close(r1, r2))));
     }
 }

@@ -10,18 +10,18 @@ public abstract class Rule {
     public Collection<String> getValidationErrors(DiscourjeModel<?> model) {
         Set<String> result = new HashSet<>(0);
         for (Channel channel : model.getChannels()) {
-            CtlFormula ctlFormula = createCtlOperator(channel.getSender(), channel.getReceiver());
+            CtlFormula ctlFormula = createCtlFormula(channel.getSender(), channel.getReceiver());
             ctlFormula.label(model);
             int labelIndex = model.getLabelIndex(ctlFormula);
 
             if (model.getInitialStates().stream().anyMatch(s -> !s.hasLabel(labelIndex))) {
-                result.add(createDescription(channel.getSender(), channel.getReceiver()));
+                result.add(createErrorDescription(channel.getSender(), channel.getReceiver()));
             }
         }
         return result;
     }
 
-    public abstract String createDescription(String r1, String r2);
+    public abstract String createErrorDescription(String r1, String r2);
 
-    public abstract CtlFormula createCtlOperator(String r1, String r2);
+    public abstract CtlFormula createCtlFormula(String r1, String r2);
 }
