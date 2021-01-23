@@ -93,5 +93,3 @@
 (def used-channels-must-be-closed-trivial-incorrect-async (make-lts ::ucmbca/protocol-trivial-incorrect []))
 (def used-channels-must-be-closed-non-trivial-correct-async (make-lts ::ucmbca/protocol-non-trivial-correct []))
 (def used-channels-must-be-closed-non-trivial-incorrect-async (make-lts ::ucmbca/protocol-non-trivial-incorrect []))
-
-(def huge-lts (make-lts ::perf/huge-lts []))

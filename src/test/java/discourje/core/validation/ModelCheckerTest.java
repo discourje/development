@@ -38,7 +38,7 @@ class ModelCheckerTest<Spec> extends AbstractModelCheckerTest<Spec> {
     public void testCausalityNonTrivialIncorrect() {
         List<String> result = getModelCheckerResult("causality-non-trivial-incorrect");
         assertEquals(1, result.size());
-        assertTrue(result.contains(new Causality().createErrorDescription("a", "b")));
+        assertTrue(result.contains(new Causality().createErrorDescription("d", "a")));
     }
 
     @Test

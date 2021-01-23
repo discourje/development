@@ -54,7 +54,7 @@ class ModelCheckerPerformanceTest<Spec> extends AbstractModelCheckerTest<Spec> {
         long t0 = System.currentTimeMillis();
         String sizeString = System.getenv("discourje.performance.ltssize");
         int size = sizeString != null ? Integer.parseInt(sizeString) : 1;
-        LTS<Spec> lts = getHugeLTS(size);
+        LTS<Spec> lts = getLargeLTS(size);
         lts.expandRecursively();
         long t1 = System.currentTimeMillis();
         int ltsSize = lts.getStates().size();
@@ -75,8 +75,8 @@ class ModelCheckerPerformanceTest<Spec> extends AbstractModelCheckerTest<Spec> {
         ps.close();
     }
 
-    LTS<Spec> getHugeLTS(long size) {
-        IFn var = Clojure.var("discourje.core.validation.performance", "get-huge-lts");
+    LTS<Spec> getLargeLTS(long size) {
+        IFn var = Clojure.var("discourje.core.validation.performance", "get-large-lts");
         @SuppressWarnings("unchecked")
         LTS<Spec> lts = (LTS<Spec>) var.invoke(size);
         return lts;
