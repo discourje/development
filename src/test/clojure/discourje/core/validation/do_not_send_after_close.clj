@@ -46,10 +46,11 @@
                  (s/close ::a ::b)
                  ]
                 [(s/--> ::a ::b)
-                 (s/--> ::b ::c)
-                 (s/--> ::c ::a)
+                 (s/--> ::b ::d)
+                 (s/--> ::d ::a)
                  (s/close ::a ::b)
                  ])
               (s/close ::b ::c)
               (s/close ::c ::a)
+              (s/close ::d ::a)
               )

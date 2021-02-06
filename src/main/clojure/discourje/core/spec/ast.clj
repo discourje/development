@@ -115,7 +115,7 @@
 (defrecord Multiary [type branches])
 
 (defn cat [branches]
-  (->Multiary :cat branches))
+  (->Multiary :cat (vec branches)))
 (defn alt [branches]
   (->Multiary :alt branches))
 (defn par [branches]
