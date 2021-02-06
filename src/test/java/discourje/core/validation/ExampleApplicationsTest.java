@@ -4,13 +4,10 @@ import clojure.java.api.Clojure;
 import clojure.lang.IFn;
 import clojure.lang.Var;
 import discourje.core.lts.LTS;
-import discourje.core.validation.rules.DoNotSendToSelf;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ExampleApplicationsTest<Spec> {
 
@@ -18,21 +15,75 @@ class ExampleApplicationsTest<Spec> {
 
     @BeforeAll
     public static void setUp() {
-        require = Clojure.var("clojure.core", "require");
-//        require.invoke(Clojure.read("clojure.core.async"));
     }
 
     @Test
-    public void testDoNotSendToSelfNonTrivialIncorrect() {
-        List<String> result = getModelCheckerResult("discourje.core.validation.example-applications", "chess-protocol");
-        assertTrue(result.contains(new DoNotSendToSelf().createErrorDescription("a", "b")));
+    public void testProtocolChess() {
+        List<String> result = getModelCheckerResult("chess-protocol");
+        System.out.println(result);
     }
 
-    protected List<String> getModelCheckerResult(String namespace, String name) {
-        require.invoke(Clojure.read(namespace));
-        IFn var = Clojure.var(namespace, name);
+    @Test
+    public void testProtocolGoFish() {
+        List<String> result = getModelCheckerResult("go-fish-protocol");
+        System.out.println(result);
+    }
+
+    @Test
+    public void testProtocolRockPaperScissors() {
+        List<String> result = getModelCheckerResult("rock-paper-scissors-protocol");
+        System.out.println(result);
+    }
+
+    @Test
+    public void testProtocolTicTacToe() {
+        List<String> result = getModelCheckerResult("tic-tac-toe-protocol");
+        System.out.println(result);
+    }
+
+    @Test
+    public void testProtocolCg() {
+        List<String> result = getModelCheckerResult("cg-protocol");
+        System.out.println(result);
+    }
+
+    @Test
+    public void testProtocolFt() {
+        List<String> result = getModelCheckerResult("ft-protocol");
+        System.out.println(result);
+    }
+
+    @Test
+    @Disabled
+    public void testProtocolIs() {
+        List<String> result = getModelCheckerResult("is-protocol");
+        System.out.println(result);
+    }
+
+    @Test
+    @Disabled
+    public void testProtocolMg() {
+        List<String> result = getModelCheckerResult("mg-protocol");
+        System.out.println(result);
+    }
+
+    protected List<String> getModelCheckerResult(String name) {
+        require = Clojure.var("clojure.core", "require");
+        require.invoke(Clojure.read("discourje.core.async"));
+
+        long t0 = System.currentTimeMillis();
+        require.invoke(Clojure.read("discourje.core.validation.example-applications"));
+        IFn var = Clojure.var("discourje.core.validation.example-applications", name);
         @SuppressWarnings("unchecked")
         LTS<Spec> lts = (LTS<Spec>) ((Var) var).get();
-        return new ModelChecker(lts).checkModel();
+        lts.expandRecursively();
+        long t1 = System.currentTimeMillis();
+        ModelChecker modelChecker = new ModelChecker(lts);
+        long t2 = System.currentTimeMillis();
+        List<String> result = modelChecker.checkModel();
+        long t3 = System.currentTimeMillis();
+        System.out.println("#states;LTS; Model; Labelling");
+        System.out.println("" + lts.getStates().size() + ";" + (t1 - t0) / 1000.0 + ";" + (t2 - t1) / 1000.0 + ";" + (t3 - t2) / 1000.0);
+        return result;
     }
 }

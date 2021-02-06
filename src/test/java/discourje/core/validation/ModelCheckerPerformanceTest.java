@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ class ModelCheckerPerformanceTest<Spec> extends AbstractModelCheckerTest<Spec> {
         String java = System.getProperty("java.home") + "/bin/java";
         String classpath = System.getProperty("java.class.path");
         println("run #;#states;LTS creation;Model creation;Labelling");
+        long i_old = 1;
         long i = 1;
         outer:
         while (true) {
@@ -45,7 +47,9 @@ class ModelCheckerPerformanceTest<Spec> extends AbstractModelCheckerTest<Spec> {
                     break outer;
                 }
             }
-            i++;
+            long tmp = i;
+            i = i + i_old;
+            i_old = tmp;
         }
     }
 
@@ -53,7 +57,7 @@ class ModelCheckerPerformanceTest<Spec> extends AbstractModelCheckerTest<Spec> {
     public void testLtsForSize() throws FileNotFoundException {
         long t0 = System.currentTimeMillis();
         String sizeString = System.getenv("discourje.performance.ltssize");
-        int size = sizeString != null ? Integer.parseInt(sizeString) : 1;
+        int size = sizeString != null ? Integer.parseInt(sizeString) : 100;
         LTS<Spec> lts = getLargeLTS(size);
         lts.expandRecursively();
         long t1 = System.currentTimeMillis();
@@ -62,10 +66,11 @@ class ModelCheckerPerformanceTest<Spec> extends AbstractModelCheckerTest<Spec> {
         ModelChecker modelChecker = new ModelChecker(lts);
         long t2 = System.currentTimeMillis();
 
-        modelChecker.checkModel();
+        List<String> result = modelChecker.checkModel();
+        System.out.println(result);
 
         long t3 = System.currentTimeMillis();
-        String line = String.format("%s;%s;%s;%s;%s", size, ltsSize, (t1 - t0) / 1000.0, (t2 - t1) / 1000.0, (t3 - t2) / 1000.0);
+        String line = String.format("%s;%s;%s;%s;%s", size, ltsSize, (t1 - t0), (t2 - t1), (t3 - t2));
         println(line);
     }
 
@@ -76,7 +81,7 @@ class ModelCheckerPerformanceTest<Spec> extends AbstractModelCheckerTest<Spec> {
     }
 
     LTS<Spec> getLargeLTS(long size) {
-        IFn var = Clojure.var("discourje.core.validation.performance", "get-large-lts");
+        IFn var = Clojure.var("discourje.core.validation.example-applications", "get-protocol");
         @SuppressWarnings("unchecked")
         LTS<Spec> lts = (LTS<Spec>) var.invoke(size);
         return lts;

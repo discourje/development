@@ -13,7 +13,7 @@ public class AbstractModelCheckerTest<Spec> {
     @BeforeAll
     public static void setUp() {
         IFn require = Clojure.var("clojure.core", "require");
-        require.invoke(Clojure.read("discourje.core.validation.validation-tests"));
+        require.invoke(Clojure.read("discourje.core.validation.example-applications"));
         require.invoke(Clojure.read(NS_VALIDATION));
     }
 
