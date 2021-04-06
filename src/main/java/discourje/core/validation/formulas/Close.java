@@ -6,14 +6,14 @@ import discourje.core.validation.DiscourjeModel;
 import java.util.Objects;
 
 class Close implements CtlFormula {
-    private final String role1;
-    private final String role2;
+    private final String sender;
+    private final String receiver;
     private final int hash;
 
-    Close(String role1, String role2) {
-        this.role1 = role1;
-        this.role2 = role2;
-        hash = Objects.hash(this.role1, this.role2);
+    Close(String sender, String receiver) {
+        this.sender = sender;
+        this.receiver = receiver;
+        hash = Objects.hash(this.sender, this.receiver);
     }
 
     @Override
@@ -24,8 +24,8 @@ class Close implements CtlFormula {
                 Action action = state.getAction();
                 if (action != null &&
                         action.getType() == Action.Type.CLOSE &&
-                        role1.equals(action.getSender()) &&
-                        role2.equals(action.getReceiver())) {
+                        (sender == null || sender.equals(action.getSender())) &&
+                        (receiver == null || receiver.equals(action.getReceiver()))) {
                     state.addLabel(labelIndex);
                 }
             }
@@ -33,7 +33,7 @@ class Close implements CtlFormula {
     }
 
     public String toString() {
-        return String.format("close_%s_%s", role1, role2);
+        return String.format("close_%s_%s", sender, receiver);
     }
 
     @Override
@@ -41,8 +41,8 @@ class Close implements CtlFormula {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Close that = (Close) o;
-        return role1.equals(that.role1) &&
-                role2.equals(that.role2);
+        return sender.equals(that.sender) &&
+                receiver.equals(that.receiver);
     }
 
     @Override

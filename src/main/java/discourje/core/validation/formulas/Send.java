@@ -3,15 +3,18 @@ package discourje.core.validation.formulas;
 import discourje.core.lts.Action;
 import discourje.core.validation.DMState;
 import discourje.core.validation.DiscourjeModel;
+
 import java.util.Objects;
 
 class Send implements CtlFormula {
-    private final String role;
+    private final String sender;
+    private final String receiver;
     private final int hash;
 
-    Send(String role) {
-        this.role = role;
-        hash = Objects.hash(this.role);
+    Send(String sender, String receiver) {
+        this.sender = sender;
+        this.receiver = receiver;
+        hash = Objects.hash(this.sender, this.receiver);
     }
 
     @Override
@@ -20,8 +23,10 @@ class Send implements CtlFormula {
             int labelIndex = model.setLabelledBy(this);
             for (DMState<?> state : model.getStates()) {
                 Action action = state.getAction();
-                if (action.getType() != Action.Type.CLOSE &&
-                        role.equals(action.getSender())) {
+                if (action != null &&
+                        (action.getType() == Action.Type.SYNC || action.getType() == Action.Type.SEND) &&
+                        (sender == null || sender.equals(action.getSender())) &&
+                        (receiver == null || receiver.equals(action.getReceiver()))) {
                     state.addLabel(labelIndex);
                 }
             }
@@ -30,7 +35,7 @@ class Send implements CtlFormula {
 
     @Override
     public String toString() {
-        return String.format("send_%s", role);
+        return String.format("send_%s_%s", sender, receiver);
     }
 
     @Override
@@ -38,7 +43,8 @@ class Send implements CtlFormula {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Send that = (Send) o;
-        return role.equals(that.role);
+        return Objects.equals(sender, that.sender) &&
+                Objects.equals(receiver, that.receiver);
     }
 
     @Override

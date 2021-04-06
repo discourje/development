@@ -19,14 +19,14 @@ public class CtlFormulas {
      * Label each state where the last action is a send by r1.
      */
     public static CtlFormula snd(String r1) {
-        return new Send(r1);
+        return new Send(r1, null);
     }
 
     /**
      * Label each state where the last action is a receive by r1.
      */
     public static CtlFormula rcv(String r1) {
-        return new Receive(r1);
+        return new Receive(null, r1);
     }
 
     /**

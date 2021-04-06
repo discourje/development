@@ -4,8 +4,6 @@
       <root url="jar://$MAVEN_REPOSITORY$/org/clojure/clojure/1.10.1/clojure-1.10.1.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES>
-      <root url="jar://$MAVEN_REPOSITORY$/org/clojure/clojure/1.10.1/clojure-1.10.1-sources.jar!/" />
-    </SOURCES>
+    <SOURCES />
   </library>
 </component>

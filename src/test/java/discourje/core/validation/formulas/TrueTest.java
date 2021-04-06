@@ -13,7 +13,7 @@ class TrueTest<S> extends AbstractCtlFormulaTest<S> {
         DMState<S> s1 = createState(Action.Type.SYNC, "a", "b");
         DiscourjeModel<S> model = createModel(s1);
 
-        Send snd = new Send("a");
+        Send snd = new Send("a", null);
         snd.label(model);
 
         assertTrue(s1.hasLabel(model.getLabelIndex(snd)));

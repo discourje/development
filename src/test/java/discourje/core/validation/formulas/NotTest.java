@@ -14,7 +14,7 @@ class NotTest<S> extends AbstractCtlFormulaTest<S> {
         DMState<S> s2 = createState(Action.Type.SEND, "b", "a");
         DiscourjeModel<S> model = createModel(s1, s2);
 
-        Not not = new Not(new Send("a"));
+        Not not = new Not(new Send("a", null));
         not.label(model);
 
         assertFalse(s1.hasLabel(model.getLabelIndex(not)));
