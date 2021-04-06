@@ -5,7 +5,7 @@ import discourje.core.validation.DMState;
 import discourje.core.validation.DiscourjeModel;
 import org.junit.jupiter.api.Test;
 import static discourje.core.validation.formulas.CtlFormulas.close;
-import static discourje.core.validation.formulas.CtlFormulas.snd;
+import static discourje.core.validation.formulas.CtlFormulas.send;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -26,7 +26,7 @@ class ASTest<S> extends AbstractCtlFormulaTest<S> {
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
-        AS as = new AS(snd("a"), close("a", "b"));
+        AS as = new AS(send("a", null), close("a", "b"));
         as.label(model);
 
         assertTrue(s1.hasLabel(model.getLabelIndex(as)));
@@ -45,7 +45,7 @@ class ASTest<S> extends AbstractCtlFormulaTest<S> {
 
         DiscourjeModel<S> model = createModel(s1, s2, s3a, s3b);
 
-        AS as = new AS(snd("a"), close("a", "b"));
+        AS as = new AS(send("a", null), close("a", "b"));
         as.label(model);
 
         assertTrue(s1.hasLabel(model.getLabelIndex(as)));
@@ -66,7 +66,7 @@ class ASTest<S> extends AbstractCtlFormulaTest<S> {
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
-        AS as = new AS(snd("a"), close("a", "b"));
+        AS as = new AS(send("a", null), close("a", "b"));
         as.label(model);
 
         assertFalse(s1.hasLabel(model.getLabelIndex(as)));
@@ -87,7 +87,7 @@ class ASTest<S> extends AbstractCtlFormulaTest<S> {
 
         DiscourjeModel<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
-        AS as = new AS(snd("a"), close("a", "b"));
+        AS as = new AS(send("a", null), close("a", "b"));
         as.label(model);
 
         assertFalse(s1.hasLabel(model.getLabelIndex(as)));

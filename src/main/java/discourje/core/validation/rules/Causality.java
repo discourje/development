@@ -9,7 +9,7 @@ import static discourje.core.validation.formulas.CtlFormulas.first;
 import static discourje.core.validation.formulas.CtlFormulas.implies;
 import static discourje.core.validation.formulas.CtlFormulas.msg;
 import static discourje.core.validation.formulas.CtlFormulas.or;
-import static discourje.core.validation.formulas.CtlFormulas.rcv;
+import static discourje.core.validation.formulas.CtlFormulas.receive;
 
 public class Causality extends Rule {
 
@@ -20,6 +20,6 @@ public class Causality extends Rule {
 
     @Override
     public CtlFormula createCtlFormula(String r1, String r2) {
-        return implies(EF(msg(r1, r2)), EF(and(EX(msg(r1, r2)), or(first(), rcv(r1)))));
+        return implies(EF(msg(r1, r2)), EF(and(EX(msg(r1, r2)), or(first(), receive(null, r1)))));
     }
 }

@@ -1,6 +1,36 @@
 package discourje.core.validation.formulas;
 
 public class CtlFormulas {
+
+    //
+    // Atoms
+    //
+
+    public static CtlFormula send(String sender, String receiver) {
+        return new Send(sender, receiver);
+    }
+
+    public static CtlFormula receive(String sender, String receiver) {
+        return new Receive(sender, receiver);
+    }
+
+    public static CtlFormula close(String sender, String receive) {
+        return new Close(sender, receive);
+    }
+
+    //
+    // Propositional operators
+    //
+
+
+    //
+    // Temporal operators
+    //
+
+
+
+
+
     /**
      * Label each state that is the first state in the LTS.
      */
@@ -16,31 +46,10 @@ public class CtlFormulas {
     }
 
     /**
-     * Label each state where the last action is a send by r1.
-     */
-    public static CtlFormula snd(String r1) {
-        return new Send(r1, null);
-    }
-
-    /**
-     * Label each state where the last action is a receive by r1.
-     */
-    public static CtlFormula rcv(String r1) {
-        return new Receive(null, r1);
-    }
-
-    /**
      * Label each state where the last action is a send by r1 and a receive by r2.
      */
     public static CtlFormula msg(String r1, String r2) {
         return new Message(r1, r2);
-    }
-
-    /**
-     * Label each state where the last action is a close on the channel between r1 and r2..
-     */
-    public static CtlFormula close(String r1, String r2) {
-        return new Close(r1, r2);
     }
 
     /**
