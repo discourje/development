@@ -26,7 +26,7 @@
     ;; form ::= expr
     :else `(predicate ~form)))
 
-(defn- desugared-role [form]
+(defn desugared-role [form]
   (cond
     ;; form ::= (role name-expr index-exprs)
     (and (seq? form) (= 'discourje.core.spec.ast/role (first (macroexpand form))))

@@ -1,6 +1,7 @@
 package discourje.core.validation;
 
 import discourje.core.lts.LTS;
+import discourje.core.validation.formulas.CtlFormula;
 import discourje.core.validation.rules.Causality;
 import discourje.core.validation.rules.CloseChannelsOnlyOnce;
 import discourje.core.validation.rules.ClosedChannelMustBeUsedInPath;
@@ -39,5 +40,12 @@ public class ModelChecker {
         return rules.stream()
                 .flatMap(r -> r.getValidationErrors(dmModel).stream())
                 .collect(Collectors.toList());
+    }
+
+    public static boolean check(LTS<?> lts, CtlFormula f) {
+        var model = new DiscourjeModel<>(lts);
+        f.label(model);
+        var i = model.getLabelIndex(f);
+        return !model.getInitialStates().stream().anyMatch(s -> !s.hasLabel(i));
     }
 }
