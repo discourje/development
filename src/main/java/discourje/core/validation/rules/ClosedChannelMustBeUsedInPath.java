@@ -6,7 +6,7 @@ import static discourje.core.validation.formulas.CtlFormulas.AG;
 import static discourje.core.validation.formulas.CtlFormulas.EP;
 import static discourje.core.validation.formulas.CtlFormulas.close;
 import static discourje.core.validation.formulas.CtlFormulas.implies;
-import static discourje.core.validation.formulas.CtlFormulas.msg;
+import static discourje.core.validation.formulas.CtlFormulas.send;
 
 public class ClosedChannelMustBeUsedInPath extends Rule {
 
@@ -17,6 +17,6 @@ public class ClosedChannelMustBeUsedInPath extends Rule {
 
     @Override
     public CtlFormula createCtlFormula(String r1, String r2) {
-        return AG(implies(close(r1, r2), EP(msg(r1, r2))));
+        return AG(implies(close(r1, r2), EP(send(r1, r2))));
     }
 }

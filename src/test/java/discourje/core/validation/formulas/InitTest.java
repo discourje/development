@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class FirstTest<S> extends AbstractCtlFormulaTest<S> {
+class InitTest<S> extends AbstractCtlFormulaTest<S> {
 
     @Test
     public void testFirst() {
@@ -16,10 +16,10 @@ class FirstTest<S> extends AbstractCtlFormulaTest<S> {
         DMState<S> secondState = createState(Action.Type.SEND, "a", "b");
         DiscourjeModel<S> model = createModel(firstState, secondState);
 
-        First first = First.INSTANCE;
-        first.label(model);
+        Init init = Init.INSTANCE;
+        init.label(model);
 
-        assertTrue(firstState.hasLabel(model.getLabelIndex(first)));
-        assertFalse(secondState.hasLabel(model.getLabelIndex(first)));
+        assertTrue(firstState.hasLabel(model.getLabelIndex(init)));
+        assertFalse(secondState.hasLabel(model.getLabelIndex(init)));
     }
 }

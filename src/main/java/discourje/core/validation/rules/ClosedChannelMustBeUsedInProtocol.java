@@ -5,7 +5,7 @@ import discourje.core.validation.formulas.CtlFormula;
 import static discourje.core.validation.formulas.CtlFormulas.EF;
 import static discourje.core.validation.formulas.CtlFormulas.close;
 import static discourje.core.validation.formulas.CtlFormulas.implies;
-import static discourje.core.validation.formulas.CtlFormulas.msg;
+import static discourje.core.validation.formulas.CtlFormulas.send;
 
 public class ClosedChannelMustBeUsedInProtocol extends Rule {
 
@@ -16,6 +16,6 @@ public class ClosedChannelMustBeUsedInProtocol extends Rule {
 
     @Override
     public CtlFormula createCtlFormula(String r1, String r2) {
-        return implies(EF(close(r1, r2)), EF(msg(r1, r2)));
+        return implies(EF(close(r1, r2)), EF(send(r1, r2)));
     }
 }

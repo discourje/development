@@ -5,11 +5,11 @@ import discourje.core.validation.DMState;
 import discourje.core.validation.DiscourjeModel;
 import java.util.Objects;
 
-class First implements CtlFormula {
+class Init implements CtlFormula {
 
-    public static final First INSTANCE = new First();
+    public static final Init INSTANCE = new Init();
 
-    private First() {
+    private Init() {
     }
 
     @Override

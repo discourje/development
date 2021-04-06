@@ -6,7 +6,7 @@ import static discourje.core.validation.formulas.CtlFormulas.AF;
 import static discourje.core.validation.formulas.CtlFormulas.AG;
 import static discourje.core.validation.formulas.CtlFormulas.close;
 import static discourje.core.validation.formulas.CtlFormulas.implies;
-import static discourje.core.validation.formulas.CtlFormulas.msg;
+import static discourje.core.validation.formulas.CtlFormulas.send;
 
 public class UsedChannelsMustBeClosed extends Rule {
 
@@ -17,6 +17,6 @@ public class UsedChannelsMustBeClosed extends Rule {
 
     @Override
     public CtlFormula createCtlFormula(String r1, String r2) {
-        return AG(implies(msg(r1, r2), AF(close(r1, r2))));
+        return AG(implies(send(r1, r2), AF(close(r1, r2))));
     }
 }

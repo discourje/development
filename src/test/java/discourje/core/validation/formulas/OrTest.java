@@ -5,7 +5,6 @@ import discourje.core.validation.DMState;
 import discourje.core.validation.DiscourjeModel;
 import org.junit.jupiter.api.Test;
 import static discourje.core.validation.formulas.CtlFormulas.receive;
-import static discourje.core.validation.formulas.CtlFormulas.self;
 import static discourje.core.validation.formulas.CtlFormulas.send;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -20,7 +19,7 @@ class OrTest<S> extends AbstractCtlFormulaTest<S> {
         DMState<S> s4 = createState(Action.Type.SEND, "b", "b");
         DiscourjeModel<S> model = createModel(s1, s2, s3, s4);
 
-        CtlFormula or = new Or(self("a"), send("a", null), receive(null, "a"));
+        CtlFormula or = new Or(send("a", "a"), send("a", null), receive(null, "a"));
         or.label(model);
 
         // verify
