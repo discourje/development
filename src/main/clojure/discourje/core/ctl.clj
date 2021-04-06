@@ -16,6 +16,9 @@
 ;;;; ATOMS
 ;;;;
 
+(defmacro init []
+  `(CtlFormulas/init))
+
 (defmacro send [sender receiver]
   (let [sender (s/desugared-role sender)
         receiver (s/desugared-role receiver)]
