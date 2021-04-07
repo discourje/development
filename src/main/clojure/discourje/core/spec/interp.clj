@@ -325,8 +325,21 @@
                               {})))))
      :alt (let [branches (:branches ast)]
             (reduce (partial merge-with into) (map #(successors % unfolded) branches)))
-     :par (let [branches (:branches ast)]
-            (successors (ast/alt (permute branches)) unfolded))
+     :par (let [branches (:branches ast)
+                branches' (filterv #(not (empty? (successors % unfolded))) branches)]
+            (case (count branches')
+              0 {}
+              1 (successors (first branches') unfolded)
+              (loop [i 0
+                     m {}]
+                (if (= i (count branches'))
+                  m
+                  (recur (inc i) (merge-with into m (successors (ast/par branches') i unfolded)))))))
+
+     ;; Erik's partial-order reduction
+     ;:par (let [branches (:branches ast)]
+     ;       (successors (ast/alt (permute branches)) unfolded))
+
      ;:dot (let [branches ast]
      ;       (if (empty? branches)
      ;         {}
