@@ -2,35 +2,21 @@
   (:gen-class)
   (:refer-clojure :exclude [send and or not])
   (:require [discourje.core.spec :as s]
+            [discourje.core.spec.ast :as ast]
             [discourje.core.spec.interp :as interp]
-            [discourje.core.spec.lts :as lts])
+            [discourje.core.spec.lts :as lts]
+            [discourje.core.spec.mcrl2 :as mcrl2])
   (:import (discourje.core.validation Model State)
            (discourje.core.validation.formulas CtlFormula CtlFormulas)
            (discourje.core.lts LTS)))
-
-(defn check-all [ast-or-lts fmap]
-  (if (= (type ast-or-lts) LTS)
-    (let [m (Model. ^LTS ast-or-lts)]
-      (into {} (map (fn [[name f]]
-                      (let [begin (System/nanoTime)]
-                        (.label f m)
-                        (let [end (System/nanoTime)
-                              time (long (/ (- end begin) 1000000))
-                              i (.getLabelIndex m f)]
-                          [name {:result (every? #(.hasLabel ^State % i) (.getInitialStates m))
-                                 :time   time}])))
-                    fmap)))
-    (check-all (lts/lts ast-or-lts) fmap)))
-
-(defn check-one [ast-or-lts f]
-  (:f (check-all ast-or-lts {:f f})))
 
 ;;;;
 ;;;; ATOMS
 ;;;;
 
-(defmacro init []
-  `(CtlFormulas/init))
+(def init (CtlFormulas/init))
+
+(def fin (CtlFormulas/fin))
 
 (defmacro send [sender receiver]
   (let [sender (s/desugared-role sender)
@@ -121,3 +107,85 @@
 
 (defn ES [arg1 arg2]
   (CtlFormulas/ES arg1 arg2))
+
+;;;;
+;;;; GENERIC PROPERTIES
+;;;;
+
+(defn must-terminate []
+  (AG (AF fin)))
+
+(defn may-terminate []
+  (AG (EF fin)))
+
+(defn cant-terminate []
+  (AG (not fin)))
+
+(defn close-after-send [channels]
+  (let [args (map (fn [[sender receiver]]
+                    (let [x (eval `(send ~sender ~receiver))
+                          y (eval `(close ~sender ~receiver))]
+                      (AG (implies x (AF y)))))
+                  channels)
+        f (apply and args)]
+    f))
+
+(defn send-before-close [channels]
+  (let [args (map (fn [[sender receiver]]
+                    (let [x (eval `(send ~sender ~receiver))
+                          y (eval `(close ~sender ~receiver))]
+                      (AG (implies y (AP x)))))
+                  channels)
+        f (apply and args)]
+    f))
+
+(defn no-act-after-close [channels]
+  (let [args (map (fn [[sender receiver]]
+                    (let [x (eval `(send ~sender ~receiver))
+                          y (eval `(close ~sender ~receiver))]
+                      (AG (implies y (or fin (AX (AG (not (or x y)))))))))
+                  channels)
+        f (apply and args)]
+    f))
+
+;;;;
+;;;; API
+;;;;
+
+(defn check-all [ast-or-lts fmap]
+  (if (= (type ast-or-lts) LTS)
+    (let [m (Model. ^LTS ast-or-lts)]
+      ;(println ast-or-lts)
+      ;(binding [mcrl2/*mcrl2-bin* "/Applications/mCRL2.app/Contents/bin"]
+      ;  (mcrl2/ltsgraph ast-or-lts "/Users/sungshik/Desktop/temp"))
+      (into {} (map (fn [[fname f]]
+                      (let [begin (System/nanoTime)]
+                        (.label f m)
+                        (let [i (.getLabelIndex m f)
+                              end (System/nanoTime)
+                              result (every? #(.hasLabel ^State % i) (.getInitialStates m))
+                              time (long (/ (- end begin) 1000000))]
+                          (if result
+                            [fname {:result result
+                                    :time   time}]
+                            [fname {:result   result
+                                    :evidence (str (.getCounterexample f m))
+                                    :time     time}]))))
+                    fmap)))
+    (check-all (lts/lts ast-or-lts) fmap)))
+
+(defn check-one [ast-or-lts f]
+  (:f (check-all ast-or-lts {:f f})))
+
+(defn lint [ast-or-lts]
+  (if (= (type ast-or-lts) LTS)
+    (let [channels (lts/channels ast-or-lts)
+          ;roles (lts/roles ast-or-lts)
+          fmap {:must-terminate     (must-terminate)
+                :may-terminate      (may-terminate)
+                :cant-terminate     (cant-terminate)
+                :close-after-send   (close-after-send channels)
+                :send-before-close  (send-before-close channels)
+                :no-act-after-close (no-act-after-close channels)}]
+      (check-all ast-or-lts fmap))
+    (lint (lts/lts ast-or-lts))))
