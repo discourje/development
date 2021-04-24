@@ -1,8 +1,10 @@
 package discourje.core.validation.formulas;
 
+import discourje.core.lts.Action;
 import discourje.core.validation.State;
 import discourje.core.validation.Model;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 class And implements CtlFormula {
@@ -26,6 +28,21 @@ class And implements CtlFormula {
                 }
             }
         }
+    }
+
+    @Override
+    public List<Action> getCounterexample(Model<?> model) {
+
+        for (State<?> s : model.getInitialStates()) {
+            for (CtlFormula f : args) {
+                var i = model.getLabelIndex(f);
+                if (!s.hasLabel(i) && f instanceof AG) {
+                    return f.getCounterexample(model);
+                }
+            }
+        }
+
+        throw new UnsupportedOperationException();
     }
 
     public String toString() {
