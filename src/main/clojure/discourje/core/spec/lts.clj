@@ -68,6 +68,14 @@
 (defn initial-states [lts]
   (.getInitialStates lts))
 
+(defn channels [lts]
+  (reduce clojure.set/union
+          (map (fn [^State s]
+                 (reduce clojure.set/union
+                         (map (fn [a] #{[(.getSender a) (.getReceiver a)]})
+                              (.getActions (.getTransitionsOrNull s)))))
+               (.getStates lts))))
+
 (defn roles [lts]
   (reduce clojure.set/union
           (map (fn [^State s]
