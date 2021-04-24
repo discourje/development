@@ -26,27 +26,35 @@
           mcf-file (str temp-dir File/separator "lts2pbes-pbes2bool-" timestamp ".mcf")
           pbes-file (str temp-dir File/separator "lts2pbes-pbes2bool-" timestamp ".pbes")]
 
-      ;; TODO: How to deal with non-numeric labels?
-
       (let [lts-string (str lts)
+            lts-string (clojure.string/replace lts-string "Object," "")
+            lts-string (clojure.string/replace lts-string "[" "(")
+            lts-string (clojure.string/replace lts-string "]" ")")
             lts-string (clojure.string/replace lts-string "‽" "handshake")
             lts-string (clojure.string/replace lts-string "!" "send")
             lts-string (clojure.string/replace lts-string "?" "receive")
             lts-string (clojure.string/replace lts-string "C" "close")]
         (spit aut-file lts-string))
 
-      (spit mcrl2-file (join "\n" ["sort Role = struct " (join " | " (sort (lts/roles lts))) ";"
-                                   "act"
-                                   "  handshake, send, receive: Nat # Role # Role;"
-                                   "  close: Role # Role;"]))
+      (let [mcrl2-string (join "\n" [(str "sort Role = struct "
+                                          (join " | " (distinct (map #(if-let [[_ name _] (re-matches #"(.+)\[([0-9]+)\]" %)]
+                                                                        (str name "(Nat)")
+                                                                        %)
+                                                                     (sort (lts/roles lts)))))
+                                          ";")
+                                     "act"
+                                     "  handshake, send, receive: Role # Role;"
+                                     "  close: Role # Role;"])]
+        (spit mcrl2-file mcrl2-string))
 
       (loop [formulas formulas
              bools {}]
         (if (empty? formulas)
-          (pprint bools)
+          bools
           (let [[name formula] (first formulas)
                 _ (spit mcf-file formula)
-                _ (sh (mcrl2 :lts2pbes) "-D" mcrl2-file "-f" mcf-file aut-file pbes-file)
+                lts2pbes (sh (mcrl2 :lts2pbes) "-D" mcrl2-file "-f" mcf-file aut-file pbes-file)
+                _ (println (:err lts2pbes))
                 pbes2bool (sh (mcrl2 :pbes2bool) pbes-file)
                 bool (read-string (:out pbes2bool))]
             (recur (rest formulas)
