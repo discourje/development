@@ -1,4 +1,4 @@
-(ns discourje.core.ctl
+(ns discourje.core.lint
   (:gen-class)
   (:refer-clojure :exclude [send and or not])
   (:require [discourje.core.spec :as s]
