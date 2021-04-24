@@ -2,7 +2,9 @@ package discourje.core.validation.formulas;
 
 import discourje.core.validation.DMState;
 import discourje.core.validation.DiscourjeModel;
+
 import java.util.Objects;
+import java.util.concurrent.ForkJoinPool;
 
 public class AF implements CtlFormula {
     private final CtlFormula arg;
@@ -20,11 +22,50 @@ public class AF implements CtlFormula {
             CtlFormula au = new AU(True.TRUE, arg);
             au.label(model);
             int auIndex = model.getLabelIndex(au);
+
+            /* Sequential version */
             for (DMState<?> state : model.getStates()) {
                 if (state.hasLabel(auIndex)) {
                     state.addLabel(labelIndex);
                 }
             }
+
+            /* Parallel version 1
+            model.getStates().parallelStream().forEach((state) -> {
+                if (state.hasLabel(auIndex)) {
+                    state.addLabel(labelIndex);
+                }
+            });
+            */
+
+            /* Parallel version 2
+            var states = model.getStates();
+            var n = 8;
+            var work = states.size() / n + 1;
+            System.out.println(n + " " + work);
+            Thread[] threads = new Thread[n];
+            for (int i = 0; i < n; i++) {
+                final var id = i;
+                threads[i] = new Thread(() -> {
+                    for (int x = id * work; x < (id + 1) * work; x++) {
+                        if (x < states.size() - 1) {
+                            var state = states.get(x);
+                            if (state.hasLabel(auIndex)) {
+                                state.addLabel(labelIndex);
+                            }
+                        }
+                    }
+
+                });
+                threads[i].start();
+            }
+            for (int i = 0; i < n; i++) {
+                try {
+                    threads[i].join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }*/
         }
     }
 
