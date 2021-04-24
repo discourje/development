@@ -1,7 +1,7 @@
 package discourje.core.validation.formulas;
 
-import discourje.core.validation.DMState;
-import discourje.core.validation.DiscourjeModel;
+import discourje.core.validation.State;
+import discourje.core.validation.Model;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -15,12 +15,12 @@ class And implements CtlFormula {
     }
 
     @Override
-    public void label(DiscourjeModel<?> model) {
+    public void label(Model<?> model) {
         if (!model.isLabelledBy(this)) {
             int labelIndex = model.setLabelledBy(this);
             Arrays.stream(args).forEach(a -> a.label(model));
 
-            for (DMState<?> state : model.getStates()) {
+            for (State<?> state : model.getStates()) {
                 if (Arrays.stream(args).allMatch(arg -> state.hasLabel(model.getLabelIndex(arg)))) {
                     state.addLabel(labelIndex);
                 }

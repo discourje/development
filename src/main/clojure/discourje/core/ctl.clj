@@ -1,16 +1,29 @@
 (ns discourje.core.ctl
   (:gen-class)
   (:refer-clojure :exclude [send and or not])
-  (:require [clojure.walk :as w]
-            [discourje.core.spec :as s]
-            [discourje.core.spec.ast :as ast]
+  (:require [discourje.core.spec :as s]
             [discourje.core.spec.interp :as interp]
             [discourje.core.spec.lts :as lts])
-  (:import (discourje.core.validation ModelChecker)
-           (discourje.core.validation.formulas CtlFormula CtlFormulas)))
+  (:import (discourje.core.validation Model State)
+           (discourje.core.validation.formulas CtlFormula CtlFormulas)
+           (discourje.core.lts LTS)))
 
-(defn check [spec f]
-  (ModelChecker/check (lts/lts spec) f))
+(defn check-all [ast-or-lts fmap]
+  (if (= (type ast-or-lts) LTS)
+    (let [m (Model. ^LTS ast-or-lts)]
+      (into {} (map (fn [[name f]]
+                      (let [begin (System/nanoTime)]
+                        (.label f m)
+                        (let [end (System/nanoTime)
+                              time (long (/ (- end begin) 1000000))
+                              i (.getLabelIndex m f)]
+                          [name {:result (every? #(.hasLabel ^State % i) (.getInitialStates m))
+                                 :time   time}])))
+                    fmap)))
+    (check-all (lts/lts ast-or-lts) fmap)))
+
+(defn check-one [ast-or-lts f]
+  (:f (check-all ast-or-lts {:f f})))
 
 ;;;;
 ;;;; ATOMS

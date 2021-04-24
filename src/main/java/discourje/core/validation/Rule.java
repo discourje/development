@@ -7,7 +7,7 @@ import java.util.Set;
 
 public abstract class Rule {
 
-    public Collection<String> getValidationErrors(DiscourjeModel<?> model) {
+    public Collection<String> getValidationErrors(Model<?> model) {
         Set<String> result = new HashSet<>(0);
         for (Channel channel : model.getChannels()) {
             CtlFormula ctlFormula = createCtlFormula(channel.getSender(), channel.getReceiver());

@@ -1,7 +1,7 @@
 package discourje.core.validation.formulas;
 
-import discourje.core.validation.DMState;
-import discourje.core.validation.DiscourjeModel;
+import discourje.core.validation.State;
+import discourje.core.validation.Model;
 import java.util.Objects;
 
 public class Implies implements CtlFormula {
@@ -16,7 +16,7 @@ public class Implies implements CtlFormula {
     }
 
     @Override
-    public void label(DiscourjeModel<?> model) {
+    public void label(Model<?> model) {
         if (!model.isLabelledBy(this)) {
             int labelIndex = model.setLabelledBy(this);
             lhs.label(model);
@@ -24,7 +24,7 @@ public class Implies implements CtlFormula {
             int lhsLabelIndex = model.getLabelIndex(lhs);
             int rhsLabelIndex = model.getLabelIndex(rhs);
 
-            for (DMState<?> state : model.getStates()) {
+            for (State<?> state : model.getStates()) {
                 if (!state.hasLabel(lhsLabelIndex) || state.hasLabel(rhsLabelIndex)) {
                     state.addLabel(labelIndex);
                 }

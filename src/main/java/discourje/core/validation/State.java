@@ -1,26 +1,26 @@
 package discourje.core.validation;
 
 import discourje.core.lts.Action;
-import discourje.core.lts.State;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 
-public class DMState<Spec> {
-    private final State<Spec> state;
+public class State<Spec> {
+    private final discourje.core.lts.State state;
     private final Action action;
-    private final Collection<DMState<Spec>> nextStates = new ArrayList<>();
-    private final Collection<DMState<Spec>> previousStates = new ArrayList<>();
+    private final Collection<State<Spec>> nextStates = new ArrayList<>();
+    private final Collection<State<Spec>> previousStates = new ArrayList<>();
     private final BitSet labels = new BitSet();
 
-    public DMState(State<Spec> state, Action action) {
+    public State(discourje.core.lts.State state, Action action) {
         this.state = state;
         this.action = action;
     }
 
-    public State<Spec> getState() {
+    public discourje.core.lts.State getState() {
         return state;
     }
 
@@ -28,16 +28,16 @@ public class DMState<Spec> {
         return action;
     }
 
-    public Collection<DMState<Spec>> getNextStates() {
+    public Collection<State<Spec>> getNextStates() {
         return Collections.unmodifiableCollection(nextStates);
     }
 
-    public void addNextState(DMState<Spec> state) {
+    public void addNextState(State<Spec> state) {
         nextStates.add(state);
         state.previousStates.add(this);
     }
 
-    public Collection<DMState<Spec>> getPreviousStates() {
+    public Collection<State<Spec>> getPreviousStates() {
         return Collections.unmodifiableCollection(previousStates);
     }
 
@@ -45,9 +45,9 @@ public class DMState<Spec> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DMState<?> dmState = (DMState<?>) o;
-        return state.equals(dmState.state) &&
-                Objects.equals(action, dmState.action);
+        State<?> state = (State<?>) o;
+        return this.state.equals(state.state) &&
+                Objects.equals(action, state.action);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package discourje.core.validation.formulas;
 
-import discourje.core.validation.DMState;
-import discourje.core.validation.DiscourjeModel;
+import discourje.core.validation.State;
+import discourje.core.validation.Model;
 import java.util.Objects;
 import static discourje.core.validation.formulas.CtlFormulas.AP;
 import static discourje.core.validation.formulas.CtlFormulas.not;
@@ -16,13 +16,13 @@ public class EH implements CtlFormula {
     }
 
     @Override
-    public void label(DiscourjeModel<?> model) {
+    public void label(Model<?> model) {
         if (!model.isLabelledBy(this)) {
             int labelIndex = model.setLabelledBy(this);
             CtlFormula eh = not(AP(not(arg)));
             eh.label(model);
             int ehLabelIndex = model.getLabelIndex(eh);
-            for (DMState<?> state : model.getStates()) {
+            for (State<?> state : model.getStates()) {
                 if (state.hasLabel(ehLabelIndex)) {
                     state.addLabel(labelIndex);
                 }

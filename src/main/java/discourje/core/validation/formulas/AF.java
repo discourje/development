@@ -1,10 +1,9 @@
 package discourje.core.validation.formulas;
 
-import discourje.core.validation.DMState;
-import discourje.core.validation.DiscourjeModel;
+import discourje.core.validation.State;
+import discourje.core.validation.Model;
 
 import java.util.Objects;
-import java.util.concurrent.ForkJoinPool;
 
 public class AF implements CtlFormula {
     private final CtlFormula arg;
@@ -16,7 +15,7 @@ public class AF implements CtlFormula {
     }
 
     @Override
-    public void label(DiscourjeModel<?> model) {
+    public void label(Model<?> model) {
         if (!model.isLabelledBy(this)) {
             int labelIndex = model.setLabelledBy(this);
             CtlFormula au = new AU(True.TRUE, arg);
@@ -24,7 +23,7 @@ public class AF implements CtlFormula {
             int auIndex = model.getLabelIndex(au);
 
             /* Sequential version */
-            for (DMState<?> state : model.getStates()) {
+            for (State<?> state : model.getStates()) {
                 if (state.hasLabel(auIndex)) {
                     state.addLabel(labelIndex);
                 }

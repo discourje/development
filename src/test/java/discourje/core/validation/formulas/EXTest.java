@@ -1,8 +1,8 @@
 package discourje.core.validation.formulas;
 
 import discourje.core.lts.Action;
-import discourje.core.validation.DMState;
-import discourje.core.validation.DiscourjeModel;
+import discourje.core.validation.State;
+import discourje.core.validation.Model;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -10,14 +10,14 @@ class EXTest<S> extends AbstractCtlFormulaTest<S> {
 
     @Test
     public void testEXLine() {
-        DMState<S> s1 = createState(Action.Type.SEND, "a", "b");
-        DMState<S> s2 = createState(Action.Type.SEND, "b", "c");
-        DMState<S> s3 = createState(Action.Type.CLOSE, "a", "b");
-        DMState<S> s4 = createState(Action.Type.CLOSE, "b", "c");
+        State<S> s1 = createState(Action.Type.SEND, "a", "b");
+        State<S> s2 = createState(Action.Type.SEND, "b", "c");
+        State<S> s3 = createState(Action.Type.CLOSE, "a", "b");
+        State<S> s4 = createState(Action.Type.CLOSE, "b", "c");
         s1.addNextState(s2);
         s2.addNextState(s3);
         s3.addNextState(s4);
-        DiscourjeModel<S> model = createModel(s1, s2, s3, s4);
+        Model<S> model = createModel(s1, s2, s3, s4);
 
         EX ex = new EX(new Close("a", "b"));
         ex.label(model);
@@ -30,12 +30,12 @@ class EXTest<S> extends AbstractCtlFormulaTest<S> {
 
     @Test
     public void testEXAllPaths() {
-        DMState<S> s1 = createState(Action.Type.SEND, "a", "b");
-        DMState<S> s2a = createState(Action.Type.CLOSE, "a", "b");
-        DMState<S> s2b = createState(Action.Type.CLOSE, "a", "b");
+        State<S> s1 = createState(Action.Type.SEND, "a", "b");
+        State<S> s2a = createState(Action.Type.CLOSE, "a", "b");
+        State<S> s2b = createState(Action.Type.CLOSE, "a", "b");
         s1.addNextState(s2a);
         s1.addNextState(s2b);
-        DiscourjeModel<S> model = createModel(s1, s2a, s2b);
+        Model<S> model = createModel(s1, s2a, s2b);
 
         EX ex = new EX(new Close("a", "b"));
         ex.label(model);
@@ -47,12 +47,12 @@ class EXTest<S> extends AbstractCtlFormulaTest<S> {
 
     @Test
     public void testEXOnePath() {
-        DMState<S> s1 = createState(Action.Type.SEND, "a", "b");
-        DMState<S> s2a = createState(Action.Type.CLOSE, "a", "b");
-        DMState<S> s2b = createState(Action.Type.CLOSE, "b", "c");
+        State<S> s1 = createState(Action.Type.SEND, "a", "b");
+        State<S> s2a = createState(Action.Type.CLOSE, "a", "b");
+        State<S> s2b = createState(Action.Type.CLOSE, "b", "c");
         s1.addNextState(s2a);
         s1.addNextState(s2b);
-        DiscourjeModel<S> model = createModel(s1, s2a, s2b);
+        Model<S> model = createModel(s1, s2a, s2b);
 
         EX ex = new EX(new Close("a", "b"));
         ex.label(model);
@@ -64,12 +64,12 @@ class EXTest<S> extends AbstractCtlFormulaTest<S> {
 
     @Test
     public void testEXNoPath() {
-        DMState<S> s1 = createState(Action.Type.SEND, "a", "b");
-        DMState<S> s2a = createState(Action.Type.CLOSE, "b", "c");
-        DMState<S> s2b = createState(Action.Type.CLOSE, "b", "c");
+        State<S> s1 = createState(Action.Type.SEND, "a", "b");
+        State<S> s2a = createState(Action.Type.CLOSE, "b", "c");
+        State<S> s2b = createState(Action.Type.CLOSE, "b", "c");
         s1.addNextState(s2a);
         s1.addNextState(s2b);
-        DiscourjeModel<S> model = createModel(s1, s2a, s2b);
+        Model<S> model = createModel(s1, s2a, s2b);
 
         EX ex = new EX(new Close("a", "b"));
         ex.label(model);

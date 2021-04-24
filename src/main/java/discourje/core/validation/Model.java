@@ -2,7 +2,6 @@ package discourje.core.validation;
 
 import discourje.core.lts.Action;
 import discourje.core.lts.LTS;
-import discourje.core.lts.State;
 import discourje.core.lts.Transitions;
 import discourje.core.validation.formulas.CtlFormula;
 import java.util.ArrayList;
@@ -18,13 +17,13 @@ import org.apache.commons.math3.util.Pair;
 /**
  * The abstract model the is used to check the {@link LTS} using CTL.
  */
-public class DiscourjeModel<Spec> {
+public class Model<Spec> {
 
-    private final Collection<DMState<Spec>> initialStates;
+    private final Collection<State<Spec>> initialStates;
 
-    private final Collection<DMState<Spec>> states = new ArrayList<>();
+    private final Collection<State<Spec>> states = new ArrayList<>();
 
-    private final Map<Pair<State<Spec>, Action>, DMState<Spec>> dmStateMap = new HashMap<>();
+    private final Map<Pair<discourje.core.lts.State, Action>, State<Spec>> dmStateMap = new HashMap<>();
 
     private final Collection<Channel> channels = new HashSet<>();
 
@@ -32,17 +31,17 @@ public class DiscourjeModel<Spec> {
 
     private final Map<CtlFormula, Integer> labelIndices = new HashMap<>();
 
-    public DiscourjeModel(LTS<Spec> lts) {
+    public Model(LTS<Spec> lts) {
         lts.expandRecursively();
         lts.getInitialStates().stream()
-                .sorted(Comparator.comparing(State::getIdentifier))
+                .sorted(Comparator.comparing(discourje.core.lts.State::getIdentifier))
                 .forEach(is -> addState(is, null));
         initialStates = new ArrayList<>(states);
 
-        for (State<Spec> state : lts.getStates()) {
+        for (discourje.core.lts.State state : lts.getStates()) {
             Transitions<Spec> transitions = state.getTransitionsOrNull();
             for (Action action : transitions.getActions()) {
-                for (State<Spec> targetState : transitions.getTargetsOrNull(action)) {
+                for (discourje.core.lts.State targetState : transitions.getTargetsOrNull(action)) {
                     addState(targetState, action);
                 }
                 if (action.getSender() != null || action.getReceiver() != null) {
@@ -51,11 +50,11 @@ public class DiscourjeModel<Spec> {
             }
         }
 
-        for (DMState<Spec> dmState : states) {
+        for (State<Spec> dmState : states) {
             Transitions<Spec> transitions = dmState.getState().getTransitionsOrNull();
             for (Action action : transitions.getActions()) {
-                for (State<Spec> state : transitions.getTargetsOrNull(action)) {
-                    DMState<Spec> nextState = findState(state, action);
+                for (discourje.core.lts.State state : transitions.getTargetsOrNull(action)) {
+                    State<Spec> nextState = findState(state, action);
                     dmState.addNextState(nextState);
 //                    nextState.addPreviousState(dmState);
                 }
@@ -63,26 +62,26 @@ public class DiscourjeModel<Spec> {
         }
     }
 
-    public DiscourjeModel(DMState<Spec>[] states) {
+    public Model(State<Spec>[] states) {
         this.initialStates = Arrays.asList(states);
         this.states.addAll(Arrays.asList(states));
     }
 
-    private void addState(State<Spec> state, Action action) {
-        DMState<Spec> newState = new DMState<>(state, action);
+    private void addState(discourje.core.lts.State state, Action action) {
+        State<Spec> newState = new State<>(state, action);
         states.add(newState);
         dmStateMap.put(new Pair<>(state, action), newState);
     }
 
-    private DMState<Spec> findState(State<Spec> state, Action action) {
+    private State<Spec> findState(discourje.core.lts.State state, Action action) {
         return dmStateMap.get(new Pair<>(state, action));
     }
 
-    public Collection<DMState<Spec>> getInitialStates() {
+    public Collection<State<Spec>> getInitialStates() {
         return Collections.unmodifiableCollection(initialStates);
     }
 
-    public Collection<DMState<Spec>> getStates() {
+    public Collection<State<Spec>> getStates() {
         return Collections.unmodifiableCollection(states);
     }
 

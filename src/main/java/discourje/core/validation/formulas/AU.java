@@ -1,7 +1,7 @@
 package discourje.core.validation.formulas;
 
-import discourje.core.validation.DMState;
-import discourje.core.validation.DiscourjeModel;
+import discourje.core.validation.State;
+import discourje.core.validation.Model;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Queue;
@@ -18,7 +18,7 @@ class AU implements CtlFormula {
     }
 
     @Override
-    public void label(DiscourjeModel<?> model) {
+    public void label(Model<?> model) {
         if (!model.isLabelledBy(this)) {
             int labelIndex = model.setLabelledBy(this);
             lhs.label(model);
@@ -26,13 +26,13 @@ class AU implements CtlFormula {
             int lhsLabelIndex = model.getLabelIndex(lhs);
             int rhsLabelIndex = model.getLabelIndex(rhs);
 
-            Queue<DMState<?>> states = new LinkedList<>(model.getStates());
+            Queue<State<?>> states = new LinkedList<>(model.getStates());
             while (!states.isEmpty()) {
-                DMState<?> dmState = states.remove();
-                if (dmState.hasLabel(rhsLabelIndex) ||
-                        (dmState.hasLabel(lhsLabelIndex) && dmState.successorsExistAndAllHaveLabel(labelIndex))) {
-                    if (dmState.addLabel(labelIndex)) {
-                        states.addAll(dmState.getPreviousStates());
+                State<?> state = states.remove();
+                if (state.hasLabel(rhsLabelIndex) ||
+                        (state.hasLabel(lhsLabelIndex) && state.successorsExistAndAllHaveLabel(labelIndex))) {
+                    if (state.addLabel(labelIndex)) {
+                        states.addAll(state.getPreviousStates());
                     }
                 }
             }

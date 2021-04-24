@@ -1,8 +1,8 @@
 package discourje.core.validation.formulas;
 
 import discourje.core.lts.Action;
-import discourje.core.validation.DMState;
-import discourje.core.validation.DiscourjeModel;
+import discourje.core.validation.State;
+import discourje.core.validation.Model;
 
 import java.util.Objects;
 
@@ -18,10 +18,10 @@ class Send implements CtlFormula {
     }
 
     @Override
-    public void label(DiscourjeModel<?> model) {
+    public void label(Model<?> model) {
         if (!model.isLabelledBy(this)) {
             int labelIndex = model.setLabelledBy(this);
-            for (DMState<?> state : model.getStates()) {
+            for (State<?> state : model.getStates()) {
                 Action action = state.getAction();
                 if (action != null &&
                         (action.getType() == Action.Type.SYNC || action.getType() == Action.Type.SEND) &&

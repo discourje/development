@@ -2,7 +2,6 @@ package discourje.core.validation;
 
 import discourje.core.lts.Action;
 import discourje.core.lts.LTS;
-import discourje.core.lts.State;
 import discourje.core.lts.Transitions;
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
-class DiscourjeModelTest<Spec> {
+class ModelTest<Spec> {
 
     /**
      * Test the creation of a DiscourjeModel from an LTS representing this:
@@ -33,11 +32,11 @@ class DiscourjeModelTest<Spec> {
     @Test
     public void createDiscourjeModel_shouldFillFieldsCorrectly() {
         @SuppressWarnings("unchecked")
-        State<Spec> _1 = mock(State.class);
+        discourje.core.lts.State _1 = mock(discourje.core.lts.State.class);
         when(_1.getIdentifier()).thenReturn(1);
 
         @SuppressWarnings("unchecked")
-        State<Spec> _2 = mock(State.class);
+        discourje.core.lts.State _2 = mock(discourje.core.lts.State.class);
         when(_2.getIdentifier()).thenReturn(2);
 
         Action sync = new Action("sync", Action.Type.SYNC, o -> true, "a", "b");
@@ -65,15 +64,15 @@ class DiscourjeModelTest<Spec> {
         when(lts.getStates()).thenReturn(Arrays.asList(_1, _2));
 
         // execute
-        DiscourjeModel<?> model = new DiscourjeModel<>(lts);
+        Model<?> model = new Model<>(lts);
 
         // verify
         // expected states
-        DMState<?> _1_null = new DMState<>(_1, null);
-        DMState<?> _1_close = new DMState<>(_1, close);
-        DMState<?> _2_sync = new DMState<>(_2, sync);
-        DMState<?> _2_recv = new DMState<>(_2, recv);
-        DMState<?> _2_send = new DMState<>(_2, send);
+        State<?> _1_null = new State<>(_1, null);
+        State<?> _1_close = new State<>(_1, close);
+        State<?> _2_sync = new State<>(_2, sync);
+        State<?> _2_recv = new State<>(_2, recv);
+        State<?> _2_send = new State<>(_2, send);
 
         assertEquals(1, model.getInitialStates().size());
         assertTrue(model.getInitialStates().containsAll(Collections.singletonList(_1_null)));
@@ -85,7 +84,7 @@ class DiscourjeModelTest<Spec> {
         assertTrue(model.getStates().contains(_2_send));
         assertTrue(model.getStates().contains(_2_recv));
 
-        for (DMState<?> state : model.getStates()) {
+        for (State<?> state : model.getStates()) {
             if (state.equals(_1_null)) {
                 assertEquals(3, state.getNextStates().size());
                 assertTrue(state.getNextStates().contains(_2_sync));

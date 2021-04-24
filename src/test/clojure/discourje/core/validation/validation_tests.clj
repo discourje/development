@@ -18,13 +18,13 @@
             [discourje.core.validation.used-channels-must-be-closed-async :as ucmbca]
             [discourje.core.validation.performance :as perf]
             )
-  (:import (discourje.core.validation DiscourjeModel)))
+  (:import (discourje.core.validation Model)))
 
 (s/defrole ::white)
 (s/defrole ::black)
 
 (defn print-lts [lts]
-  (let [dm (new DiscourjeModel lts)
+  (let [dm (new Model lts)
         lts-size (.size (.getStates lts))
         dm-size (.size (.getStates dm))]
     (print (str "lts-size: " lts-size "; dm-size: " dm-size "\n"))

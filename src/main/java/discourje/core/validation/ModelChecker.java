@@ -23,16 +23,16 @@ public class ModelChecker {
             new DoNotSendAfterClose(),
             new DoNotSendToSelf());
 
-    private final DiscourjeModel<?> dmModel;
+    private final Model<?> dmModel;
     private final Collection<Rule> rules;
 
     public ModelChecker(LTS<?> lts) {
-        this.dmModel = new DiscourjeModel<>(lts);
+        this.dmModel = new Model<>(lts);
         rules = DEFAULT_RULES;
     }
 
     public ModelChecker(LTS<?> lts, Collection<Rule> rules) {
-        this.dmModel = new DiscourjeModel<>(lts);
+        this.dmModel = new Model<>(lts);
         this.rules = rules;
     }
 
@@ -43,7 +43,7 @@ public class ModelChecker {
     }
 
     public static boolean check(LTS<?> lts, CtlFormula f) {
-        var model = new DiscourjeModel<>(lts);
+        var model = new Model<>(lts);
         f.label(model);
         var i = model.getLabelIndex(f);
         return !model.getInitialStates().stream().anyMatch(s -> !s.hasLabel(i));
