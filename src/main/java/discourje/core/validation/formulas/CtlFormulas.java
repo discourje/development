@@ -10,6 +10,10 @@ public class CtlFormulas {
         return Init.INSTANCE;
     }
 
+    public static CtlFormula fin() {
+        return Fin.INSTANCE;
+    }
+
     public static CtlFormula send(String sender, String receiver) {
         return new Send(sender, receiver);
     }
