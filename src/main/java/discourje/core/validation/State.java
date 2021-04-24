@@ -2,17 +2,14 @@ package discourje.core.validation;
 
 import discourje.core.lts.Action;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class State<Spec> {
     private final discourje.core.lts.State state;
     private final Action action;
-    private final Collection<State<Spec>> nextStates = new ArrayList<>();
-    private final Collection<State<Spec>> previousStates = new ArrayList<>();
+    private final Collection<State<Spec>> nextStates = new LinkedHashSet<>();
+    private final Collection<State<Spec>> previousStates = new LinkedHashSet<>();
     private final BitSet labels = new BitSet();
 
     public State(discourje.core.lts.State state, Action action) {
@@ -53,6 +50,13 @@ public class State<Spec> {
     @Override
     public int hashCode() {
         return Objects.hash(state, action);
+    }
+
+    @Override
+    public String toString() {
+        return previousStates.stream().map(State::getState).collect(Collectors.toList()) + "(" + previousStates.size() + ")" +
+                " -> " + action + "," + state + " -> " +
+                nextStates.stream().map(State::getState).collect(Collectors.toList());
     }
 
     public boolean addLabel(int labelIndex) {

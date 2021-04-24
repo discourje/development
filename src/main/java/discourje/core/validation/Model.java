@@ -4,14 +4,9 @@ import discourje.core.lts.Action;
 import discourje.core.lts.LTS;
 import discourje.core.lts.Transitions;
 import discourje.core.validation.formulas.CtlFormula;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+
+import java.util.*;
+
 import org.apache.commons.math3.util.Pair;
 
 /**
@@ -21,7 +16,7 @@ public class Model<Spec> {
 
     private final Collection<State<Spec>> initialStates;
 
-    private final Collection<State<Spec>> states = new ArrayList<>();
+    private final Collection<State<Spec>> states = new LinkedHashSet<>();
 
     private final Map<Pair<discourje.core.lts.State, Action>, State<Spec>> dmStateMap = new HashMap<>();
 
@@ -56,7 +51,6 @@ public class Model<Spec> {
                 for (discourje.core.lts.State state : transitions.getTargetsOrNull(action)) {
                     State<Spec> nextState = findState(state, action);
                     dmState.addNextState(nextState);
-//                    nextState.addPreviousState(dmState);
                 }
             }
         }
@@ -68,9 +62,11 @@ public class Model<Spec> {
     }
 
     private void addState(discourje.core.lts.State state, Action action) {
-        State<Spec> newState = new State<>(state, action);
-        states.add(newState);
-        dmStateMap.put(new Pair<>(state, action), newState);
+        if (!dmStateMap.containsKey(new Pair<>(state, action))) {
+            State<Spec> newState = new State<>(state, action);
+            states.add(newState);
+            dmStateMap.put(new Pair<>(state, action), newState);
+        }
     }
 
     private State<Spec> findState(discourje.core.lts.State state, Action action) {
