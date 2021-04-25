@@ -26,6 +26,10 @@ public class CtlFormulas {
         return new Close(sender, receive);
     }
 
+    public static CtlFormula act(String role) {
+        return new Act(role);
+    }
+
     //
     // Propositional operators
     //

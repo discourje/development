@@ -36,6 +36,10 @@
     `(CtlFormulas/close (interp/eval-role ~sender)
                         (interp/eval-role ~receiver))))
 
+(defmacro act [role]
+  (let [role (s/desugared-role role)]
+    `(CtlFormulas/act (interp/eval-role ~role))))
+
 ;;;;
 ;;;; PROPOSITIONAL OPERATORS
 ;;;;
@@ -148,6 +152,20 @@
         f (apply and args)]
     f))
 
+(defn causality [roles]
+  (let [args (remove nil?
+                     (apply concat
+                            (map (fn [p] (map (fn [q]
+                                                (if (not= p q)
+                                                  (let [act-p (eval `(act ~p))
+                                                        act-q (eval `(act ~q))]
+                                                    (AG (implies (EX (and act-p (EX act-q)))
+                                                                 (EX (and act-q (EX act-p))))))))
+                                              roles))
+                                 roles)))
+        f (apply and args)]
+    f))
+
 ;;;;
 ;;;; API
 ;;;;
@@ -180,12 +198,13 @@
 (defn lint [ast-or-lts]
   (if (= (type ast-or-lts) LTS)
     (let [channels (lts/channels ast-or-lts)
-          ;roles (lts/roles ast-or-lts)
+          roles (lts/roles ast-or-lts)
           fmap {:must-terminate     (must-terminate)
                 :may-terminate      (may-terminate)
                 :cant-terminate     (cant-terminate)
                 :close-after-send   (close-after-send channels)
                 :send-before-close  (send-before-close channels)
-                :no-act-after-close (no-act-after-close channels)}]
+                :no-act-after-close (no-act-after-close channels)
+                :causality          (causality roles)}]
       (check-all ast-or-lts fmap))
     (lint (lts/lts ast-or-lts))))
