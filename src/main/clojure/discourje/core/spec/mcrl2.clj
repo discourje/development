@@ -6,25 +6,26 @@
   (:import (java.io File)))
 
 (def ^:dynamic *mcrl2-bin* nil)
+(def ^:dynamic *mcrl2-tmp* nil)
 
 (defn mcrl2 [tool]
   (if *mcrl2-bin*
     (str *mcrl2-bin* File/separator (name tool))
     (throw (Exception.))))
 
-(defn ltsgraph [lts temp-dir]
+(defn ltsgraph [lts]
   (future
-    (let [aut-file (str temp-dir File/separator "ltsgraph-" (System/currentTimeMillis) ".aut")]
+    (let [aut-file (str *mcrl2-tmp* File/separator "ltsgraph-" (System/currentTimeMillis) ".aut")]
       (spit aut-file (str lts))
       (sh (mcrl2 :ltsgraph) aut-file))))
 
-(defn lts2pbes-pbes2bool [lts formulas temp-dir]
+(defn lts2pbes-pbes2bool [lts formulas]
   (future
     (let [timestamp (System/currentTimeMillis)
-          aut-file (str temp-dir File/separator "lts2pbes-pbes2bool-" timestamp ".aut")
-          mcrl2-file (str temp-dir File/separator "lts2pbes-pbes2bool-" timestamp ".mcrl2")
-          mcf-file (str temp-dir File/separator "lts2pbes-pbes2bool-" timestamp ".mcf")
-          pbes-file (str temp-dir File/separator "lts2pbes-pbes2bool-" timestamp ".pbes")]
+          aut-file (str *mcrl2-tmp* File/separator "lts2pbes-pbes2bool-" timestamp ".aut")
+          mcrl2-file (str *mcrl2-tmp* File/separator "lts2pbes-pbes2bool-" timestamp ".mcrl2")
+          mcf-file (str *mcrl2-tmp* File/separator "lts2pbes-pbes2bool-" timestamp ".mcf")
+          pbes-file (str *mcrl2-tmp* File/separator "lts2pbes-pbes2bool-" timestamp ".pbes")]
 
       (let [lts-string (str lts)
             lts-string (clojure.string/replace lts-string "Object," "")
@@ -60,9 +61,10 @@
             (recur (rest formulas)
                    (assoc bools name bool)))))
 
-      (clojure.java.io/delete-file mcf-file)
-      (clojure.java.io/delete-file mcrl2-file)
-      (clojure.java.io/delete-file pbes-file))))
+      ;(clojure.java.io/delete-file mcf-file)
+      ;(clojure.java.io/delete-file mcrl2-file)
+      ;(clojure.java.io/delete-file pbes-file)
+      )))
 
 ;;;;;
 ;;;;; Example
