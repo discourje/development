@@ -138,6 +138,7 @@
   (let [args (map (fn [[sender receiver]]
                     (let [x (eval `(send ~sender ~receiver))
                           y (eval `(close ~sender ~receiver))]
+                      ;; Alternative: (AU (not y) (or fin x))
                       (AG (implies y (AP x)))))
                   channels)
         f (apply and args)]
@@ -170,32 +171,46 @@
 ;;;; API
 ;;;;
 
-(defn check-all [ast-or-lts fmap]
+(defn check-all [ast-or-lts fmap & {:keys [engine justify]
+                                    :or   {engine :dcj justify true}}]
   (if (= (type ast-or-lts) LTS)
-    (let [m (Model. ^LTS ast-or-lts)]
-      ;(println ast-or-lts)
-      ;(binding [mcrl2/*mcrl2-bin* "/Applications/mCRL2.app/Contents/bin"]
-      ;  (mcrl2/ltsgraph ast-or-lts "/Users/sungshik/Desktop/temp"))
-      (into {} (map (fn [[fname f]]
-                      (let [begin (System/nanoTime)]
-                        (.label f m)
-                        (let [i (.getLabelIndex m f)
-                              end (System/nanoTime)
-                              result (every? #(.hasLabel ^State % i) (.getInitialStates m))
-                              time (long (/ (- end begin) 1000000))]
-                          (if result
-                            [fname {:result result
-                                    :time   time}]
-                            [fname {:result   result
-                                    :evidence (str (.getCounterexample f m))
-                                    :time     time}]))))
-                    fmap)))
-    (check-all (lts/lts ast-or-lts) fmap)))
+    (condp = engine
+      :dcj (let [m (Model. ^LTS ast-or-lts)]
+             (into {} (map (fn [[fname f]]
+                             (let [begin (System/nanoTime)]
+                               (.label f m)
+                               (let [i (.getLabelIndex m f)
+                                     end (System/nanoTime)
+                                     result (every? #(.hasLabel ^State % i) (.getInitialStates m))
+                                     time (long (/ (- end begin) 1000000))]
+                                 (if (clojure.core/or result (clojure.core/not justify))
+                                   [fname {:result result
+                                           :time   time
+                                           :engine engine}]
+                                   [fname {:result   result
+                                           :evidence (str (.getCounterexample f m))
+                                           :time     time
+                                           :engine   engine}]))))
+                           fmap)))
+      :mcrl2 (into {} (map (fn [[fname f]]
+                             (let [begin (System/nanoTime)
+                                   result (try
+                                            (:f @(mcrl2/lts2pbes-pbes2bool ast-or-lts {:f (.toMCRL2 f)}))
+                                            (catch Exception _))
+                                   end (System/nanoTime)
+                                   time (long (/ (- end begin) 1000000))]
+                               [fname {:result result
+                                       :time   time
+                                       :engine engine}]))
+                           fmap)))
+    (check-all (lts/lts ast-or-lts) fmap :engine engine :justify justify)))
 
-(defn check-one [ast-or-lts f]
-  (:f (check-all ast-or-lts {:f f})))
+(defn check-one [ast-or-lts f & {:keys [engine justify]
+                                 :or   {engine :dcj justify true}}]
+  (:f (check-all ast-or-lts {:f f} :engine engine :justify justify)))
 
-(defn lint [ast-or-lts]
+(defn lint [ast-or-lts & {:keys [engine justify]
+                          :or   {engine :dcj justify true}}]
   (if (= (type ast-or-lts) LTS)
     (let [channels (lts/channels ast-or-lts)
           roles (lts/roles ast-or-lts)
@@ -206,5 +221,5 @@
                 :send-before-close  (send-before-close channels)
                 :no-act-after-close (no-act-after-close channels)
                 :causality          (causality roles)}]
-      (check-all ast-or-lts fmap))
-    (lint (lts/lts ast-or-lts))))
+      (check-all ast-or-lts fmap :engine engine :justify justify))
+    (lint (lts/lts ast-or-lts) :engine engine :justify justify)))

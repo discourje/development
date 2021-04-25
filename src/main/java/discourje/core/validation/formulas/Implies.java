@@ -2,6 +2,7 @@ package discourje.core.validation.formulas;
 
 import discourje.core.validation.State;
 import discourje.core.validation.Model;
+
 import java.util.Objects;
 
 public class Implies implements CtlFormula {
@@ -29,6 +30,21 @@ public class Implies implements CtlFormula {
                     state.addLabel(labelIndex);
                 }
             }
+        }
+    }
+
+    @Override
+    public String toMCRL2() {
+        if (lhs.isActionFormula() && rhs.isActionFormula()) {
+            throw new UnsupportedOperationException();
+        } else if (lhs.isActionFormula() && !rhs.isActionFormula()) {
+            return "[" + lhs.toMCRL2() + "](" + rhs.toMCRL2() + ")";
+        } else if (!lhs.isActionFormula() && rhs.isActionFormula()) {
+            return "(" + lhs.toMCRL2() + ") => <" + rhs.toMCRL2() + ">true";
+        } else if (!lhs.isActionFormula() && !rhs.isActionFormula()) {
+            return "(" + lhs.toMCRL2() + ") => (" + rhs.toMCRL2() + ")";
+        } else {
+            throw new UnsupportedOperationException();
         }
     }
 

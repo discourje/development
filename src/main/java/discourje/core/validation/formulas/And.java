@@ -3,6 +3,7 @@ package discourje.core.validation.formulas;
 import discourje.core.lts.Action;
 import discourje.core.validation.State;
 import discourje.core.validation.Model;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,6 +44,19 @@ class And implements CtlFormula {
         }
 
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String toMCRL2() {
+        String s = "true";
+        for (var arg : args) {
+            if (arg.isActionFormula()) {
+                s += " && <" + arg.toMCRL2() + ">true";
+            } else {
+                s += " && (" + arg.toMCRL2() + ")";
+            }
+        }
+        return s;
     }
 
     public String toString() {

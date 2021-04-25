@@ -12,4 +12,12 @@ public interface CtlFormula {
     default List<Action> getCounterexample(Model<?> model) {
         throw new UnsupportedOperationException();
     }
+
+    default boolean isActionFormula() {
+        return false;
+    }
+
+    default String toMCRL2() {
+        throw new UnsupportedOperationException(getClass().getSimpleName());
+    }
 }

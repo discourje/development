@@ -25,6 +25,11 @@ class Fin implements CtlFormula {
     }
 
     @Override
+    public String toMCRL2() {
+        return "[true]false";
+    }
+
+    @Override
     public String toString() {
         return "fin";
     }

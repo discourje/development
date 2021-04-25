@@ -29,6 +29,15 @@ public class EF implements CtlFormula {
     }
 
     @Override
+    public String toMCRL2() {
+        if (arg.isActionFormula()) {
+            return "<true*><" + arg.toMCRL2() + ">true";
+        } else {
+            return "<true*>(" + arg.toMCRL2() + ")";
+        }
+    }
+
+    @Override
     public String toString() {
         return "EF(" + arg + ")";
     }

@@ -28,6 +28,19 @@ class Or implements CtlFormula {
         }
     }
 
+    @Override
+    public String toMCRL2() {
+        String s = "false";
+        for (var arg : args) {
+            if (arg.isActionFormula()) {
+                s += " || <" + arg.toMCRL2() + ">true";
+            } else {
+                s += " || (" + arg.toMCRL2() + ")";
+            }
+        }
+        return s;
+    }
+
     public String toString() {
         return String.format("(%s)",
                 Arrays.stream(args).map(Object::toString).collect(Collectors.joining(" or "))

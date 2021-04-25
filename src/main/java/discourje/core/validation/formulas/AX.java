@@ -28,6 +28,15 @@ public class AX implements CtlFormula {
     }
 
     @Override
+    public String toMCRL2() {
+        if (arg.isActionFormula()) {
+            return "<true>true && [true]<" + arg.toMCRL2() + ">true";
+        } else {
+            return "<true>true && [true](" + arg.toMCRL2() + ")";
+        }
+    }
+
+    @Override
     public String toString() {
         return "AX(" + arg + ")";
     }

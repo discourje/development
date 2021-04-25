@@ -2,6 +2,7 @@ package discourje.core.validation.formulas;
 
 import discourje.core.validation.State;
 import discourje.core.validation.Model;
+
 import java.util.Objects;
 
 class Not implements CtlFormula {
@@ -25,6 +26,15 @@ class Not implements CtlFormula {
                     state.addLabel(labelIndex);
                 }
             }
+        }
+    }
+
+    @Override
+    public String toMCRL2() {
+        if (arg.isActionFormula()) {
+            return "[" + arg.toMCRL2() + "]false";
+        } else {
+            return "!(" + arg.toMCRL2() + ")";
         }
     }
 

@@ -34,6 +34,24 @@ class Send implements CtlFormula {
     }
 
     @Override
+    public boolean isActionFormula() {
+        return true;
+    }
+
+    @Override
+    public String toMCRL2() {
+        return "send(" +
+                sender.replace('[', '(').replace(']', ')') +
+                "," +
+                receiver.replace('[', '(').replace(']', ')') +
+                ") || handshake(" +
+                sender.replace('[', '(').replace(']', ')') +
+                "," +
+                receiver.replace('[', '(').replace(']', ')') +
+                ")";
+    }
+
+    @Override
     public String toString() {
         return String.format("send_%s_%s", sender, receiver);
     }

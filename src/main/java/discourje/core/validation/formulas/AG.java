@@ -34,6 +34,15 @@ public class AG implements CtlFormula {
     }
 
     @Override
+    public String toMCRL2() {
+        if (arg.isActionFormula()) {
+            return "[true*]<" + arg.toMCRL2() + ">true";
+        } else {
+            return "[true*](" + arg.toMCRL2() + ")";
+        }
+    }
+
+    @Override
     public List<Action> getCounterexample(Model<?> model) {
         var i = model.getLabelIndex(arg);
 

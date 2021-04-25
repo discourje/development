@@ -69,6 +69,21 @@ public class AF implements CtlFormula {
     }
 
     @Override
+    public String toMCRL2() {
+        var s = arg.toMCRL2();
+        var x = "X";
+        while (s.contains(x + ".")) {
+            x += "X";
+        }
+
+        if (arg.isActionFormula()) {
+            return "mu " + x + ".(([true]" + x + " && <true>true) || <" + s + ">true)";
+        } else {
+            return "mu " + x + ".(([true]" + x + " && <true>true) || (" + s + "))";
+        }
+    }
+
+    @Override
     public String toString() {
         return "AF(" + arg + ")";
     }

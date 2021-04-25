@@ -3,6 +3,7 @@ package discourje.core.validation.formulas;
 import discourje.core.lts.Action;
 import discourje.core.validation.State;
 import discourje.core.validation.Model;
+
 import java.util.Objects;
 
 class Close implements CtlFormula {
@@ -30,6 +31,20 @@ class Close implements CtlFormula {
                 }
             }
         }
+    }
+
+    @Override
+    public boolean isActionFormula() {
+        return true;
+    }
+
+    @Override
+    public String toMCRL2() {
+        return "close(" +
+                sender.replace('[', '(').replace(']', ')') +
+                "," +
+                receiver.replace('[', '(').replace(']', ')') +
+                ")";
     }
 
     public String toString() {

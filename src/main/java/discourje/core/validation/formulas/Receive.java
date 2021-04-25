@@ -33,6 +33,24 @@ class Receive implements CtlFormula {
         }
     }
 
+    @Override
+    public boolean isActionFormula() {
+        return true;
+    }
+
+    @Override
+    public String toMCRL2() {
+        return "receive(" +
+                sender.replace('[', '(').replace(']', ')') +
+                "," +
+                receiver.replace('[', '(').replace(']', ')') +
+                ") || handshake(" +
+                sender.replace('[', '(').replace(']', ')') +
+                "," +
+                receiver.replace('[', '(').replace(']', ')') +
+                ")";
+    }
+
     public String toString() {
         return String.format("recv_%s_%s", sender, receiver);
     }
