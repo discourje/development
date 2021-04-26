@@ -74,7 +74,7 @@ public class AF extends Temporal {
 
         var segment1 = f.apply(source, target1);
         var segment2 = f.apply(target1, target2);
-        segment2.add(0, segment1.remove(segment1.size() - 1));
+        segment2.add(target1.getAction());
         return Arrays.asList(segment1, segment2);
     }
 

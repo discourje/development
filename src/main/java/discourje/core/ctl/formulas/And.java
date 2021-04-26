@@ -25,11 +25,10 @@ public class And implements Formula {
 
     @Override
     public List<List<Action>> extractWitness(Model<?> model, State<?> source) {
-
-        for (Formula f : args) {
-            var i = model.getLabelIndex(f);
+        for (Formula arg : args) {
+            var i = model.getLabelIndex(arg);
             if (!source.hasLabel(i)) {
-                return f.extractWitness(model, source);
+                return arg.extractWitness(model, source);
             }
         }
 

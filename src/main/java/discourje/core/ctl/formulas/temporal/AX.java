@@ -6,9 +6,7 @@ import discourje.core.ctl.Model;
 import discourje.core.ctl.Formula;
 import discourje.core.ctl.formulas.Temporal;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class AX extends Temporal {
     private final Formula arg;
@@ -26,7 +24,10 @@ public class AX extends Temporal {
             var ii = model.getLabelIndex(arg);
             for (var next : source.getNextStates()) {
                 if (!next.hasLabel(ii)) {
-                    return Collections.singletonList(Collections.singletonList(next.getAction()));
+                    var segments = new ArrayList<List<Action>>();
+                    segments.add(Collections.singletonList(next.getAction()));
+                    segments.addAll(arg.extractWitness(model, next));
+                    return segments;
                 }
             }
         }

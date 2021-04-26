@@ -25,12 +25,16 @@ public class Not implements Formula {
 
     @Override
     public List<List<Action>> extractWitness(Model<?> model, State<?> source) {
+        if (isTemporal()) {
+            throw new IllegalStateException();
+        }
+
         var i = model.getLabelIndex(this);
-        if (!isTemporal() && !source.hasLabel(i)) {
-            return Collections.singletonList(Collections.emptyList());
-        } else {
+        if (source.hasLabel(i)) {
             throw new IllegalArgumentException();
         }
+
+        return Collections.singletonList(Collections.emptyList());
     }
 
     @Override

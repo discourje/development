@@ -6,6 +6,7 @@ import discourje.core.ctl.State;
 import discourje.core.ctl.Model;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +26,23 @@ public class Or implements Formula {
 
     @Override
     public List<List<Action>> extractWitness(Model<?> model, State<?> source) {
-        throw new UnsupportedOperationException();
+
+        if (Arrays.stream(args).filter(Formula::isTemporal).count() > 1) {
+            throw new IllegalStateException();
+        }
+
+        var i = model.getLabelIndex(this);
+        if (source.hasLabel(i)) {
+            throw new IllegalArgumentException();
+        }
+
+        for (var arg : args) {
+            if (arg.isTemporal()) {
+                return arg.extractWitness(model, source);
+            }
+        }
+
+        return Collections.singletonList(Collections.emptyList());
     }
 
     @Override

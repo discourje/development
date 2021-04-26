@@ -6,6 +6,6 @@ public abstract class Temporal implements Formula {
 
     @Override
     public final boolean isTemporal() {
-        return false;
+        return true;
     }
 }
