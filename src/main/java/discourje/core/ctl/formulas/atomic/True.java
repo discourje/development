@@ -5,7 +5,7 @@ import discourje.core.ctl.Model;
 import discourje.core.ctl.formulas.Atomic;
 
 public class True extends Atomic {
-    public static final True TRUE = new True();
+    public static final True INSTANCE = new True();
     public static final int hash = True.class.hashCode();
 
     private True() {

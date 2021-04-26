@@ -105,14 +105,14 @@ public class Formulas {
     }
 
     /**
-     * "In all paths, sometime in the past"
+     * "In all paths, sometime in the past" -- weak
      */
     public static Formula AP(Formula arg) {
         return new AP(arg);
     }
 
     /**
-     * "In all paths, always in the past
+     * "In all paths, always in the past" -- weak
      */
     public static Formula AH(Formula arg) {
         return new AH(arg);
@@ -133,14 +133,14 @@ public class Formulas {
     }
 
     /**
-     * "For some path, sometime in the past"
+     * "For some path, sometime in the past" -- weak
      */
     public static Formula EP(Formula arg) {
         return new EP(arg);
     }
 
     /**
-     * "For some path, always in the past"
+     * "For some path, always in the past" -- weak
      */
     public static Formula EH(Formula arg) {
         return new EH(arg);

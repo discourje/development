@@ -6,10 +6,7 @@ import discourje.core.ctl.Model;
 import discourje.core.ctl.Formula;
 import discourje.core.ctl.formulas.Temporal;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Queue;
+import java.util.*;
 
 public class AS extends Temporal {
     private final Formula lhs;
@@ -24,7 +21,12 @@ public class AS extends Temporal {
 
     @Override
     public List<List<Action>> extractWitness(Model<?> model, State<?> source) {
-        throw new UnsupportedOperationException();
+        var i = model.getLabelIndex(this);
+        if (source.hasLabel(i)) {
+            throw new IllegalArgumentException();
+        }
+
+        return Collections.emptyList();
     }
 
     @Override

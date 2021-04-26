@@ -21,7 +21,12 @@ public class ES extends Temporal {
 
     @Override
     public List<List<Action>> extractWitness(Model<?> model, State<?> source) {
-        throw new UnsupportedOperationException();
+        var i = model.getLabelIndex(this);
+        if (source.hasLabel(i)) {
+            throw new IllegalArgumentException();
+        }
+
+        return Collections.emptyList();
     }
 
     @Override

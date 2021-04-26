@@ -6,118 +6,117 @@
             [discourje.core.spec.interp :as interp]
             [discourje.core.spec.lts :as lts]
             [discourje.core.spec.mcrl2 :as mcrl2])
-  (:import (discourje.core.validation Model State)
-           (discourje.core.validation.formulas CtlFormula CtlFormulas)
+  (:import (discourje.core.ctl Formula Formulas Model State)
            (discourje.core.lts LTS)))
 
 ;;;;
 ;;;; ATOMS
 ;;;;
 
-(def init (CtlFormulas/init))
+(def init (Formulas/init))
 
-(def fin (CtlFormulas/fin))
+(def fin (Formulas/fin))
 
 (defmacro send [sender receiver]
   (let [sender (s/desugared-role sender)
         receiver (s/desugared-role receiver)]
-    `(CtlFormulas/send (interp/eval-role ~sender)
-                       (interp/eval-role ~receiver))))
+    `(Formulas/send (interp/eval-role ~sender)
+                    (interp/eval-role ~receiver))))
 
 (defmacro receive [sender receiver]
   (let [sender (s/desugared-role sender)
         receiver (s/desugared-role receiver)]
-    `(CtlFormulas/receive (interp/eval-role ~sender)
-                          (interp/eval-role ~receiver))))
+    `(Formulas/receive (interp/eval-role ~sender)
+                       (interp/eval-role ~receiver))))
 
 (defmacro close [sender receiver]
   (let [sender (s/desugared-role sender)
         receiver (s/desugared-role receiver)]
-    `(CtlFormulas/close (interp/eval-role ~sender)
-                        (interp/eval-role ~receiver))))
+    `(Formulas/close (interp/eval-role ~sender)
+                     (interp/eval-role ~receiver))))
 
 (defmacro act [role]
   (let [role (s/desugared-role role)]
-    `(CtlFormulas/act (interp/eval-role ~role))))
+    `(Formulas/act (interp/eval-role ~role))))
 
 ;;;;
 ;;;; PROPOSITIONAL OPERATORS
 ;;;;
 
 (defn and [& args]
-  (CtlFormulas/and (into-array CtlFormula args)))
+  (Formulas/and (into-array Formula args)))
 
 (defn or [& args]
-  (CtlFormulas/or (into-array CtlFormula args)))
+  (Formulas/or (into-array Formula args)))
 
 (defn not [arg]
-  (CtlFormulas/not arg))
+  (Formulas/not arg))
 
 (defn implies [arg1 arg2]
-  (CtlFormulas/implies arg1 arg2))
+  (Formulas/implies arg1 arg2))
 
 ;;;;
 ;;;; TEMPORAL OPERATORS - FUTURE
 ;;;;
 
 (defn AX [arg]
-  (CtlFormulas/AX arg))
+  (Formulas/AX arg))
 
 (defn AF [arg]
-  (CtlFormulas/AF arg))
+  (Formulas/AF arg))
 
 (defn AG [arg]
-  (CtlFormulas/AG arg))
+  (Formulas/AG arg))
 
 (defn AU [arg1 arg2]
-  (CtlFormulas/AU arg1 arg2))
+  (Formulas/AU arg1 arg2))
 
 (defn EX [arg]
-  (CtlFormulas/EX arg))
+  (Formulas/EX arg))
 
 (defn EF [arg]
-  (CtlFormulas/EF arg))
+  (Formulas/EF arg))
 
 (defn EG [arg]
-  (CtlFormulas/EG arg))
+  (Formulas/EG arg))
 
 (defn EU [arg1 arg2]
-  (CtlFormulas/EU arg1 arg2))
+  (Formulas/EU arg1 arg2))
 
 ;;;;
 ;;;; TEMPORAL OPERATORS - PAST
 ;;;;
 
 (defn AY [arg]
-  (CtlFormulas/AY arg))
+  (Formulas/AY arg))
 
 (defn AP [arg]
-  (CtlFormulas/AP arg))
+  (Formulas/AP arg))
 
 (defn AH [arg]
-  (CtlFormulas/AH arg))
+  (Formulas/AH arg))
 
 (defn AS [arg1 arg2]
-  (CtlFormulas/AS arg1 arg2))
+  (Formulas/AS arg1 arg2))
 
 (defn EY [arg]
-  (CtlFormulas/EY arg))
+  (Formulas/EY arg))
 
 (defn EP [arg]
-  (CtlFormulas/EP arg))
+  (Formulas/EP arg))
 
 (defn EH [arg]
-  (CtlFormulas/EH arg))
+  (Formulas/EH arg))
 
 (defn ES [arg1 arg2]
-  (CtlFormulas/ES arg1 arg2))
+  (Formulas/ES arg1 arg2))
 
 ;;;;
 ;;;; GENERIC PROPERTIES
 ;;;;
 
 (defn must-terminate []
-  (AG (AF fin)))
+  (AF fin))
 
 (defn may-terminate []
   (AG (EF fin)))
@@ -171,46 +170,50 @@
 ;;;; API
 ;;;;
 
-(defn check-all [ast-or-lts fmap & {:keys [engine justify]
-                                    :or   {engine :dcj justify true}}]
+(defn check-all [ast-or-lts fmap & {:keys [engine witness]
+                                    :or   {engine :dcj witness true}}]
   (if (= (type ast-or-lts) LTS)
     (condp = engine
       :dcj (let [m (Model. ^LTS ast-or-lts)]
-             (into {} (map (fn [[fname f]]
-                             (let [begin (System/nanoTime)]
-                               (.label f m)
-                               (let [i (.getLabelIndex m f)
-                                     end (System/nanoTime)
-                                     result (every? #(.hasLabel ^State % i) (.getInitialStates m))
-                                     time (long (/ (- end begin) 1000000))]
-                                 (if (clojure.core/or result (clojure.core/not justify))
-                                   [fname {:result result
-                                           :time   time
-                                           :engine engine}]
-                                   [fname {:result   result
-                                           :evidence (str (.getCounterexample f m))
-                                           :time     time
-                                           :engine   engine}]))))
-                           fmap)))
-      :mcrl2 (into {} (map (fn [[fname f]]
-                             (let [begin (System/nanoTime)
-                                   result (try
-                                            (:f @(mcrl2/lts2pbes-pbes2bool ast-or-lts {:f (.toMCRL2 f)}))
-                                            (catch Exception _))
-                                   end (System/nanoTime)
-                                   time (long (/ (- end begin) 1000000))]
-                               [fname {:result result
-                                       :time   time
-                                       :engine engine}]))
-                           fmap)))
-    (check-all (lts/lts ast-or-lts) fmap :engine engine :justify justify)))
+             (into (sorted-map) (map (fn [[fname f]]
+                                       (let [begin (System/nanoTime)]
+                                         (.label f m)
+                                         (let [i (.getLabelIndex m f)
+                                               end (System/nanoTime)
+                                               verdict (every? #(.hasLabel ^State % i) (.getInitialStates m))
+                                               time (long (/ (- end begin) 1000000))]
+                                           (if (clojure.core/or verdict (clojure.core/not witness))
+                                             [fname {:verdict verdict
+                                                     :time    time}]
+                                             [fname {:verdict verdict
+                                                     :witness (str (.extractWitness f m))
+                                                     :time    time}]))))
+                                     fmap)))
 
-(defn check-one [ast-or-lts f & {:keys [engine justify]
-                                 :or   {engine :dcj justify true}}]
-  (:f (check-all ast-or-lts {:f f} :engine engine :justify justify)))
+      :mcrl2 @(mcrl2/lts2pbes-pbes2bool ast-or-lts
+                                        (into {} (map (fn [[fname f]] [fname (.toMCRL2 f)]) fmap)))
 
-(defn lint [ast-or-lts & {:keys [engine justify]
-                          :or   {engine :dcj justify true}}]
+      :mcrl2-split @(mcrl2/lts2pbes-pbes2bool ast-or-lts
+                                              (into {} (map (fn [[fname f]]
+                                                              (loop [conjuncts (.split f)
+                                                                     i 1
+                                                                     m (sorted-map)]
+                                                                (if (empty? conjuncts)
+                                                                  m
+                                                                  (recur (rest conjuncts)
+                                                                         (inc i)
+                                                                         (assoc m (keyword (str (name fname) "-" i))
+                                                                                  (.toMCRL2 (first conjuncts)))))))
+                                                            fmap)))
+      )
+    (check-all (lts/lts ast-or-lts) fmap :engine engine :witness witness)))
+
+(defn check-one [ast-or-lts f & {:keys [engine witness]
+                                 :or   {engine :dcj witness true}}]
+  (:f (check-all ast-or-lts {:f f} :engine engine :witness witness)))
+
+(defn lint [ast-or-lts & {:keys [engine witness]
+                          :or   {engine :dcj witness true}}]
   (if (= (type ast-or-lts) LTS)
     (let [channels (lts/channels ast-or-lts)
           roles (lts/roles ast-or-lts)
@@ -220,6 +223,7 @@
                 :close-after-send   (close-after-send channels)
                 :send-before-close  (send-before-close channels)
                 :no-act-after-close (no-act-after-close channels)
-                :causality          (causality roles)}]
-      (check-all ast-or-lts fmap :engine engine :justify justify))
-    (lint (lts/lts ast-or-lts) :engine engine :justify justify)))
+                ;:causality          (causality roles)
+                }]
+      (check-all ast-or-lts fmap :engine engine :witness witness))
+    (lint (lts/lts ast-or-lts) :engine engine :witness witness)))

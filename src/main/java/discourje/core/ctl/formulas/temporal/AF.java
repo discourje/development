@@ -82,7 +82,7 @@ public class AF extends Temporal {
     public void label(Model<?> model) {
         if (!model.isLabelledBy(this)) {
             int labelIndex = model.setLabelledBy(this);
-            Formula au = new AU(True.TRUE, arg);
+            Formula au = new AU(True.INSTANCE, arg);
             au.label(model);
             int auIndex = model.getLabelIndex(au);
             for (State<?> state : model.getStates()) {

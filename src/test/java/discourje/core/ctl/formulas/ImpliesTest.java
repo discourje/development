@@ -14,7 +14,7 @@ class ImpliesTest<S> extends AbstractCtlFormulaTest<S> {
         State<S> s1 = createState(Action.Type.SEND, "a", "b");
         Model<S> model = createModel(s1);
 
-        Implies implies = new Implies(True.TRUE, True.TRUE);
+        Implies implies = new Implies(True.INSTANCE, True.INSTANCE);
         implies.label(model);
 
         assertTrue(s1.hasLabel(model.getLabelIndex(implies)));
@@ -25,7 +25,7 @@ class ImpliesTest<S> extends AbstractCtlFormulaTest<S> {
         State<S> s1 = createState(Action.Type.SEND, "a", "b");
         Model<S> model = createModel(s1);
 
-        Implies implies = new Implies(True.TRUE, new Not(True.TRUE));
+        Implies implies = new Implies(True.INSTANCE, new Not(True.INSTANCE));
         implies.label(model);
 
         assertFalse(s1.hasLabel(model.getLabelIndex(implies)));
@@ -36,7 +36,7 @@ class ImpliesTest<S> extends AbstractCtlFormulaTest<S> {
         State<S> s1 = createState(Action.Type.SEND, "a", "b");
         Model<S> model = createModel(s1);
 
-        Implies implies = new Implies(True.TRUE, True.TRUE);
+        Implies implies = new Implies(True.INSTANCE, True.INSTANCE);
         implies.label(model);
 
         assertTrue(s1.hasLabel(model.getLabelIndex(implies)));
@@ -47,7 +47,7 @@ class ImpliesTest<S> extends AbstractCtlFormulaTest<S> {
         State<S> s1 = createState(Action.Type.SEND, "a", "b");
         Model<S> model = createModel(s1);
 
-        Implies implies = new Implies(True.TRUE, True.TRUE);
+        Implies implies = new Implies(True.INSTANCE, True.INSTANCE);
         implies.label(model);
 
         assertTrue(s1.hasLabel(model.getLabelIndex(implies)));

@@ -72,12 +72,7 @@ public class AG extends Temporal {
         var segment = f.apply(source, target);
         var segments = new ArrayList<List<Action>>();
         segments.add(segment);
-        try {
-            segments.addAll(arg.extractWitness(model, target));
-        } catch (Exception ignored) {
-            System.out.println(this);
-            ignored.printStackTrace();
-        }
+        segments.addAll(arg.extractWitness(model, target));
         return segments;
     }
 

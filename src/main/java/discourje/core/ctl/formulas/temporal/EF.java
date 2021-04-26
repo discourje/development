@@ -34,7 +34,7 @@ public class EF extends Temporal {
     public void label(Model<?> model) {
         if (!model.isLabelledBy(this)) {
             int labelIndex = model.setLabelledBy(this);
-            Formula ef = new EU(True.TRUE, arg);
+            Formula ef = new EU(True.INSTANCE, arg);
             ef.label(model);
             int efLabelIndex = model.getLabelIndex(ef);
             for (State<?> state : model.getStates()) {
