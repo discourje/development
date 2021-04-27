@@ -2,7 +2,6 @@
   (:gen-class)
   (:refer-clojure :exclude [send and or not])
   (:require [discourje.core.spec :as s]
-            [discourje.core.spec.ast :as ast]
             [discourje.core.spec.interp :as interp]
             [discourje.core.spec.lts :as lts]
             [discourje.core.spec.mcrl2 :as mcrl2])
@@ -18,26 +17,26 @@
 (def fin (Formulas/fin))
 
 (defmacro send [sender receiver]
-  (let [sender (s/desugared-role sender)
-        receiver (s/desugared-role receiver)]
-    `(Formulas/send (interp/eval-role ~sender)
-                    (interp/eval-role ~receiver))))
+  (let [sender (if sender (s/desugared-role sender))
+        receiver (if receiver (s/desugared-role receiver))]
+    `(Formulas/send (if ~sender (interp/eval-role ~sender))
+                    (if ~receiver (interp/eval-role ~receiver)))))
 
 (defmacro receive [sender receiver]
-  (let [sender (s/desugared-role sender)
-        receiver (s/desugared-role receiver)]
-    `(Formulas/receive (interp/eval-role ~sender)
-                       (interp/eval-role ~receiver))))
+  (let [sender (if sender (s/desugared-role sender))
+        receiver (if receiver (s/desugared-role receiver))]
+    `(Formulas/receive (if ~sender (interp/eval-role ~sender))
+                       (if ~receiver (interp/eval-role ~receiver)))))
 
 (defmacro close [sender receiver]
-  (let [sender (s/desugared-role sender)
-        receiver (s/desugared-role receiver)]
-    `(Formulas/close (interp/eval-role ~sender)
-                     (interp/eval-role ~receiver))))
+  (let [sender (if sender (s/desugared-role sender))
+        receiver (if receiver (s/desugared-role receiver))]
+    `(Formulas/close (if ~sender (interp/eval-role ~sender))
+                     (if ~receiver (interp/eval-role ~receiver)))))
 
 (defmacro act [role]
-  (let [role (s/desugared-role role)]
-    `(Formulas/act (interp/eval-role ~role))))
+  (let [role (if role (s/desugared-role role))]
+    `(Formulas/act (if ~role (interp/eval-role ~role)))))
 
 ;;;;
 ;;;; PROPOSITIONAL OPERATORS
@@ -112,6 +111,49 @@
   (Formulas/ES arg1 arg2))
 
 ;;;;
+;;;; CUSTOM
+;;;;
+
+(def diamond
+  (reify Formula
+    (isTemporal [_] false)
+    (label [this model]
+      (if-not (.isLabelledBy model this)
+        (let [i (.setLabelledBy model this)]
+          (doseq [s (.getStates model)]
+            (let [results (identity
+
+                            ;; For every predecessor of s...
+                            (for [prev (.getPreviousStates s)]
+
+                              ;; For every predecessor of prev...
+                              (for [prevprev (.getPreviousStates prev)]
+
+                                ;; For some successor of prevprev...
+                                (if (loop [nexts (.getNextStates prevprev)]
+                                      (when-let [next (first nexts)]
+
+                                        ;; For some successor of next...
+                                        (if (loop [nextnexts (.getNextStates next)]
+                                              (when-let [nextnext (first nextnexts)]
+
+                                                ;; Diamond
+                                                (if (clojure.core/and (= (.getAction s) (.getAction next))
+                                                                      (= (.getAction prev) (.getAction nextnext))
+                                                                      (= (.getState s) (.getState nextnext)))
+                                                  true
+                                                  (recur (rest nextnexts)))))
+                                          true
+                                          (recur (rest nexts)))))
+                                  true))))]
+              (if (clojure.core/and (not-any? empty? results)
+                                    (not= '() results)
+                                    (every? true? (flatten results)))
+                (.addLabel s i)))))))
+    (extractWitness [_ _ _] [[]])
+    ))
+
+;;;;
 ;;;; GENERIC PROPERTIES
 ;;;;
 
@@ -137,7 +179,6 @@
   (let [args (map (fn [[sender receiver]]
                     (let [x (eval `(send ~sender ~receiver))
                           y (eval `(close ~sender ~receiver))]
-                      ;; Alternative: (AU (not y) (or fin x))
                       (AG (implies y (AP x)))))
                   channels)
         f (apply and args)]
@@ -153,16 +194,13 @@
     f))
 
 (defn causality [roles]
-  (let [args (remove nil?
-                     (apply concat
-                            (map (fn [p] (map (fn [q]
-                                                (if (not= p q)
-                                                  (let [act-p (eval `(act ~p))
-                                                        act-q (eval `(act ~q))]
-                                                    (AG (implies (EX (and act-p (EX act-q)))
-                                                                 (EX (and act-q (EX act-p))))))))
-                                              roles))
-                                 roles)))
+  (let [args (map (fn [p] (let [act-p (eval `(act ~p))
+                                receive-p (eval `(receive nil ~p))]
+                            (AG (implies act-p
+                                         (or receive-p
+                                             (AY (or init act-p))
+                                             diamond)))))
+                  roles)
         f (apply and args)]
     f))
 
@@ -212,8 +250,17 @@
                                  :or   {engine :dcj witness true}}]
   (:f (check-all ast-or-lts {:f f} :engine engine :witness witness)))
 
-(defn lint [ast-or-lts & {:keys [engine witness]
-                          :or   {engine :dcj witness true}}]
+(defn lint [ast-or-lts & {:keys [engine witness include exclude]
+                          :or   {engine  :dcj
+                                 witness true
+                                 include #{:must-terminate
+                                           :may-terminate
+                                           :cant-terminate
+                                           :close-after-send
+                                           :send-before-close
+                                           :no-act-after-close
+                                           :causality}
+                                 exclude #{}}}]
   (if (= (type ast-or-lts) LTS)
     (let [channels (lts/channels ast-or-lts)
           roles (lts/roles ast-or-lts)
@@ -223,7 +270,7 @@
                 :close-after-send   (close-after-send channels)
                 :send-before-close  (send-before-close channels)
                 :no-act-after-close (no-act-after-close channels)
-                ;:causality          (causality roles)
-                }]
+                :causality          (causality roles)}
+          fmap (select-keys fmap (clojure.set/difference include exclude))]
       (check-all ast-or-lts fmap :engine engine :witness witness))
     (lint (lts/lts ast-or-lts) :engine engine :witness witness)))
