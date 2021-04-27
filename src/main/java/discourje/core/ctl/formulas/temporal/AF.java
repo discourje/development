@@ -62,6 +62,10 @@ public class AF extends Temporal {
          * Construct segments
          */
 
+        if (target1 == null) {
+            return Arrays.asList(Collections.emptyList(), Collections.emptyList());
+        }
+
         BiFunction<State<?>, State<?>, List<Action>> f = (s, t) -> {
             var segment = new ArrayList<Action>();
             while (!s.equals(t)) {

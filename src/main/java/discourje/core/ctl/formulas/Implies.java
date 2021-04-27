@@ -26,10 +26,6 @@ public class Implies implements Formula {
 
     @Override
     public List<List<Action>> extractWitness(Model<?> model, State<?> source) {
-        if (lhs.isTemporal()) {
-            throw new IllegalStateException();
-        }
-
         var i = model.getLabelIndex(this);
         if (source.hasLabel(i)) {
             throw new IllegalArgumentException();

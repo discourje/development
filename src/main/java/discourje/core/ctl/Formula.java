@@ -7,6 +7,12 @@ import java.util.List;
 
 public interface Formula {
 
+    default boolean isAction() {
+        return false;
+    }
+
+    boolean isTemporal();
+
     void label(Model<?> model);
 
     default List<List<Action>> extractWitness(Model<?> model) {
@@ -20,12 +26,6 @@ public interface Formula {
     }
 
     List<List<Action>> extractWitness(Model<?> model, State<?> source);
-
-    default boolean isAction() {
-        return false;
-    }
-
-    boolean isTemporal();
 
     default List<Formula> split() {
         return Collections.singletonList(this);
