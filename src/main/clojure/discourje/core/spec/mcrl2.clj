@@ -49,17 +49,21 @@
         (spit mcrl2-file mcrl2-string))
 
       (loop [formulas formulas
-             bools {}]
+             bools (sorted-map)]
         (if (empty? formulas)
           bools
-          (let [[name formula] (first formulas)
+          (let [begin (System/nanoTime)
+                [name formula] (first formulas)
                 _ (spit mcf-file formula)
                 lts2pbes (sh (mcrl2 :lts2pbes) "-D" mcrl2-file "-f" mcf-file aut-file pbes-file)
                 _ (println (:err lts2pbes))
                 pbes2bool (sh (mcrl2 :pbes2bool) pbes-file)
-                bool (read-string (:out pbes2bool))]
+                bool (read-string (:out pbes2bool))
+                end (System/nanoTime)
+                time (long (/ (- end begin) 1000000))]
             (recur (rest formulas)
-                   (assoc bools name bool)))))
+                   (assoc bools name {:verdict bool
+                                      :time    time})))))
 
       ;(clojure.java.io/delete-file mcf-file)
       ;(clojure.java.io/delete-file mcrl2-file)
