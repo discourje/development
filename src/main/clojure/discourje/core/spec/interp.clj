@@ -257,6 +257,55 @@
 ;    :session (throw (Exception.))
 ;    (throw (Exception.))))
 
+(defn simplify [ast]
+  (case (:type ast)
+
+    ;; Actions
+    :sync ast
+    :send ast
+    :receive ast
+    :close ast
+
+    ;; Nullary operators
+    :end ast
+
+    ;; Multiary operators
+    :cat (let [branches (:branches ast)
+               branches (mapv #(simplify %) branches)
+               branches (filterv #(not= (:type %) :end) branches)]
+           (case (count branches)
+             0 (ast/end)
+             1 (first branches)
+             (ast/cat branches)))
+    :alt (let [branches (:branches ast)
+               branches (mapv #(simplify %) branches)
+               branches (filterv #(not= (:type %) :end) branches)]
+           (case (count branches)
+             0 (ast/end)
+             1 (first branches)
+             (ast/alt branches)))
+    :par (let [branches (:branches ast)
+               branches (mapv #(simplify %) branches)
+               branches (filterv #(not= (:type %) :end) branches)]
+           (case (count branches)
+             0 (ast/end)
+             1 (first branches)
+             (ast/par branches)))
+    :every ast
+
+    ;; "Special forms" operators
+    :if ast
+    :loop ast
+    :recur ast
+
+    ;; Misc operators
+    :graph ast
+
+    ;; Sessions
+    :session ast
+
+    (throw (Exception.))))
+
 (defn terminated? [ast unfolded]
   (case (:type ast)
 

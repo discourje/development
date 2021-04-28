@@ -59,7 +59,7 @@
                      (apply [_ ast]
                        (let [successors (interp/successors ast)]
                          (zipmap (map #(action (interp/action %)) (keys successors))
-                                 (vals successors))))))
+                                 (map #(mapv (fn [ast] (interp/simplify ast)) %) (vals successors)))))))
         lts (LTS. #{initial} expander)]
     (if (not on-the-fly)
       (.expandRecursively lts))
