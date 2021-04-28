@@ -62,7 +62,7 @@
 
 (defmacro thread
   [& body]
-  (let [clj (macroexpand `(a/thread ~@body))]
+  (let [clj (macroexpand `(a/thread (try ~@body (catch Exception ~'e (.printStackTrace ~'e)))))]
     `(let [c# (chan 1)]
        (a/take! ~clj
                 (fn [x#]
