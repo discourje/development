@@ -88,6 +88,9 @@
                (clojure.core/let [indices (vec indices)]
                  (role k indices)))))))
 
+(defn defroles [& ks]
+  (doseq [k ks] (defrole k)))
+
 ;;;;
 ;;;; Actions
 ;;;;
