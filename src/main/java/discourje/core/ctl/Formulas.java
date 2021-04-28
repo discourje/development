@@ -21,6 +21,10 @@ public class Formulas {
         return Fin.INSTANCE;
     }
 
+    public static Formula handshake(String sender, String receiver) {
+        return new Handshake(sender, receiver);
+    }
+
     public static Formula send(String sender, String receiver) {
         return new Send(sender, receiver);
     }

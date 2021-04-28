@@ -1,18 +1,18 @@
 package discourje.core.ctl.formulas.atomic;
 
-import discourje.core.lts.Action;
-import discourje.core.ctl.State;
 import discourje.core.ctl.Model;
+import discourje.core.ctl.State;
 import discourje.core.ctl.formulas.Atomic;
+import discourje.core.lts.Action;
 
 import java.util.Objects;
 
-public class Receive extends Atomic {
+public class Handshake extends Atomic {
     private final String sender;
     private final String receiver;
     private final int hash;
 
-    public Receive(String sender, String receiver) {
+    public Handshake(String sender, String receiver) {
         this.sender = sender;
         this.receiver = receiver;
         hash = Objects.hash(this.sender, this.receiver);
@@ -29,7 +29,7 @@ public class Receive extends Atomic {
             int labelIndex = model.setLabelledBy(this);
             for (State<?> state : model.getStates()) {
                 Action action = state.getAction();
-                if (action != null && action.getType() == Action.Type.RECEIVE &&
+                if (action != null && action.getType() == Action.Type.SYNC &&
                         (sender == null || sender.equals(action.getSender())) &&
                         (receiver == null || receiver.equals(action.getReceiver()))) {
                     state.addLabel(labelIndex);
@@ -40,7 +40,7 @@ public class Receive extends Atomic {
 
     @Override
     public String toMCRL2() {
-        return "receive(" +
+        return "handshake(" +
                 sender.replace('[', '(').replace(']', ')') +
                 "," +
                 receiver.replace('[', '(').replace(']', ')') +
@@ -49,14 +49,14 @@ public class Receive extends Atomic {
 
     @Override
     public String toString() {
-        return String.format("recv(%s,%s)", sender, receiver);
+        return String.format("handshake(%s,%s)", sender, receiver);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Receive that = (Receive) o;
+        Handshake that = (Handshake) o;
         return Objects.equals(sender, that.sender) &&
                 Objects.equals(receiver, that.receiver);
     }

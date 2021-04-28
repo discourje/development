@@ -29,8 +29,7 @@ public class Send extends Atomic {
             int labelIndex = model.setLabelledBy(this);
             for (State<?> state : model.getStates()) {
                 Action action = state.getAction();
-                if (action != null &&
-                        (action.getType() == Action.Type.SYNC || action.getType() == Action.Type.SEND) &&
+                if (action != null && action.getType() == Action.Type.SEND &&
                         (sender == null || sender.equals(action.getSender())) &&
                         (receiver == null || receiver.equals(action.getReceiver()))) {
                     state.addLabel(labelIndex);
