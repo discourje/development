@@ -6,7 +6,7 @@
             [discourje.core.spec.lts :as lts]
             [discourje.core.spec.mcrl2 :as mcrl2])
   (:import (discourje.core.ctl Formula Formulas Model State)
-           (discourje.core.lts LTS)))
+           (discourje.core.lts Action Action$Type LTS)))
 
 ;;;;
 ;;;; ATOMS
@@ -16,6 +16,11 @@
 
 (def fin (Formulas/fin))
 
+(defmacro handshake [sender receiver]
+  (let [sender (if sender (s/desugared-role sender))
+        receiver (if receiver (s/desugared-role receiver))]
+    `(Formulas/handshake (if ~sender (interp/eval-role ~sender))
+                         (if ~receiver (interp/eval-role ~receiver)))))
 (defmacro send [sender receiver]
   (let [sender (if sender (s/desugared-role sender))
         receiver (if receiver (s/desugared-role receiver))]
@@ -115,43 +120,57 @@
 ;;;;
 
 (def diamond
-  (reify Formula
-    (isTemporal [_] false)
-    (label [this model]
-      (if-not (.isLabelledBy model this)
-        (let [i (.setLabelledBy model this)]
-          (doseq [s (.getStates model)]
-            (let [results (identity
+  (let [active-roles (fn [^Action a]
+                       (condp = (.getType a)
+                         Action$Type/SYNC #{(.getSender a) (.getReceiver a)}
+                         Action$Type/SEND #{(.getSender a)}
+                         Action$Type/RECEIVE #{(.getReceiver a)}
+                         Action$Type/CLOSE #{(.getSender a)}))
+        disjoint-active-roles (fn [^Action a1 ^Action a2]
+                                (let [active1 (active-roles a1)
+                                      active2 (active-roles a2)
+                                      disjoint (empty? (clojure.set/intersection active1 active2))]
+                                  disjoint))]
 
-                            ;; For every predecessor of s...
-                            (for [prev (.getPreviousStates s)]
+    (reify Formula
+      (isTemporal [_] false)
+      (label [this model]
+        (if-not (.isLabelledBy model this)
+          (let [i (.setLabelledBy model this)]
+            (doseq [s ^State (.getStates model)]
+              (let [results (identity
 
-                              ;; For every predecessor of prev...
-                              (for [prevprev (.getPreviousStates prev)]
+                              ;; For every predecessor of s...
+                              (for [prev ^State (.getPreviousStates s)]
 
-                                ;; For some successor of prevprev...
-                                (if (loop [nexts (.getNextStates prevprev)]
-                                      (when-let [next (first nexts)]
+                                ;; For every predecessor of prev...
+                                (for [prevprev ^State (.getPreviousStates prev)]
+                                  (if (disjoint-active-roles (.getAction s) (.getAction prev))
 
-                                        ;; For some successor of next...
-                                        (if (loop [nextnexts (.getNextStates next)]
-                                              (when-let [nextnext (first nextnexts)]
+                                    ;; For some successor of prevprev...
+                                    (if (loop [nexts (.getNextStates prevprev)]
+                                          (when-let [next (first nexts)]
 
-                                                ;; Diamond
-                                                (if (clojure.core/and (= (.getAction s) (.getAction next))
-                                                                      (= (.getAction prev) (.getAction nextnext))
-                                                                      (= (.getState s) (.getState nextnext)))
-                                                  true
-                                                  (recur (rest nextnexts)))))
-                                          true
-                                          (recur (rest nexts)))))
-                                  true))))]
-              (if (clojure.core/and (not-any? empty? results)
-                                    (not= '() results)
-                                    (every? true? (flatten results)))
-                (.addLabel s i)))))))
-    (extractWitness [_ _ _] [[]])
-    ))
+                                            ;; For some successor of next...
+                                            (if (loop [nextnexts (.getNextStates next)]
+                                                  (when-let [nextnext (first nextnexts)]
+
+                                                    ;; Diamond
+                                                    (if (clojure.core/and (= (.getAction s) (.getAction next))
+                                                                          (= (.getAction prev) (.getAction nextnext))
+                                                                          (= (.getState s) (.getState nextnext)))
+                                                      true
+                                                      (recur (rest nextnexts)))))
+                                              true
+                                              (recur (rest nexts)))))
+                                      true)
+                                    true))))]
+                (if (clojure.core/and (not-any? empty? results)
+                                      (not= '() results)
+                                      (every? true? (flatten results)))
+                  (.addLabel s i)))))))
+      (extractWitness [_ _ _] [[]])
+      )))
 
 ;;;;
 ;;;; GENERIC PROPERTIES
@@ -167,40 +186,50 @@
   (AG (not fin)))
 
 (defn close-after-send [channels]
-  (let [args (map (fn [[sender receiver]]
-                    (let [x (eval `(send ~sender ~receiver))
-                          y (eval `(close ~sender ~receiver))]
-                      (AG (implies x (AF y)))))
+  (let [args (map (fn [[p q]]
+                    (let [handshake-pq (eval `(handshake ~p ~q))
+                          send-p (eval `(send ~p ~q))
+                          close-p (eval `(close ~p ~q))]
+                      (AG (implies (or handshake-pq send-p) (AF close-p)))))
                   channels)
         f (apply and args)]
     f))
 
 (defn send-before-close [channels]
-  (let [args (map (fn [[sender receiver]]
-                    (let [x (eval `(send ~sender ~receiver))
-                          y (eval `(close ~sender ~receiver))]
-                      (AG (implies y (AP x)))))
+  (let [args (map (fn [[p q]]
+                    (let [handshake-pq (eval `(handshake ~p ~q))
+                          send-p (eval `(send ~p ~q))
+                          close-p (eval `(close ~p ~q))]
+                      (AG (implies close-p (AP (or handshake-pq send-p))))))
                   channels)
         f (apply and args)]
     f))
 
 (defn no-act-after-close [channels]
-  (let [args (map (fn [[sender receiver]]
-                    (let [x (eval `(send ~sender ~receiver))
-                          y (eval `(close ~sender ~receiver))]
-                      (AG (implies y (or fin (AX (AG (not (or x y)))))))))
+  (let [args (map (fn [[p q]]
+                    (let [handshake-pq (eval `(handshake ~p ~q))
+                          send-p (eval `(send ~p ~q))
+                          close-p (eval `(close ~p ~q))]
+                      (AG (implies close-p (or fin (AX (AG (not (or handshake-pq send-p close-p)))))))))
                   channels)
         f (apply and args)]
     f))
 
-(defn causality [roles]
-  (let [args (map (fn [p] (let [act-p (eval `(act ~p))
-                                receive-p (eval `(receive nil ~p))]
-                            (AG (implies act-p
-                                         (or receive-p
-                                             (AY (or init act-p))
-                                             diamond)))))
-                  roles)
+(defn causality [channels]
+  (let [args (map (fn [[p q]]
+                    (let [handshake-pq (eval `(handshake ~p ~q))
+                          send-p (eval `(send ~p ~q))
+                          close-p (eval `(close ~p ~q))
+                          act-p (eval `(act ~p))
+                          act-q (eval `(act ~q))]
+
+                      (AG (and (implies handshake-pq
+                                        (or (AY (or init act-p act-q))
+                                            diamond))
+                               (implies (or send-p close-p)
+                                        (or (AY (or init act-p))
+                                            diamond))))))
+                  channels)
         f (apply and args)]
     f))
 
@@ -224,7 +253,7 @@
                                              [fname {:verdict verdict
                                                      :time    time}]
                                              [fname {:verdict verdict
-                                                     :witness (str (.extractWitness f m))
+                                                     :witness (map #(str %) (flatten (seq (map #(seq %) (.extractWitness f m)))))
                                                      :time    time}]))))
                                      fmap)))
 
@@ -263,14 +292,18 @@
                                  exclude #{}}}]
   (if (= (type ast-or-lts) LTS)
     (let [channels (lts/channels ast-or-lts)
-          roles (lts/roles ast-or-lts)
+          ;roles (lts/roles ast-or-lts)
           fmap {:must-terminate     (must-terminate)
                 :may-terminate      (may-terminate)
                 :cant-terminate     (cant-terminate)
                 :close-after-send   (close-after-send channels)
                 :send-before-close  (send-before-close channels)
                 :no-act-after-close (no-act-after-close channels)
-                :causality          (causality roles)}
+                :causality          (causality channels)}
           fmap (select-keys fmap (clojure.set/difference include exclude))]
       (check-all ast-or-lts fmap :engine engine :witness witness))
-    (lint (lts/lts ast-or-lts) :engine engine :witness witness)))
+    (lint (lts/lts ast-or-lts)
+          :engine engine
+          :witness witness
+          :include include
+          :exclude exclude)))
