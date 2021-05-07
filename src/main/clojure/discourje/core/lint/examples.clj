@@ -5,7 +5,7 @@
   (:import (java.util Date)))
 
 ;;;;;
-;;;;; Specification
+;;;;; Write S
 ;;;;;
 
 (s/defroles ::buyer1 ::buyer2 ::seller)
@@ -15,8 +15,7 @@
          (s/--> Integer ::seller ::buyer1)
          (s/--> Integer ::seller ::buyer2)
          (s/--> Integer ::buyer1 ::buyer2)
-         (s/alt (s/--> #{true} ::buyer2 ::seller)
-                (s/--> (fn [v] (= v false)) ::buyer2 ::seller))
+         (s/--> Boolean ::buyer2 ::seller)
          (s/par (s/close ::buyer1 ::buyer2)
                 (s/close ::buyer1 ::seller)
                 (s/close ::buyer2 ::buyer1)
