@@ -72,8 +72,8 @@ class ExampleApplicationsTest<Spec> {
         require.invoke(Clojure.read("discourje.core.async"));
 
         long t0 = System.currentTimeMillis();
-        require.invoke(Clojure.read("discourje.core.validation.example-applications"));
-        IFn var = Clojure.var("discourje.core.validation.example-applications", name);
+        require.invoke(Clojure.read("discourje.core.ctl.example-applications"));
+        IFn var = Clojure.var("discourje.core.ctl.example-applications", name);
         @SuppressWarnings("unchecked")
         LTS<Spec> lts = (LTS<Spec>) ((Var) var).get();
         lts.expandRecursively();

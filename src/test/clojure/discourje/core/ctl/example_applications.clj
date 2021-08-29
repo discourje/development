@@ -1,4 +1,4 @@
-(ns discourje.core.validation.example-applications
+(ns discourje.core.ctl.example-applications
   (:require [discourje.core.spec.lts :as lts]
             [discourje.core.spec :as s]
             [discourje.core.async]))

@@ -1,4 +1,4 @@
-(ns discourje.core.validation.closed-channel-must-be-used-in-path
+(ns discourje.core.ctl.closed-channel-must-be-used-in-path
   (:require [discourje.core.spec :as s]))
 
 (s/defrole ::a)

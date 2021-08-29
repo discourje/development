@@ -1,4 +1,4 @@
-(ns discourje.core.validation.performance
+(ns discourje.core.ctl.performance
   (:require [discourje.core.spec :as s]
             [discourje.core.spec.lts :as lts]))
 

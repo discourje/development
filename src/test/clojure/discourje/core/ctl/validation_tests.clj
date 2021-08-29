@@ -1,24 +1,24 @@
-(ns discourje.core.validation.validation-tests
+(ns discourje.core.ctl.validation-tests
   (:require [clojure.test :refer :all]
             [discourje.core.spec :as s]
             [discourje.core.spec.lts :as lts]
-            [discourje.core.validation.causality :as c]
-            [discourje.core.validation.close-channels-only-once :as ccoo]
-            [discourje.core.validation.closed-channel-must-be-used-in-protocol :as ccuiprot]
-            [discourje.core.validation.closed-channel-must-be-used-in-path :as ccuipath]
-            [discourje.core.validation.do-not-send-to-self :as dnsts]
-            [discourje.core.validation.do-not-send-after-close :as dnsac]
-            [discourje.core.validation.used-channels-must-be-closed :as ucmbc]
-            [discourje.core.validation.causality-async :as ca]
-            [discourje.core.validation.close-channels-only-once-async :as ccooa]
-            [discourje.core.validation.closed-channel-must-be-used-in-protocol-async :as ccuiprota]
-            [discourje.core.validation.closed-channel-must-be-used-in-path-async :as ccuipatha]
-            [discourje.core.validation.do-not-send-to-self-async :as dnstsa]
-            [discourje.core.validation.do-not-send-after-close-async :as dnsaca]
-            [discourje.core.validation.used-channels-must-be-closed-async :as ucmbca]
-            [discourje.core.validation.performance :as perf]
+            [discourje.core.ctl.causality :as c]
+            [discourje.core.ctl.close-channels-only-once :as ccoo]
+            [discourje.core.ctl.closed-channel-must-be-used-in-protocol :as ccuiprot]
+            [discourje.core.ctl.closed-channel-must-be-used-in-path :as ccuipath]
+            [discourje.core.ctl.do-not-send-to-self :as dnsts]
+            [discourje.core.ctl.do-not-send-after-close :as dnsac]
+            [discourje.core.ctl.used-channels-must-be-closed :as ucmbc]
+            [discourje.core.ctl.causality-async :as ca]
+            [discourje.core.ctl.close-channels-only-once-async :as ccooa]
+            [discourje.core.ctl.closed-channel-must-be-used-in-protocol-async :as ccuiprota]
+            [discourje.core.ctl.closed-channel-must-be-used-in-path-async :as ccuipatha]
+            [discourje.core.ctl.do-not-send-to-self-async :as dnstsa]
+            [discourje.core.ctl.do-not-send-after-close-async :as dnsaca]
+            [discourje.core.ctl.used-channels-must-be-closed-async :as ucmbca]
+            [discourje.core.ctl.performance :as perf]
             )
-  (:import (ctl Model)))
+  (:import (discourje.core.ctl Model)))
 
 (s/defrole ::white)
 (s/defrole ::black)

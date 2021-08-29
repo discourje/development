@@ -28,7 +28,7 @@ class ModelCheckerPerformanceTest<Spec> extends AbstractModelCheckerTest<Spec> {
         while (true) {
             for (int j = 0; j < 3; j++) {
                 long t0 = System.currentTimeMillis();
-                String[] command = {java, "-classpath", classpath, "com.intellij.rt.junit.JUnitStarter", "-ideVersion5", "-junit5", "discourje.core.validation.ModelCheckerPerformanceTest,testLtsForSize"};
+                String[] command = {java, "-classpath", classpath, "com.intellij.rt.junit.JUnitStarter", "-ideVersion5", "-junit5", "discourje.core.ctl.ModelCheckerPerformanceTest,testLtsForSize"};
                 String[] envp = {"discourje.performance.ltssize=" + i};
                 Process process = Runtime.getRuntime().exec(command, envp);
                 try {
@@ -81,7 +81,7 @@ class ModelCheckerPerformanceTest<Spec> extends AbstractModelCheckerTest<Spec> {
     }
 
     LTS<Spec> getLargeLTS(long size) {
-        IFn var = Clojure.var("discourje.core.validation.example-applications", "get-protocol");
+        IFn var = Clojure.var("discourje.core.ctl.example-applications", "get-protocol");
         @SuppressWarnings("unchecked")
         LTS<Spec> lts = (LTS<Spec>) var.invoke(size);
         return lts;
