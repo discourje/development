@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Objects;
 
 import static discourje.core.ctl.Formulas.EP;
+import static discourje.core.ctl.Formulas.and;
+import static discourje.core.ctl.Formulas.init;
 import static discourje.core.ctl.Formulas.not;
 
 public class AH extends Temporal {
@@ -36,7 +38,7 @@ public class AH extends Temporal {
     public void label(Model<?> model) {
         if (!model.isLabelledBy(this)) {
             int labelIndex = model.setLabelledBy(this);
-            Formula ah = not(EP(not(arg)));
+            Formula ah = not(EP(and(not(arg), not(init()))));
             ah.label(model);
             int ahLabelIndex = model.getLabelIndex(ah);
             for (State<?> state : model.getStates()) {
