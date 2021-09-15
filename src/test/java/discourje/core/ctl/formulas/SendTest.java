@@ -26,9 +26,9 @@ class SendTest<S> extends AbstractCtlFormulaTest<S> {
         snd.label(model);
 
         int labelIndex = model.getLabelIndex(snd);
-        assertTrue(s1.hasLabel(labelIndex));
+        assertFalse(s1.hasLabel(labelIndex));
         assertTrue(s2.hasLabel(labelIndex));
-        //assertTrue(s3.hasLabel(labelIndex));
+        assertFalse(s3.hasLabel(labelIndex));
         assertFalse(s4.hasLabel(labelIndex));
         assertFalse(s5.hasLabel(labelIndex));
         assertFalse(s6.hasLabel(labelIndex));

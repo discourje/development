@@ -14,10 +14,10 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+@Disabled
 class ModelCheckerPerformanceTest<Spec> extends AbstractModelCheckerTest<Spec> {
 
     @Test
-    @Disabled
     public void testIncreasingLtsSize() throws IOException {
         String java = System.getProperty("java.home") + "/bin/java";
         String classpath = System.getProperty("java.class.path");

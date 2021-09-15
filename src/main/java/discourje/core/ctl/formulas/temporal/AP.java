@@ -37,8 +37,7 @@ public class AP extends Temporal {
     public void label(Model<?> model) {
         if (!model.isLabelledBy(this)) {
             int labelIndex = model.setLabelledBy(this);
-            //Formula ap = new AS(True.INSTANCE, arg);
-            Formula ap = new Not(new ES(new Not(arg), new And(Init.INSTANCE, new Not(arg))));
+            Formula ap = new AS(True.INSTANCE, arg);
             ap.label(model);
             int apLabelIndex = model.getLabelIndex(ap);
             for (State<?> state : model.getStates()) {

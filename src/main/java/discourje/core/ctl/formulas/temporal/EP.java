@@ -1,15 +1,11 @@
 package discourje.core.ctl.formulas.temporal;
 
-import discourje.core.ctl.formulas.And;
-import discourje.core.ctl.formulas.Not;
-import discourje.core.ctl.formulas.atomic.Init;
-import discourje.core.lts.Action;
-import discourje.core.ctl.State;
-import discourje.core.ctl.Model;
 import discourje.core.ctl.Formula;
+import discourje.core.ctl.Model;
+import discourje.core.ctl.State;
 import discourje.core.ctl.formulas.Temporal;
 import discourje.core.ctl.formulas.atomic.True;
-
+import discourje.core.lts.Action;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -37,8 +33,7 @@ public class EP extends Temporal {
     public void label(Model<?> model) {
         if (!model.isLabelledBy(this)) {
             int labelIndex = model.setLabelledBy(this);
-            //Formula ep = new ES(True.INSTANCE, arg);
-            Formula ep = new Not(new AS(new Not(arg), new And(Init.INSTANCE, new Not(arg))));
+            Formula ep = new ES(True.INSTANCE, arg);
             ep.label(model);
             int epLabelIndex = model.getLabelIndex(ep);
             for (State<?> state : model.getStates()) {

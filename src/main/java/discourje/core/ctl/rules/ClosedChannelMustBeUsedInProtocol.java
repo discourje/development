@@ -1,11 +1,11 @@
 package discourje.core.ctl.rules;
 
-import discourje.core.ctl.Rule;
 import discourje.core.ctl.Formula;
+import discourje.core.ctl.Rule;
 import static discourje.core.ctl.Formulas.EF;
+import static discourje.core.ctl.Formulas.sendOrHandshake;
 import static discourje.core.ctl.Formulas.close;
 import static discourje.core.ctl.Formulas.implies;
-import static discourje.core.ctl.Formulas.send;
 
 public class ClosedChannelMustBeUsedInProtocol extends Rule {
 
@@ -16,6 +16,6 @@ public class ClosedChannelMustBeUsedInProtocol extends Rule {
 
     @Override
     public Formula createCtlFormula(String r1, String r2) {
-        return implies(EF(close(r1, r2)), EF(send(r1, r2)));
+        return implies(EF(close(r1, r2)), EF(sendOrHandshake(r1, r2)));
     }
 }

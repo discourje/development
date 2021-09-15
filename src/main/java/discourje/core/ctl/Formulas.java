@@ -33,6 +33,14 @@ public class Formulas {
         return new Receive(sender, receiver);
     }
 
+    public static Formula sendOrHandshake(String sender, String receiver) {
+        return or(send(sender, receiver), handshake(sender, receiver));
+    }
+
+    public static Formula receiveOrHandshake(String sender, String receiver) {
+        return or(receive(sender, receiver), handshake(sender, receiver));
+    }
+
     public static Formula close(String sender, String receive) {
         return new Close(sender, receive);
     }
