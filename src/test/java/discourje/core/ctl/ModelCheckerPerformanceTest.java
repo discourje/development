@@ -67,7 +67,7 @@ class ModelCheckerPerformanceTest<Spec> extends AbstractModelCheckerTest<Spec> {
         long t2 = System.currentTimeMillis();
 
         List<String> result = modelChecker.checkModel();
-        System.out.println(result);
+        System.out.println(result.size());
 
         long t3 = System.currentTimeMillis();
         String line = String.format("%s;%s;%s;%s;%s", size, ltsSize, (t1 - t0), (t2 - t1), (t3 - t2));
@@ -81,7 +81,7 @@ class ModelCheckerPerformanceTest<Spec> extends AbstractModelCheckerTest<Spec> {
     }
 
     LTS<Spec> getLargeLTS(long size) {
-        IFn var = Clojure.var("discourje.core.ctl.example-applications", "get-protocol");
+        IFn var = Clojure.var("discourje.core.ctl.performance", "get-large-lts");
         @SuppressWarnings("unchecked")
         LTS<Spec> lts = (LTS<Spec>) var.invoke(size);
         return lts;
