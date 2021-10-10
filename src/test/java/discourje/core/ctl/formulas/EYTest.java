@@ -23,12 +23,12 @@ class EYTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2, s3, s4);
 
         EY ey = new EY(new Close("a", "b"));
-        ey.label(model);
+        model.calculateLabels(ey);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(ey)));
-        assertTrue(s2.hasLabel(model.getLabelIndex(ey)));
-        assertFalse(s3.hasLabel(model.getLabelIndex(ey)));
-        assertFalse(s4.hasLabel(model.getLabelIndex(ey)));
+        assertFalse(model.hasLabel(s1, ey));
+        assertTrue(model.hasLabel(s2, ey));
+        assertFalse(model.hasLabel(s3, ey));
+        assertFalse(model.hasLabel(s4, ey));
     }
 
     @Test
@@ -41,11 +41,11 @@ class EYTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b);
 
         EY ey = new EY(new Close("a", "b"));
-        ey.label(model);
+        model.calculateLabels(ey);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(ey)));
-        assertFalse(s2a.hasLabel(model.getLabelIndex(ey)));
-        assertFalse(s2b.hasLabel(model.getLabelIndex(ey)));
+        assertTrue(model.hasLabel(s1, ey));
+        assertFalse(model.hasLabel(s2a, ey));
+        assertFalse(model.hasLabel(s2b, ey));
     }
 
     @Test
@@ -58,11 +58,11 @@ class EYTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b);
 
         EY ey = new EY(new Close("a", "b"));
-        ey.label(model);
+        model.calculateLabels(ey);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(ey)));
-        assertFalse(s2a.hasLabel(model.getLabelIndex(ey)));
-        assertFalse(s2b.hasLabel(model.getLabelIndex(ey)));
+        assertTrue(model.hasLabel(s1, ey));
+        assertFalse(model.hasLabel(s2a, ey));
+        assertFalse(model.hasLabel(s2b, ey));
     }
 
     @Test
@@ -75,10 +75,10 @@ class EYTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b);
 
         EY ey = new EY(new Close("a", "b"));
-        ey.label(model);
+        model.calculateLabels(ey);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(ey)));
-        assertFalse(s2a.hasLabel(model.getLabelIndex(ey)));
-        assertFalse(s2b.hasLabel(model.getLabelIndex(ey)));
+        assertFalse(model.hasLabel(s1, ey));
+        assertFalse(model.hasLabel(s2a, ey));
+        assertFalse(model.hasLabel(s2b, ey));
     }
 }

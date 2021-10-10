@@ -10,11 +10,12 @@ public class State<Spec> {
     private final Action action;
     private final Collection<State<Spec>> nextStates = new LinkedHashSet<>();
     private final Collection<State<Spec>> previousStates = new LinkedHashSet<>();
-    private final BitSet labels = new BitSet();
+    private final int index;
 
-    public State(discourje.core.lts.State state, Action action) {
+    public State(discourje.core.lts.State state, Action action, int index) {
         this.state = state;
         this.action = action;
+        this.index = index;
     }
 
     public discourje.core.lts.State getState() {
@@ -25,7 +26,7 @@ public class State<Spec> {
         return action;
     }
 
-    public Collection<State<Spec>> getNextStates() {
+    public Collection<State<?>> getNextStates() {
         return Collections.unmodifiableCollection(nextStates);
     }
 
@@ -34,7 +35,7 @@ public class State<Spec> {
         state.previousStates.add(this);
     }
 
-    public Collection<State<Spec>> getPreviousStates() {
+    public Collection<State<?>> getPreviousStates() {
         return Collections.unmodifiableCollection(previousStates);
     }
 
@@ -59,42 +60,7 @@ public class State<Spec> {
                 nextStates.stream().map(State::getState).collect(Collectors.toList());
     }
 
-    public boolean addLabel(int labelIndex) {
-        if (labels.get(labelIndex)) {
-            return false;
-        } else {
-            labels.set(labelIndex);
-            return true;
-        }
-    }
-
-    public boolean hasLabel(int labelIndex) {
-        return labels.get(labelIndex);
-    }
-
-    public boolean successorsExistAndAllHaveLabel(int labelIndex) {
-        long successorsWithLabelCount = nextStates.stream()
-                .filter(s -> s.hasLabel(labelIndex))
-                .count();
-        int numSuccessors = nextStates.size();
-        return numSuccessors > 0 && numSuccessors == successorsWithLabelCount;
-    }
-
-    public boolean anySuccessorHasLabel(int labelIndex) {
-        return nextStates.stream()
-                .anyMatch(s -> s.hasLabel(labelIndex));
-    }
-
-    public boolean predecessorsExistAndAllHaveLabel(int labelIndex) {
-        long precedersWithLabelCount = previousStates.stream()
-                .filter(s -> s.hasLabel(labelIndex))
-                .count();
-        int numPreceders = previousStates.size();
-        return numPreceders > 0 && numPreceders == precedersWithLabelCount;
-    }
-
-    public boolean anyPredecessorHasLabel(int labelIndex) {
-        return previousStates.stream()
-                .anyMatch(s -> s.hasLabel(labelIndex));
+    public int getIndex() {
+        return index;
     }
 }

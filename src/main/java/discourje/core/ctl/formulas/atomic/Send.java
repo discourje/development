@@ -1,5 +1,6 @@
 package discourje.core.ctl.formulas.atomic;
 
+import discourje.core.ctl.Labels;
 import discourje.core.lts.Action;
 import discourje.core.ctl.State;
 import discourje.core.ctl.Model;
@@ -24,18 +25,17 @@ public class Send extends Atomic {
     }
 
     @Override
-    public void label(Model<?> model) {
-        if (!model.isLabelledBy(this)) {
-            int labelIndex = model.setLabelledBy(this);
-            for (State<?> state : model.getStates()) {
-                Action action = state.getAction();
-                if (action != null && action.getType() == Action.Type.SEND &&
-                        (sender == null || sender.equals(action.getSender())) &&
-                        (receiver == null || receiver.equals(action.getReceiver()))) {
-                    state.addLabel(labelIndex);
-                }
+    public Labels label(Model<?> model) {
+        Labels labels = new Labels();
+        for (State<?> state : model.getStates()) {
+            Action action = state.getAction();
+            if (action != null && action.getType() == Action.Type.SEND &&
+                    (sender == null || sender.equals(action.getSender())) &&
+                    (receiver == null || receiver.equals(action.getReceiver()))) {
+                labels.setLabel(state);
             }
         }
+        return labels;
     }
 
     @Override

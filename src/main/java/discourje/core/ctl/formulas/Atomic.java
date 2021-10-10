@@ -12,8 +12,7 @@ public abstract class Atomic implements Formula {
 
     @Override
     public List<List<Action>> extractWitness(Model<?> model, State<?> source) {
-        var i = model.getLabelIndex(this);
-        if (source.hasLabel(i)) {
+        if (model.hasLabel(source, this)) {
             throw new IllegalArgumentException();
         }
 

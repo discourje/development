@@ -1,5 +1,6 @@
 package discourje.core.ctl.formulas;
 
+import discourje.core.ctl.Labels;
 import discourje.core.lts.Action;
 import discourje.core.ctl.Formula;
 import discourje.core.ctl.State;
@@ -29,8 +30,7 @@ public class Not implements Formula {
             throw new IllegalStateException();
         }
 
-        var i = model.getLabelIndex(this);
-        if (source.hasLabel(i)) {
+        if (model.hasLabel(source, this)) {
             throw new IllegalArgumentException();
         }
 
@@ -38,18 +38,15 @@ public class Not implements Formula {
     }
 
     @Override
-    public void label(Model<?> model) {
-        if (!model.isLabelledBy(this)) {
-            int labelIndex = model.setLabelledBy(this);
-            arg.label(model);
-            int argLabelIndex = model.getLabelIndex(arg);
-
-            for (State<?> state : model.getStates()) {
-                if (!state.hasLabel(argLabelIndex)) {
-                    state.addLabel(labelIndex);
-                }
+    public Labels label(Model<?> model) {
+        Labels labels = new Labels();
+        Labels argLabels = model.calculateLabels(arg);
+        for (State<?> state : model.getStates()) {
+            if (!argLabels.hasLabel(state)) {
+                labels.setLabel(state);
             }
         }
+        return labels;
     }
 
     @Override

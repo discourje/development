@@ -1,5 +1,6 @@
 package discourje.core.ctl.formulas.temporal;
 
+import discourje.core.ctl.Labels;
 import discourje.core.lts.Action;
 import discourje.core.ctl.State;
 import discourje.core.ctl.Model;
@@ -19,11 +20,10 @@ public class AX extends Temporal {
 
     @Override
     public List<List<Action>> extractWitness(Model<?> model, State<?> source) {
-        var i = model.getLabelIndex(this);
-        if (!source.hasLabel(i)) {
-            var ii = model.getLabelIndex(arg);
+        if (!model.hasLabel(source, this)) {
+            var argLabels = model.getLabels(arg);
             for (var next : source.getNextStates()) {
-                if (!next.hasLabel(ii)) {
+                if (!argLabels.hasLabel(next)) {
                     var segments = new ArrayList<List<Action>>();
                     segments.add(Collections.singletonList(next.getAction()));
                     segments.addAll(arg.extractWitness(model, next));
@@ -35,17 +35,15 @@ public class AX extends Temporal {
     }
 
     @Override
-    public void label(Model<?> model) {
-        if (!model.isLabelledBy(this)) {
-            int labelIndex = model.setLabelledBy(this);
-            arg.label(model);
-            int argLabelIndex = model.getLabelIndex(arg);
-            for (State<?> state : model.getStates()) {
-                if (state.successorsExistAndAllHaveLabel(argLabelIndex)) {
-                    state.addLabel(labelIndex);
-                }
+    public Labels label(Model<?> model) {
+        Labels labels = new Labels();
+        Labels argLabels = model.calculateLabels(arg);
+        for (State<?> state : model.getStates()) {
+            if (!state.getNextStates().isEmpty() && argLabels.allHaveLabel(state.getNextStates())) {
+                labels.setLabel(state);
             }
         }
+        return labels;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package discourje.core.ctl.formulas.temporal;
 
+import discourje.core.ctl.Labels;
 import discourje.core.lts.Action;
 import discourje.core.ctl.State;
 import discourje.core.ctl.Model;
@@ -22,8 +23,7 @@ public class EF extends Temporal {
 
     @Override
     public List<List<Action>> extractWitness(Model<?> model, State<?> source) {
-        var i = model.getLabelIndex(this);
-        if (!source.hasLabel(i)) {
+        if (!model.hasLabel(source, this)) {
             return Collections.singletonList(Collections.emptyList());
         } else {
             throw new IllegalArgumentException();
@@ -31,18 +31,9 @@ public class EF extends Temporal {
     }
 
     @Override
-    public void label(Model<?> model) {
-        if (!model.isLabelledBy(this)) {
-            int labelIndex = model.setLabelledBy(this);
-            Formula ef = new EU(True.INSTANCE, arg);
-            ef.label(model);
-            int efLabelIndex = model.getLabelIndex(ef);
-            for (State<?> state : model.getStates()) {
-                if (state.hasLabel(efLabelIndex)) {
-                    state.addLabel(labelIndex);
-                }
-            }
-        }
+    public Labels label(Model<?> model) {
+        Formula ef = new EU(True.INSTANCE, arg);
+        return model.calculateLabels(ef);
     }
 
     @Override

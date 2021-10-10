@@ -18,6 +18,6 @@ public class CloseChannelsOnlyOnce extends Rule {
 
     @Override
     public Formula createCtlFormula(String r1, String r2) {
-        return AG(implies(close(r1,r2), not(EX(EF(close(r1, r2))))));
+        return AG(implies(close(r1, r2), not(EX(EF(close(r1, r2))))));
     }
 }

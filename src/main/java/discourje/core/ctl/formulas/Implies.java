@@ -1,10 +1,10 @@
 package discourje.core.ctl.formulas;
 
-import discourje.core.lts.Action;
 import discourje.core.ctl.Formula;
-import discourje.core.ctl.State;
+import discourje.core.ctl.Labels;
 import discourje.core.ctl.Model;
-
+import discourje.core.ctl.State;
+import discourje.core.lts.Action;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,8 +26,7 @@ public class Implies implements Formula {
 
     @Override
     public List<List<Action>> extractWitness(Model<?> model, State<?> source) {
-        var i = model.getLabelIndex(this);
-        if (source.hasLabel(i)) {
+        if (model.hasLabel(source, this)) {
             throw new IllegalArgumentException();
         }
 
@@ -35,20 +34,17 @@ public class Implies implements Formula {
     }
 
     @Override
-    public void label(Model<?> model) {
-        if (!model.isLabelledBy(this)) {
-            int labelIndex = model.setLabelledBy(this);
-            lhs.label(model);
-            rhs.label(model);
-            int lhsLabelIndex = model.getLabelIndex(lhs);
-            int rhsLabelIndex = model.getLabelIndex(rhs);
+    public Labels label(Model<?> model) {
+        Labels labels = new Labels();
+        Labels lhsLabels = model.calculateLabels(lhs);
+        Labels rhsLabels = model.calculateLabels(rhs);
 
-            for (State<?> state : model.getStates()) {
-                if (!state.hasLabel(lhsLabelIndex) || state.hasLabel(rhsLabelIndex)) {
-                    state.addLabel(labelIndex);
-                }
+        for (State<?> state : model.getStates()) {
+            if (!lhsLabels.hasLabel(state) || rhsLabels.hasLabel(state)) {
+                labels.setLabel(state);
             }
         }
+        return labels;
     }
 
     @Override

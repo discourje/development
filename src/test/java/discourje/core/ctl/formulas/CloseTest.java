@@ -21,11 +21,11 @@ class CloseTest<S> extends AbstractCtlFormulaTest<S> {
 
         // execute
         Formula close = new Close("a", "b");
-        close.label(model);
+        model.calculateLabels(close);
 
         // verify
-        assertTrue(s1.hasLabel(model.getLabelIndex(close)));
-        assertFalse(s2.hasLabel(model.getLabelIndex(close)));
+        assertTrue(model.hasLabel(s1, close));
+        assertFalse(model.hasLabel(s2, close));
     }
 
 }

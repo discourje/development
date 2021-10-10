@@ -15,9 +15,9 @@ class ImpliesTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1);
 
         Implies implies = new Implies(True.INSTANCE, True.INSTANCE);
-        implies.label(model);
+        model.calculateLabels(implies);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(implies)));
+        assertTrue(model.hasLabel(s1, implies));
     }
 
     @Test
@@ -26,9 +26,9 @@ class ImpliesTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1);
 
         Implies implies = new Implies(True.INSTANCE, new Not(True.INSTANCE));
-        implies.label(model);
+        model.calculateLabels(implies);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(implies)));
+        assertFalse(model.hasLabel(s1, implies));
     }
 
     @Test
@@ -37,9 +37,9 @@ class ImpliesTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1);
 
         Implies implies = new Implies(True.INSTANCE, True.INSTANCE);
-        implies.label(model);
+        model.calculateLabels(implies);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(implies)));
+        assertTrue(model.hasLabel(s1, implies));
     }
 
     @Test
@@ -48,8 +48,8 @@ class ImpliesTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1);
 
         Implies implies = new Implies(True.INSTANCE, True.INSTANCE);
-        implies.label(model);
+        model.calculateLabels(implies);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(implies)));
+        assertTrue(model.hasLabel(s1, implies));
     }
 }

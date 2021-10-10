@@ -23,9 +23,9 @@ class AYTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b);
 
         AY ay = new AY(close("a", "b"));
-        ay.label(model);
+        model.calculateLabels(ay);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(ay)));
+        assertTrue(model.hasLabel(s1, ay));
     }
 
     @Test
@@ -40,9 +40,9 @@ class AYTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b);
 
         AY ay = new AY(close("a", "b"));
-        ay.label(model);
+        model.calculateLabels(ay);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(ay)));
+        assertTrue(model.hasLabel(s1, ay));
     }
 
     @Test
@@ -57,9 +57,9 @@ class AYTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b);
 
         AY ay = new AY(close("a", "b"));
-        ay.label(model);
+        model.calculateLabels(ay);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(ay)));
+        assertFalse(model.hasLabel(s1, ay));
     }
 
     @Test
@@ -74,8 +74,8 @@ class AYTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b);
 
         AY ay = new AY(close("a", "b"));
-        ay.label(model);
+        model.calculateLabels(ay);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(ay)));
+        assertFalse(model.hasLabel(s1, ay));
     }
 }

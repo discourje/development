@@ -1,15 +1,12 @@
 package discourje.core.ctl.formulas.temporal;
 
-import discourje.core.ctl.formulas.And;
-import discourje.core.ctl.formulas.Not;
-import discourje.core.ctl.formulas.atomic.Init;
-import discourje.core.lts.Action;
-import discourje.core.ctl.State;
-import discourje.core.ctl.Model;
 import discourje.core.ctl.Formula;
+import discourje.core.ctl.Labels;
+import discourje.core.ctl.Model;
+import discourje.core.ctl.State;
 import discourje.core.ctl.formulas.Temporal;
 import discourje.core.ctl.formulas.atomic.True;
-
+import discourje.core.lts.Action;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -25,8 +22,7 @@ public class AP extends Temporal {
 
     @Override
     public List<List<Action>> extractWitness(Model<?> model, State<?> source) {
-        var i = model.getLabelIndex(this);
-        if (source.hasLabel(i)) {
+        if (model.hasLabel(source, this)) {
             throw new IllegalArgumentException();
         }
 
@@ -34,18 +30,9 @@ public class AP extends Temporal {
     }
 
     @Override
-    public void label(Model<?> model) {
-        if (!model.isLabelledBy(this)) {
-            int labelIndex = model.setLabelledBy(this);
-            Formula ap = new AS(True.INSTANCE, arg);
-            ap.label(model);
-            int apLabelIndex = model.getLabelIndex(ap);
-            for (State<?> state : model.getStates()) {
-                if (state.hasLabel(apLabelIndex)) {
-                    state.addLabel(labelIndex);
-                }
-            }
-        }
+    public Labels label(Model<?> model) {
+        Formula ap = new AS(True.INSTANCE, arg);
+        return model.calculateLabels(ap);
     }
 
     @Override

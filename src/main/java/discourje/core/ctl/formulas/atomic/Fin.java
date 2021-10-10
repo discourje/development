@@ -1,5 +1,6 @@
 package discourje.core.ctl.formulas.atomic;
 
+import discourje.core.ctl.Labels;
 import discourje.core.ctl.Model;
 import discourje.core.ctl.State;
 import discourje.core.ctl.formulas.Atomic;
@@ -12,15 +13,14 @@ public class Fin extends Atomic {
     }
 
     @Override
-    public void label(Model<?> model) {
-        if (!model.isLabelledBy(this)) {
-            int labelIndex = model.setLabelledBy(this);
-            for (State<?> state : model.getStates()) {
-                if (state.getNextStates().isEmpty()) {
-                    state.addLabel(labelIndex);
-                }
+    public Labels label(Model<?> model) {
+        Labels labels = new Labels();
+        for (State<?> state : model.getStates()) {
+            if (state.getNextStates().isEmpty()) {
+                labels.setLabel(state);
             }
         }
+        return labels;
     }
 
     @Override

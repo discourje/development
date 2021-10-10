@@ -1,5 +1,6 @@
 package discourje.core.ctl.formulas.temporal;
 
+import discourje.core.ctl.Labels;
 import discourje.core.lts.Action;
 import discourje.core.ctl.State;
 import discourje.core.ctl.Model;
@@ -21,8 +22,7 @@ public class EU extends Temporal {
 
     @Override
     public List<List<Action>> extractWitness(Model<?> model, State<?> source) {
-        var i = model.getLabelIndex(this);
-        if (!source.hasLabel(i)) {
+        if (!model.hasLabel(source, this)) {
             return Collections.singletonList(Collections.emptyList());
         } else {
             throw new IllegalArgumentException();
@@ -30,25 +30,22 @@ public class EU extends Temporal {
     }
 
     @Override
-    public void label(Model<?> model) {
-        if (!model.isLabelledBy(this)) {
-            int labelIndex = model.setLabelledBy(this);
-            lhs.label(model);
-            rhs.label(model);
-            int lhsLabelIndex = model.getLabelIndex(lhs);
-            int rhsLabelIndex = model.getLabelIndex(rhs);
+    public Labels label(Model<?> model) {
+        Labels labels = new Labels();
+        Labels lhsLabels = model.calculateLabels(lhs);
+        Labels rhsLabels = model.calculateLabels(rhs);
 
-            Queue<State<?>> states = new LinkedList<>(model.getStates());
-            while (!states.isEmpty()) {
-                State<?> state = states.remove();
-                if (state.hasLabel(rhsLabelIndex) ||
-                        (state.hasLabel(lhsLabelIndex) && state.anySuccessorHasLabel(labelIndex))) {
-                    if (state.addLabel(labelIndex)) {
-                        states.addAll(state.getPreviousStates());
-                    }
+        Queue<State<?>> states = new LinkedList<>(model.getStates());
+        while (!states.isEmpty()) {
+            State<?> state = states.remove();
+            if (rhsLabels.hasLabel(state) ||
+                    (lhsLabels.hasLabel(state) && !state.getNextStates().isEmpty() && labels.anyHaveLabel(state.getNextStates()))) {
+                if (labels.setLabel(state)) {
+                    states.addAll(state.getPreviousStates());
                 }
             }
         }
+        return labels;
     }
 
     @Override

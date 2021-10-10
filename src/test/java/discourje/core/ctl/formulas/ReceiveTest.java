@@ -22,15 +22,15 @@ class ReceiveTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2, s3, s4, s5, s6, s7, s8);
 
         Receive rcv = new Receive(null, "a");
-        rcv.label(model);
+        model.calculateLabels(rcv);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(rcv)));
-        assertFalse(s2.hasLabel(model.getLabelIndex(rcv)));
-        assertFalse(s3.hasLabel(model.getLabelIndex(rcv)));
-        assertFalse(s4.hasLabel(model.getLabelIndex(rcv)));
-        assertFalse(s5.hasLabel(model.getLabelIndex(rcv)));
-        assertFalse(s6.hasLabel(model.getLabelIndex(rcv)));
-        assertTrue(s7.hasLabel(model.getLabelIndex(rcv)));
-        assertFalse(s8.hasLabel(model.getLabelIndex(rcv)));
+        assertFalse(model.hasLabel(s1, rcv));
+        assertFalse(model.hasLabel(s2, rcv));
+        assertFalse(model.hasLabel(s3, rcv));
+        assertFalse(model.hasLabel(s4, rcv));
+        assertFalse(model.hasLabel(s5, rcv));
+        assertFalse(model.hasLabel(s6, rcv));
+        assertTrue(model.hasLabel(s7, rcv));
+        assertFalse(model.hasLabel(s8, rcv));
     }
 }

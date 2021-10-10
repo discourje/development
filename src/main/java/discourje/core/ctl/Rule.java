@@ -10,10 +10,9 @@ public abstract class Rule {
         Set<String> result = new HashSet<>(0);
         for (Channel channel : model.getChannels()) {
             Formula formula = createCtlFormula(channel.getSender(), channel.getReceiver());
-            formula.label(model);
-            int labelIndex = model.getLabelIndex(formula);
+            model.calculateLabels(formula);
 
-            if (model.getInitialStates().stream().anyMatch(s -> !s.hasLabel(labelIndex))) {
+            if (model.getInitialStates().stream().anyMatch(s -> !model.hasLabel(s, formula))) {
                 result.add(createErrorDescription(channel.getSender(), channel.getReceiver()));
             }
         }
