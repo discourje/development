@@ -28,8 +28,8 @@ class ReceiveTest<S> extends AbstractCtlFormulaTest<S> {
         assertFalse(s2.hasLabel(model.getLabelIndex(rcv)));
         assertFalse(s3.hasLabel(model.getLabelIndex(rcv)));
         assertFalse(s4.hasLabel(model.getLabelIndex(rcv)));
-        assertTrue(s5.hasLabel(model.getLabelIndex(rcv)));
-        //assertTrue(s6.hasLabel(model.getLabelIndex(rcv)));
+        assertFalse(s5.hasLabel(model.getLabelIndex(rcv)));
+        assertFalse(s6.hasLabel(model.getLabelIndex(rcv)));
         assertTrue(s7.hasLabel(model.getLabelIndex(rcv)));
         assertFalse(s8.hasLabel(model.getLabelIndex(rcv)));
     }

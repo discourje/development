@@ -1,4 +1,4 @@
-(ns discourje.core.validation.close-channels-only-once-async
+(ns discourje.core.ctl.close-channels-only-once-async
   (:require [discourje.core.spec :as s]))
 
 (s/defrole ::a)

@@ -41,39 +41,13 @@ class ExampleApplicationsTest<Spec> {
         System.out.println(result);
     }
 
-    @Test
-    public void testProtocolCg() {
-        List<String> result = getModelCheckerResult("cg-protocol");
-        System.out.println(result);
-    }
-
-    @Test
-    public void testProtocolFt() {
-        List<String> result = getModelCheckerResult("ft-protocol");
-        System.out.println(result);
-    }
-
-    @Test
-    @Disabled
-    public void testProtocolIs() {
-        List<String> result = getModelCheckerResult("is-protocol");
-        System.out.println(result);
-    }
-
-    @Test
-    @Disabled
-    public void testProtocolMg() {
-        List<String> result = getModelCheckerResult("mg-protocol");
-        System.out.println(result);
-    }
-
     protected List<String> getModelCheckerResult(String name) {
         require = Clojure.var("clojure.core", "require");
         require.invoke(Clojure.read("discourje.core.async"));
 
         long t0 = System.currentTimeMillis();
-        require.invoke(Clojure.read("discourje.core.validation.example-applications"));
-        IFn var = Clojure.var("discourje.core.validation.example-applications", name);
+        require.invoke(Clojure.read("discourje.core.ctl.example-applications"));
+        IFn var = Clojure.var("discourje.core.ctl.example-applications", name);
         @SuppressWarnings("unchecked")
         LTS<Spec> lts = (LTS<Spec>) ((Var) var).get();
         lts.expandRecursively();

@@ -1,4 +1,4 @@
-(ns discourje.core.validation.do-not-send-to-self-async
+(ns discourje.core.ctl.do-not-send-to-self-async
   (:require [discourje.core.spec :as s]))
 
 (s/defrole ::a)

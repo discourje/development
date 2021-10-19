@@ -1,4 +1,4 @@
-(ns discourje.core.validation.causality
+(ns discourje.core.ctl.causality
   (:require [discourje.core.spec :as s]))
 
 (s/defrole ::a)

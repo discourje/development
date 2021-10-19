@@ -1,4 +1,4 @@
-(ns discourje.core.validation.used-channels-must-be-closed-async
+(ns discourje.core.ctl.used-channels-must-be-closed-async
   (:require [discourje.core.spec :as s]))
 
 (s/defrole ::a)

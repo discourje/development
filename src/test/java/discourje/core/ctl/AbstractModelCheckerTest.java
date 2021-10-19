@@ -8,12 +8,12 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 
 public class AbstractModelCheckerTest<Spec> {
-    public static final String NS_VALIDATION = "discourje.core.validation.validation-tests";
+    public static final String NS_VALIDATION = "discourje.core.ctl.validation-tests";
 
     @BeforeAll
     public static void setUp() {
         IFn require = Clojure.var("clojure.core", "require");
-        require.invoke(Clojure.read("discourje.core.validation.example-applications"));
+        require.invoke(Clojure.read("discourje.core.ctl.example-applications"));
         require.invoke(Clojure.read(NS_VALIDATION));
     }
 
