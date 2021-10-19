@@ -59,7 +59,7 @@
                      (apply [_ ast]
                        (let [successors (interp/successors ast)]
                          (zipmap (map #(action (interp/action %)) (keys successors))
-                                 (vals successors))))))
+                                 (map #(mapv (fn [ast] (interp/simplify ast)) %) (vals successors)))))))
         lts (LTS. #{initial} expander)]
     (if (not on-the-fly)
       (.expandRecursively lts))
@@ -68,13 +68,23 @@
 (defn initial-states [lts]
   (.getInitialStates lts))
 
+(defn channels [lts]
+  (into (sorted-set)
+        (reduce clojure.set/union
+                (map (fn [^State s]
+                       (reduce clojure.set/union
+                               (map (fn [a] #{[(.getSender a) (.getReceiver a)]})
+                                    (.getActions (.getTransitionsOrNull s)))))
+                     (.getStates lts)))))
+
 (defn roles [lts]
-  (reduce clojure.set/union
-          (map (fn [^State s]
-                 (reduce clojure.set/union
-                         (map (fn [a] #{(.getSender a) (.getReceiver a)})
-                              (.getActions (.getTransitionsOrNull s)))))
-               (.getStates lts))))
+  (into (sorted-set)
+        (reduce clojure.set/union
+                (map (fn [^State s]
+                       (reduce clojure.set/union
+                               (map (fn [a] #{(.getSender a) (.getReceiver a)})
+                                    (.getActions (.getTransitionsOrNull s)))))
+                     (.getStates lts)))))
 
 (defn bisimilar? [lts1 lts2]
   (LTSs/bisimilar lts1 lts2))

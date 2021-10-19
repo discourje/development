@@ -14,5 +14,7 @@ public interface State<Spec> {
 
     int getIdentifier();
 
+    Spec getSpec();
+
     Transitions<Spec> getTransitionsOrNull();
 }

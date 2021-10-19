@@ -121,6 +121,11 @@ public class LTS<Spec> {
         }
 
         @Override
+        public Spec getSpec() {
+            return spec;
+        }
+
+        @Override
         public Transitions<Spec> getTransitionsOrNull() {
             return transitions.get();
         }

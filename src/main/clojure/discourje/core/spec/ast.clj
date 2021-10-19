@@ -26,7 +26,8 @@
          (fn [m]
            (if (contains? m k)
              (update m k #(into % {(count vars) {:vars vars, :body body}}))
-             (into m {k {(count vars) {:vars vars, :body body}}})))))
+             (into m {k {(count vars) {:vars vars, :body body}}}))))
+  nil)
 
 (defn get-ast
   [k n]
@@ -115,7 +116,7 @@
 (defrecord Multiary [type branches])
 
 (defn cat [branches]
-  (->Multiary :cat branches))
+  (->Multiary :cat (vec branches)))
 (defn alt [branches]
   (->Multiary :alt branches))
 (defn par [branches]

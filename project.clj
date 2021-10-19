@@ -20,12 +20,21 @@
                  [str-to-argv "0.1.1"]
                  [clojure-complete "0.2.5"]]
   :source-paths ["src/main/clojure"]
-  :test-paths ["src/test/clojure"]
+  :test-paths ["src/test/clojure" "src/test/java"]
   :java-source-paths ["src/main/java"]
   :profiles {:examples  {:main         discourje.examples.main
                          :aot          [discourje.core.async
                                         discourje.core.spec
                                         discourje.examples.main]
-                         :uberjar-name "discourje-examples.jar"}})
+                         :uberjar-name "discourje-examples.jar"}
+             :fse2021   {:main         discourje.core.lint.benchmarks
+                         :aot          [discourje.core.async
+                                        discourje.core.lint
+                                        discourje.core.lint.benchmarks
+                                        discourje.core.spec]
+                         :uberjar-name "fse2021.jar"}
+             :dev       {:dependencies [
+                                        [org.junit.jupiter/junit-jupiter "5.7.0"]
+                                        [org.mockito/mockito-all "1.10.19"]]}})
 
 ;; $ lein with-profile examples uberjar
