@@ -1,11 +1,12 @@
 package discourje.core.ctl.formulas;
 
-import discourje.core.lts.Action;
 import discourje.core.ctl.Formula;
-import discourje.core.ctl.State;
+import discourje.core.ctl.Labels;
 import discourje.core.ctl.Model;
-
+import discourje.core.ctl.State;
+import discourje.core.lts.Action;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,8 +32,7 @@ public class Or implements Formula {
             throw new IllegalStateException();
         }
 
-        var i = model.getLabelIndex(this);
-        if (source.hasLabel(i)) {
+        if (model.hasLabel(source, this)) {
             throw new IllegalArgumentException();
         }
 
@@ -46,17 +46,16 @@ public class Or implements Formula {
     }
 
     @Override
-    public void label(Model<?> model) {
-        if (!model.isLabelledBy(this)) {
-            int labelIndex = model.setLabelledBy(this);
-            Arrays.stream(args).forEach(a -> a.label(model));
+    public Labels label(Model<?> model) {
+        Labels labels = new Labels();
+        Collection<Labels> argLabels = Arrays.stream(args)
+                .map(model::calculateLabels)
+                .collect(Collectors.toList());
 
-            for (State<?> state : model.getStates()) {
-                if (Arrays.stream(args).anyMatch(arg -> state.hasLabel(model.getLabelIndex(arg)))) {
-                    state.addLabel(labelIndex);
-                }
-            }
-        }
+        model.getStates().stream()
+                .filter(s -> argLabels.stream().anyMatch(arg -> arg.hasLabel(s)))
+                .forEach(labels::setLabel);
+        return labels;
     }
 
     @Override

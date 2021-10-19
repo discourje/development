@@ -21,12 +21,12 @@ class OrTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2, s3, s4);
 
         Formula or = new Or(send("a", "a"), send("a", null), receive(null, "a"));
-        or.label(model);
+        model.calculateLabels(or);
 
         // verify
-        assertTrue(s1.hasLabel(model.getLabelIndex(or)));
-        assertTrue(s2.hasLabel(model.getLabelIndex(or)));
-        //assertTrue(s3.hasLabel(model.getLabelIndex(or)));
-        assertFalse(s4.hasLabel(model.getLabelIndex(or)));
+        assertTrue(model.hasLabel(s1, or));
+        assertTrue(model.hasLabel(s2, or));
+        assertFalse(model.hasLabel(s3, or));
+        assertFalse(model.hasLabel(s4, or));
     }
 }

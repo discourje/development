@@ -27,9 +27,9 @@ class EGTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         EG eg = new EG(close("a", "b"));
-        eg.label(model);
+        model.calculateLabels(eg);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(eg)));
+        assertTrue(model.hasLabel(s1, eg));
     }
 
     @Test
@@ -46,9 +46,9 @@ class EGTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2, s3a, s3b);
 
         EG eg = new EG(close("a", "b"));
-        eg.label(model);
+        model.calculateLabels(eg);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(eg)));
+        assertTrue(model.hasLabel(s1, eg));
     }
 
     @Test
@@ -63,9 +63,9 @@ class EGTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2, s3);
 
         EG eg = new EG(close("a", "b"));
-        eg.label(model);
+        model.calculateLabels(eg);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(eg)));
+        assertFalse(model.hasLabel(s1, eg));
     }
 
     @Test
@@ -84,9 +84,9 @@ class EGTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         EG eg = new EG(close("a", "b"));
-        eg.label(model);
+        model.calculateLabels(eg);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(eg)));
+        assertTrue(model.hasLabel(s1, eg));
     }
 
     @Test
@@ -105,9 +105,9 @@ class EGTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         EG eg = new EG(close("a", "b"));
-        eg.label(model);
+        model.calculateLabels(eg);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(eg)));
+        assertFalse(model.hasLabel(s1, eg));
     }
 
     @Test
@@ -126,8 +126,8 @@ class EGTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         EG eg = new EG(close("a", "b"));
-        eg.label(model);
+        model.calculateLabels(eg);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(eg)));
+        assertFalse(model.hasLabel(s1, eg));
     }
 }

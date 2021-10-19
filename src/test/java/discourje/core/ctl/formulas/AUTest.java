@@ -1,9 +1,9 @@
 package discourje.core.ctl.formulas;
 
-import discourje.core.lts.Action;
-import discourje.core.ctl.State;
 import discourje.core.ctl.Model;
+import discourje.core.ctl.State;
 import discourje.core.ctl.formulas.temporal.AU;
+import discourje.core.lts.Action;
 import org.junit.jupiter.api.Test;
 import static discourje.core.ctl.Formulas.close;
 import static discourje.core.ctl.Formulas.send;
@@ -28,9 +28,9 @@ class AUTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         AU au = new AU(send("a", null), close("a", "b"));
-        au.label(model);
+        model.calculateLabels(au);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(au)));
+        assertTrue(model.hasLabel(s1, au));
     }
 
     @Test
@@ -47,9 +47,9 @@ class AUTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2, s3a, s3b);
 
         AU au = new AU(send("a", null), close("a", "b"));
-        au.label(model);
+        model.calculateLabels(au);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(au)));
+        assertTrue(model.hasLabel(s1, au));
     }
 
     @Test
@@ -68,9 +68,9 @@ class AUTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         AU au = new AU(send("a", null), close("a", "b"));
-        au.label(model);
+        model.calculateLabels(au);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(au)));
+        assertFalse(model.hasLabel(s1, au));
     }
 
     @Test
@@ -89,8 +89,8 @@ class AUTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         AU au = new AU(send("a", null), close("a", "b"));
-        au.label(model);
+        model.calculateLabels(au);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(au)));
+        assertFalse(model.hasLabel(s1, au));
     }
 }

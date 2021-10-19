@@ -27,9 +27,9 @@ class AFTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         AF af = new AF(close("a", "b"));
-        af.label(model);
+        model.calculateLabels(af);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(af)));
+        assertTrue(model.hasLabel(s1, af));
     }
 
     @Test
@@ -46,9 +46,9 @@ class AFTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2, s3a, s3b);
 
         AF af = new AF(close("a", "b"));
-        af.label(model);
+        model.calculateLabels(af);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(af)));
+        assertTrue(model.hasLabel(s1, af));
     }
 
     @Test
@@ -63,9 +63,9 @@ class AFTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b);
 
         AF af = new AF(close("a", "b"));
-        af.label(model);
+        model.calculateLabels(af);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(af)));
+        assertFalse(model.hasLabel(s1, af));
     }
 
     @Test
@@ -84,9 +84,9 @@ class AFTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         AF af = new AF(close("a", "b"));
-        af.label(model);
+        model.calculateLabels(af);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(af)));
+        assertFalse(model.hasLabel(s1, af));
     }
 
     @Test
@@ -105,9 +105,9 @@ class AFTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         AF af = new AF(close("a", "b"));
-        af.label(model);
+        model.calculateLabels(af);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(af)));
+        assertFalse(model.hasLabel(s1, af));
     }
 
 }

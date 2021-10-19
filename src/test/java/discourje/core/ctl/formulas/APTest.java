@@ -1,9 +1,9 @@
 package discourje.core.ctl.formulas;
 
-import discourje.core.lts.Action;
-import discourje.core.ctl.State;
 import discourje.core.ctl.Model;
+import discourje.core.ctl.State;
 import discourje.core.ctl.formulas.temporal.AP;
+import discourje.core.lts.Action;
 import org.junit.jupiter.api.Test;
 import static discourje.core.ctl.Formulas.close;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -27,9 +27,9 @@ class APTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         AP ap = new AP(close("a", "b"));
-        ap.label(model);
+        model.calculateLabels(ap);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(ap)));
+        assertTrue(model.hasLabel(s1, ap));
     }
 
     @Test
@@ -46,9 +46,9 @@ class APTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2, s3a, s3b);
 
         AP ap = new AP(close("a", "b"));
-        ap.label(model);
+        model.calculateLabels(ap);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(ap)));
+        assertTrue(model.hasLabel(s1, ap));
     }
 
     @Test
@@ -63,9 +63,9 @@ class APTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b);
 
         AP ap = new AP(close("a", "b"));
-        ap.label(model);
+        model.calculateLabels(ap);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(ap)));
+        assertFalse(model.hasLabel(s1, ap));
     }
 
     @Test
@@ -84,9 +84,9 @@ class APTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         AP ap = new AP(close("a", "b"));
-        ap.label(model);
+        model.calculateLabels(ap);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(ap)));
+        assertFalse(model.hasLabel(s1, ap));
     }
 
     @Test
@@ -105,9 +105,9 @@ class APTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         AP ap = new AP(close("a", "b"));
-        ap.label(model);
+        model.calculateLabels(ap);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(ap)));
+        assertFalse(model.hasLabel(s1, ap));
     }
 
 }

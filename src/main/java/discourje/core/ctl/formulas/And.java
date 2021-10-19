@@ -1,11 +1,12 @@
 package discourje.core.ctl.formulas;
 
-import discourje.core.lts.Action;
 import discourje.core.ctl.Formula;
-import discourje.core.ctl.State;
+import discourje.core.ctl.Labels;
 import discourje.core.ctl.Model;
-
+import discourje.core.ctl.State;
+import discourje.core.lts.Action;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,8 +27,7 @@ public class And implements Formula {
     @Override
     public List<List<Action>> extractWitness(Model<?> model, State<?> source) {
         for (Formula arg : args) {
-            var i = model.getLabelIndex(arg);
-            if (!source.hasLabel(i)) {
+            if (!model.hasLabel(source, arg)) {
                 return arg.extractWitness(model, source);
             }
         }
@@ -36,17 +36,16 @@ public class And implements Formula {
     }
 
     @Override
-    public void label(Model<?> model) {
-        if (!model.isLabelledBy(this)) {
-            int labelIndex = model.setLabelledBy(this);
-            Arrays.stream(args).forEach(a -> a.label(model));
+    public Labels label(Model<?> model) {
+        Labels labels = new Labels();
+        Collection<Labels> argLabels = Arrays.stream(args)
+                .map(model::calculateLabels)
+                .collect(Collectors.toList());
 
-            for (State<?> state : model.getStates()) {
-                if (Arrays.stream(args).allMatch(arg -> state.hasLabel(model.getLabelIndex(arg)))) {
-                    state.addLabel(labelIndex);
-                }
-            }
-        }
+        model.getStates().stream()
+                .filter(s -> argLabels.stream().allMatch(arg -> arg.hasLabel(s)))
+                .forEach(labels::setLabel);
+        return labels;
     }
 
     @Override

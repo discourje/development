@@ -1,10 +1,10 @@
 package discourje.core.ctl.formulas.atomic;
 
-import discourje.core.lts.Action;
+import discourje.core.ctl.Labels;
 import discourje.core.ctl.Model;
 import discourje.core.ctl.State;
 import discourje.core.ctl.formulas.Atomic;
-
+import discourje.core.lts.Action;
 import java.util.Objects;
 
 public class Act extends Atomic {
@@ -17,33 +17,32 @@ public class Act extends Atomic {
     }
 
     @Override
-    public void label(Model<?> model) {
-        if (!model.isLabelledBy(this)) {
-            int labelIndex = model.setLabelledBy(this);
-            for (State<?> state : model.getStates()) {
-                Action action = state.getAction();
-                if (action != null) {
-                    switch (action.getType()) {
-                        case SYNC:
-                            if (role.equals((action.getSender())) || role.equals(action.getReceiver())) {
-                                state.addLabel(labelIndex);
-                            }
-                            break;
-                        case CLOSE:
-                        case SEND:
-                            if (role.equals((action.getSender()))) {
-                                state.addLabel(labelIndex);
-                            }
-                            break;
-                        case RECEIVE:
-                            if (role.equals(action.getReceiver())) {
-                                state.addLabel(labelIndex);
-                            }
-                            break;
-                    }
+    public Labels label(Model<?> model) {
+        Labels labels = new Labels();
+        for (State<?> state : model.getStates()) {
+            Action action = state.getAction();
+            if (action != null) {
+                switch (action.getType()) {
+                    case SYNC:
+                        if (role.equals((action.getSender())) || role.equals(action.getReceiver())) {
+                            labels.setLabel(state);
+                        }
+                        break;
+                    case CLOSE:
+                    case SEND:
+                        if (role.equals((action.getSender()))) {
+                            labels.setLabel(state);
+                        }
+                        break;
+                    case RECEIVE:
+                        if (role.equals(action.getReceiver())) {
+                            labels.setLabel(state);
+                        }
+                        break;
                 }
             }
         }
+        return labels;
     }
 
     @Override

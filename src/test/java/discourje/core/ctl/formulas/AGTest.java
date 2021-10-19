@@ -1,12 +1,13 @@
 package discourje.core.ctl.formulas;
 
-import discourje.core.lts.Action;
-import discourje.core.ctl.State;
 import discourje.core.ctl.Model;
+import discourje.core.ctl.State;
 import discourje.core.ctl.formulas.temporal.AG;
+import discourje.core.lts.Action;
 import org.junit.jupiter.api.Test;
 import static discourje.core.ctl.Formulas.close;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AGTest<S> extends AbstractCtlFormulaTest<S> {
 
@@ -26,9 +27,9 @@ class AGTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         AG ag = new AG(close("a", "b"));
-        ag.label(model);
+        model.calculateLabels(ag);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(ag)));
+        assertTrue(model.hasLabel(s1, ag));
     }
 
     @Test
@@ -45,9 +46,9 @@ class AGTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2, s3a, s3b);
 
         AG ag = new AG(close("a", "b"));
-        ag.label(model);
+        model.calculateLabels(ag);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(ag)));
+        assertTrue(model.hasLabel(s1, ag));
     }
 
     @Test
@@ -62,9 +63,9 @@ class AGTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2, s3);
 
         AG ag = new AG(close("a", "b"));
-        ag.label(model);
+        model.calculateLabels(ag);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(ag)));
+        assertFalse(model.hasLabel(s1, ag));
     }
 
     @Test
@@ -83,9 +84,9 @@ class AGTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         AG ag = new AG(close("a", "b"));
-        ag.label(model);
+        model.calculateLabels(ag);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(ag)));
+        assertFalse(model.hasLabel(s1, ag));
     }
 
     @Test
@@ -104,9 +105,9 @@ class AGTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         AG ag = new AG(close("a", "b"));
-        ag.label(model);
+        model.calculateLabels(ag);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(ag)));
+        assertFalse(model.hasLabel(s1, ag));
     }
 
     @Test
@@ -125,8 +126,8 @@ class AGTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         AG ag = new AG(close("a", "b"));
-        ag.label(model);
+        model.calculateLabels(ag);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(ag)));
+        assertFalse(model.hasLabel(s1, ag));
     }
 }

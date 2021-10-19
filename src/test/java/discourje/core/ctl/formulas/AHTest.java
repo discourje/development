@@ -1,9 +1,9 @@
 package discourje.core.ctl.formulas;
 
-import discourje.core.lts.Action;
-import discourje.core.ctl.State;
 import discourje.core.ctl.Model;
+import discourje.core.ctl.State;
 import discourje.core.ctl.formulas.temporal.AH;
+import discourje.core.lts.Action;
 import org.junit.jupiter.api.Test;
 import static discourje.core.ctl.Formulas.close;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -27,9 +27,9 @@ class AHTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         AH ah = new AH(close("a", "b"));
-        ah.label(model);
+        model.calculateLabels(ah);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(ah)));
+        assertTrue(model.hasLabel(s1, ah));
     }
 
     @Test
@@ -46,9 +46,9 @@ class AHTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2, s3a, s3b);
 
         AH ah = new AH(close("a", "b"));
-        ah.label(model);
+        model.calculateLabels(ah);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(ah)));
+        assertTrue(model.hasLabel(s1, ah));
     }
 
     @Test
@@ -63,9 +63,9 @@ class AHTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2, s3);
 
         AH ah = new AH(close("a", "b"));
-        ah.label(model);
+        model.calculateLabels(ah);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(ah)));
+        assertFalse(model.hasLabel(s1, ah));
     }
 
     @Test
@@ -84,9 +84,9 @@ class AHTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         AH ah = new AH(close("a", "b"));
-        ah.label(model);
+        model.calculateLabels(ah);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(ah)));
+        assertFalse(model.hasLabel(s1, ah));
     }
 
     @Test
@@ -105,9 +105,9 @@ class AHTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         AH ah = new AH(close("a", "b"));
-        ah.label(model);
+        model.calculateLabels(ah);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(ah)));
+        assertFalse(model.hasLabel(s1, ah));
     }
 
     @Test
@@ -126,8 +126,8 @@ class AHTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         AH ah = new AH(close("a", "b"));
-        ah.label(model);
+        model.calculateLabels(ah);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(ah)));
+        assertFalse(model.hasLabel(s1, ah));
     }
 }

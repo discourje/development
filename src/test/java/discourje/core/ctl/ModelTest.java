@@ -68,14 +68,14 @@ class ModelTest<Spec> {
 
         // verify
         // expected states
-        State<?> _1_null = new State<>(_1, null);
-        State<?> _1_close = new State<>(_1, close);
-        State<?> _2_sync = new State<>(_2, sync);
-        State<?> _2_recv = new State<>(_2, recv);
-        State<?> _2_send = new State<>(_2, send);
+        State<?> _1_null = new State<>(_1, null, 0);
+        State<?> _1_close = new State<>(_1, close, 1);
+        State<?> _2_sync = new State<>(_2, sync, 2);
+        State<?> _2_recv = new State<>(_2, recv, 3);
+        State<?> _2_send = new State<>(_2, send, 4);
 
         assertEquals(1, model.getInitialStates().size());
-        assertTrue(model.getInitialStates().containsAll(Collections.singletonList(_1_null)));
+        assertTrue(model.getInitialStates().contains(_1_null));
 
         assertEquals(5, model.getStates().size());
         assertTrue(model.getStates().contains(_1_null));

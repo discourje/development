@@ -22,9 +22,9 @@ class AXTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b);
 
         AX ax = new AX(close("a", "b"));
-        ax.label(model);
+        model.calculateLabels(ax);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(ax)));
+        assertTrue(model.hasLabel(s1, ax));
     }
 
     @Test
@@ -39,9 +39,9 @@ class AXTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b);
 
         AX ax = new AX(close("a", "b"));
-        ax.label(model);
+        model.calculateLabels(ax);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(ax)));
+        assertTrue(model.hasLabel(s1, ax));
     }
 
     @Test
@@ -56,9 +56,9 @@ class AXTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b);
 
         AX ax = new AX(close("a", "b"));
-        ax.label(model);
+        model.calculateLabels(ax);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(ax)));
+        assertFalse(model.hasLabel(s1, ax));
     }
 
     @Test
@@ -73,8 +73,8 @@ class AXTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b);
 
         AX ax = new AX(close("a", "b"));
-        ax.label(model);
+        model.calculateLabels(ax);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(ax)));
+        assertFalse(model.hasLabel(s1, ax));
     }
 }

@@ -28,9 +28,9 @@ class EUTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         EU eu = new EU(send("a", null), close("a", "b"));
-        eu.label(model);
+        model.calculateLabels(eu);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(eu)));
+        assertTrue(model.hasLabel(s1, eu));
     }
 
     @Test
@@ -47,9 +47,9 @@ class EUTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2, s3a, s3b);
 
         EU eu = new EU(send("a", null), close("a", "b"));
-        eu.label(model);
+        model.calculateLabels(eu);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(eu)));
+        assertTrue(model.hasLabel(s1, eu));
     }
 
     @Test
@@ -68,9 +68,9 @@ class EUTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         EU eu = new EU(send("a", null), close("a", "b"));
-        eu.label(model);
+        model.calculateLabels(eu);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(eu)));
+        assertTrue(model.hasLabel(s1, eu));
     }
 
     @Test
@@ -89,8 +89,8 @@ class EUTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         EU eu = new EU(send("a", null), close("a", "b"));
-        eu.label(model);
+        model.calculateLabels(eu);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(eu)));
+        assertFalse(model.hasLabel(s1, eu));
     }
 }

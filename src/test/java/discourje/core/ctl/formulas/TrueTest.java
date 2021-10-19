@@ -15,8 +15,8 @@ class TrueTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1);
 
         True _true = True.INSTANCE;
-        _true.label(model);
+        model.calculateLabels(_true);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(_true)));
+        assertTrue(model.hasLabel(s1, _true));
     }
 }

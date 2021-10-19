@@ -21,9 +21,9 @@ public class Model<Spec> {
 
     private final Collection<Channel> channels = new HashSet<>();
 
-    private int currentLabelIndex = 0;
+    private int currentActionIndex = 0;
 
-    private final Map<Formula, Integer> labelIndices = new HashMap<>();
+    private final Map<Formula, Labels> stateLabelsByFormula = new HashMap<>();
 
     public Model(LTS<Spec> lts) {
         lts.expandRecursively();
@@ -62,7 +62,7 @@ public class Model<Spec> {
 
     private void addState(discourje.core.lts.State state, Action action) {
         if (!dmStateMap.containsKey(new Pair<>(state, action))) {
-            State<Spec> newState = new State<>(state, action);
+            State<Spec> newState = new State<>(state, action, currentActionIndex++);
             states.add(newState);
             dmStateMap.put(new Pair<>(state, action), newState);
         }
@@ -84,16 +84,18 @@ public class Model<Spec> {
         return Collections.unmodifiableCollection(channels);
     }
 
-    public int setLabelledBy(Formula formula) {
-        labelIndices.put(formula, currentLabelIndex);
-        return currentLabelIndex++;
+    public boolean hasLabel(State<?> state, Formula formula) {
+        return stateLabelsByFormula.get(formula).hasLabel(state);
     }
 
-    public boolean isLabelledBy(Formula formula) {
-        return labelIndices.containsKey(formula);
+    public Labels getLabels(Formula formula) {
+        return stateLabelsByFormula.get(formula);
     }
 
-    public int getLabelIndex(Formula formula) {
-        return labelIndices.get(formula);
+    public Labels calculateLabels(Formula formula) {
+        if (stateLabelsByFormula.get(formula) == null) {
+            stateLabelsByFormula.put(formula, formula.label(this));
+        }
+        return stateLabelsByFormula.get(formula);
     }
 }

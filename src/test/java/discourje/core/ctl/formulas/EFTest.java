@@ -26,9 +26,9 @@ class EFTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         EF ef = new EF(close("a", "b"));
-        ef.label(model);
+        model.calculateLabels(ef);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(ef)));
+        assertTrue(model.hasLabel(s1, ef));
     }
 
     @Test
@@ -45,9 +45,9 @@ class EFTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2, s3a, s3b);
 
         EF ef = new EF(close("a", "b"));
-        ef.label(model);
+        model.calculateLabels(ef);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(ef)));
+        assertTrue(model.hasLabel(s1, ef));
     }
 
     @Test
@@ -62,9 +62,9 @@ class EFTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b);
 
         EF ef = new EF(close("a", "b"));
-        ef.label(model);
+        model.calculateLabels(ef);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(ef)));
+        assertTrue(model.hasLabel(s1, ef));
     }
 
     @Test
@@ -83,9 +83,9 @@ class EFTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         EF ef = new EF(close("a", "b"));
-        ef.label(model);
+        model.calculateLabels(ef);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(ef)));
+        assertTrue(model.hasLabel(s1, ef));
     }
 
     @Test
@@ -104,8 +104,8 @@ class EFTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         EF ef = new EF(close("a", "b"));
-        ef.label(model);
+        model.calculateLabels(ef);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(ef)));
+        assertFalse(model.hasLabel(s1, ef));
     }
 }

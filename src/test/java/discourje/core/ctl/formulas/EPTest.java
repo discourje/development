@@ -27,9 +27,9 @@ class EPTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         EP ep = new EP(close("a", "b"));
-        ep.label(model);
+        model.calculateLabels(ep);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(ep)));
+        assertTrue(model.hasLabel(s1, ep));
     }
 
     @Test
@@ -46,9 +46,9 @@ class EPTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2, s3a, s3b);
 
         EP ep = new EP(close("a", "b"));
-        ep.label(model);
+        model.calculateLabels(ep);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(ep)));
+        assertTrue(model.hasLabel(s1, ep));
     }
 
     @Test
@@ -63,9 +63,9 @@ class EPTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b);
 
         EP ep = new EP(close("a", "b"));
-        ep.label(model);
+        model.calculateLabels(ep);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(ep)));
+        assertTrue(model.hasLabel(s1, ep));
     }
 
     @Test
@@ -84,9 +84,9 @@ class EPTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         EP ep = new EP(close("a", "b"));
-        ep.label(model);
+        model.calculateLabels(ep);
 
-        assertTrue(s1.hasLabel(model.getLabelIndex(ep)));
+        assertTrue(model.hasLabel(s1, ep));
     }
 
     @Test
@@ -105,8 +105,8 @@ class EPTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2a, s2b, s3a, s3b);
 
         EP ep = new EP(close("a", "b"));
-        ep.label(model);
+        model.calculateLabels(ep);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(ep)));
+        assertFalse(model.hasLabel(s1, ep));
     }
 }

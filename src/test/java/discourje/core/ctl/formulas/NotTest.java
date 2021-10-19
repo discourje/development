@@ -16,9 +16,9 @@ class NotTest<S> extends AbstractCtlFormulaTest<S> {
         Model<S> model = createModel(s1, s2);
 
         Not not = new Not(new Send("a", null));
-        not.label(model);
+        model.calculateLabels(not);
 
-        assertFalse(s1.hasLabel(model.getLabelIndex(not)));
-        assertTrue(s2.hasLabel(model.getLabelIndex(not)));
+        assertFalse(model.hasLabel(s1, not));
+        assertTrue(model.hasLabel(s2, not));
     }
 }

@@ -244,10 +244,9 @@
       :dcj (let [m (Model. ^LTS ast-or-lts)]
              (into (sorted-map) (map (fn [[fname f]]
                                        (let [begin (System/nanoTime)]
-                                         (.label f m)
-                                         (let [i (.getLabelIndex m f)
-                                               end (System/nanoTime)
-                                               verdict (every? #(.hasLabel ^State % i) (.getInitialStates m))
+                                         (.calculateLabels m f)
+                                         (let [end (System/nanoTime)
+                                               verdict (every? #(.hasLabel m % f) (.getInitialStates m))
                                                time (long (/ (- end begin) 1000000))]
                                            (if (clojure.core/or verdict (clojure.core/not witness))
                                              [fname {:verdict verdict

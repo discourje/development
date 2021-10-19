@@ -43,8 +43,7 @@ public class ModelChecker {
 
     public static boolean check(LTS<?> lts, Formula f) {
         var model = new Model<>(lts);
-        f.label(model);
-        var i = model.getLabelIndex(f);
-        return !model.getInitialStates().stream().anyMatch(s -> !s.hasLabel(i));
+        model.calculateLabels(f);
+        return model.getInitialStates().stream().allMatch(s -> model.hasLabel(s, f));
     }
 }
