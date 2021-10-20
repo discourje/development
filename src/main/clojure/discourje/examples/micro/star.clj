@@ -52,13 +52,13 @@
         (if (= config/*lib* :dcj)
           (let [s (condp = flags
                     #{:unbuffered :outwards}
-                    (s/session ::star-unbuffered-outwards [k])
+                    (star-unbuffered-outwards k)
                     #{:unbuffered :inwards}
-                    (s/session ::star-unbuffered-inwards [k])
+                    (star-unbuffered-inwards k)
                     #{:buffered :outwards}
-                    (s/session ::star-buffered-outwards [k])
+                    (star-buffered-outwards k)
                     #{:buffered :inwards}
-                    (s/session ::star-buffered-inwards [k]))
+                    (star-buffered-inwards k))
                 m (a/monitor s)]
             (u/link-star star master worker m)))
 
