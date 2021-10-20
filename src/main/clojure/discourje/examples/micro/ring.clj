@@ -26,18 +26,25 @@
 ;;;;
 
 (let [input config/*input*
-      buffered (:buffered input)
+      flags (:flags input)
       k (:k input)
       n (:n input)]
 
   (let [;; Create channels
         ring
-        (u/ring (if buffered (fn [] (a/chan 1)) a/chan) (range k))
+        (cond (contains? flags :unbuffered)
+              (u/ring a/chan (range k))
+              (contains? flags :buffered)
+              (u/ring (partial a/chan 1) (range k)))
 
         ;; Link monitor [optional]
         _
         (if (= config/*lib* :dcj)
-          (let [s (apply (if buffered ring-buffered ring-unbuffered) [k])
+          (let [s (condp = flags
+                    #{:unbuffered}
+                    (ring-unbuffered k)
+                    #{:buffered}
+                    (ring-buffered k))
                 m (a/monitor s)]
             (u/link-ring ring worker m)))
 

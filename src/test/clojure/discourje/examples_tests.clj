@@ -14,24 +14,24 @@
 
   (print (main/run-all [:clj :dcj]
                        ['discourje.examples.micro.ring]
-                       {:buffered [false] :k [3] :n [1000]}))
+                       {:flags [#{:unbuffered}] :k [3] :n [1000]}))
   (is true)
 
   (print (main/run-all [:clj :dcj]
                        ['discourje.examples.micro.ring]
-                       {:buffered [true] :k [3] :n [1000]}))
+                       {:flags [#{:buffered}] :k [3] :n [1000]}))
   (is true)
 
   ;; Mesh
 
   (print (main/run-all [:clj :dcj]
                        ['discourje.examples.micro.mesh]
-                       {:buffered [false] :k [3] :n [1000]}))
+                       {:flags [#{:unbuffered}] :k [3] :n [1000]}))
   (is true)
 
   (print (main/run-all [:clj :dcj]
                        ['discourje.examples.micro.mesh]
-                       {:buffered [true] :k [3] :n [1000]}))
+                       {:flags [#{:buffered}] :k [3] :n [1000]}))
   (is true)
 
   ;; Star
