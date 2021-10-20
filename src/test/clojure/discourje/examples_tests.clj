@@ -14,12 +14,12 @@
 
   (print (main/run-all [:clj :dcj]
                        ['discourje.examples.micro.ring]
-                       {:buffered [true] :k [2] :secs [0]}))
+                       {:buffered [true] :k [2] :n [1000]}))
   (is true)
 
   (print (main/run-all [:clj :dcj]
                        ['discourje.examples.micro.ring]
-                       {:buffered [false] :k [2] :secs [0]}))
+                       {:buffered [false] :k [2] :n [1000]}))
   (is true)
 
   ;; Mesh

@@ -39,14 +39,16 @@
              config/*input* (merge {:resolution 1} input)
              config/*output* nil
              config/*time* nil]
-     (try
-       (require program :reload)
+     (let [begin (System/nanoTime)
+           _ (try
+               (require program :reload)
+               (catch Throwable t (.printStackTrace t)))
+           end (System/nanoTime)]
        {:lib     lib
         :program program
         :input   input
         :output  config/*output*
-        :time    config/*time*}
-       (catch Throwable t (.printStackTrace t))))))
+        :time    (int (/ (- end begin) (* 1000 1000)))}))))
 
 (defn run-all
   ([configs]
