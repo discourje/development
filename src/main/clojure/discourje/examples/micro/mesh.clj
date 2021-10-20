@@ -3,6 +3,7 @@
             [discourje.core.async]
             [discourje.core.util :as u]
             [discourje.core.spec :as s]
+            [discourje.core.lint :as l]
             [discourje.examples.config :as config]))
 
 (config/clj-or-dcj)
@@ -27,47 +28,55 @@
 ;;;; Implementation
 ;;;;
 
-(let [input config/*input*
-      flags (:flags input)
-      k (:k input)
-      n (:n input)]
+(defn spec []
+  (condp = (:flags config/*input*)
+    #{:unbuffered}
+    (mesh-unbuffered (:k config/*input*))
+    #{:buffered}
+    (mesh-buffered (:k config/*input*))))
 
-  (let [;; Create channels
-        mesh
-        (cond (contains? flags :unbuffered)
-              (u/mesh a/chan (range k))
-              (contains? flags :buffered)
-              (u/mesh (partial a/chan 1) (range k)))
+(config/clj-or-dcj)
 
-        ;; Link monitor [optional]
-        _
-        (if (= config/*lib* :dcj)
-          (let [s (condp = flags
-                    #{:unbuffered}
-                    (mesh-unbuffered k)
-                    #{:buffered}
-                    (mesh-buffered k))
-                m (a/monitor s)]
-            (u/link-mesh mesh worker m)))
+(when (some? config/*lint*)
+  (set! config/*output* (l/lint (spec))))
 
-        ;; Spawn threads
-        workers
-        (mapv (fn [i] (a/thread (loop [to-put (zipmap (remove #{i} (range k)) (repeat n))
-                                       to-take (zipmap (remove #{i} (range k)) (repeat n))]
-                                  (let [keep-fn (fn [[j count]] (if (> count 0) j))
-                                        puts (u/puts mesh [i true] (keep keep-fn to-put))
-                                        takes (u/takes mesh (keep keep-fn to-take) i)
-                                        puts-and-takes (into puts takes)]
-                                    (if (not-empty puts-and-takes)
-                                      (let [[_ c] (a/alts!! puts-and-takes)]
-                                        (if (= (u/putter-id mesh c) i)
-                                          (recur (update to-put (u/taker-id mesh c) dec) to-take)
-                                          (recur to-put (update to-take (u/putter-id mesh c) dec)))))))))
-              (range k))
+(when (some? config/*run*)
+  (let [input config/*input*
+        flags (:flags input)
+        k (:k input)
+        n (:n input)]
 
-        ;; Await termination
-        output
-        (doseq [worker workers]
-          (a/<!! worker))]
+    (let [;; Create channels
+          mesh
+          (cond (contains? flags :unbuffered)
+                (u/mesh a/chan (range k))
+                (contains? flags :buffered)
+                (u/mesh (partial a/chan 1) (range k)))
 
-    (set! config/*output* output)))
+          ;; Link monitor [optional]
+          _
+          (if (= config/*run* :dcj)
+            (let [m (a/monitor (spec))]
+              (u/link-mesh mesh worker m)))
+
+          ;; Spawn threads
+          workers
+          (mapv (fn [i] (a/thread (loop [to-put (zipmap (remove #{i} (range k)) (repeat n))
+                                         to-take (zipmap (remove #{i} (range k)) (repeat n))]
+                                    (let [keep-fn (fn [[j count]] (if (> count 0) j))
+                                          puts (u/puts mesh [i true] (keep keep-fn to-put))
+                                          takes (u/takes mesh (keep keep-fn to-take) i)
+                                          puts-and-takes (into puts takes)]
+                                      (if (not-empty puts-and-takes)
+                                        (let [[_ c] (a/alts!! puts-and-takes)]
+                                          (if (= (u/putter-id mesh c) i)
+                                            (recur (update to-put (u/taker-id mesh c) dec) to-take)
+                                            (recur to-put (update to-take (u/putter-id mesh c) dec)))))))))
+                (range k))
+
+          ;; Await termination
+          output
+          (doseq [worker workers]
+            (a/<!! worker))]
+
+      (set! config/*output* output))))

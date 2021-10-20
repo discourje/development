@@ -2,62 +2,32 @@
   (:gen-class)
   (:refer-clojure :exclude [compare])
   (:require [clojure.string :refer [join last-index-of]]
+            [discourje.core.lint :as l]
+            [discourje.core.spec.mcrl2 :as mcrl2]
             [discourje.examples.config :as config])
   (:import (java.time LocalDateTime)
            (org.apache.commons.math3.distribution TDistribution)))
 
-;;;;
-;;;; Execution
-;;;;
-
-(defn configs
-  ([m]
-   (configs (:lib m) (:program m) (:input m)))
-  ([libs programs inputs]
-   {:pre  [(vector? libs)
-           (vector? programs)
-           (map? inputs) (every? vector? (vals inputs))]
-    :post [(vec %) (every? map? %)]}
-   (let [f (fn [k vals m] (mapv #(merge m {k %}) vals))
-         inputs (loop [inputs inputs
-                       result [{}]]
-                  (if (empty? inputs)
-                    result
-                    (let [[k vals] (first inputs)]
-                      (recur (rest inputs) (reduce into (mapv (partial f k vals) result))))))
-         configs [{}]
-         configs (reduce into (mapv (partial f :lib libs) configs))
-         configs (reduce into (mapv (partial f :program programs) configs))
-         configs (reduce into (mapv (partial f :input inputs) configs))]
-     configs)))
-
-(defn run
-  ([config]
-   (run (:lib config) (:program config) (:input config)))
-  ([lib program input]
-   (binding [config/*lib* lib
-             config/*input* (merge {:resolution 1} input)
-             config/*output* nil
-             config/*time* nil]
-     (let [begin (System/nanoTime)
-           _ (try
-               (require program :reload)
-               (catch Throwable t (.printStackTrace t)))
-           end (System/nanoTime)]
-       {:lib     lib
-        :program program
-        :input   input
-        :output  config/*output*
-        :time    (int (/ (- end begin) (* 1000 1000)))}))))
-
-(defn run-all
-  ([configs]
-   (mapv #(run %) configs))
-  ([libs programs inputs]
-   (run-all (configs libs programs inputs))))
-
-(defn start [lib program input]
-  (.start (Thread. ^Runnable (fn [] (println (run lib program input))))))
+(defn main [settings program input]
+  (binding [config/*lint* (:lint settings)
+            config/*run* (:run settings)
+            config/*input* input
+            config/*output* nil
+            l/*engine* (:lint settings)
+            l/*witness* (if (some? (:witness settings)) (:witness settings) l/*witness*)
+            l/*exclude* (if (some? (:exclude settings)) (:exclude settings) l/*exclude*)
+            mcrl2/*mcrl2-bin* (:mcrl2-bin settings)
+            mcrl2/*mcrl2-tmp* (:mcrl2-tmp settings)]
+    (let [begin (System/nanoTime)
+          _ (try
+              (require program :reload)
+              (catch Throwable t (.printStackTrace t)))
+          end (System/nanoTime)]
+      {:settings settings
+       :program  program
+       :input    config/*input*
+       :output   config/*output*
+       :time     (int (/ (- end begin) (* 1000 1000)))})))
 
 ;;;;
 ;;;; Post-processing
@@ -222,96 +192,96 @@
 (defmacro version []
   (str (LocalDateTime/now)))
 
-(defn -main [& args]
-  (try
-    (case (first args)
-      "run"
-      (let [args (rest args)]
-        (if (< (count args) 2)
-          (throw (ex-info "" {::message "Not enough arguments"})))
-
-        (let [lib (keyword (first args))
-              program (symbol (str "discourje.examples" "." (second args)))
-              input (read-string (join " " (rest (rest args))))]
-
-          (if (not (contains? #{:clj :dcj :dcj-nil} lib))
-            (throw (ex-info "" {::message "Unknown lib"})))
-
-          (if (not (contains? #{'discourje.examples.micro.mesh
-                                'discourje.examples.micro.ring
-                                'discourje.examples.micro.star
-                                'discourje.examples.games.chess
-                                'discourje.examples.games.go-fish
-                                'discourje.examples.games.rock-paper-scissors
-                                'discourje.examples.games.tic-tac-toe
-                                'discourje.examples.npb3.cg
-                                'discourje.examples.npb3.ft
-                                'discourje.examples.npb3.is
-                                'discourje.examples.npb3.mg}
-                              program))
-            (throw (ex-info "" {::message "Unknown program"})))
-
-          (prn (run lib program input))))
-
-      "benchmark"
-      (let [args (rest args)]
-        (if (< (count args) 1)
-          (throw (ex-info "" {::message "Not enough arguments"})))
-
-        (let [n (read-string (first args))]
-          (doseq [config (configs (read-string (join " " (rest args))))]
-            (doseq [_ (range n)]
-              (println (str "java -jar discourje-examples.jar run "
-                            (name (:lib config)) " "
-                            (clojure.string/replace (str (:program config)) "discourje.examples." "") " "
-                            (:input config)))))))
-
-      "chart"
-      (let [args (rest args)]
-        (let [data (read-string (str "[" (join " " args) "]"))
-              samples (samples data)
-              stats (stats samples)
-              ratios (ratios stats)
-              chart (chart stats ratios)]
-          (println chart)))
-
-      "experiment"
-      (let [args (rest args)]
-        (let [id (System/currentTimeMillis)]
-          (println (str "echo \"*** Begin: Experiment #" id " ***\""))
-          (println (str "echo \"Generating benchmark...\""))
-          (println (str "java -jar discourje-examples.jar benchmark " (join " " args) " > benchmark-" id ".sh"))
-          (println (str "echo \"Running benchmark and generating data...\""))
-          (println (str "sh benchmark-" id ".sh > data-" id ".txt"))
-          (println (str "rm benchmark-" id ".sh"))
-          (println (str "echo \"Processing data and generating chart...\""))
-          (println (str "java -jar discourje-examples.jar chart \"$(cat data-" id ".txt)\" > chart-" id ".tex"))
-          (println (str "if [ -x \"$(command -v pdflatex)\" ]; then"))
-          (println (str "\techo \"Compiling chart...\""))
-          (println (str "\tpdflatex chart-" id ".tex > /dev/null"))
-          (println (str "\trm chart-" id ".aux chart-" id ".log"))
-          (println (str "else"))
-          (println (str "\techo \"Not compiling chart (pdflatex required but not provided)\""))
-          (println (str "fi"))
-          (println (str "echo \"*** End: Experiment #" id " ***\""))))
-
-      (throw (ex-info "" {::message "Unknown command"})))
-
-    (catch Throwable t
-      (let [m (ex-data t)]
-        (println)
-        (if (contains? m ::message)
-          (do (println (str "Discourje Examples (" (version) ")"))
-              (println (str "Error: " (::message m)))
-              (println (str "Usage 1: java -jar discourje-examples.jar run <lib> <program> <input>"))
-              (println (str "  <lib>     \u2208 {clj, dcj, dcj-nil}"))
-              (println (str "  <program> \u2208 {"
-                            (join ", " ["micro.mesh" "micro.ring" "micro.star"
-                                        "games.chess" "games.go-fish" "games.rock-paper-scissors" "games.tic-tac-toe"
-                                        "npb3.cg" "npb3.ft" "npb3.is" "npb3.mg"])
-                            "}"))
-              (println (str "Usage 2: java -jar discourje-examples.jar script <n> <configs>"))
-              (println (str "Usage 3: java -jar discourje-examples.jar chart <data>"))
-              (println (str "Usage 4: java -jar discourje-examples.jar experiment <n> <configs>")))
-          (.printStackTrace t))
-        (println)))))
+;(defn -main [& args]
+;  (try
+;    (case (first args)
+;      "run"
+;      (let [args (rest args)]
+;        (if (< (count args) 2)
+;          (throw (ex-info "" {::message "Not enough arguments"})))
+;
+;        (let [lib (keyword (first args))
+;              program (symbol (str "discourje.examples" "." (second args)))
+;              input (read-string (join " " (rest (rest args))))]
+;
+;          (if (not (contains? #{:clj :dcj :dcj-nil} lib))
+;            (throw (ex-info "" {::message "Unknown lib"})))
+;
+;          (if (not (contains? #{'discourje.examples.micro.mesh
+;                                'discourje.examples.micro.ring
+;                                'discourje.examples.micro.star
+;                                'discourje.examples.games.chess
+;                                'discourje.examples.games.go-fish
+;                                'discourje.examples.games.rock-paper-scissors
+;                                'discourje.examples.games.tic-tac-toe
+;                                'discourje.examples.npb3.cg
+;                                'discourje.examples.npb3.ft
+;                                'discourje.examples.npb3.is
+;                                'discourje.examples.npb3.mg}
+;                              program))
+;            (throw (ex-info "" {::message "Unknown program"})))
+;
+;          (prn (run lib program input))))
+;
+;      "benchmark"
+;      (let [args (rest args)]
+;        (if (< (count args) 1)
+;          (throw (ex-info "" {::message "Not enough arguments"})))
+;
+;        (let [n (read-string (first args))]
+;          (doseq [config (configs (read-string (join " " (rest args))))]
+;            (doseq [_ (range n)]
+;              (println (str "java -jar discourje-examples.jar run "
+;                            (name (:lib config)) " "
+;                            (clojure.string/replace (str (:program config)) "discourje.examples." "") " "
+;                            (:input config)))))))
+;
+;      "chart"
+;      (let [args (rest args)]
+;        (let [data (read-string (str "[" (join " " args) "]"))
+;              samples (samples data)
+;              stats (stats samples)
+;              ratios (ratios stats)
+;              chart (chart stats ratios)]
+;          (println chart)))
+;
+;      "experiment"
+;      (let [args (rest args)]
+;        (let [id (System/currentTimeMillis)]
+;          (println (str "echo \"*** Begin: Experiment #" id " ***\""))
+;          (println (str "echo \"Generating benchmark...\""))
+;          (println (str "java -jar discourje-examples.jar benchmark " (join " " args) " > benchmark-" id ".sh"))
+;          (println (str "echo \"Running benchmark and generating data...\""))
+;          (println (str "sh benchmark-" id ".sh > data-" id ".txt"))
+;          (println (str "rm benchmark-" id ".sh"))
+;          (println (str "echo \"Processing data and generating chart...\""))
+;          (println (str "java -jar discourje-examples.jar chart \"$(cat data-" id ".txt)\" > chart-" id ".tex"))
+;          (println (str "if [ -x \"$(command -v pdflatex)\" ]; then"))
+;          (println (str "\techo \"Compiling chart...\""))
+;          (println (str "\tpdflatex chart-" id ".tex > /dev/null"))
+;          (println (str "\trm chart-" id ".aux chart-" id ".log"))
+;          (println (str "else"))
+;          (println (str "\techo \"Not compiling chart (pdflatex required but not provided)\""))
+;          (println (str "fi"))
+;          (println (str "echo \"*** End: Experiment #" id " ***\""))))
+;
+;      (throw (ex-info "" {::message "Unknown command"})))
+;
+;    (catch Throwable t
+;      (let [m (ex-data t)]
+;        (println)
+;        (if (contains? m ::message)
+;          (do (println (str "Discourje Examples (" (version) ")"))
+;              (println (str "Error: " (::message m)))
+;              (println (str "Usage 1: java -jar discourje-examples.jar run <lib> <program> <input>"))
+;              (println (str "  <lib>     \u2208 {clj, dcj, dcj-nil}"))
+;              (println (str "  <program> \u2208 {"
+;                            (join ", " ["micro.mesh" "micro.ring" "micro.star"
+;                                        "games.chess" "games.go-fish" "games.rock-paper-scissors" "games.tic-tac-toe"
+;                                        "npb3.cg" "npb3.ft" "npb3.is" "npb3.mg"])
+;                            "}"))
+;              (println (str "Usage 2: java -jar discourje-examples.jar script <n> <configs>"))
+;              (println (str "Usage 3: java -jar discourje-examples.jar chart <data>"))
+;              (println (str "Usage 4: java -jar discourje-examples.jar experiment <n> <configs>")))
+;          (.printStackTrace t))
+;        (println)))))

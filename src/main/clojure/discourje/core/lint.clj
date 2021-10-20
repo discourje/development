@@ -237,8 +237,19 @@
 ;;;; API
 ;;;;
 
+(def ^:dynamic *engine* :dcj)
+(def ^:dynamic *witness* true)
+(def ^:dynamic *include* #{:must-terminate
+                           :may-terminate
+                           :cant-terminate
+                           :close-after-send
+                           :send-before-close
+                           :no-act-after-close
+                           :causality})
+(def ^:dynamic *exclude* #{})
+
 (defn check-all [ast-or-lts fmap & {:keys [engine witness]
-                                    :or   {engine :dcj witness true}}]
+                                    :or   {engine *engine* witness *witness*}}]
   (if (= (type ast-or-lts) LTS)
     (condp = engine
       :dcj (let [m (Model. ^LTS ast-or-lts)]
@@ -270,28 +281,20 @@
                                                                          (inc i)
                                                                          (assoc m (keyword (str (name fname) "-" i))
                                                                                   (.toMCRL2 (first conjuncts)))))))
-                                                            fmap)))
-      )
+                                                            fmap))))
     (check-all (lts/lts ast-or-lts) fmap :engine engine :witness witness)))
 
 (defn check-one [ast-or-lts f & {:keys [engine witness]
-                                 :or   {engine :dcj witness true}}]
+                                 :or   {engine *engine* witness *witness*}}]
   (:f (check-all ast-or-lts {:f f} :engine engine :witness witness)))
 
 (defn lint [ast-or-lts & {:keys [engine witness include exclude]
-                          :or   {engine  :dcj
-                                 witness true
-                                 include #{:must-terminate
-                                           :may-terminate
-                                           :cant-terminate
-                                           :close-after-send
-                                           :send-before-close
-                                           :no-act-after-close
-                                           :causality}
-                                 exclude #{}}}]
+                          :or   {engine  *engine*
+                                 witness *witness*
+                                 include *include*
+                                 exclude *exclude*}}]
   (if (= (type ast-or-lts) LTS)
     (let [channels (lts/channels ast-or-lts)
-          ;roles (lts/roles ast-or-lts)
           fmap {:must-terminate     (must-terminate)
                 :may-terminate      (may-terminate)
                 :cant-terminate     (cant-terminate)
