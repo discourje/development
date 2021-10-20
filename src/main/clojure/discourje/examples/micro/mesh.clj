@@ -15,12 +15,12 @@
 
 (s/defsession ::mesh-unbuffered [k]
   (s/* (s/alt-every [i (range k)
-                     j (range k)]
+                     j (remove #{i} (range k))]
          (s/--> Boolean (::worker i) (::worker j)))))
 
 (s/defsession ::mesh-buffered [k]
   (s/par-every [i (range k)
-                j (range k)]
+                j (remove #{i} (range k))]
     (s/* (s/-->> Boolean (::worker i) (::worker j)))))
 
 ;;;;
