@@ -54,31 +54,6 @@
   (print (main/run-all [:clj :dcj]
                        ['discourje.examples.micro.star]
                        {:flags [#{:buffered :inwards}] :k [3] :n [1000]}))
-  (is true)
-  ;
-  ;(print (main/run-all [:clj :dcj]
-  ;                     ['discourje.examples.micro.star]
-  ;                     {:buffered [true] :ordered-sends [true] :ordered-receives [false] :k [2] :secs [0]}))
-  ;(is true)
-  ;
-  ;(print (main/run-all [:clj :dcj]
-  ;                     ['discourje.examples.micro.star]
-  ;                     {:buffered [true] :ordered-sends [false] :ordered-receives [true] :k [2] :secs [0]}))
-  ;(is true)
-  ;
-  ;(print (main/run-all [:clj :dcj]
-  ;                     ['discourje.examples.micro.star]
-  ;                     {:buffered [true] :ordered-sends [false] :ordered-receives [false] :k [2] :secs [0]}))
-  ;(is true)
-  ;
-  ;(print (main/run-all [:clj :dcj]
-  ;                     ['discourje.examples.micro.star]
-  ;                     {:buffered [false] :ordered-sends [true] :k [2] :secs [0]}))
-  ;(is true)
-  ;
-  ;(print (main/run-all [:clj :dcj]
-  ;                     ['discourje.examples.micro.star]
-  ;                     {:buffered [false] :ordered-sends [false] :k [2] :secs [0]}))
   (is true))
 
 (defn- stockfish [os]
