@@ -35,7 +35,6 @@
   (if (empty? statss)
     nil
     (let [n (reduce + (map #(:n %) statss))]
-      (println "FOOOOOO" n)
       (assoc (stats) :n n
                      :big-m (if (> n 0) (reduce + (map #(* (/ (:n %) n) (:big-m %)) statss)))
                      :big-s (if (> n (count statss))
