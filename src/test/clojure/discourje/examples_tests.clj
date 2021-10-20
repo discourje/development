@@ -34,12 +34,27 @@
                        {:buffered [true] :k [3] :n [1000]}))
   (is true)
 
-  ;;; Star
-  ;
-  ;(print (main/run-all [:clj :dcj]
-  ;                     ['discourje.examples.micro.star]
-  ;                     {:buffered [true] :ordered-sends [true] :ordered-receives [true] :k [2] :secs [0]}))
-  ;(is true)
+  ;; Star
+
+  (print (main/run-all [:clj :dcj]
+                       ['discourje.examples.micro.star]
+                       {:flags [#{:unbuffered :outwards}] :k [3] :n [1000]}))
+  (is true)
+
+  (print (main/run-all [:clj :dcj]
+                       ['discourje.examples.micro.star]
+                       {:flags [#{:unbuffered :inwards}] :k [3] :n [1000]}))
+  (is true)
+
+  (print (main/run-all [:clj :dcj]
+                       ['discourje.examples.micro.star]
+                       {:flags [#{:buffered :outwards}] :k [3] :n [1000]}))
+  (is true)
+
+  (print (main/run-all [:clj :dcj]
+                       ['discourje.examples.micro.star]
+                       {:flags [#{:buffered :inwards}] :k [3] :n [1000]}))
+  (is true)
   ;
   ;(print (main/run-all [:clj :dcj]
   ;                     ['discourje.examples.micro.star]
