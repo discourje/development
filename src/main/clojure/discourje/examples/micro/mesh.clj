@@ -3,8 +3,7 @@
             [discourje.core.async]
             [discourje.core.util :as u]
             [discourje.core.spec :as s]
-            [discourje.examples.config :as config]
-            [discourje.examples.timer :as timer]))
+            [discourje.examples.config :as config]))
 
 (config/clj-or-dcj)
 
@@ -12,7 +11,7 @@
 ;;;; Specification
 ;;;;
 
-(s/defrole ::worker "worker")
+(s/defrole ::worker)
 
 (s/defsession ::mesh-unbuffered [k]
   (s/* (s/alt-every [i (range k)
@@ -29,15 +28,11 @@
 ;;;;
 
 (let [input config/*input*
-      resolution (:resolution input)
       buffered (:buffered input)
-      secs (:secs input)
-      k (:k input)]
+      k (:k input)
+      n (:n input)]
 
-  (let [;; Start timer
-        begin (System/nanoTime)
-
-        ;; Create channels
+  (let [;; Create channels
         mesh
         (u/mesh (if buffered (fn [] (a/chan 1)) a/chan) (range k))
 
@@ -50,26 +45,24 @@
 
         ;; Spawn threads
         workers
-        (map (fn [i] (a/thread (let [acts (reduce into [(u/puts mesh [i true] (remove #{i} (range k)))
-                                                        (u/takes mesh (remove #{i} (range k)) i)
-                                                        [(a/timeout 100)]])
-                                     deadline (+ begin (* secs 1000 1000 1000))]
-                                 (loop [not-done true
-                                        timer (timer/timer resolution)]
-                                   (let [[v _] (a/alts!! acts)]
-                                     (if not-done
-                                       (if v
-                                         (recur (< (System/nanoTime) deadline) (timer/tick timer))
-                                         (recur (< (System/nanoTime) deadline) timer))
-                                       timer))))))
-             (range k))
+        (mapv (fn [i] (a/thread (loop [to-put (zipmap (remove #{i} (range k)) (repeat n))
+                                       to-take (zipmap (remove #{i} (range k)) (repeat n))]
+
+                                  (let [keep-fn (fn [[j count]] (if (> count 0) j))
+                                        puts (u/puts mesh [i true] (keep keep-fn to-put))
+                                        takes (u/takes mesh (keep keep-fn to-take) i)
+                                        puts-and-takes (into puts takes)]
+
+                                    (if (not-empty puts-and-takes)
+                                      (let [[_ c] (a/alts!! puts-and-takes)]
+                                        (if (= (u/putter-id mesh c) i)
+                                          (recur (update to-put (u/taker-id mesh c) dec) to-take)
+                                          (recur to-put (update to-take (u/putter-id mesh c) dec)))))))))
+              (range k))
 
         ;; Await termination
         output
-        (timer/report (apply timer/aggregate (map #(a/<!! %) workers)))
+        (doseq [worker workers]
+          (a/<!! worker))]
 
-        ;; Stop timer
-        end (System/nanoTime)]
-
-    (set! config/*output* output)
-    (set! config/*time* (- end begin))))
+    (set! config/*output* output)))
