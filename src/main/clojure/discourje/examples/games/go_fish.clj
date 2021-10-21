@@ -6,9 +6,9 @@
             [discourje.core.lint :as l]
             [discourje.examples.config :as config]))
 
-;;;;
-;;;; Data types
-;;;;
+;;;;;
+;;;;; Data types
+;;;;;
 
 (defrecord Card [suit rank]
   Object
@@ -21,9 +21,9 @@
 
 (defrecord OutOfCards [])
 
-;;;;
-;;;; Specification
-;;;;
+;;;;;
+;;;;; Specification
+;;;;;
 
 (s/defrole ::dealer)
 (s/defrole ::player)
@@ -62,9 +62,9 @@
 (when (some? config/*lint*)
   (set! config/*output* (l/lint (spec))))
 
-;;;;
-;;;; Implementation
-;;;;
+;;;;;
+;;;;; Implementation
+;;;;;
 
 (config/clj-or-dcj)
 
