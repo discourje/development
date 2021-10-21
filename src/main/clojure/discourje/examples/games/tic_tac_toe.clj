@@ -2,13 +2,12 @@
   (:require [clojure.core.async]
             [discourje.core.async]
             [discourje.core.spec :as s]
+            [discourje.core.lint :as l]
             [discourje.examples.config :as config]))
 
-(config/clj-or-dcj)
-
-;;;;
-;;;; Specification
-;;;;
+;;;;;
+;;;;; Specification
+;;;;;
 
 (s/defrole ::alice)
 (s/defrole ::bob)
@@ -23,9 +22,16 @@
          (s/par (s/close r1 r2)
                 (s/close r2 r1))))
 
-;;;;
-;;;; Implementation
-;;;;
+(defn spec [] (tic-tac-toe))
+
+(when (some? config/*lint*)
+  (set! config/*output* (l/lint (spec))))
+
+;;;;;
+;;;;; Implementation
+;;;;;
+
+(config/clj-or-dcj)
 
 (def blank " ")
 (def cross "x")
@@ -71,59 +77,51 @@
   (println "+---+---+---+")
   (println))
 
-(let [input config/*input*
-      _ (:resolution input)]
+(when (some? config/*run*)
+  (let [input config/*input*]
 
-  (let [;; Start timer
-        begin (System/nanoTime)
+    (let [;; Create channels
+          a->b (a/chan)
+          b->a (a/chan)
 
-        ;; Create channels
-        a->b (a/chan)
-        b->a (a/chan)
+          ;; Link monitor [optional]
+          _
+          (if (= config/*run* :dcj)
+            (let [m (a/monitor (spec))]
+              (a/link a->b alice bob m)
+              (a/link b->a bob alice m)))
 
-        ;; Link monitor [optional]
-        _
-        (if (= config/*lib* :dcj)
-          (let [s (tic-tac-toe)
-                m (a/monitor s)]
-            (a/link a->b alice bob m)
-            (a/link b->a bob alice m)))
+          ;; Spawn threads
+          alice
+          (a/thread (loop [g initial-grid]
+                      (let [i (get-blank g)
+                            g (put g i cross)]
+                        (a/>!! a->b i)
+                        (if (not-final? g)
+                          (let [i (a/<!! b->a)
+                                g (put g i nought)]
+                            (if (not-final? g)
+                              (recur g)))
+                          (println-grid g))))
+                    (a/close! a->b))
 
-        ;; Spawn threads
-        alice
-        (a/thread (loop [g initial-grid]
-                    (let [i (get-blank g)
-                          g (put g i cross)]
-                      (a/>!! a->b i)
-                      (if (not-final? g)
-                        (let [i (a/<!! b->a)
-                              g (put g i nought)]
-                          (if (not-final? g)
-                            (recur g)))
-                        (println-grid g))))
-                  (a/close! a->b))
+          bob
+          (a/thread (loop [g initial-grid]
+                      (let [i (a/<!! a->b)
+                            g (put g i cross)]
+                        (if (not-final? g)
+                          (let [i (get-blank g)
+                                g (put g i nought)]
+                            (a/>!! b->a i)
+                            (if (not-final? g)
+                              (recur g)
+                              (println-grid g))))))
+                    (a/close! b->a))
 
-        bob
-        (a/thread (loop [g initial-grid]
-                    (let [i (a/<!! a->b)
-                          g (put g i cross)]
-                      (if (not-final? g)
-                        (let [i (get-blank g)
-                              g (put g i nought)]
-                          (a/>!! b->a i)
-                          (if (not-final? g)
-                            (recur g)
-                            (println-grid g))))))
-                  (a/close! b->a))
+          ;; Await termination
+          output
+          (do (a/<!! alice)
+              (a/<!! bob)
+              nil)]
 
-        ;; Await termination
-        output
-        (do (a/<!! alice)
-            (a/<!! bob)
-            nil)
-
-        ;; Stop timer
-        end (System/nanoTime)]
-
-    (set! config/*output* output)
-    (set! config/*time* (- end begin))))
+      (set! config/*output* output))))
