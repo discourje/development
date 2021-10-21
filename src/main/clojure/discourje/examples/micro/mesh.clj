@@ -6,11 +6,9 @@
             [discourje.core.lint :as l]
             [discourje.examples.config :as config]))
 
-(config/clj-or-dcj)
-
-;;;;
-;;;; Specification
-;;;;
+;;;;;
+;;;;; Specification
+;;;;;
 
 (s/defrole ::worker)
 
@@ -24,10 +22,6 @@
                 j (remove #{i} (range k))]
     (s/* (s/-->> Boolean (::worker i) (::worker j)))))
 
-;;;;
-;;;; Implementation
-;;;;
-
 (defn spec []
   (condp = (:flags config/*input*)
     #{:unbuffered}
@@ -35,10 +29,14 @@
     #{:buffered}
     (mesh-buffered (:k config/*input*))))
 
-(config/clj-or-dcj)
-
 (when (some? config/*lint*)
   (set! config/*output* (l/lint (spec))))
+
+;;;;;
+;;;;; Implementation
+;;;;;
+
+(config/clj-or-dcj)
 
 (when (some? config/*run*)
   (let [input config/*input*

@@ -8,9 +8,9 @@
 
 (config/clj-or-dcj)
 
-;;;;
-;;;; Specification
-;;;;
+;;;;;
+;;;;; Specification
+;;;;;
 
 (s/defrole ::master)
 (s/defrole ::worker)
@@ -31,10 +31,6 @@
   (s/par-every [i (range k)]
     (s/* (s/-->> Boolean (::worker i) ::master))))
 
-;;;;
-;;;; Implementation
-;;;;
-
 (defn spec []
   (condp = (:flags config/*input*)
     #{:unbuffered :outwards}
@@ -46,10 +42,14 @@
     #{:buffered :inwards}
     (star-buffered-inwards (:k config/*input*))))
 
-(config/clj-or-dcj)
-
 (when (some? config/*lint*)
   (set! config/*output* (l/lint (spec))))
+
+;;;;;
+;;;;; Implementation
+;;;;;
+
+(config/clj-or-dcj)
 
 (when (some? config/*run*)
   (let [input config/*input*

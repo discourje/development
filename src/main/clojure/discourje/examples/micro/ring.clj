@@ -6,9 +6,9 @@
             [discourje.core.lint :as l]
             [discourje.examples.config :as config]))
 
-;;;;
-;;;; Specification
-;;;;
+;;;;;
+;;;;; Specification
+;;;;;
 
 (s/defrole ::worker)
 
@@ -20,10 +20,6 @@
   (s/* (s/cat-every [i (range k)]
          (s/-->> Boolean (::worker i) (::worker (mod (inc i) k))))))
 
-;;;;
-;;;; Implementation
-;;;;
-
 (defn spec []
   (condp = (:flags config/*input*)
     #{:unbuffered}
@@ -31,10 +27,14 @@
     #{:buffered}
     (ring-buffered (:k config/*input*))))
 
-(config/clj-or-dcj)
-
 (when (some? config/*lint*)
   (set! config/*output* (l/lint (spec))))
+
+;;;;;
+;;;;; Implementation
+;;;;;
+
+(config/clj-or-dcj)
 
 (when (some? config/*run*)
   (let [input config/*input*
