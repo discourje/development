@@ -170,27 +170,27 @@
                     {:stockfish (stockfish :mac) :turns-per-player 1 :time-per-player 0}))
   (is true))
 
-;(deftest games-go-fish-tests
-;
-;  (print (main/main {:run :clj}
-;                    'discourje.examples.games.go-fish
-;                    {:k 3}))
-;  (is true)
-;
-;  (print (main/main {:run :dcj}
-;                    'discourje.examples.games.go-fish
-;                    {:k 3}))
-;  (is true)
-;
-;  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
-;                    'discourje.examples.games.go-fish
-;                    {:k 3}))
-;  (is true)
-;
-;  (print (main/main (merge {:lint :dcj} lint lint-dcj)
-;                    'discourje.examples.games.go-fish
-;                    {:k 3}))
-;  (is true))
+(deftest games-go-fish-tests
+
+  (print (main/main {:run :clj}
+                    'discourje.examples.games.go-fish
+                    {:k 3}))
+  (is true)
+
+  (print (main/main {:run :dcj}
+                    'discourje.examples.games.go-fish
+                    {:k 3}))
+  (is true)
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.games.go-fish
+                    {:k 3}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.games.go-fish
+                    {:k 3}))
+  (is true))
 
 ;(deftest games-rock-paper-scissors-tests
 ;
