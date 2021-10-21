@@ -192,27 +192,27 @@
                     {:k 3}))
   (is true))
 
-;(deftest games-rock-paper-scissors-tests
-;
-;  (print (main/main {:run :clj}
-;                    'discourje.examples.games.rock-paper-scissors
-;                    {:k 3}))
-;  (is true)
-;
-;  (print (main/main {:run :dcj}
-;                    'discourje.examples.games.rock-paper-scissors
-;                    {:k 3}))
-;  (is true)
-;
-;  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
-;                    'discourje.examples.games.rock-paper-scissors
-;                    {:k 3}))
-;  (is true)
-;
-;  (print (main/main (merge {:lint :dcj} lint lint-dcj)
-;                    'discourje.examples.games.rock-paper-scissors
-;                    {:k 3}))
-;  (is true))
+(deftest games-rock-paper-scissors-tests
+
+  (print (main/main {:run :clj}
+                    'discourje.examples.games.rock-paper-scissors
+                    {:k 3}))
+  (is true)
+
+  (print (main/main {:run :dcj}
+                    'discourje.examples.games.rock-paper-scissors
+                    {:k 3}))
+  (is true)
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.games.rock-paper-scissors
+                    {:k 3}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.games.rock-paper-scissors
+                    {:k 3}))
+  (is true))
 
 (deftest games-tic-tac-toe-tests
 
