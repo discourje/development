@@ -14,7 +14,131 @@
                  :mcrl2-bin "/Applications/mCRL2.app/Contents/bin",
                  :mcrl2-tmp "/Users/sungshik/Desktop/tmp"})
 
-(deftest micro.ring-tests
+(deftest da-awerbuch-tests
+
+  ;; Ring
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.da.awerbuch
+                    {:topology :ring, :k 3, :initiator 0}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.da.awerbuch
+                    {:topology :ring, :k 3, :initiator 0}))
+  (is true)
+
+  ;; Tree
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.da.awerbuch
+                    {:topology :tree, :k 3, :initiator 0}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.da.awerbuch
+                    {:topology :tree, :k 3, :initiator 0}))
+  (is true)
+
+  ;; 2d-Mesh
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.da.awerbuch
+                    {:topology :mesh-2d, :k 3, :initiator 0}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.da.awerbuch
+                    {:topology :mesh-2d, :k 3, :initiator 0}))
+  (is true)
+
+  ;; Star
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.da.awerbuch
+                    {:topology :star, :k 3, :initiator 0}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.da.awerbuch
+                    {:topology :star, :k 3, :initiator 0}))
+  (is true)
+
+  ;; Full Mesh
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.da.awerbuch
+                    {:topology :mesh-full, :k 3, :initiator 0}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.da.awerbuch
+                    {:topology :mesh-full, :k 3, :initiator 0}))
+  (is true))
+
+(deftest da-cheung-tests
+
+  ;; Ring
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.da.cheung
+                    {:topology :ring, :k 3, :initiator 0}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.da.cheung
+                    {:topology :ring, :k 3, :initiator 0}))
+  (is true)
+
+  ;; Tree
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.da.cheung
+                    {:topology :tree, :k 3, :initiator 0}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.da.cheung
+                    {:topology :tree, :k 3, :initiator 0}))
+  (is true)
+
+  ;; 2d-Mesh
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.da.cheung
+                    {:topology :mesh-2d, :k 3, :initiator 0}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.da.cheung
+                    {:topology :mesh-2d, :k 3, :initiator 0}))
+  (is true)
+
+  ;; Star
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.da.cheung
+                    {:topology :star, :k 3, :initiator 0}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.da.cheung
+                    {:topology :star, :k 3, :initiator 0}))
+  (is true)
+
+  ;; Full Mesh
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.da.cheung
+                    {:topology :mesh-full, :k 3, :initiator 0}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.da.cheung
+                    {:topology :mesh-full, :k 3, :initiator 0}))
+  (is true))
+
+(deftest micro-ring-tests
 
   ;; Unbuffered
 
@@ -62,7 +186,7 @@
                     {:flags #{:buffered}, :k 3}))
   (is true))
 
-(deftest micro.mesh-tests
+(deftest micro-mesh-tests
 
   ;; Unbuffered
 
@@ -108,7 +232,7 @@
                     {:flags #{:buffered}, :k 3}))
   (is true))
 
-(deftest micro.star-tests
+(deftest micro-star-tests
 
   ;; Unbuffered, Outwards
 
