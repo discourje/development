@@ -6,9 +6,9 @@
             [discourje.examples.config :as config])
   (:import (discourje.examples.games.impl.chess Engine)))
 
-;;;;
-;;;; Specification
-;;;;
+;;;;;
+;;;;; Specification
+;;;;;
 
 (s/defrole ::white)
 (s/defrole ::black)
@@ -27,9 +27,9 @@
 (when (some? config/*lint*)
   (set! config/*output* (l/lint (spec))))
 
-;;;;
-;;;; Implementation
-;;;;
+;;;;;
+;;;;; Implementation
+;;;;;
 
 (config/clj-or-dcj)
 
