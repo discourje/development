@@ -420,47 +420,94 @@
                     {:flags #{:buffered :inwards}, :k 3}))
   (is true))
 
-;(deftest games-tests
-;
-;  ;; Tic-Tac-Toe
-;
-;  (print (main/run-all [:clj :dcj]
-;                       ['discourje.examples.games.tic-tac-toe]
-;                       {}))
-;  (is true)
-;
-;  ;; Rock-Paper-Scissors
-;
-;  (print (main/run-all [:clj :dcj]
-;                       ['discourje.examples.games.rock-paper-scissors]
-;                       {:k [3]}))
-;  (is true)
-;
-;  ;; Go Fish
-;
-;  (print (main/run-all [:clj :dcj]
-;                       ['discourje.examples.games.go-fish]
-;                       {:k [3]}))
-;  (is true))
-;
-;(deftest npb3-tests
-;
-;  (print (main/run-all [:clj :dcj]
-;                       ['discourje.examples.npb3.cg]
-;                       {:k [3] :class ['w] :secs [0]}))
-;  (is true)
-;
-;  (print (main/run-all [:clj :dcj]
-;                       ['discourje.examples.npb3.ft]
-;                       {:k [3] :class ['w] :secs [0]}))
-;  (is true)
-;
-;  (print (main/run-all [:clj :dcj]
-;                       ['discourje.examples.npb3.is]
-;                       {:k [3] :class ['w] :secs [0]}))
-;  (is true)
-;
-;  (print (main/run-all [:clj :dcj]
-;                       ['discourje.examples.npb3.cg]
-;                       {:k [3] :class ['w] :secs [0]}))
-;  (is true))
+(deftest npb3-cg-tests
+
+  (print (main/main {:run :clj}
+                    'discourje.examples.npb3.cg
+                    {:k 3, :class 'w, :verbose false}))
+  (is true)
+
+  (print (main/main {:run :dcj}
+                    'discourje.examples.npb3.cg
+                    {:k 3, :class 'w, :verbose false}))
+  (is true)
+
+  ;(print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+  ;                  'discourje.examples.npb3.cg
+  ;                  {:k 3}))
+  ;(is true)
+  ;
+  ;(print (main/main (merge {:lint :dcj} lint lint-dcj)
+  ;                  'discourje.examples.npb3.cg
+  ;                  {:k 3}))
+  ;(is true))
+  )
+
+(deftest npb3-ft-tests
+
+  (print (main/main {:run :clj}
+                    'discourje.examples.npb3.ft
+                    {:k 3, :class 'w, :verbose false}))
+  (is true)
+
+  (print (main/main {:run :dcj}
+                    'discourje.examples.npb3.ft
+                    {:k 3, :class 'w, :verbose false}))
+  (is true)
+
+  ;(print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+  ;                  'discourje.examples.npb3.cg
+  ;                  {:k 3}))
+  ;(is true)
+  ;
+  ;(print (main/main (merge {:lint :dcj} lint lint-dcj)
+  ;                  'discourje.examples.npb3.cg
+  ;                  {:k 3}))
+  ;(is true))
+  )
+
+(deftest npb3-is-tests
+
+  (print (main/main {:run :clj}
+                    'discourje.examples.npb3.is
+                    {:k 3, :class 'w, :verbose false}))
+  (is true)
+
+  (print (main/main {:run :dcj}
+                    'discourje.examples.npb3.is
+                    {:k 3, :class 'w, :verbose false}))
+  (is true)
+
+  ;(print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+  ;                  'discourje.examples.npb3.cg
+  ;                  {:k 3}))
+  ;(is true)
+  ;
+  ;(print (main/main (merge {:lint :dcj} lint lint-dcj)
+  ;                  'discourje.examples.npb3.cg
+  ;                  {:k 3}))
+  ;(is true))
+  )
+
+(deftest npb3-mg-tests
+
+  (print (main/main {:run :clj}
+                    'discourje.examples.npb3.mg
+                    {:k 3, :class 'w, :verbose false}))
+  (is true)
+
+  (print (main/main {:run :dcj}
+                    'discourje.examples.npb3.mg
+                    {:k 3, :class 'w, :verbose false}))
+  (is true)
+
+  ;(print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+  ;                  'discourje.examples.npb3.cg
+  ;                  {:k 3}))
+  ;(is true)
+  ;
+  ;(print (main/main (merge {:lint :dcj} lint lint-dcj)
+  ;                  'discourje.examples.npb3.cg
+  ;                  {:k 3}))
+  ;(is true))
+  )

@@ -2,16 +2,14 @@
   (:require [clojure.core.async]
             [discourje.core.async]
             [discourje.core.spec :as s]
-            [discourje.examples.config :as config]
-            [discourje.examples.timer :as timer])
+            [discourje.core.lint :as l]
+            [discourje.examples.config :as config])
   (:import (discourje.examples.npb3 Config)
            (discourje.examples.npb3.impl CG)))
 
-(config/clj-or-dcj)
-
-;;;;
-;;;; Specification
-;;;;
+;;;;;
+;;;;; Specification
+;;;;;
 
 (s/defrole ::master)
 (s/defrole ::worker)
@@ -41,39 +39,33 @@
 ;         (s/cat-every [i (range k)]
 ;           (s/close (::worker i) ::master))))
 
-;;;;
-;;;; Implementation
-;;;;
+(defn spec []
+  (cg (:k config/*input*)))
 
-(let [input config/*input*
-      resolution (:resolution input)
-      secs (:secs input)
-      k (:k input)
-      class (:class input)
-      verbose (:verbose input)]
+(when (some? config/*lint*)
+  (set! config/*output* (l/lint (spec))))
 
-  (let [;; Start timer
-        begin (System/nanoTime)
-        deadline (+ begin (* secs 1000 1000 1000))
+;;;;;
+;;;;; Implementation
+;;;;;
 
-        ;; Configure
-        _ (do (Config/verbose verbose)
-              (case config/*lib*
-                :clj (Config/clj)
-                :dcj (Config/dcj)
-                :dcj-nil (Config/dcjNil)))
+(config/clj-or-dcj)
 
-        ;; Run
-        output (loop [not-done true
-                      timer (timer/timer resolution)]
-                 (if not-done
-                   (do (CG/main (into-array String [(str "np=" k) (str "CLASS=" class)]))
-                       (recur (< (System/nanoTime) deadline) (timer/tick timer)))
-                   (timer/report timer)))
+(when (some? config/*run*)
+  (let [input config/*input*
+        k (:k input)
+        class (:class input)
+        verbose (:verbose input)]
 
-        ;; Stop timer
-        end (System/nanoTime)]
+    (let [;; Configure
+          _ (do (Config/verbose verbose)
+                (case config/*run*
+                  :clj (Config/clj)
+                  :dcj (Config/dcj)
+                  :dcj-nil (Config/dcjNil)))
 
-    (Config/verbose true)
-    (set! config/*output* output)
-    (set! config/*time* (- end begin))))
+          ;; Run
+          output (CG/main (into-array String [(str "np=" k) (str "CLASS=" class)]))]
+
+      (Config/verbose true)
+      (set! config/*output* output))))
