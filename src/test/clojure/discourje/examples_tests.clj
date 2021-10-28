@@ -8,125 +8,506 @@
   (prn)
   (p/pprint x))
 
-(deftest micro-tests
-
-  ;; Ring
-
-  (print (main/run-all [:clj :dcj]
-                       ['discourje.examples.micro.ring]
-                       {:buffered [true] :k [2] :secs [0]}))
-  (is true)
-
-  (print (main/run-all [:clj :dcj]
-                       ['discourje.examples.micro.ring]
-                       {:buffered [false] :k [2] :secs [0]}))
-  (is true)
-
-  ;; Mesh
-
-  (print (main/run-all [:clj :dcj]
-                       ['discourje.examples.micro.mesh]
-                       {:buffered [true] :k [2] :secs [0]}))
-  (is true)
-
-  (print (main/run-all [:clj :dcj]
-                       ['discourje.examples.micro.mesh]
-                       {:buffered [false] :k [2] :secs [0]}))
-  (is true)
-
-  ;; Star
-
-  (print (main/run-all [:clj :dcj]
-                       ['discourje.examples.micro.star]
-                       {:buffered [true] :ordered-sends [true] :ordered-receives [true] :k [2] :secs [0]}))
-  (is true)
-
-  (print (main/run-all [:clj :dcj]
-                       ['discourje.examples.micro.star]
-                       {:buffered [true] :ordered-sends [true] :ordered-receives [false] :k [2] :secs [0]}))
-  (is true)
-
-  (print (main/run-all [:clj :dcj]
-                       ['discourje.examples.micro.star]
-                       {:buffered [true] :ordered-sends [false] :ordered-receives [true] :k [2] :secs [0]}))
-  (is true)
-
-  (print (main/run-all [:clj :dcj]
-                       ['discourje.examples.micro.star]
-                       {:buffered [true] :ordered-sends [false] :ordered-receives [false] :k [2] :secs [0]}))
-  (is true)
-
-  (print (main/run-all [:clj :dcj]
-                       ['discourje.examples.micro.star]
-                       {:buffered [false] :ordered-sends [true] :k [2] :secs [0]}))
-  (is true)
-
-  (print (main/run-all [:clj :dcj]
-                       ['discourje.examples.micro.star]
-                       {:buffered [false] :ordered-sends [false] :k [2] :secs [0]}))
-  (is true))
-
 (defn- stockfish [os]
   (str (System/getProperty "user.dir") "/"
        "src/main/java/"
        "discourje/examples/games/impl/chess/"
-       (cond (= os "linux")
-             "stockfish-linux"
-             (= os "mac")
-             "stockfish-mac"
-             (= os "win32")
-             "stockfish-win32.exe"
-             (= os "win64'")
-             "stockfish-win64.exe")))
+       (case os
+         :linux "stockfish-linux"
+         :mac "stockfish-mac"
+         :win32 "stockfish-win32.exe"
+         :win64 "stockfish-win64.exe")))
 
-(deftest games-tests
+(def lint {:witness false, :exclude #{:send-before-close :causality}})
+(def lint-dcj {:lint :dcj})
+(def lint-mcrl2 {:lint      :mcrl2,
+                 :mcrl2-bin "/Applications/mCRL2.app/Contents/bin",
+                 :mcrl2-tmp "/Users/sungshik/Desktop/tmp"})
 
-  ;; Tic-Tac-Toe
+(deftest da-awerbuch-tests
 
-  (print (main/run-all [:clj :dcj]
-                       ['discourje.examples.games.tic-tac-toe]
-                       {}))
+  ;; Ring
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.da.awerbuch
+                    {:topology :ring, :k 3, :initiator 0}))
   (is true)
 
-  ;; Chess
-
-  (print (main/run-all [:clj :dcj]
-                       ['discourje.examples.games.chess]
-                       {:stockfish [(stockfish "mac")] :turns-per-player [1] :time-per-player [0]}))
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.da.awerbuch
+                    {:topology :ring, :k 3, :initiator 0}))
   (is true)
 
-  ;; Rock-Paper-Scissors
+  ;; Tree
 
-  (print (main/run-all [:clj :dcj]
-                       ['discourje.examples.games.rock-paper-scissors]
-                       {:k [3]}))
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.da.awerbuch
+                    {:topology :tree, :k 3, :initiator 0}))
   (is true)
 
-  ;; Go Fish
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.da.awerbuch
+                    {:topology :tree, :k 3, :initiator 0}))
+  (is true)
 
-  (print (main/run-all [:clj :dcj]
-                       ['discourje.examples.games.go-fish]
-                       {:k [3]}))
+  ;; 2d-Mesh
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.da.awerbuch
+                    {:topology :mesh-2d, :k 3, :initiator 0}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.da.awerbuch
+                    {:topology :mesh-2d, :k 3, :initiator 0}))
+  (is true)
+
+  ;; Star
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.da.awerbuch
+                    {:topology :star, :k 3, :initiator 0}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.da.awerbuch
+                    {:topology :star, :k 3, :initiator 0}))
+  (is true)
+
+  ;; Full Mesh
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.da.awerbuch
+                    {:topology :mesh-full, :k 3, :initiator 0}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.da.awerbuch
+                    {:topology :mesh-full, :k 3, :initiator 0}))
   (is true))
 
-(deftest npb3-tests
+(deftest da-cheung-tests
 
-  (print (main/run-all [:clj :dcj]
-                       ['discourje.examples.npb3.cg]
-                       {:k [3] :class ['w] :secs [0]}))
+  ;; Ring
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.da.cheung
+                    {:topology :ring, :k 3, :initiator 0}))
   (is true)
 
-  (print (main/run-all [:clj :dcj]
-                       ['discourje.examples.npb3.ft]
-                       {:k [3] :class ['w] :secs [0]}))
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.da.cheung
+                    {:topology :ring, :k 3, :initiator 0}))
   (is true)
 
-  (print (main/run-all [:clj :dcj]
-                       ['discourje.examples.npb3.is]
-                       {:k [3] :class ['w] :secs [0]}))
+  ;; Tree
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.da.cheung
+                    {:topology :tree, :k 3, :initiator 0}))
   (is true)
 
-  (print (main/run-all [:clj :dcj]
-                       ['discourje.examples.npb3.cg]
-                       {:k [3] :class ['w] :secs [0]}))
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.da.cheung
+                    {:topology :tree, :k 3, :initiator 0}))
+  (is true)
+
+  ;; 2d-Mesh
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.da.cheung
+                    {:topology :mesh-2d, :k 3, :initiator 0}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.da.cheung
+                    {:topology :mesh-2d, :k 3, :initiator 0}))
+  (is true)
+
+  ;; Star
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.da.cheung
+                    {:topology :star, :k 3, :initiator 0}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.da.cheung
+                    {:topology :star, :k 3, :initiator 0}))
+  (is true)
+
+  ;; Full Mesh
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.da.cheung
+                    {:topology :mesh-full, :k 3, :initiator 0}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.da.cheung
+                    {:topology :mesh-full, :k 3, :initiator 0}))
   (is true))
+
+(deftest games-chess-tests
+
+  (print (main/main {:run :clj}
+                    'discourje.examples.games.chess
+                    {:stockfish (stockfish :mac) :turns-per-player 1 :time-per-player 0}))
+  (is true)
+
+  (print (main/main {:run :dcj}
+                    'discourje.examples.games.chess
+                    {:stockfish (stockfish :mac) :turns-per-player 1 :time-per-player 0}))
+  (is true)
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.games.chess
+                    {:stockfish (stockfish :mac) :turns-per-player 1 :time-per-player 0}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.games.chess
+                    {:stockfish (stockfish :mac) :turns-per-player 1 :time-per-player 0}))
+  (is true))
+
+(deftest games-go-fish-tests
+
+  (print (main/main {:run :clj}
+                    'discourje.examples.games.go-fish
+                    {:k 3}))
+  (is true)
+
+  (print (main/main {:run :dcj}
+                    'discourje.examples.games.go-fish
+                    {:k 3}))
+  (is true)
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.games.go-fish
+                    {:k 3}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.games.go-fish
+                    {:k 3}))
+  (is true))
+
+(deftest games-rock-paper-scissors-tests
+
+  (print (main/main {:run :clj}
+                    'discourje.examples.games.rock-paper-scissors
+                    {:k 3}))
+  (is true)
+
+  (print (main/main {:run :dcj}
+                    'discourje.examples.games.rock-paper-scissors
+                    {:k 3}))
+  (is true)
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.games.rock-paper-scissors
+                    {:k 3}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.games.rock-paper-scissors
+                    {:k 3}))
+  (is true))
+
+(deftest games-tic-tac-toe-tests
+
+  (print (main/main {:run :clj}
+                    'discourje.examples.games.tic-tac-toe
+                    {}))
+  (is true)
+
+  (print (main/main {:run :dcj}
+                    'discourje.examples.games.tic-tac-toe
+                    {}))
+  (is true)
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.games.tic-tac-toe
+                    {}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.games.tic-tac-toe
+                    {}))
+  (is true))
+
+(deftest micro-ring-tests
+
+  ;; Unbuffered
+
+  (print (main/main {:run :clj}
+                    'discourje.examples.micro.ring
+                    {:flags #{:unbuffered}, :k 3, :n 1000}))
+  (is true)
+
+  (print (main/main {:run :dcj}
+                    'discourje.examples.micro.ring
+                    {:flags #{:unbuffered}, :k 3, :n 1000}))
+  (is true)
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.micro.ring
+                    {:flags #{:unbuffered}, :k 3}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.micro.ring
+                    {:flags #{:unbuffered}, :k 3}))
+  (is true)
+
+  ;;
+  ;; Buffered
+  ;;
+
+  (print (main/main {:run :clj}
+                    'discourje.examples.micro.ring
+                    {:flags #{:buffered}, :k 3, :n 1000}))
+  (is true)
+
+  (print (main/main {:run :dcj}
+                    'discourje.examples.micro.ring
+                    {:flags #{:buffered}, :k 3, :n 1000}))
+  (is true)
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.micro.ring
+                    {:flags #{:buffered}, :k 3}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.micro.ring
+                    {:flags #{:buffered}, :k 3}))
+  (is true))
+
+(deftest micro-mesh-tests
+
+  ;; Unbuffered
+
+  (print (main/main {:run :clj}
+                    'discourje.examples.micro.mesh
+                    {:flags #{:unbuffered}, :k 3, :n 1000}))
+  (is true)
+
+  (print (main/main {:run :dcj}
+                    'discourje.examples.micro.mesh
+                    {:flags #{:unbuffered}, :k 3, :n 1000}))
+  (is true)
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.micro.mesh
+                    {:flags #{:unbuffered}, :k 3}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.micro.mesh
+                    {:flags #{:unbuffered}, :k 3}))
+  (is true)
+
+  ;; Buffered
+
+  (print (main/main {:run :clj}
+                    'discourje.examples.micro.mesh
+                    {:flags #{:buffered}, :k 3, :n 1000}))
+  (is true)
+
+  (print (main/main {:run :dcj}
+                    'discourje.examples.micro.mesh
+                    {:flags #{:buffered}, :k 3, :n 1000}))
+  (is true)
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.micro.mesh
+                    {:flags #{:buffered}, :k 3}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.micro.mesh
+                    {:flags #{:buffered}, :k 3}))
+  (is true))
+
+(deftest micro-star-tests
+
+  ;; Unbuffered, Outwards
+
+  (print (main/main {:run :clj}
+                    'discourje.examples.micro.star
+                    {:flags #{:unbuffered :outwards}, :k 3, :n 1000}))
+  (is true)
+
+  (print (main/main {:run :dcj}
+                    'discourje.examples.micro.star
+                    {:flags #{:unbuffered :outwards}, :k 3, :n 1000}))
+  (is true)
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.micro.star
+                    {:flags #{:unbuffered :outwards}, :k 3}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.micro.star
+                    {:flags #{:unbuffered :outwards}, :k 3}))
+  (is true)
+
+  ;; Unbuffered, Inwards
+
+  (print (main/main {:run :clj}
+                    'discourje.examples.micro.star
+                    {:flags #{:unbuffered :inwards}, :k 3, :n 1000}))
+  (is true)
+
+  (print (main/main {:run :dcj}
+                    'discourje.examples.micro.star
+                    {:flags #{:unbuffered :inwards}, :k 3, :n 1000}))
+  (is true)
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.micro.star
+                    {:flags #{:unbuffered :inwards}, :k 3}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.micro.star
+                    {:flags #{:unbuffered :inwards}, :k 3}))
+  (is true)
+
+  ;; Buffered, Outwards
+
+  (print (main/main {:run :clj}
+                    'discourje.examples.micro.star
+                    {:flags #{:buffered :outwards}, :k 3, :n 1000}))
+  (is true)
+
+  (print (main/main {:run :dcj}
+                    'discourje.examples.micro.star
+                    {:flags #{:buffered :outwards}, :k 3, :n 1000}))
+  (is true)
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.micro.star
+                    {:flags #{:buffered :outwards}, :k 3}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.micro.star
+                    {:flags #{:buffered :outwards}, :k 3}))
+  (is true)
+
+  ;; Buffered, Inwards
+
+  (print (main/main {:run :clj}
+                    'discourje.examples.micro.star
+                    {:flags #{:buffered :inwards}, :k 3, :n 1000}))
+  (is true)
+
+  (print (main/main {:run :dcj}
+                    'discourje.examples.micro.star
+                    {:flags #{:buffered :inwards}, :k 3, :n 1000}))
+  (is true)
+
+  (print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+                    'discourje.examples.micro.star
+                    {:flags #{:buffered :inwards}, :k 3}))
+  (is true)
+
+  (print (main/main (merge {:lint :dcj} lint lint-dcj)
+                    'discourje.examples.micro.star
+                    {:flags #{:buffered :inwards}, :k 3}))
+  (is true))
+
+(deftest npb3-cg-tests
+
+  (print (main/main {:run :clj}
+                    'discourje.examples.npb3.cg
+                    {:k 3, :class 'w, :verbose false}))
+  (is true)
+
+  (print (main/main {:run :dcj}
+                    'discourje.examples.npb3.cg
+                    {:k 3, :class 'w, :verbose false}))
+  (is true)
+
+  ;(print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+  ;                  'discourje.examples.npb3.cg
+  ;                  {:k 3}))
+  ;(is true)
+  ;
+  ;(print (main/main (merge {:lint :dcj} lint lint-dcj)
+  ;                  'discourje.examples.npb3.cg
+  ;                  {:k 3}))
+  ;(is true))
+  )
+
+(deftest npb3-ft-tests
+
+  (print (main/main {:run :clj}
+                    'discourje.examples.npb3.ft
+                    {:k 3, :class 'w, :verbose false}))
+  (is true)
+
+  (print (main/main {:run :dcj}
+                    'discourje.examples.npb3.ft
+                    {:k 3, :class 'w, :verbose false}))
+  (is true)
+
+  ;(print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+  ;                  'discourje.examples.npb3.cg
+  ;                  {:k 3}))
+  ;(is true)
+  ;
+  ;(print (main/main (merge {:lint :dcj} lint lint-dcj)
+  ;                  'discourje.examples.npb3.cg
+  ;                  {:k 3}))
+  ;(is true))
+  )
+
+(deftest npb3-is-tests
+
+  (print (main/main {:run :clj}
+                    'discourje.examples.npb3.is
+                    {:k 3, :class 'w, :verbose false}))
+  (is true)
+
+  (print (main/main {:run :dcj}
+                    'discourje.examples.npb3.is
+                    {:k 3, :class 'w, :verbose false}))
+  (is true)
+
+  ;(print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+  ;                  'discourje.examples.npb3.cg
+  ;                  {:k 3}))
+  ;(is true)
+  ;
+  ;(print (main/main (merge {:lint :dcj} lint lint-dcj)
+  ;                  'discourje.examples.npb3.cg
+  ;                  {:k 3}))
+  ;(is true))
+  )
+
+(deftest npb3-mg-tests
+
+  (print (main/main {:run :clj}
+                    'discourje.examples.npb3.mg
+                    {:k 3, :class 'w, :verbose false}))
+  (is true)
+
+  (print (main/main {:run :dcj}
+                    'discourje.examples.npb3.mg
+                    {:k 3, :class 'w, :verbose false}))
+  (is true)
+
+  ;(print (main/main (merge {:lint :mcrl2} lint lint-mcrl2)
+  ;                  'discourje.examples.npb3.cg
+  ;                  {:k 3}))
+  ;(is true)
+  ;
+  ;(print (main/main (merge {:lint :dcj} lint lint-dcj)
+  ;                  'discourje.examples.npb3.cg
+  ;                  {:k 3}))
+  ;(is true))
+  )

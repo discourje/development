@@ -3,13 +3,12 @@
             [discourje.core.async]
             [discourje.core.util :as u]
             [discourje.core.spec :as s]
+            [discourje.core.lint :as l]
             [discourje.examples.config :as config]))
 
-(config/clj-or-dcj)
-
-;;;;
-;;;; Specification
-;;;;
+;;;;;
+;;;;; Specification
+;;;;;
 
 (s/defrole ::player)
 
@@ -28,9 +27,17 @@
                                     j (s/disj (s/union ids co-ids) i)]
                         (s/close (::player i) (::player j)))))))))
 
-;;;;
-;;;; Implementation
-;;;;
+(defn spec []
+  (rock-paper-scissors (set (range (:k config/*input*)))))
+
+(when (some? config/*lint*)
+  (set! config/*output* (l/lint (spec))))
+
+;;;;;
+;;;;; Implementation
+;;;;;
+
+(config/clj-or-dcj)
 
 (def rock "rock")
 (def paper "paper")
@@ -71,14 +78,11 @@
     (println (str "Round " i ": " (into (sorted-map) m))))
   (println))
 
-(let [input config/*input*
-      _ (:resolution input)
+(when (some? config/*lint*)
+  (let [input config/*input*
       k (:k input)]
 
-  (let [;; Start timer
-        begin (System/nanoTime)
-
-        ;; Create channels
+  (let [;; Create channels
         players<->players
         (u/mesh a/chan (range k))
 
@@ -88,9 +92,8 @@
 
         ;; Link monitor [optional]
         _
-        (if (= config/*lib* :dcj)
-          (let [s (rock-paper-scissors (set (range k)))
-                m (a/monitor s)]
+        (if (= config/*run* :dcj)
+          (let [m (a/monitor (spec))]
             (u/link-mesh players<->players player m)))
 
         ;; Spawn threads
@@ -124,10 +127,6 @@
         ;; Await termination
         output
         (doseq [i (range k)]
-          (a/<!! (nth players i)))
+          (a/<!! (nth players i)))]
 
-        ;; Stop timer
-        end (System/nanoTime)]
-
-    (set! config/*output* output)
-    (set! config/*time* (- end begin))))
+    (set! config/*output* output))))

@@ -3,16 +3,14 @@
             [discourje.core.async]
             [discourje.core.util :as u]
             [discourje.core.spec :as s]
-            [discourje.examples.config :as config]
-            [discourje.examples.timer :as timer]))
+            [discourje.core.lint :as l]
+            [discourje.examples.config :as config]))
 
-(config/clj-or-dcj)
+;;;;;
+;;;;; Specification
+;;;;;
 
-;;;;
-;;;; Specification
-;;;;
-
-(s/defrole ::worker "worker")
+(s/defrole ::worker)
 
 (s/defsession ::ring-unbuffered [k]
   (s/* (s/cat-every [i (range k)]
@@ -22,56 +20,57 @@
   (s/* (s/cat-every [i (range k)]
          (s/-->> Boolean (::worker i) (::worker (mod (inc i) k))))))
 
-;;;;
-;;;; Implementation
-;;;;
+(defn spec []
+  (condp = (:flags config/*input*)
+    #{:unbuffered}
+    (ring-unbuffered (:k config/*input*))
+    #{:buffered}
+    (ring-buffered (:k config/*input*))))
 
-(let [input config/*input*
-      resolution (:resolution input)
-      buffered (:buffered input)
-      secs (:secs input)
-      k (:k input)]
+(when (some? config/*lint*)
+  (set! config/*output* (l/lint (spec))))
 
-  (let [;; Start timer
-        begin (System/nanoTime)
+;;;;;
+;;;;; Implementation
+;;;;;
 
-        ;; Create channels
-        ring
-        (u/ring (if buffered (fn [] (a/chan 1)) a/chan) (range k))
+(config/clj-or-dcj)
 
-        ;; Link monitor [optional]
-        _
-        (if (= config/*lib* :dcj)
-          (let [s (apply (if buffered ring-buffered ring-unbuffered) [k])
-                m (a/monitor s)]
-            (u/link-ring ring worker m)))
+(when (some? config/*run*)
+  (let [input config/*input*
+        flags (:flags input)
+        k (:k input)
+        n (:n input)]
 
-        ;; Spawn threads
-        worker0
-        (a/thread (let [deadline (+ begin (* secs 1000 1000 1000))]
-                    (loop [not-done true
-                           timer (timer/timer resolution)]
-                      (a/>!! (ring 0 1) not-done)
-                      (a/<!! (ring (dec k) 0))
-                      (if not-done
-                        (recur (< (System/nanoTime) deadline) (timer/tick timer))
-                        timer))))
+    (let [;; Create channels
+          ring
+          (cond (contains? flags :unbuffered)
+                (u/ring a/chan (range k))
+                (contains? flags :buffered)
+                (u/ring (partial a/chan 1) (range k)))
 
-        workers'
-        (map (fn [i] (a/thread (loop []
-                                 (let [v (a/<!! (ring (dec i) i))
-                                       _ (a/>!! (ring i (mod (inc i) k)) v)]
-                                   (if v (recur))))))
-             (range 1 k))
+          ;; Link monitor [optional]
+          _
+          (if (= config/*run* :dcj)
+            (let [m (a/monitor (spec))]
+              (u/link-ring ring worker m)))
 
-        ;; Await termination
-        output
-        (do (doseq [worker workers']
-              (a/<!! worker))
-            (timer/report (a/<!! worker0)))
+          ;; Spawn threads
+          worker0
+          (a/thread (doseq [_ (range n)]
+                      (a/>!! (ring 0 1) true)
+                      (a/<!! (ring (dec k) 0))))
 
-        ;; Stop timer
-        end (System/nanoTime)]
+          workers'
+          (mapv (fn [i] (a/thread (doseq [_ (range n)]
+                                    (a/<!! (ring (dec i) i))
+                                    (a/>!! (ring i (mod (inc i) k)) true))))
+                (range 1 k))
 
-    (set! config/*output* output)
-    (set! config/*time* (- end begin))))
+          ;; Await termination
+          output
+          (do (a/<!! worker0)
+              (doseq [worker workers']
+                (a/<!! worker)))]
+
+      (set! config/*output* output))))

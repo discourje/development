@@ -140,6 +140,7 @@ public class Engine {
             out.print(ponder ? " ponder" : "");
             out.print((moves.size() % 2 == 0 ? " wtime " : " btime ") + remainingTime);
             out.print(" movestogo " + remainingTurns);
+            out.print(" movetime " + (remainingTurns > 0 ? remainingTime / remainingTurns : 0));
         }
         out.println();
         out.flush();

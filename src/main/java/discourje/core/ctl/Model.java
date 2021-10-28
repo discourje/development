@@ -6,18 +6,40 @@ import discourje.core.lts.Transitions;
 
 import java.util.*;
 
-import org.apache.commons.math3.util.Pair;
-
 /**
  * The abstract model the is used to check the {@link LTS} using CTL.
  */
 public class Model<Spec> {
 
+    class DmState {
+        discourje.core.lts.State<Spec> s;
+        Action a;
+
+        DmState(discourje.core.lts.State<Spec> s, Action a) {
+            this.s = s;
+            this.a = a;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            DmState that = (DmState) o;
+            return Objects.equals(s, that.s) &&
+                    Objects.equals(a, that.a);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(s, a);
+        }
+    }
+
     private final Collection<State<Spec>> initialStates;
 
     private final Collection<State<Spec>> states = new LinkedHashSet<>();
 
-    private final Map<Pair<discourje.core.lts.State, Action>, State<Spec>> dmStateMap = new HashMap<>();
+    private final Map<DmState, State<Spec>> dmStateMap = new HashMap<>();
 
     private final Collection<Channel> channels = new HashSet<>();
 
@@ -32,10 +54,10 @@ public class Model<Spec> {
                 .forEach(is -> addState(is, null));
         initialStates = new ArrayList<>(states);
 
-        for (discourje.core.lts.State state : lts.getStates()) {
+        for (discourje.core.lts.State<Spec> state : lts.getStates()) {
             Transitions<Spec> transitions = state.getTransitionsOrNull();
             for (Action action : transitions.getActions()) {
-                for (discourje.core.lts.State targetState : transitions.getTargetsOrNull(action)) {
+                for (discourje.core.lts.State<Spec> targetState : transitions.getTargetsOrNull(action)) {
                     addState(targetState, action);
                 }
                 if (action.getSender() != null || action.getReceiver() != null) {
@@ -47,7 +69,7 @@ public class Model<Spec> {
         for (State<Spec> dmState : states) {
             Transitions<Spec> transitions = dmState.getState().getTransitionsOrNull();
             for (Action action : transitions.getActions()) {
-                for (discourje.core.lts.State state : transitions.getTargetsOrNull(action)) {
+                for (discourje.core.lts.State<Spec> state : transitions.getTargetsOrNull(action)) {
                     State<Spec> nextState = findState(state, action);
                     dmState.addNextState(nextState);
                 }
@@ -60,16 +82,16 @@ public class Model<Spec> {
         this.states.addAll(Arrays.asList(states));
     }
 
-    private void addState(discourje.core.lts.State state, Action action) {
-        if (!dmStateMap.containsKey(new Pair<>(state, action))) {
+    private void addState(discourje.core.lts.State<Spec> state, Action action) {
+        if (!dmStateMap.containsKey(new DmState(state, action))) {
             State<Spec> newState = new State<>(state, action, currentActionIndex++);
             states.add(newState);
-            dmStateMap.put(new Pair<>(state, action), newState);
+            dmStateMap.put(new DmState(state, action), newState);
         }
     }
 
-    private State<Spec> findState(discourje.core.lts.State state, Action action) {
-        return dmStateMap.get(new Pair<>(state, action));
+    private State<Spec> findState(discourje.core.lts.State<Spec> state, Action action) {
+        return dmStateMap.get(new DmState(state, action));
     }
 
     public Collection<State<Spec>> getInitialStates() {
