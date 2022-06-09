@@ -16,7 +16,7 @@ Suggested resources to get an overview of Discourje: talk 1 and/or paper 1.
 
 ### Papers
 
-1. Ruben Hamers, Erik Horlings, and Sung-Shik Jongmans. **The Discourje Project: Run-Time Verification of Communication Protocols in Clojure**. International Journal on Software Tools for Technology Transfer (in press).
+1. Ruben Hamers, Erik Horlings, and Sung-Shik Jongmans. **The Discourje Project: Run-Time Verification of Communication Protocols in Clojure**. International Journal on Software Tools for Technology Transfer (in press). [[pdf](https://sungshik.github.io/papers/sttt24.pdf)]
 
 2. Erik Horlings and Sung-Shik Jongmans. **dcj-lint: Analysis of Specifications of Multiparty Sessions.** Proceedings of ESEC/FSE'21. [[link](https://dx.doi.org/10.1145/3468264.3473127), [pdf](https://sungshik.github.io/papers/esecfse2021.pdf)]
 
