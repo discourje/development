@@ -4,15 +4,17 @@ The Discourje project aims to help programmers cope with channels and concurrenc
 
 ## Resources
 
-Suggested resources to get an overview of Discourje: talk 1 and/or paper 1. 
+Suggested resources to get an overview of Discourje: talk 2 and/or paper 1. 
 
 ### Talks
 
-1. Sung-Shik Jongmans. **dcj-lint: Analysis of Specifications of Multiparty Sessions.** ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE), 2021. [[link](https://www.youtube.com/watch?v=f1MgTrxLKeI)]
+1. Sung-Shik Jongmans. **Automated Correctness Analysis for core.async.** Clojure conference in Germany (:clojureD), 2022. [[link](https://www.youtube.com/watch?v=uIcf0rAu5QQ)]
 
-2. Sung-Shik Jongmans. **Discourje: Runtime Verification of Communication Protocols in Clojure.** International Conference on Tools and Algorithms for the Construction and Analysis of Systems (TACAS), 2020. [[link](https://www.morressier.com/o/event/6048becc82fa0a0019cb3048/article/604907f51a80aac83ca25d9e)]
+2. Sung-Shik Jongmans. **dcj-lint: Analysis of Specifications of Multiparty Sessions.** ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE), 2021. [[link](https://www.youtube.com/watch?v=f1MgTrxLKeI)]
 
-3. Ruben Hamers. **Discourje: Automatically validated message exchange patterns in Clojure.** Dutch Clojure Day (DCD), 2019. [[link](https://www.youtube.com/watch?v=Vf6lfrX5caw)]
+3. Sung-Shik Jongmans. **Discourje: Runtime Verification of Communication Protocols in Clojure.** International Conference on Tools and Algorithms for the Construction and Analysis of Systems (TACAS), 2020. [[link](https://www.morressier.com/o/event/6048becc82fa0a0019cb3048/article/604907f51a80aac83ca25d9e)]
+
+4. Ruben Hamers. **Discourje: Automatically validated message exchange patterns in Clojure.** Dutch Clojure Day (DCD), 2019. [[link](https://www.youtube.com/watch?v=Vf6lfrX5caw)]
 
 ### Papers
 
