@@ -1,6 +1,7 @@
 (ns discourje.core.async.channels
   (:require [clojure.core.async :as a]
             [discourje.core.async.buffers :as buffers]
+            [discourje.core.async.deadlocks :as deadlocks]
             [discourje.core.async.monitors :as monitors]
             [discourje.core.spec.ast :as ast]
             [discourje.core.spec.interp :as interp]))
@@ -117,7 +118,13 @@
 (defn- >!!-step1
   [channel]
   {:pre [(channel? channel)]}
-  (a/>!! (.-ch_ghost1 channel) token))
+  (when (.getSender channel)
+    (deadlocks/add-pending! channel)
+    (deadlocks/check))
+  (let [ret (a/>!! (.-ch_ghost1 channel) token)]
+    (when (.getSender channel)
+      (deadlocks/remove-pending!))
+    ret))
 
 (defn- >!!-step2
   [channel message]
@@ -169,9 +176,15 @@
 (defn <!!-step1
   [channel]
   {:pre [(channel? channel)]}
-  (if (.-buffered channel)
-    (a/<!! (.-ch_ghost2 channel))
-    (a/<!! (.-ch_ghost1 channel))))
+  (when (.getReceiver channel)
+    (deadlocks/add-pending! channel)
+    (deadlocks/check))
+  (let [ret (if (.-buffered channel)
+              (a/<!! (.-ch_ghost2 channel))
+              (a/<!! (.-ch_ghost1 channel)))]
+    (when (.getReceiver channel)
+      (deadlocks/remove-pending!))
+    ret))
 
 (defn <!!-step2
   [channel]

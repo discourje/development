@@ -3,18 +3,27 @@
   (:require [clojure.core.async :as a]
             [discourje.core.async.buffers :as buffers]
             [discourje.core.async.channels :as channels]
+            [discourje.core.async.deadlocks :as deadlocks]
             [discourje.core.async.monitors :as monitors]
+            [discourje.core.spec :as s]
             [discourje.core.spec.lts :as lts]))
 
-(defn monitor [spec & {:keys [on-the-fly history]
-                       :or   {on-the-fly true, history false}}]
-  (monitors/monitor (lts/lts spec :on-the-fly on-the-fly :history history)))
+(defn monitor [spec & {:keys [on-the-fly history n]
+                       :or   {on-the-fly true, history false, n -1}}]
+  (deadlocks/set-n! n)
+  (deadlocks/clear-pending!)
+  (monitors/monitor (lts/lts (if (keyword? spec) (s/session spec []) spec)
+                             :on-the-fly on-the-fly
+                             :history history)))
 
 (defn link
   ([channel sender receiver monitor]
    (link channel sender receiver monitor nil))
   ([channel sender receiver monitor options]
-   (channels/link channel sender receiver monitor)))
+   (channels/link channel
+                  (if (string? sender) (s/role sender) sender)
+                  (if (string? receiver) (s/role receiver) receiver)
+                  monitor)))
 
 ;;;;
 ;;;; CORE CONCEPTS: chan, close!
@@ -62,7 +71,12 @@
 
 (defmacro thread
   [& body]
-  (let [clj (macroexpand `(a/thread (try ~@body (catch Exception ~'e (.printStackTrace ~'e)))))]
+  (let [clj (macroexpand
+              `(a/thread
+                 (let [ret# (try ~@body (catch Exception ~'e (.printStackTrace ~'e)))]
+                   (deadlocks/dec-n!)
+                   (deadlocks/check)
+                   ret#)))]
     `(let [c# (chan 1)]
        (a/take! ~clj
                 (fn [x#]
