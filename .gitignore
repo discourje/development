@@ -1,3 +1,6 @@
 target
 .nrepl-port
 **/.DS_Store
+.clj-kondo/.cache
+.lsp/.cache
+.lock

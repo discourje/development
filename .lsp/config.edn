@@ -1,0 +1,2 @@
+{:linters {:clj-kondo {:level :off}
+           :clj-depend {:level :off}}}
