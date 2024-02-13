@@ -4,11 +4,11 @@ The Discourje project aims to help programmers cope with channels and concurrenc
 
 ## Resources
 
-Suggested resources to get an overview of Discourje: talk 2 and/or paper 1. 
+Suggested resources to get an overview of Discourje: talk 2 and/or paper 1.
 
 ### Talks
 
-1. Sung-Shik Jongmans. **Automated Correctness Analysis for core.async.** Dutch Clojure Days (DCD), 2022.
+1. Sung-Shik Jongmans. **Automated Correctness Analysis for core.async.** Dutch Clojure Days (DCD), 2022. [[link](https://www.youtube.com/watch?v=AB0rLLVej6U)]
 
 2. Sung-Shik Jongmans. **Automated Correctness Analysis for core.async.** Clojure conference in Germany (:clojureD), 2022. [[link](https://www.youtube.com/watch?v=uIcf0rAu5QQ)]
 
