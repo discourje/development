@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Leiningen: org.junit.jupiter/junit-jupiter-params:5.7.0">
-    <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/org/junit/jupiter/junit-jupiter-params/5.7.0/junit-jupiter-params-5.7.0.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
