@@ -4,3 +4,4 @@ target
 .clj-kondo/.cache
 .lsp/.cache
 .lock
+.calva
