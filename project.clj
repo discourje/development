@@ -13,6 +13,7 @@ are safe relative to specifications."
   :source-paths ["src/main/clojure"]
   :test-paths ["src/test/clojure" "src/test/java"]
   :java-source-paths ["src/main/java"]
+  :main discourje.examples.main
   :profiles {:examples  {:main         discourje.examples.main
                          :aot          [discourje.core.async
                                         discourje.core.spec

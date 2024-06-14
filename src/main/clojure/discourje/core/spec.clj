@@ -2,6 +2,7 @@
   (:gen-class)
   (:refer-clojure :exclude [if do let loop cat * + apply count empty? disj])
   (:require [clojure.walk :as w]
+            [clojure.set]
             [discourje.core.spec.ast :as ast]))
 
 (require '[discourje.core.spec :as s])

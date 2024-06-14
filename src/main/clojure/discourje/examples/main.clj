@@ -60,6 +60,6 @@
     #(do
        (println "begin")
        (main {:run :dcj}
-             'discourje.examples.micro.star
-             {:flags #{:buffered :outwards}, :k 3, :n 1000})
+             'discourje.examples.games.go-fish
+             {:k 3})
        (println "end")))))
