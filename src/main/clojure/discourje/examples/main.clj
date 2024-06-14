@@ -2,6 +2,7 @@
   (:gen-class)
   (:require [discourje.core.lint :as l]
             [discourje.core.spec.mcrl2 :as mcrl2]
+            [discourje.core.spec.ast :as ast]
             [discourje.examples.config :as config]))
 
 (defn main [settings program input]
@@ -53,4 +54,12 @@
       (.printStackTrace t)
       (println))))
 
-;(apply -main (clojure.string/split "{:run :clj} micro.ring {:flags #{:unbuffered}, :k 3, :n 1000}" #" "))
+(comment
+  (.start
+   (Thread.
+    #(do
+       (println "begin")
+       (main {:run :dcj}
+             'discourje.examples.micro.star
+             {:flags #{:buffered :outwards}, :k 3, :n 1000})
+       (println "end")))))

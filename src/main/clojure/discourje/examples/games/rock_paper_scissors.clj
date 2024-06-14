@@ -93,7 +93,7 @@
         ;; Link monitor [optional]
         _
         (if (= config/*run* :dcj)
-          (let [m (a/monitor (spec))]
+          (let [m (a/monitor (spec) :n k)]
             (u/link-mesh players<->players player m)))
 
         ;; Spawn threads

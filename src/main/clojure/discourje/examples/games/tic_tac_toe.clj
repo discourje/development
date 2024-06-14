@@ -87,7 +87,7 @@
           ;; Link monitor [optional]
           _
           (if (= config/*run* :dcj)
-            (let [m (a/monitor (spec))]
+            (let [m (a/monitor (spec) :n 2)]
               (a/link a->b alice bob m)
               (a/link b->a bob alice m)))
 

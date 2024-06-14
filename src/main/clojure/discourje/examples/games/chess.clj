@@ -51,7 +51,7 @@
           ;; Link monitor [optional]
           _
           (if (= config/*run* :dcj)
-            (let [m (a/monitor (spec))]
+            (let [m (a/monitor (spec) :n 2)]
               (a/link w->b white black m)
               (a/link b->w black white m)))
 

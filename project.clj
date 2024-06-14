@@ -7,7 +7,7 @@ run-time verification library to ensure that channel actions in implementations
 are safe relative to specifications."
 
   :url "https://github.com/discourje"
-  :dependencies [[org.clojure/clojure "1.10.1"]
+  :dependencies [[org.clojure/clojure "1.11.0"]
                  [org.clojure/core.async "0.4.500"]
                  [org.clojure/tools.nrepl "0.2.13"]]
   :source-paths ["src/main/clojure"]

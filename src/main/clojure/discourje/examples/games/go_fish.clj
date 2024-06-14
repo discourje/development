@@ -137,7 +137,7 @@
           ;; Link monitor [optional]
           _
           (if (= config/*run* :dcj)
-            (let [m (a/monitor (spec))]
+            (let [m (a/monitor (spec) :n (+ k 1))]
               (u/link-star dealer<->players dealer player m)
               (u/link-mesh players<->players player m)))
 
