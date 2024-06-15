@@ -45,9 +45,7 @@
                          (::go-fish-turn j player-ids))))))
 
 (defn spec []
-  (go-fish (set (range (:k config/*input*))))
-  ;; (s/session ::go-fish [(set (range (:k config/*input*)))])
-  )
+  (go-fish (set (range (:k config/*input*)))))
 
 (when (some? config/*lint*)
   (set! config/*output* (l/lint (spec))))

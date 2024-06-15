@@ -78,7 +78,7 @@
     (println (str "Round " i ": " (into (sorted-map) m))))
   (println))
 
-(when (some? config/*lint*)
+(when (some? config/*run*)
   (let [input config/*input*
       k (:k input)]
 
