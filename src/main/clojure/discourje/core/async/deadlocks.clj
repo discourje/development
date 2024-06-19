@@ -4,7 +4,6 @@
 
 (defn- runtime-exception []
   (let [message "[SESSION FAILURE] Deadlock!"]
-    (println message)
     (ex-info message {})))
 
 (def ^:private permit 0000)

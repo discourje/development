@@ -1,6 +1,6 @@
-(ns discourje.examples.fm24.example2
+(ns discourje.examples.fm24.example2-dead2
   (:require [clojure.test :refer [deftest]]
-            [discourje.core.async :refer [thread chan >!! <!! alts!! monitor link]]
+            [discourje.core.async :refer :all]
             [discourje.core.spec :as s]))
 
 (s/defrole ::c)
@@ -35,18 +35,18 @@
 (thread ;; Load Balancer
   (let [x (<!! c1)]
     (alts!! [[c4 x]
-             [c5 x]])))
+             [c5 x]]))) ;; BUG
 
 (thread ;; Client
   (>!! c1 5)
   (alts!! [c2 c3]))
 
 (thread ;; Server1
-  (let [x (<!! c2) ;; (<!! c4)
+  (let [x (<!! c4) ;; FIXED
         y (inc x)]
     (>!! c2 y)))
 
 (thread ;; Server2
-  (let [x (<!! c3) ;; (<!! c5)
+  (let [x (<!! c5) ;; FIXED
         y (inc x)]
     (>!! c3 y)))

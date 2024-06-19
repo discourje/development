@@ -1,6 +1,6 @@
-(ns discourje.examples.fm24.example1
+(ns discourje.examples.fm24.example1-dead
   (:require [clojure.test :refer [deftest]]
-            [discourje.core.async :refer [thread chan >!! <!! alts!! monitor link]]
+            [discourje.core.async :refer :all]
             [discourje.core.spec :as s]))
 
 (s/defrole ::buyer1)
@@ -34,7 +34,7 @@
 
 (thread ;; Buyer1
   (>!! c2 "book")
-  (let [x (<!! c5) ;; (<!! c3)
+  (let [x (<!! c3) ;; BUG
         y (/ x 2)]
     (>!! c1 y)))
 
