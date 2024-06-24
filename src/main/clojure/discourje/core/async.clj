@@ -21,8 +21,8 @@
    (link channel sender receiver monitor nil))
   ([channel sender receiver monitor options]
    (channels/link channel
-                  (if (string? sender) (s/role sender) sender)
-                  (if (string? receiver) (s/role receiver) receiver)
+                  (if (or (keyword? sender) (string? sender)) (s/role sender) sender)
+                  (if (or (keyword? receiver) (string? receiver)) (s/role receiver) receiver)
                   monitor)))
 
 ;;;;

@@ -1,21 +1,20 @@
 (ns discourje.examples.fm24.example1-live
-  (:require [clojure.test :refer [deftest]]
-            [discourje.core.async :refer :all]
-            [discourje.core.spec :as s]))
+  (:require [discourje.core.async :refer :all]
+            [discourje.core.spec :refer [defthread defsession -->> --> close alt cat par role]]))
 
-(s/defrole ::buyer1)
-(s/defrole ::buyer2)
-(s/defrole ::seller)
+(defthread :buyer1)
+(defthread :buyer2)
+(defthread :seller)
 
-(s/defsession ::two-buyer []
-  (s/cat
-   (s/-->> String ::buyer1 ::seller)
-   (s/par
-    (s/cat
-     (s/-->> Double ::seller ::buyer1)
-     (s/-->> Double ::buyer1 ::buyer2))
-    (s/-->> Double ::seller ::buyer2))
-   (s/-->> Boolean ::buyer2 ::seller)))
+(defsession :two-buyer []
+  (cat
+   (-->> String :buyer1 :seller)
+   (par
+    (cat
+     (-->> Double :seller :buyer1)
+     (-->> Double :buyer1 :buyer2))
+    (-->> Double :seller :buyer2))
+   (-->> Boolean :buyer2 :seller)))
 
 (def c1 (chan 1))
 (def c2 (chan 1))
@@ -24,13 +23,13 @@
 (def c5 (chan 1))
 (def c6 (chan 1))
 
-(def m (monitor ::two-buyer :n 3))
-(link c1 (s/role ::buyer1) (s/role ::buyer2) m)
-(link c2 (s/role ::buyer1) (s/role ::seller) m)
-(link c3 (s/role ::buyer2) (s/role ::buyer1) m)
-(link c4 (s/role ::buyer2) (s/role ::seller) m)
-(link c5 (s/role ::seller) (s/role ::buyer1) m)
-(link c6 (s/role ::seller) (s/role ::buyer2) m)
+(def m (monitor :two-buyer :n 3))
+(link c1 :buyer1 :buyer2 m)
+(link c2 :buyer1 :seller m)
+(link c3 :buyer2 :buyer1 m)
+(link c4 :buyer2 :seller m)
+(link c5 :seller :buyer1 m)
+(link c6 :seller :buyer2 m)
 
 (thread ;; Buyer1
   (>!! c2 "book")

@@ -89,6 +89,8 @@
                (clojure.core/let [indices (vec indices)]
                  (role k indices)))))))
 
+(def defthread defrole)
+
 (defn defroles [& ks]
   (doseq [k ks] (defrole k)))
 
