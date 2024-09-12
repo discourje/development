@@ -2,6 +2,7 @@
   (:gen-class)
   (:refer-clojure :exclude [if do let loop cat * + apply count empty? disj])
   (:require [clojure.walk :as w]
+            [clojure.set]
             [discourje.core.spec.ast :as ast]))
 
 (require '[discourje.core.spec :as s])
@@ -87,6 +88,8 @@
              (fn [& indices]
                (clojure.core/let [indices (vec indices)]
                  (role k indices)))))))
+
+(def defthread defrole)
 
 (defn defroles [& ks]
   (doseq [k ks] (defrole k)))

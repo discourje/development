@@ -18,14 +18,14 @@
   (getMonitor [])
   (setMonitor [newMonitor]))
 
-(deftype Channel
-  [buffered
-   ch
-   ch-ghost1
-   ch-ghost2
-   ^:volatile-mutable sender
-   ^:volatile-mutable receiver
-   ^:volatile-mutable monitor]
+(deftype Channel [buffered
+                  ch
+                  ch-ghost1
+                  ch-ghost2
+                  ch-mock
+                  ^:volatile-mutable sender
+                  ^:volatile-mutable receiver
+                  ^:volatile-mutable monitor]
 
   MutableSender
   (getSender [_] sender)
@@ -42,13 +42,13 @@
 (defn channel? [x]
   (= (type x) Channel))
 
-(defn- channel [buffered ch ch-ghost1 ch-ghost2]
+(defn- channel [buffered ch ch-ghost1 ch-ghost2 ch-mock]
   {:pre []}
-  (->Channel buffered ch ch-ghost1 ch-ghost2 nil nil nil))
+  (->Channel buffered ch ch-ghost1 ch-ghost2 ch-mock nil nil nil))
 
 (defn unbuffered-channel []
   {:pre []}
-  (channel false (a/chan) (a/chan) nil))
+  (channel false (a/chan) (a/chan) nil (a/chan)))
 
 (defn buffered-channel [buffer]
   {:pre [(buffers/buffer? buffer)]}
@@ -58,7 +58,7 @@
                  :dropping-buffer (a/chan (a/dropping-buffer (buffers/n buffer)))
                  :sliding-buffer (a/chan (a/sliding-buffer (buffers/n buffer)))
                  :promise-buffer (throw (IllegalArgumentException.))))]
-    (channel true (chan buffer) (chan buffer) (chan buffer))))
+    (channel true (chan buffer) (chan buffer) (chan buffer) (chan buffer))))
 
 (defn link [this r1 r2 m]
   {:pre [(channel? this)
@@ -95,7 +95,8 @@
         (do (a/close! (.-ch channel))
             (monitors/lower-flag! (.getMonitor channel))
             (a/close! (.-ch_ghost1 channel))
-            (a/close! (.-ch_ghost2 channel)))
+            (a/close! (.-ch_ghost2 channel))
+            (a/close! (.-ch_mock channel)))
 
         ;; Abort
         (throw result))
@@ -106,7 +107,8 @@
         ;; Commit
         (do (a/close! (.-ch channel))
             (monitors/lower-flag! (.getMonitor channel))
-            (a/close! (.-ch_ghost1 channel)))
+            (a/close! (.-ch_ghost1 channel))
+            (a/close! (.-ch_mock channel)))
 
         ;; Abort
         (throw result)))))
@@ -118,12 +120,7 @@
 (defn- >!!-step1
   [channel]
   {:pre [(channel? channel)]}
-  (when (.getSender channel)
-    (deadlocks/add-pending! channel)
-    (deadlocks/check))
   (let [ret (a/>!! (.-ch_ghost1 channel) token)]
-    (when (.getSender channel)
-      (deadlocks/remove-pending!))
     ret))
 
 (defn- >!!-step2
@@ -170,20 +167,15 @@
 (defn >!!
   [channel message]
   {:pre [(channel? channel)]}
+  (deadlocks/>!!-live (.getMonitor channel) (.-ch_mock channel) token)
   (if (>!!-step1 channel)
     (>!!-step2 channel message)))
 
 (defn <!!-step1
   [channel]
   {:pre [(channel? channel)]}
-  (when (.getReceiver channel)
-    (deadlocks/add-pending! channel)
-    (deadlocks/check))
-  (let [ret (if (.-buffered channel)
-              (a/<!! (.-ch_ghost2 channel))
-              (a/<!! (.-ch_ghost1 channel)))]
-    (when (.getReceiver channel)
-      (deadlocks/remove-pending!))
+  (let [ch-ghost (if (.-buffered channel) (.-ch_ghost2 channel) (.-ch_ghost1 channel))
+        ret (a/<!! ch-ghost)]
     ret))
 
 (defn <!!-step2
@@ -218,6 +210,7 @@
 (defn <!!
   [channel]
   {:pre [(channel? channel)]}
+  (deadlocks/<!!-live (.getMonitor channel) (.-ch_mock channel))
   (if (<!!-step1 channel)
     (<!!-step2 channel)))
 
@@ -233,34 +226,31 @@
 
 ;; TODO: alts!
 
+(defn- alts!!-channel [op]
+  (if (vector? op) (first op) op))
+
 (defn alts!!
-  [alternatives opts]
-  {:pre [(every? #(or (and (vector? %) (= 2 (count %)) (channel? (first %)))
+  [alternatives & {:as opts}]
+  {:pre [(< 0 (count alternatives))
+         (every? #(or (and (vector? %) (= 2 (count %)) (channel? (first %)))
                       (channel? %))
                  alternatives)]}
 
-  (let [ports (mapv #(if (vector? %)
-                       (let [channel (first %)
-                             port (.-ch_ghost1 channel)]
-                         [port token])
-                       (let [channel %
-                             port (if (.-buffered channel)
-                                    (.-ch_ghost2 channel)
-                                    (.-ch_ghost1 channel))]
-                         port))
-                    alternatives)
+  (let [channels (mapv alts!!-channel alternatives)
+        monitor (.getMonitor (first channels))
 
-        [val port] (if (nil? opts)
-                     (a/alts!! ports)
-                     (if (contains? opts :default)
-                       (if (contains? opts :priority)
-                         (a/alts!! ports :default (:default opts) :priority (:priority opts))
-                         (a/alts!! ports :default (:default opts)))
-                       (if (contains? opts :priority)
-                         (a/alts!! ports :priority (:priority opts))
-                         (a/alts!! ports))))
+        ports-mock (mapv #(if (vector? %)
+                            (let [channel (first %)
+                                  port (.-ch_mock channel)]
+                              [port token])
+                            (let [channel %
+                                  port (.-ch_mock channel)]
+                              port))
+                         alternatives)
 
-        alternative (if (= port :default)
+        [val port-mock] (deadlocks/alts!!-live monitor ports-mock opts)
+
+        alternative (if (= port-mock :default)
                       nil
                       (loop [todo alternatives]
                         (if (empty? todo)
@@ -268,22 +258,27 @@
                           (let [alternative (first todo)]
                             (if (vector? alternative)
                               (let [channel (first alternative)]
-                                (if (= port (.-ch_ghost1 channel))
+                                (if (= port-mock (.-ch_mock channel))
                                   alternative
                                   (recur (rest todo))))
                               (let [channel alternative]
-                                (if (= port (if (.-buffered channel)
-                                              (.-ch_ghost2 channel)
-                                              (.-ch_ghost1 channel)))
+                                (if (= port-mock (.-ch_mock channel))
                                   alternative
                                   (recur (rest todo)))))))))]
 
     (if (nil? alternative)
       [val :default]
       (if (vector? alternative)
-        (let [channel (first alternative)]
-          [(>!!-step2 channel (second alternative)) channel])
+
+        ;; Send
+        (let [channel (first alternative)
+              message (second alternative)]
+          (>!!-step1 channel)
+          [(>!!-step2 channel message) channel])
+
+        ;; Receive
         (let [channel alternative]
+          (<!!-step1 channel)
           [(<!!-step2 channel) channel])))))
 
 ;;;;

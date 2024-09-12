@@ -7,12 +7,13 @@ run-time verification library to ensure that channel actions in implementations
 are safe relative to specifications."
 
   :url "https://github.com/discourje"
-  :dependencies [[org.clojure/clojure "1.10.1"]
+  :dependencies [[org.clojure/clojure "1.11.0"]
                  [org.clojure/core.async "0.4.500"]
                  [org.clojure/tools.nrepl "0.2.13"]]
   :source-paths ["src/main/clojure"]
   :test-paths ["src/test/clojure" "src/test/java"]
   :java-source-paths ["src/main/java"]
+  :main discourje.examples.main
   :profiles {:examples  {:main         discourje.examples.main
                          :aot          [discourje.core.async
                                         discourje.core.spec

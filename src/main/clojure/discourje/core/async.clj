@@ -9,20 +9,20 @@
             [discourje.core.spec.lts :as lts]))
 
 (defn monitor [spec & {:keys [on-the-fly history n]
-                       :or   {on-the-fly true, history false, n -1}}]
-  (deadlocks/set-n! n)
-  (deadlocks/clear-pending!)
-  (monitors/monitor (lts/lts (if (keyword? spec) (s/session spec []) spec)
-                             :on-the-fly on-the-fly
-                             :history history)))
+                       :or   {on-the-fly true, history false, n nil}}]
+  (let [spec (if (keyword? spec) (s/session spec []) spec)
+        lts (lts/lts spec :on-the-fly on-the-fly :history history)
+        monitor (monitors/monitor lts)]
+    (deadlocks/create-checker monitor n)
+    monitor))
 
 (defn link
   ([channel sender receiver monitor]
    (link channel sender receiver monitor nil))
   ([channel sender receiver monitor options]
    (channels/link channel
-                  (if (string? sender) (s/role sender) sender)
-                  (if (string? receiver) (s/role receiver) receiver)
+                  (if (or (keyword? sender) (string? sender)) (s/role sender) sender)
+                  (if (or (keyword? receiver) (string? receiver)) (s/role receiver) receiver)
                   monitor)))
 
 ;;;;
@@ -72,15 +72,16 @@
 (defmacro thread
   [& body]
   (let [clj (macroexpand
-              `(a/thread
-                 (let [ret# (try ~@body (catch Exception ~'e (.printStackTrace ~'e)))]
-                   (deadlocks/dec-n!)
-                   (deadlocks/check)
-                   ret#)))]
+             `(a/thread
+                (binding [deadlocks/*thread-name* (gensym)]
+                  (deadlocks/spawn-thread)
+                  (let [ret# (try ~@body (catch Exception ~'e (.printStackTrace ~'e)))]
+                    (deadlocks/kill-thread)
+                    ret#))))]
     `(let [c# (chan 1)]
        (a/take! ~clj
                 (fn [x#]
-                  (if (not (nil? x#))
+                  (when (not (nil? x#))
                     (channels/>!! c# x#))
                   (channels/close! c#)))
        c#)))

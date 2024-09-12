@@ -68,7 +68,7 @@
           ;; Link monitor [optional]
           _
           (if (= config/*run* :dcj)
-            (let [m (a/monitor (spec))]
+            (let [m (a/monitor (spec) :n (+ k 1))]
               (u/link-star star master worker m)))
 
           ;; Spawn threads

@@ -5,3 +5,5 @@ target
 .lsp/.cache
 .lock
 .calva
+.lein-failures
+.lein-repl-history

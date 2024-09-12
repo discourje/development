@@ -78,7 +78,7 @@
     (println (str "Round " i ": " (into (sorted-map) m))))
   (println))
 
-(when (some? config/*lint*)
+(when (some? config/*run*)
   (let [input config/*input*
       k (:k input)]
 
@@ -93,7 +93,7 @@
         ;; Link monitor [optional]
         _
         (if (= config/*run* :dcj)
-          (let [m (a/monitor (spec))]
+          (let [m (a/monitor (spec) :n k)]
             (u/link-mesh players<->players player m)))
 
         ;; Spawn threads
