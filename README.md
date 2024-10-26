@@ -4,7 +4,7 @@ The Discourje project aims to help programmers cope with channels and concurrenc
 
 ## Resources
 
-Suggested resources to get an overview of Discourje: talk 2 and/or paper 1.
+Suggested resources to get an overview of Discourje: talk 2 and/or paper 2.
 
 ### Talks
 
@@ -20,11 +20,13 @@ Suggested resources to get an overview of Discourje: talk 2 and/or paper 1.
 
 ### Papers
 
-1. Ruben Hamers, Erik Horlings, and Sung-Shik Jongmans. **The Discourje Project: Run-Time Verification of Communication Protocols in Clojure**. International Journal on Software Tools for Technology Transfer, 2022. [[link](https://doi.org/10.1007/s10009-022-00674-y), [pdf](https://sungshik.github.io/papers/sttt24.pdf)]
+1. Sung-Shik Jongmans. **Discourje: Run-Time Verification of Communication Protocols in Clojure - Live at Last**. Proceedings of FM'24. [[link](https://doi.org/10.1007/978-3-031-71177-0_11), [pdf](https://sungshik.github.io/papers/fm2024.pdf)]
 
-2. Erik Horlings and Sung-Shik Jongmans. **dcj-lint: Analysis of Specifications of Multiparty Sessions.** Proceedings of ESEC/FSE'21. [[link](https://doi.org/10.1145/3468264.3473127), [pdf](https://sungshik.github.io/papers/esecfse2021.pdf)]
+2. Ruben Hamers, Erik Horlings, and Sung-Shik Jongmans. **The Discourje Project: Run-Time Verification of Communication Protocols in Clojure**. International Journal on Software Tools for Technology Transfer, 2022. [[link](https://doi.org/10.1007/s10009-022-00674-y), [pdf](https://sungshik.github.io/papers/sttt24.pdf)]
 
-3. Ruben Hamers and Sung-Shik Jongmans. **Discourje: Runtime Verification of Communication Protocols in Clojure.** Proceedings of TACAS'20. [[link](https://doi.org/10.1007/978-3-030-45190-5_15), [pdf](https://sungshik.github.io/papers/tacas2020.pdf)]
+3. Erik Horlings and Sung-Shik Jongmans. **dcj-lint: Analysis of Specifications of Multiparty Sessions.** Proceedings of ESEC/FSE'21. [[link](https://doi.org/10.1145/3468264.3473127), [pdf](https://sungshik.github.io/papers/esecfse2021.pdf)]
+
+4. Ruben Hamers and Sung-Shik Jongmans. **Discourje: Runtime Verification of Communication Protocols in Clojure.** Proceedings of TACAS'20. [[link](https://doi.org/10.1007/978-3-030-45190-5_15), [pdf](https://sungshik.github.io/papers/tacas2020.pdf)]
 
 ## Contributors
 
